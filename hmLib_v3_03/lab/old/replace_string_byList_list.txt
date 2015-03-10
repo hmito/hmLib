@@ -1,0 +1,10 @@
+%Name%	add	%AbleName%	addable	%Sign%	+
+%Name%	sub	%AbleName%	subable	%Sign%	-
+%Name%	multiplicate	%AbleName%	multiplicatable	%Sign%	*
+%Name%	divide	%AbleName%	dividable	%Sign%	/
+%Name%	surplus	%AbleName%	surplusable	%Sign%	%
+%Name%	leftshift	%AbleName%	leftshiftable	%Sign%	<<
+%Name%	rightshift	%AbleName%	rightshiftable	%Sign%	>>
+%Name%	and	%AbleName%	andable	%Sign%	&
+%Name%	or	%AbleName%	orable	%Sign%	|
+%Name%	xor	%AbleName%	xorable	%Sign%	^

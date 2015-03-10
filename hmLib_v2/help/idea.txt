@@ -1,0 +1,104 @@
+iteratorベースのグラフ描画機能
+	自動的に値を生成するiteratorが必要
+		example
+			const_add_iterator<double> itr(0,1.);
+			cout<<itr;	//0.
+			++itr;
+			cout<<itr;	//1.
+			++itr;
+			cout<<itr;	//2.
+Com/Gate/flow/streamの整理
+	通信規約によっては、まとめて送る、なんてのもザラ
+		たとえば、頭に送信先とサイズ、データ、最後にチェックサム、など
+		そうなると、flushが付いているstreambufでないと対応できない
+	送受信を一つのstreamでできないのは確定事項
+		別のクラスでComを管理するほかないのは事実
+			ただし、共通した機能は思いつかないから、あくまで名前レベルの共通化？
+			一応規定は作るけど
+		それをComとするならば、Gateの存在価値はなくなる
+	フィルタの概念
+		csvファイル用
+		圧縮、加工用
+	作り手から見たとき
+		実装したい機能
+		=Com側=
+			受信可能	bool empty()
+			送信可能	bool full()
+			受信開始処理	void recv(itfGate* pGate)
+			送信開始処理	void send(itfGate* pGate)
+			受信失敗	bool fail_recv()
+			送信失敗	bool fail_send()
+			受信サイズ	size size_recv()
+			送信サイズ	size size_send()
+
+		=Gate側=
+			送受信先	itfCom*	pCom
+			受信可能	bool empty()
+			送信可能	bool full()
+			*受信場所受入可	bool can_recv(){return true;}
+			*送信場所送出可	bool can_send(){return true;}
+			*受信場所頭取得	virtual char* begin_recv(){return 0;}
+			*送信場所頭取得	virtual char* begin_send(){return 0;}
+			*受信場所尾取得	virtual char* end_recv(){return 0;}
+			*送信場所尾取得	virtual char* end_send(){return 0;}
+			*受信オーバー時	void overflow_recv(char n)=0;
+			*送信オーバー時	char overflow_send()=0:
+			*受信オーバー時	void overflow_recv(char* n,)=0;
+			*送信オーバー時	char overflow_send()=0:
+			*受信場所受入終	void fin_recv(){return;}
+			*送信場所送出終	void fin_send(){return;}
+
+			読込オーバー時	char overflow_read()
+			書込オーバー時	void overflow_write(char c)
+
+			-Type-
+			送信
+			  SimpleType
+				write_Byte	バッファに1byte書込。
+				write_Bytes	バッファにNbyte書込。
+				write_sendByte	バッファに1byte書込＆送信。
+				write_sendBytes	バッファにNbyte書込＆送信。
+				flush_sendBytes	flush実行時に全byte送信。
+				func_sendByte	func実行時に1byte送信。
+				func_sendBytes	func実行時に全byte送信。
+				*auto_sendByte	自動的に1byte送信。
+			  DataType
+				write_dataByte	バッファに1byte書込。特定条件でDatum終了。
+				write_dataBytes	バッファにNbyte書込。特定条件でDatum終了。
+				write_dataDatum	バッファに1data書込＆Datum終了。
+				-flush_sendData	flush実行時に全data送信。
+				-flush_data	flush実行時にDatum終了。
+				func_data	func実行時にDatum終了。
+				func_sendDatum	func実行時に1data送信。
+				func_sendData	func実行時に全data送信。
+				*auto_sendDatum	自動的に1data送信。
+
+			受信
+				read_Byte	バッファから1byte読込。
+				read_Bytes	バッファからNbyte読込。
+				read_Datum	バッファから1data読込。
+				func_readByte	func実行時に1byte受信。
+				func_readBytes	func実行時に全byte受信。
+				func_readDatum	func実行時に1data受信。
+				func_readData	func実行時に全data受信。
+BufGate
+	flush
+	operator()
+DataGate
+	flush
+	operator()
+AutoBufGate;
+AutoDataBufGate;
+			SyncGate
+				同時送受信
+					送信：バッファに入れ、関数を出る前に送信処理実行
+					受信：受信処理を実行し、戻り値で結果を返す
+			AutoGate
+				随時送受信
+					送信：バッファに入れる。バッファを監視している別スレッドが随時送信処理
+					受信：Comを監視している別スレッドが随時バッファに入れる。バッファから任意に取り出し可。
+			FlushGate
+				flush処理時送受信
+					送信：バッファに入れる。flush実行時にまとめて送信処理
+					受信：受信処理実行のみ受信処理実行。
+			

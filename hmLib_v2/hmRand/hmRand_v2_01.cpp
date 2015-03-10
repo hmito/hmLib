@@ -1,0 +1,22 @@
+#ifndef INC_HMLIB_HMRAND_CPP
+#define INC_HMLIB_HMRAND_CPP 201
+#ifndef INC_HMLIB_HMRAND
+#	include "hmLib_v2/hmRand.hpp"
+#endif
+#include <ctime>
+namespace{
+	hmRand Rand(static_cast<uint>(std::time(NULL)));
+}
+namespace hm{
+	int rand(int min,int max){return rand(Rand,min,max);}
+	int rand_32(){return rand_32(Rand);}
+	uint rand_u32(){return rand_u32(Rand);}
+	dlong rand_64(){return rand_64(Rand);}
+	udlong rand_u64(){return rand_u64(Rand);}
+	double randf_ee(double min,double max){return randf_ee(Rand,min,max);}
+	double randf_ue(double min,double max){return randf_ue(Rand,min,max);}
+	double randf_eu(double min,double max){return randf_eu(Rand,min,max);}
+	double randf_uu(double min,double max){return randf_uu(Rand,min,max);}
+	double randNorm(double ave,double var){return randNorm(Rand,ave,var);}
+	}
+#endif

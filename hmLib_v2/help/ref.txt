@@ -1,0 +1,110 @@
+///////////////////////////////////
+hmLib v2_00
+///////////////////////////////////
+hmBasic.h
+	簡易printf関数 fStr,fCharp
+	時間計測用関数 PrcTime等
+	二者択一クラス hm::sel
+hmRand.h
+	クラス型高速メルセンヌツイスタ乱数生成
+	hmRandクラスの宣言により、複数のシード由来の乱数を生成可能
+	シードにこだわらない場合、初期化されたものがhm::randとして存在
+hmMatrix.hpp
+	数列クラスhmSeq<class T>
+	行列クラスhmMatrix<class T>
+	足し引き可能なベクトルクラスに相当
+hmstreambuf.hpp
+	簡易streambuf作成クラス
+	いずれかの型を選び、複数の関数を継承するだけ
+		非バッファ型streambuf hmNBstreambuf	バッファを内部に持たない
+		バッファ型streambuf hmBstreambuf	バッファに読み書きするタイプ
+	ostream,istreamを継承したクラスの別途作成が必要
+gatestream.hpp
+	擬似的にstreamクラスの機能を再現する機能
+	basic_gateを継承し、いくつかの入出力関数を継承してgateのサブクラスを作る
+	gatestreamを宣言し、引数にgateサブクラスを渡すだけで、streamとしての挙動が可能
+flowクラス(csvflow.hpp/bitflow.hpp)
+	特定の形式でstream型でのアクセスが可能なクラス
+	stream以外を保持するflow_<class T>に分類
+	flowの重ね合わせも可能
+	ex.
+		csv形式に直してから、さらにzip圧縮をかけてテキストに出力
+		ofstream ofs("test.txt");
+		csvflow csvf(ofs);
+		zipflow_<csvflow> zipf(csvf);
+fileクラス()
+	flowクラスがstream依存なのに対して、メモリの形で保持するクラス
+	bmpfile,csvfile等
+	ランダムアクセス、同時に読込/書込処理が必要なデータの場合にはこちらが便利
+hmColor/dxColor
+	hmRGB:三原色
+	hmHLS:色相、輝度、彩度
+	hmHSV:色相、彩度、明度
+	dxはdxLib用にhmから継承したクラス
+その他
+	namespace hmstdの登場
+		using namespace hmstd;としても、動作に支障がない群を移動
+		それ以外については、従来どおりnamespace hm内に存在
+		
+		主なhmstd群
+			簡易printf関数		fStr,fCharp
+			時間計測用関数		PrcTime等
+			擬似streamクラス	basic_gate
+			簡易stream生成クラス	hmstreambuf
+			独自streamクラス	gatestream等
+			flowクラス		csvflow等
+			fileクラス		csvfile等
+		主なhm群
+			乱数生成クラス	rand
+			二者択一関数	sel
+			
+	記名法の統一
+		make:新規に作成
+		load:メモリ上からの読み込み
+		open:ファイル上からの読み込み
+		など、複雑だった関数表記を統一
+			
+	dxColorの拡充
+		dxRGB:三原色
+		dxHLS:色相、輝度、彩度
+		dxHSV:色相、彩度、明度
+		の3種類から自由に選択可能
+		いずれのクラス間も互換性あり（dxRGBの引数にdxHLSを入れれる）
+		
+	ColorSetの一新
+		記名法を統一した上で直感に即したHLS型を追加
+		記名法を覚えるだけで、色相から用意に連想可能に
+		ex.
+			彩度-	-輝度-	-色相
+			Soft-	-Dark-	-Red
+			Dim-	-Light-	-Blue
+		従来型の記名法もn-を頭につけた形で存在
+		ex.
+			nRed nLime nSilver
+			
+	複数画像管理クラスの登場:dxGraphs
+		新たに画像からの分割読込が可能に
+		自由な位置に後からの挿入も可能
+		自作文字表示、自作アニメーション表示が用意に実現可能
+	
+	画像編集クラス、dxImGraphの拡充
+		より画像編集に即した関数群に一新
+		パレット画像、透過画像の読み込みや、パレット編集、透過度編集に対応
+		dxGraphからの読込機能を追加
+		特定の色のみ透過度を変える、色相を変えるなどの複雑な処理も可能に
+		
+	描画範囲、描画モード、描画原点の指定の簡易化
+		class dxDArea:スクリーン上の描画範囲指定
+		class dxDMode:描画時の3原色の明度、透過度、描画方法を指定
+		class dxDStdp:描画時の原点位置を指定
+		上記二クラスを使ってdx::setDrawArea,dx::setDrawMode,dx::setDrawStdpで設定可能
+		加算による設定も可能
+			setDrawArea(newArea+oldArea);	//従来の描画位置制限に、さらに新たな描画位置制限も加えて設定
+		
+	描画関数の一新
+		dxObjectシリーズの引数がよりシンプルに
+		描画時に透過以外に加算、減算、積算、反転が選択可能
+		全描画関数はnamespace dx内に移動		
+	
+	hmObjectからposを削減
+		posを関数記述時に設定できるので、より自由な描写が可能

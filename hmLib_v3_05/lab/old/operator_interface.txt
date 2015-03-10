@@ -1,0 +1,631 @@
+		// add +
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_add_interface{
+			private:
+				typedef operator_forward_add_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_add(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator+(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_add(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_add_interface{
+			private:
+				typedef operator_backward_add_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_add(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator+(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_add(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_add_interface{
+			private:
+				typedef operator_equal_add_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_add(const sub_type& s_)const=0;
+			public:
+				friend my_type operator+=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_add(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_add_interface
+			:public operator_forward_add_interface<my_type,sub_type,ans_type>
+			,public operator_backward_add_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_add_interface
+			:public operator_forward_add_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_add(const my_type& m_)const override{return itf_operator_add(m_);}
+				virtual ans_type itf_operator_add(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_addable_interface
+			:public operator_forward_add_interface<my_type,sub_type,my_type>
+			,public operator_equal_add_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_add(const sub_type& s_)const{itf_operator_forward_add(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_addable_interface
+			:public operator_bidirectional_add_interface<my_type,sub_type,my_type>
+			,public operator_equal_add_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_add(const sub_type& s_)const{itf_operator_forward_add(s_);}	
+		};
+		template<typename my_type>
+		struct operator_addable_interface
+			:public operator_add_interface<my_type,my_type>
+			,public operator_equal_add_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_add(const my_type& m_)const{itf_operator_add(m_);}	
+		};		// sub -
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_sub_interface{
+			private:
+				typedef operator_forward_sub_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_sub(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator-(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_sub(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_sub_interface{
+			private:
+				typedef operator_backward_sub_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_sub(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator-(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_sub(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_sub_interface{
+			private:
+				typedef operator_equal_sub_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_sub(const sub_type& s_)const=0;
+			public:
+				friend my_type operator-=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_sub(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_sub_interface
+			:public operator_forward_sub_interface<my_type,sub_type,ans_type>
+			,public operator_backward_sub_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_sub_interface
+			:public operator_forward_sub_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_sub(const my_type& m_)const override{return itf_operator_sub(m_);}
+				virtual ans_type itf_operator_sub(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_subable_interface
+			:public operator_forward_sub_interface<my_type,sub_type,my_type>
+			,public operator_equal_sub_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_sub(const sub_type& s_)const{itf_operator_forward_sub(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_subable_interface
+			:public operator_bidirectional_sub_interface<my_type,sub_type,my_type>
+			,public operator_equal_sub_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_sub(const sub_type& s_)const{itf_operator_forward_sub(s_);}	
+		};
+		template<typename my_type>
+		struct operator_subable_interface
+			:public operator_sub_interface<my_type,my_type>
+			,public operator_equal_sub_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_sub(const my_type& m_)const{itf_operator_sub(m_);}	
+		};		// multiplicate *
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_multiplicate_interface{
+			private:
+				typedef operator_forward_multiplicate_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_multiplicate(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator*(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_multiplicate(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_multiplicate_interface{
+			private:
+				typedef operator_backward_multiplicate_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_multiplicate(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator*(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_multiplicate(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_multiplicate_interface{
+			private:
+				typedef operator_equal_multiplicate_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_multiplicate(const sub_type& s_)const=0;
+			public:
+				friend my_type operator*=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_multiplicate(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_multiplicate_interface
+			:public operator_forward_multiplicate_interface<my_type,sub_type,ans_type>
+			,public operator_backward_multiplicate_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_multiplicate_interface
+			:public operator_forward_multiplicate_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_multiplicate(const my_type& m_)const override{return itf_operator_multiplicate(m_);}
+				virtual ans_type itf_operator_multiplicate(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_multiplicatable_interface
+			:public operator_forward_multiplicate_interface<my_type,sub_type,my_type>
+			,public operator_equal_multiplicate_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_multiplicate(const sub_type& s_)const{itf_operator_forward_multiplicate(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_multiplicatable_interface
+			:public operator_bidirectional_multiplicate_interface<my_type,sub_type,my_type>
+			,public operator_equal_multiplicate_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_multiplicate(const sub_type& s_)const{itf_operator_forward_multiplicate(s_);}	
+		};
+		template<typename my_type>
+		struct operator_multiplicatable_interface
+			:public operator_multiplicate_interface<my_type,my_type>
+			,public operator_equal_multiplicate_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_multiplicate(const my_type& m_)const{itf_operator_multiplicate(m_);}	
+		};		// divide /
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_divide_interface{
+			private:
+				typedef operator_forward_divide_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_divide(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator/(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_divide(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_divide_interface{
+			private:
+				typedef operator_backward_divide_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_divide(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator/(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_divide(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_divide_interface{
+			private:
+				typedef operator_equal_divide_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_divide(const sub_type& s_)const=0;
+			public:
+				friend my_type operator/=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_divide(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_divide_interface
+			:public operator_forward_divide_interface<my_type,sub_type,ans_type>
+			,public operator_backward_divide_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_divide_interface
+			:public operator_forward_divide_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_divide(const my_type& m_)const override{return itf_operator_divide(m_);}
+				virtual ans_type itf_operator_divide(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_dividable_interface
+			:public operator_forward_divide_interface<my_type,sub_type,my_type>
+			,public operator_equal_divide_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_divide(const sub_type& s_)const{itf_operator_forward_divide(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_dividable_interface
+			:public operator_bidirectional_divide_interface<my_type,sub_type,my_type>
+			,public operator_equal_divide_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_divide(const sub_type& s_)const{itf_operator_forward_divide(s_);}	
+		};
+		template<typename my_type>
+		struct operator_dividable_interface
+			:public operator_divide_interface<my_type,my_type>
+			,public operator_equal_divide_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_divide(const my_type& m_)const{itf_operator_divide(m_);}	
+		};		// surplus %
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_surplus_interface{
+			private:
+				typedef operator_forward_surplus_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_surplus(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator%(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_surplus(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_surplus_interface{
+			private:
+				typedef operator_backward_surplus_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_surplus(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator%(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_surplus(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_surplus_interface{
+			private:
+				typedef operator_equal_surplus_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_surplus(const sub_type& s_)const=0;
+			public:
+				friend my_type operator%=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_surplus(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_surplus_interface
+			:public operator_forward_surplus_interface<my_type,sub_type,ans_type>
+			,public operator_backward_surplus_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_surplus_interface
+			:public operator_forward_surplus_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_surplus(const my_type& m_)const override{return itf_operator_surplus(m_);}
+				virtual ans_type itf_operator_surplus(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_surplusable_interface
+			:public operator_forward_surplus_interface<my_type,sub_type,my_type>
+			,public operator_equal_surplus_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_surplus(const sub_type& s_)const{itf_operator_forward_surplus(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_surplusable_interface
+			:public operator_bidirectional_surplus_interface<my_type,sub_type,my_type>
+			,public operator_equal_surplus_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_surplus(const sub_type& s_)const{itf_operator_forward_surplus(s_);}	
+		};
+		template<typename my_type>
+		struct operator_surplusable_interface
+			:public operator_surplus_interface<my_type,my_type>
+			,public operator_equal_surplus_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_surplus(const my_type& m_)const{itf_operator_surplus(m_);}	
+		};		// leftshift <<
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_leftshift_interface{
+			private:
+				typedef operator_forward_leftshift_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_leftshift(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator<<(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_leftshift(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_leftshift_interface{
+			private:
+				typedef operator_backward_leftshift_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_leftshift(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator<<(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_leftshift(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_leftshift_interface{
+			private:
+				typedef operator_equal_leftshift_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_leftshift(const sub_type& s_)const=0;
+			public:
+				friend my_type operator<<=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_leftshift(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_leftshift_interface
+			:public operator_forward_leftshift_interface<my_type,sub_type,ans_type>
+			,public operator_backward_leftshift_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_leftshift_interface
+			:public operator_forward_leftshift_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_leftshift(const my_type& m_)const override{return itf_operator_leftshift(m_);}
+				virtual ans_type itf_operator_leftshift(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_leftshiftable_interface
+			:public operator_forward_leftshift_interface<my_type,sub_type,my_type>
+			,public operator_equal_leftshift_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_leftshift(const sub_type& s_)const{itf_operator_forward_leftshift(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_leftshiftable_interface
+			:public operator_bidirectional_leftshift_interface<my_type,sub_type,my_type>
+			,public operator_equal_leftshift_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_leftshift(const sub_type& s_)const{itf_operator_forward_leftshift(s_);}	
+		};
+		template<typename my_type>
+		struct operator_leftshiftable_interface
+			:public operator_leftshift_interface<my_type,my_type>
+			,public operator_equal_leftshift_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_leftshift(const my_type& m_)const{itf_operator_leftshift(m_);}	
+		};		// rightshift >>
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_rightshift_interface{
+			private:
+				typedef operator_forward_rightshift_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_rightshift(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator>>(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_rightshift(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_rightshift_interface{
+			private:
+				typedef operator_backward_rightshift_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_rightshift(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator>>(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_rightshift(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_rightshift_interface{
+			private:
+				typedef operator_equal_rightshift_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_rightshift(const sub_type& s_)const=0;
+			public:
+				friend my_type operator>>=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_rightshift(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_rightshift_interface
+			:public operator_forward_rightshift_interface<my_type,sub_type,ans_type>
+			,public operator_backward_rightshift_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_rightshift_interface
+			:public operator_forward_rightshift_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_rightshift(const my_type& m_)const override{return itf_operator_rightshift(m_);}
+				virtual ans_type itf_operator_rightshift(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_rightshiftable_interface
+			:public operator_forward_rightshift_interface<my_type,sub_type,my_type>
+			,public operator_equal_rightshift_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_rightshift(const sub_type& s_)const{itf_operator_forward_rightshift(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_rightshiftable_interface
+			:public operator_bidirectional_rightshift_interface<my_type,sub_type,my_type>
+			,public operator_equal_rightshift_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_rightshift(const sub_type& s_)const{itf_operator_forward_rightshift(s_);}	
+		};
+		template<typename my_type>
+		struct operator_rightshiftable_interface
+			:public operator_rightshift_interface<my_type,my_type>
+			,public operator_equal_rightshift_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_rightshift(const my_type& m_)const{itf_operator_rightshift(m_);}	
+		};		// and &
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_and_interface{
+			private:
+				typedef operator_forward_and_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_and(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator&(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_and(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_and_interface{
+			private:
+				typedef operator_backward_and_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_and(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator&(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_and(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_and_interface{
+			private:
+				typedef operator_equal_and_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_and(const sub_type& s_)const=0;
+			public:
+				friend my_type operator&=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_and(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_and_interface
+			:public operator_forward_and_interface<my_type,sub_type,ans_type>
+			,public operator_backward_and_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_and_interface
+			:public operator_forward_and_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_and(const my_type& m_)const override{return itf_operator_and(m_);}
+				virtual ans_type itf_operator_and(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_andable_interface
+			:public operator_forward_and_interface<my_type,sub_type,my_type>
+			,public operator_equal_and_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_and(const sub_type& s_)const{itf_operator_forward_and(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_andable_interface
+			:public operator_bidirectional_and_interface<my_type,sub_type,my_type>
+			,public operator_equal_and_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_and(const sub_type& s_)const{itf_operator_forward_and(s_);}	
+		};
+		template<typename my_type>
+		struct operator_andable_interface
+			:public operator_and_interface<my_type,my_type>
+			,public operator_equal_and_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_and(const my_type& m_)const{itf_operator_and(m_);}	
+		};		// or |
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_or_interface{
+			private:
+				typedef operator_forward_or_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_or(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator|(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_or(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_or_interface{
+			private:
+				typedef operator_backward_or_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_or(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator|(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_or(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_or_interface{
+			private:
+				typedef operator_equal_or_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_or(const sub_type& s_)const=0;
+			public:
+				friend my_type operator|=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_or(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_or_interface
+			:public operator_forward_or_interface<my_type,sub_type,ans_type>
+			,public operator_backward_or_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_or_interface
+			:public operator_forward_or_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_or(const my_type& m_)const override{return itf_operator_or(m_);}
+				virtual ans_type itf_operator_or(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_orable_interface
+			:public operator_forward_or_interface<my_type,sub_type,my_type>
+			,public operator_equal_or_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_or(const sub_type& s_)const{itf_operator_forward_or(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_orable_interface
+			:public operator_bidirectional_or_interface<my_type,sub_type,my_type>
+			,public operator_equal_or_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_or(const sub_type& s_)const{itf_operator_forward_or(s_);}	
+		};
+		template<typename my_type>
+		struct operator_orable_interface
+			:public operator_or_interface<my_type,my_type>
+			,public operator_equal_or_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_or(const my_type& m_)const{itf_operator_or(m_);}	
+		};		// xor ^
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_forward_xor_interface{
+			private:
+				typedef operator_forward_xor_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_forward_xor(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator^(const my_type& m_,const sub_type& s_){return static_cast<const this_type&>(m_).itf_operator_forward_xor(s_);}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_backward_xor_interface{
+			private:
+				typedef operator_backward_xor_interface<my_type,sub_type,ans_type> this_type;
+			protected:
+				virtual ans_type itf_operator_equal_xor(const sub_type& s_)const=0;
+			public:
+				friend ans_type operator^(const sub_type& s_,const my_type& m_){return static_cast<const this_type&>(m_).itf_operator_backward_xor(s_);}
+		};
+		template<typename my_type,typename sub_type>
+		struct operator_equal_xor_interface{
+			private:
+				typedef operator_equal_xor_interface<my_type,sub_type> this_type;
+			protected:
+				virtual void itf_operator_equal_xor(const sub_type& s_)const=0;
+			public:
+				friend my_type operator^=(const my_type& m_,const sub_type& s_){
+					static_cast<const this_type&>(m_).itf_operator_equal_xor(s_);
+					return m_;
+				}
+		};
+		template<typename my_type,typename sub_type,typename ans_type>
+		struct operator_bidirectional_xor_interface
+			:public operator_forward_xor_interface<my_type,sub_type,ans_type>
+			,public operator_backward_xor_interface<my_type,sub_type,ans_type>{
+		};
+		template<typename my_type,typename ans_type>
+		struct operator_xor_interface
+			:public operator_forward_xor_interface<my_type,my_type,ans_type>{
+			protected:
+				virtual ans_type itf_operator_forward_xor(const my_type& m_)const override{return itf_operator_xor(m_);}
+				virtual ans_type itf_operator_xor(const my_type& m_)const=0;	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_forward_xorable_interface
+			:public operator_forward_xor_interface<my_type,sub_type,my_type>
+			,public operator_equal_xor_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_xor(const sub_type& s_)const{itf_operator_forward_xor(s_);}	
+		};
+		template<typename my_type, typename sub_type>
+		struct operator_bidirectional_xorable_interface
+			:public operator_bidirectional_xor_interface<my_type,sub_type,my_type>
+			,public operator_equal_xor_interface<my_type,sub_type>{
+			protected:
+				virtual void itf_operator_equal_xor(const sub_type& s_)const{itf_operator_forward_xor(s_);}	
+		};
+		template<typename my_type>
+		struct operator_xorable_interface
+			:public operator_xor_interface<my_type,my_type>
+			,public operator_equal_xor_interface<my_type,my_type>{
+			protected:
+				virtual void itf_operator_equal_xor(const my_type& m_)const{itf_operator_xor(m_);}	
+		};

@@ -1,0 +1,52 @@
+===Object概念===
+オブジェクトとは・・・
+	dxBasic標準描画関数をオブジェクト指向に基づいて利用した、描画用クラス群。
+	標準描画関数の機能はもちろん、変数を保持できるため、複雑な描画が可能。
+	dxObject.hpp関連ファイルの機能の使用には、オブジェクトを使う必要がある。
+基底オブジェクトとは・・・
+	厳密な定義はないが、dxoを使用せずすべてdx::によって描画するもの
+	あるいは、描画の基本となる部品レベルのオブジェクト
+	hmLibによっておおよその基底オブジェクトは提供されているため、使う機会は少ない（はず）。
+実体とは・・・
+	描画範囲を事前に保持可能であること
+	具体的には、hmoObjectが持つ関数を使用可能であること
+内的/外的とは・・・
+	オブジェクトメンバ関数によって具体的に描画内容が指定されているものが内的
+	class dxFnによって描画内容を指定し、オブジェクトに挿入するものが外的
+
+基底となるオブジェクト
+dxBasicObject
+実体のある基底オブジェクト
+dxObject
+実体のない基底オブジェクト
+dxSubObject
+
+実体のない、内的オブジェクト
+dxImObject	仮想オブジェクト
+実体のある、内的オブジェクト
+dxReObject	実体オブジェクト
+実体のない、外的オブジェクト
+dxFnObject	関数オブジェクト
+実体のある、外的オブジェクト
+dxArObject	エリアオブジェクト
+
+dxArObjectのhmoBox型拡張クラス
+	dxAreaシリーズ
+
+//Example
+class dxFn{
+public:
+	virtual int fndraw(dxO& dxo)=0;
+};
+class dxfTest:public dxFn{
+public:
+	virtual int fndraw(dxO& dxo){
+		dxo.draw(Pint(0,0),dxoPixel(CLR::Red));
+		return 0;
+	}
+}
+dxfTest fTest;
+
+dxFnObject oFn(fTest);
+dx::draw(Pint(100,100),oFn);
+//dx::draw(Pint(100,100),dxFnObject(fTest));

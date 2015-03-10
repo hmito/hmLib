@@ -1,0 +1,6 @@
+DataBufGate
+	Dataの改行方法
+	・手動
+	・条件（毎回、終了時）ファンクタ(template問題)
+AutoBufGate
+	hmBufGateシリーズの、thread化

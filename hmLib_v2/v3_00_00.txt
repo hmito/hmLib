@@ -1,0 +1,161 @@
+array_v1_04.hpp
+	固定長配列用コンテナ
+	iterator,size等が使用可能なただの配列
+bitfunc_v1_00.hpp
+	hmBasic後継ファイルの一つ
+	bit演算用関数群
+	bittest:指定bitの値取得
+	bitput:指定bitを指定の値に
+	bitset:指定bitをon
+	bitclear:指定bitをoff
+	bitxor:指定bitをxor
+chain_v1_00.hpp
+	list型高速割当コンテナ
+	位置を選ばない頻繁なinsert&eraseが必要な場合に有効
+	listとの相違点は、
+		newとdeleteのタイミングがinsert,eraseと異なる
+			あらかじめまとめて確保&削除してもメモリを再利用
+		chainの一部を別のchainに委ねることができない
+			確保位置を配列単位で管理しているので、全て統合する以外に移管する方法がない
+circular_v1_00.hpp
+	循環バッファ用コンテナ
+		bicircular
+			前後から挿入、削除ができるタイプ
+		circular
+			後込め、先出し式循環バッファ
+		circular_stack
+			先込め、先出し式循環バッファ
+comgate_v1_00.hpp
+	RS232c型シリアル通信用gateクラス
+gate_v1_00.hpp
+	入出力管理用クラス
+	プログラム外部との通信の出入り口を管理する
+	gatestreamを使うことで、streamクラス化可能
+hmAlgorithm_v1_00.hpp
+	hmBasic後継ファイルの一つ
+	数値algorithm関数群
+		sort_swap 2,3変数のソート
+		max,med,min 3変数の各順位取り出し
+		positive_mod 負を出さない余り 正数の間でループ
+		sel 条件式の真偽で戻り値が変わる関数
+		hm::rourette weight_acsで重みづけしたルーレット選択
+hmAlign_v1_02.hpp
+	方向を示すクラス、4方向align_quad、8方向align_octa
+	hm::aliq内の変数を使って、位置指定可能
+	※basic_operator使用　要改修
+hmBody_v1_00.hpp
+	2次元図形を制御するクラス
+	図形間の距離、重なり、点や線などを含むか、交わるかなどを計算可能
+hmBufGate_v1_03.hpp
+	他のGateのバッファとして機能するGate
+		有限バッファクラス BufGate
+		無限バッファクラス InfBufGate
+	※gateとして要改修
+hmColor_v1_01.hpp
+	色関係制御用クラス
+		class RGBColor;	//RGB型カラー	r:赤強度 g:緑強度 b:青強度 を指定
+		class HSVColor;	//HSV型カラー	hue:色相 sat:彩度 vlu:強度 を指定
+		class HLSColor;	//HLS型カラー	hue:色相 lgt:彩度 sat:明度 を指定
+		class RGBAColor;//RGB型カラー	r:赤強度 g:緑強度 b:青強度 a:透過度 を指定
+		class HSVAColor;//HSV型カラー	hue:色相 sat:彩度 vlu:強度 a:透過度 を指定
+		class HLSAColor;//HLS型カラー	hue:色相 lgt:彩度 sat:明度 a:透過度 を指定
+hmDebug_v1_01.h/cpp
+	debug時用便利ツール
+		debug窓に出力するostream hm::debugout
+		debug時のみ出力するflow hm::debugflow
+		debug時のみ出力するcout hm::debug_cout
+		debug時のみ出力するfstream hm::debug_fout
+	※basic_streambuf使用　要改修
+hmDir_v1_02.h/cpp
+	ディレクトリ制御用クラス hm::Directory
+		フォルダの生成、削除や、移動が簡単に可能
+		現在の作業場所をsetCurrentDirectory,getCurrentDirectoryで設定可能
+hmIterator_v1_00.hpp
+	algorithm.hppの後継ファイル
+		self_iteraotr
+			参照が自身(itretorとして)を返すiterator
+		acs_iterator
+			Accessorを通じて、iteratorの中身のさす要素にアクセスするiterator
+			Accessorは、あるクラスを引数に、そのメンバ変数を戻り値とするようなファンクタ
+	※basic_operator使用　要改修
+hmPos_v3_02.hpp
+	二次元上の位置x,yへアクセス可能なクラス
+	hmLib_v3に対応
+	クラス名をhmPointからhm::PPositionへ変更
+		Pointの名義は、pointorと紛らわしいため
+		hm::SPositionを3次元用とする予定
+	defaultのstd::ostream用出力形式を定義"(x,y)"
+hmPrcTime_v1_00.hpp
+	hmBasic後継ファイルの一つ
+	時間制御関数群
+		プロセスタイムを取得
+		inline u_int prctime();
+		ストップウォッチを動かす Bufを変えることで、異なるストップウォッチとなる。
+		inline u_int stopwatch(u_int &Buf);
+		一時停止用関数
+		inline void delay(u_int ms);
+hmRand_v2_05.h/cpp
+	includeファイルをv3_00_00へ適合
+	クラス名をhm::Randに変更
+	標準Randインスタンス、GlbRandを追加
+		getGlbRandは廃止
+hmRect_v1_02.hpp
+	二点を保持する、長方形型クラス
+		&,|で、範囲の共通部分を出すことが可能
+hmStr_v1_00.h/cpp
+	hmLib_v3の規約に適合。
+	文字列変換関数群
+		書式文字列を文字列に変換するtoStr,toCStr
+		オブジェクトを文字列に変換するcast_str,cast_cstr
+hmTask_v1_00.hpp
+	TaskSystemを再現するクラス hmTask
+		複層タスク
+			createChild/releaseChild関数で、子タスクの制御可能
+		優先度付実行機能
+			Priorityを設定することで、優先実行順位を決定可能
+		条件削除機能
+			Priorityの幅と、登録したTask自体の2方法で削除可能
+		自己終了機能
+			自身の終了もexit関数で親タスクへ通告可能
+		姉妹タスク作成
+			自身の姉妹タスクとなるタスク作成を、親タスクに要求可能
+		スリープ機能
+			sleep関数で、指定回数だけ関数の実行をスキップ
+	※basic_iterator使用　要改修
+hmTime_v1_02.hpp
+	hmLib_v3に対応
+	ms単位まで保持するシステム時間用クラスhmTime
+	hmTimeを日時型へに変換する日付クラスhmDate
+hmType_v1_00.hpp
+	hmBasic後継ファイルの一つ
+	環境非依存のタイプが使用可能
+		プレフィックス
+			s_ signed
+			u_ unsigned
+			f_ float
+		typename
+			byte 8bit
+			short 16bit
+			int 32bit
+			long 64bit
+			llong 128bit
+			float 32bit
+			double 64bit
+			ldouble 128bit
+	PIの宣言
+	使用には、環境の型サイズを記録したhmTypeSize.hppが必要
+		make_hmTypeSize.c(exeファイル有)の実行で自動生成可能
+iologate_vX
+	※hmLibv3未対応
+iterator_ghost_v1_00.hpp
+	仮想的に引数として入れられたiteratorとしてふるまう、iteratorの代役
+	virtual宣言したいけどiteratorを使いたい場合に使用可能
+	通常のtemplate<iterator>に比べて、3～4倍ほど遅い
+iterator_pattern_v1_00.hpp
+	iteratorをお手軽に作成できるひな形クラス
+operator_pattern_v1_00.hpp
+	operatorをお手軽に作成できるひな形クラス
+streambuf_pattern_v1_00.hpp
+	streambufをお手軽に作成できるひな形クラス
+	basic_buf_streambuf : バッファ付ストリームバッファ基底クラス
+	basic_nonbuf_streambuf : バッファ無ストリームバッファ基底クラス
