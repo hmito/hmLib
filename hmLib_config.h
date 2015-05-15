@@ -1,13 +1,23 @@
 #ifndef HMLIB_CONFIG_INC
 #define HMLIB_CONFIG_INC
 
-//バージョン情報を表示したい場合は、以下を変更する。0:非表示、1:警告表示、2:注意表示、3:情報表示、4:全表示
+//Define the output level at the compile of hmLib library files.
+//	0: Nothing are output.
+//	1: Only Error information are output.
+//	2: Both Error and Warning information are output.
+//	3: Error, Warning and noted information are output.
+//	4: All information are output.
 #define HMLIB_OUT 4
 
-//ライブラリファイルを使わずにソースファイルをコンパイルしてリンクする場合は、以下を有効にする
+//Enable if the compiled library files rather than default library files are needed.
+//	In enable case, all macros link to default lib files are disabled.
 #define HMLIB_NOLIB
 
-//byte数の指定
+//Enable if you want to use macros write without "hmLib_" prefix, e.g. write hmLib_??? as just ???.
+//	In enable case, all macros with "hmLib_" prefix are redefined that without the prefix.
+//#define HMLIB_NOPREFIX
+
+//Define the byte size of each types in this environment.
 #define HMLIB_TYPE_SIZE_CHAR 1
 #define HMLIB_TYPE_SIZE_SHORT 2
 #define HMLIB_TYPE_SIZE_INT 4
@@ -16,7 +26,5 @@
 #define HMLIB_TYPE_SIZE_FLOAT 4
 #define HMLIB_TYPE_SIZE_DOUBLE 8
 #define HMLIB_TYPE_SIZE_LONG_DOUBLE 8
-
-//#define HMLIB_TYPE_NOPREFIX
 
 #endif
