@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>
+    <RootNamespace>hmLib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\hmLib\algorithm.hpp" />
+    <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
+    <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\cdeque.h" />
+    <ClInclude Include="..\..\..\hmLib\color.hpp" />
+    <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\config_vc.h" />
+    <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
+    <ClInclude Include="..\..\..\hmLib\cqueue.h" />
+    <ClInclude Include="..\..\..\hmLib\cstack.h" />
+    <ClInclude Include="..\..\..\hmLib\cstring.h" />
+    <ClInclude Include="..\..\..\hmLib\date.hpp" />
+    <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
+    <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
+    <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
+    <ClInclude Include="..\..\..\hmLib\gate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\gate_exceptions.hpp" />
+    <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
+    <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
+    <ClInclude Include="..\..\..\hmLib\position.hpp" />
+    <ClInclude Include="..\..\..\hmLib\random.hpp" />
+    <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />
+    <ClInclude Include="..\..\..\hmLib\signals.hpp" />
+    <ClInclude Include="..\..\..\hmLib\streambuf_interface.hpp" />
+    <ClInclude Include="..\..\..\hmLib\stream_utility.hpp" />
+    <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
+    <ClInclude Include="..\..\..\hmLib\utility.hpp" />
+    <ClInclude Include="..\..\..\hmLib\version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\hmLib\cdeque.c" />
+    <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
+    <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
+    <ClCompile Include="..\..\..\hmLib\cqueue.c" />
+    <ClCompile Include="..\..\..\hmLib\cstack.c" />
+    <ClCompile Include="..\..\..\hmLib\cstring.c" />
+    <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
+    <ClCompile Include="..\..\..\hmLib\random.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
