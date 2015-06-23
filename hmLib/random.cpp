@@ -9,7 +9,7 @@ random:v2_07/130709 hmIto
 random:v2_06/121128 hmIto
 	Šg’£q‚ğh‚©‚çhpp‚É•ÏXB
 */
-#include<hmLib_v3_06/random/random_engine.cpp>
-#include<hmLib_v3_06/random/random_bit.cpp>
+#include<hmLib/random/random_engine.cpp>
+#include<hmLib/random/random_bit.cpp>
 #
 #endif

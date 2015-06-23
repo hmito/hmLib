@@ -2,7 +2,7 @@
 #define HMLIB_PROPERTIES_MUTEXLOCKMIXIN_INC 100
 #
 #ifndef HMLIB_MUTEXPROXY_INC
-#	include<hmLib_v3_06/mutex_proxy.hpp>
+#	include<hmLib/mutex_proxy.hpp>
 #endif
 namespace hmLib {
 	namespace properties {

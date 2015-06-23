@@ -8,7 +8,7 @@ v1_00/140329 hmIto
 çÏê¨
 */
 #ifndef HMLIB_FIXEDVECTOR_INC
-#	include<hmLib_v3_06/lab/fixed_vector.hpp>
+#	include<hmLib/lab/fixed_vector.hpp>
 #endif
 namespace hmLib {
 	template<typename T>

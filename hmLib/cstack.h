@@ -24,16 +24,16 @@ cstack:v1_02/130105 hmIto
 */
 //#undef __cplusplus
 #ifndef HMLIB_CDEQUE_INC
-#	include <hmLib_v3_06/cdeque.h>
+#	include <hmLib/cdeque.h>
 #endif
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_CSTACK_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/cstack.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/cstack.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/cstack.lib")
+#		pragma comment(lib,"hmLib/lib/Release/cstack.lib")
 #	endif
 #endif
 typedef hmLib_cdeque_iterator hmLib_cstack_iterator;

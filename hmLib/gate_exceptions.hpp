@@ -8,7 +8,7 @@ gate_exceptions v1_00/130422 hmIto
 	gate_opend_exception‚Ægate_not_opened_exception‚ð’Ç‰Á
 */
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib_v3_06/exceptions.hpp>
+#	include<hmLib/exceptions.hpp>
 #endif
 namespace hmLib{
 

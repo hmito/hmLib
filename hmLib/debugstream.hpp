@@ -12,15 +12,15 @@ debugstream v1_01/130328 hmIto
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_DEBUGSTREAM_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/debugstream.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/debugstream.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/debugstream.lib")
+#		pragma comment(lib,"hmLib/lib/Release/debugstream.lib")
 #	endif
 #endif
 #include <windows.h>
 #include <iostream>
 #ifndef HMLIB_STREAMBUFINTERFACE_INC
-#	include <hmLib_v3_06/streambuf_interface.hpp>
+#	include <hmLib/streambuf_interface.hpp>
 #endif
 
 

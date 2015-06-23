@@ -8,7 +8,7 @@ v1_00/131004 hmIto
 	small_step–@, “ñ•ª–@‚ð’Ç‰Á
 */
 #include<utility>
-//#include<hmLib_v3_06/parameter.hpp>
+//#include<hmLib/parameter.hpp>
 namespace hmLib{
 	namespace numerical{
 		template<typename dFn_d>

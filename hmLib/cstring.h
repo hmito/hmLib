@@ -37,16 +37,16 @@ cstring:v1_00/121013 hmIto
 	cstringを作成
 */
 #ifndef HMLIB_TYPE_INC
-#	include <hmLib_v3_06/type.h>
+#	include <hmLib/type.h>
 #endif
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"
 #endif
 #ifndef HMLIB_NOLIB
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/cstring.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/cstring.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/cstring.lib")
+#		pragma comment(lib,"hmLib/lib/Release/cstring.lib")
 #	endif
 #endif
 typedef hmLib_uint16 hmLib_cstring_size_t;

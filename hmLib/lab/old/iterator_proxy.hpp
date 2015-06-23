@@ -5,10 +5,10 @@
 #include<boost/iterator/iterator_facade.hpp>
 #include<boost/pool/object_pool.hpp>
 #ifndef HMLIB_ITERATORINTERFACE_INC
-#	include<hmLib_v3_06/iterator_interface.hpp>
+#	include<hmLib/iterator_interface.hpp>
 #endif
 #ifndef HMLIB_OBJECTINTERFACE_INC
-#	include<hmLib_v3_06/object_interface.hpp>
+#	include<hmLib/object_interface.hpp>
 #endif
 namespace hmLib{
 	namespace proxy{

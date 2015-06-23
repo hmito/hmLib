@@ -21,7 +21,7 @@ v1_01/140408 hmIto
 	その他、全体的にコメント追加
 */
 #include<memory>
-#include<hmLib_v3_06/lab/rvalue_reference.hpp>
+#include<hmLib/lab/rvalue_reference.hpp>
 #include"unique_ptr.hpp"
 #include"default_deleter.hpp"
 namespace hmLib {

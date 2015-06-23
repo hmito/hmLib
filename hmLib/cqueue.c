@@ -2,7 +2,7 @@
 #define HMLIB_CQUEUE_C_INC 200
 #
 #ifndef HMLIB_CQUEUE_INC
-#	include <hmLib_v3_06/cqueue.h>
+#	include <hmLib/cqueue.h>
 #endif
 #ifdef __cplusplus
 extern "C"{

@@ -2,7 +2,7 @@
 #define HMLIB_CDEQUE_C_INC 200
 #
 #ifndef HMLIB_CDEQUE_INC
-#	include <hmLib_v3_06/cdeque.h>
+#	include <hmLib/cdeque.h>
 #endif
 #ifdef __cplusplus
 extern "C"{

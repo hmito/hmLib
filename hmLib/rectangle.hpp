@@ -1,7 +1,7 @@
 #ifndef HMLIB_RECTANGLE_INC
 #define HMLIB_RECTANGLE_INC 100
 #ifndef HMLIB_POSITION_INC
-#	include <hmLib_v3_06/position.hpp>
+#	include <hmLib/position.hpp>
 #endif
 namespace hmLib{
 	template<class T>

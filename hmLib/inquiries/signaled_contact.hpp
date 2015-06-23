@@ -10,10 +10,10 @@ inquiries::signaled_contact v1_00/130421 hmIto
 #include<mutex>
 #include<boost/signals2.hpp>
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib_v3_06/exceptions.hpp>
+#	include<hmLib/exceptions.hpp>
 #endif
 #ifndef HMLIB_SIGNALS_INC
-#	include<hmLib_v3_06/signals.hpp>
+#	include<hmLib/signals.hpp>
 #endif
 #ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
 #	include"inquiry_abstruct.hpp"

@@ -18,10 +18,10 @@ v1_00/130328 hmIto
 	inquiry‚©‚ç•ª—£
 */
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib_v3_06/exceptions.hpp>
+#	include<hmLib/exceptions.hpp>
 #endif
 #ifndef HMLIB_MEMORY_CLONECOUNTER_INC
-#	include<hmLib_v3_06/lab/memory/clone_counter.hpp>
+#	include<hmLib/lab/memory/clone_counter.hpp>
 #endif
 namespace hmLib{
 	namespace inquiries{

@@ -2,7 +2,7 @@
 #define HMLIB_BINARY_INC 100
 #
 #ifndef HMLIB_BYTEBASETYPE_INC
-#	include <hmLib_v3_06/bytebase_type.hpp>
+#	include <hmLib/bytebase_type.hpp>
 #endif
 //bitŠÖ˜A
 namespace hmLib{

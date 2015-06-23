@@ -1,7 +1,7 @@
 #ifndef HMLIB_CSTRING_C_INC
 #define HMLIB_CSTRING_C_INC 201
 #ifndef HMLIB_CSTRING_INC
-#	include <hmLib_v3_06/cstring.h>
+#	include <hmLib/cstring.h>
 #endif
 #ifdef __cplusplus
 extern "C"{

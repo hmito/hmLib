@@ -1,7 +1,7 @@
 #ifndef HMLIB_MEMORY_UNIQUEPTR_INC
 #define HMLIB_MEMORY_UNIQUEPTR_INC 100
 #
-#include<hmLib_v3_06/lab/rvalue_reference.hpp>
+#include<hmLib/lab/rvalue_reference.hpp>
 #include"default_deleter.hpp"
 namespace hmLib{
 	template<typename T,typename D = default_deleter<const T>>

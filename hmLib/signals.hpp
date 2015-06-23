@@ -11,7 +11,7 @@ boost::signals2を管理/補助するためのクラス群
 	connect
 		汎用接続グローバル関数
 */
-#include<hmLib_v3_06/config_vc.h>
+#include<hmLib/config_vc.h>
 #include<boost/signals2.hpp>
 #include"signals/connect.hpp"
 #include"signals/unique_connections.hpp"

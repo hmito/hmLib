@@ -24,16 +24,16 @@ cqueue:v1_02/130105 hmIto
 */
 //#undef __cplusplus
 #ifndef HMLIB_CDEQUE_INC
-#	include <hmLib_v3_06/cdeque.h>
+#	include <hmLib/cdeque.h>
 #endif
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_CQUEUE_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/cqueue.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/cqueue.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/cqueue.lib")
+#		pragma comment(lib,"hmLib/lib/Release/cqueue.lib")
 #	endif
 #endif
 typedef hmLib_cdeque_iterator hmLib_cqueue_iterator;

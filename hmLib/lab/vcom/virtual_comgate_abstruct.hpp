@@ -4,7 +4,7 @@
 /*===virtual_comgate_absturct===
 スレッドを使って仮想的にcom通信を再現するクラス群
 */
-#include<hmLib_v3_06/gate.hpp>
+#include<hmLib/gate.hpp>
 namespace hmLib{
 	namespace vcom{
 		//仮想com用gate

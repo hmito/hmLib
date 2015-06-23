@@ -13,7 +13,7 @@ v1_00/130805 hmIto
 */
 #include<iterator>
 #include<numeric>
-#include<hmLib_v3_06/exceptions.hpp>
+#include<hmLib/exceptions.hpp>
 
 namespace hmLib{
 	namespace numeric{

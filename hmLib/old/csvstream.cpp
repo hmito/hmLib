@@ -1,7 +1,7 @@
 #ifndef HMLIB_CSVSTERAM_CPP_INC
 #define HMLIB_CSVSTERAM_CPP_INC 101
 #ifndef HMLIB_CSVSTREAM_INC
-#	include <hmLib_v3_06/csvstream.hpp>
+#	include <hmLib/csvstream.hpp>
 #endif
 namespace hmLib{
 	namespace csv{

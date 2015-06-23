@@ -10,7 +10,7 @@ mutex_proxy:v1_00/130308 hmIto
 	汎用mutex参照クラス、mutex_proxyを追加
 */
 #include<functional>
-#include<hmLib_v3_06/exception.hpp>
+#include<hmLib/exception.hpp>
 namespace hmLib{
 	class mutex_proxy{
 	private:

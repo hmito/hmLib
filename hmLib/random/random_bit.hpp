@@ -16,9 +16,9 @@ random_bit:v1_00/130321 hmIto
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_RANDOM_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/random.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/random.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/random.lib")
+#		pragma comment(lib,"hmLib/lib/Release/random.lib")
 #	endif
 #endif
 namespace hmLib{

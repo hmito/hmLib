@@ -55,10 +55,10 @@ inquiry:v0_01/130224 hmIto
 	inquiry‚É‚Â‚¢‚Ä‚Í’ñ‹ŸŠJn
 	range_inquiry‚ÍAiterator_proxy‘Ò‚¿
 */
-#include <hmLib_v3_06/inquiries/inquiry.hpp>
-#include <hmLib_v3_06/inquiries/range_inquiry.hpp>
-#include <hmLib_v3_06/inquiries/signal_inquiry.hpp>
-#include <hmLib_v3_06/inquiries/unique_connections.hpp>
-#include <hmLib_v3_06/inquiries/signaled_contact.hpp>
+#include <hmLib/inquiries/inquiry.hpp>
+#include <hmLib/inquiries/range_inquiry.hpp>
+#include <hmLib/inquiries/signal_inquiry.hpp>
+#include <hmLib/inquiries/unique_connections.hpp>
+#include <hmLib/inquiries/signaled_contact.hpp>
 #
 #endif

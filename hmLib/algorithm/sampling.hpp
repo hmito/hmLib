@@ -22,10 +22,10 @@ algorithm::sampling:v1_00/130328 hmIto
 #include<algorithm>
 #include<vector>
 #ifndef HMLIB_RANDOM_INC
-#	include<hmLib_v3_06/random.hpp>
+#	include<hmLib/random.hpp>
 #endif
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib_v3_06/exceptions.hpp>
+#	include<hmLib/exceptions.hpp>
 #endif
 namespace hmLib{
 	namespace algorithm{

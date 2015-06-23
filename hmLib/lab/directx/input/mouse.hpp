@@ -2,7 +2,7 @@
 #define HMLIB_DIRECTX_MOUSE_INC 100
 #
 #include<memory>
-#include<hmLib_v3_06/position.hpp>
+#include<hmLib/position.hpp>
 namespace hmLib {
 	namespace directx {
 		class mouse_device_interface {

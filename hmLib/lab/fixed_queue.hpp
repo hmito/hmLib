@@ -8,7 +8,7 @@ v1_00/140329 hmIto
 çÏê¨
 */
 #ifndef HMLIB_FIXEDDEQUE_INC
-#	include <hmLib_v3_06/lab/fixed_deque.hpp>
+#	include <hmLib/lab/fixed_deque.hpp>
 #endif
 namespace hmLib {
 	template<typename T>

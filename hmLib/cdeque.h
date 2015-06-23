@@ -33,16 +33,16 @@ cdeque_v1_01/121009 hmIto
 */
 //#undef __cplusplus
 #ifndef HMLIB_BYTEBASETYPE_INC
-#	include <hmLib_v3_06/type.h>
+#	include <hmLib/type.h>
 #endif
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_CDEQUE_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/cdeque.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/cdeque.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/cdeque.lib")
+#		pragma comment(lib,"hmLib/lib/Release/cdeque.lib")
 #	endif
 #endif
 typedef void*			hmLib_cdeque_iterator;

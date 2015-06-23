@@ -17,10 +17,10 @@ inquiries::range_inquiry:v1_00/130328 hmIto
 #include<memory>
 #include<functional>
 #ifndef HMLIB_MUTEXPROXY_INC
-#	include<hmLib_v3_06/mutex_proxy.hpp>
+#	include<hmLib/mutex_proxy.hpp>
 #endif
 #ifndef HMLIB_EXCEPTION_INC
-#	include<hmLib_v3_06/exception.hpp>
+#	include<hmLib/exception.hpp>
 #endif
 #ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
 #	include"inquiry_abstruct.hpp"

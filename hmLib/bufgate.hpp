@@ -13,7 +13,7 @@ bufgate v1_01/130328 hmIto
 	workŠÖ”‚ğoperator()(unsigned int GetMaxNum,unsigned int PutMaxNum)‚É•ÏX‚µ‚Ü‚µ‚½B
 */
 #ifndef HMLIB_GATE_INC
-#	include <hmLib_v3_06/gate.hpp>
+#	include <hmLib/gate.hpp>
 #endif
 #include <deque>
 #include <vector>

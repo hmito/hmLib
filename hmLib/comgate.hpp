@@ -30,15 +30,15 @@ comgate v1_05/130310 hmIto
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_COMGATE_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/comgate.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/comgate.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/comgate.lib")
+#		pragma comment(lib,"hmLib/lib/Release/comgate.lib")
 #	endif
 #endif
 #ifndef HMLIB_GATE_INC
-#	include <hmLib_v3_06/gate.hpp>
+#	include <hmLib/gate.hpp>
 #endif
-#include "hmLib_v3_06/comgate/winRS/winrs.h"
+#include "hmLib/comgate/winRS/winrs.h"
 
 namespace hmLib{
 	class comgate:public virtual gate{

@@ -21,9 +21,9 @@ v1_01/130519 amby
 #endif
 #if !(defined(HMLIB_NOLIB) || defined(HMLIB_COORDINATES_NOLIB))
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/coordinates.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/coordinates.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/coordinates.lib")
+#		pragma comment(lib,"hmLib/lib/Release/coordinates.lib")
 #	endif
 #endif
 #include<cmath>

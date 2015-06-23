@@ -8,10 +8,10 @@ v1_00/140329 hmIto
 çÏê¨
 */
 #ifndef HMLIB_TYPE_INC
-#	include <hmLib_v3_06/type.h>
+#	include <hmLib/type.h>
 #endif
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include <hmLib_v3_06/exceptions.hpp>
+#	include <hmLib/exceptions.hpp>
 #endif
 namespace hmLib {
 	template<typename T>

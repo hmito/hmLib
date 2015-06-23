@@ -5,10 +5,10 @@
 #include<sstream>
 #include<fstream>
 #ifndef HMLIB_FILTERBUF_INC
-#	include <hmLib_v3_06/filterbuf.hpp>
+#	include <hmLib/filterbuf.hpp>
 #endif
 #ifndef HMLIB_STREAMBUFPATTERN_INC
-#	include<hmLib_v3_06/streambuf_pattern.hpp>
+#	include<hmLib/streambuf_pattern.hpp>
 #endif
 #
 #ifndef HMLIB_CONFIG_INC
@@ -16,9 +16,9 @@
 #endif
 #ifndef HMLIB_NOLIB
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/csvstream.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/csvstream.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/csvstream.lib")
+#		pragma comment(lib,"hmLib/lib/Release/csvstream.lib")
 #	endif
 #endif
 

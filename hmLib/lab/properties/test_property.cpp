@@ -1,5 +1,5 @@
 #include<iostream>
-#include<hmLib_v3_06/lab/properties/property.hpp>
+#include<hmLib/lab/properties/property.hpp>
 
 class cTest {
 private:

@@ -3,7 +3,7 @@
 #
 #include<string>
 #ifndef HMLIB_POSITION_INC
-#	include<hmLib_v3_06/position.hpp>
+#	include<hmLib/position.hpp>
 #endif
 namespace hmLib{
 	namespace dxlib{

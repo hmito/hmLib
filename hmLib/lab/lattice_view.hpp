@@ -2,8 +2,8 @@
 #define HMLIB_LATTICEVIEW_INC 100
 #
 #include<iterator>
-#include<hmLib_v3_06/exceptions.hpp>
-#include<hmLib_v3_06/position.hpp>
+#include<hmLib/exceptions.hpp>
+#include<hmLib/position.hpp>
 namespace hmLib{
 	namespace lattice_views{
 		namespace{

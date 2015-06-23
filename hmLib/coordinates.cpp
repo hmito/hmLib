@@ -13,7 +13,7 @@ hmrBufGate:v1_01/130519 amby
 */
 
 
-#include <hmLib_v3_06/coordinates.hpp>
+#include <hmLib/coordinates.hpp>
 
 namespace hmLib{
     namespace coordinates3D{        

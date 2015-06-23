@@ -1,7 +1,7 @@
 #ifndef HMLIB_PROPERTIES_EXCEPTIONS_INC
 #define HMLIB_PROPERTIES_EXCEPTIONS_INC 100
 #
-#include<hmLib_v3_06/exceptions.hpp>
+#include<hmLib/exceptions.hpp>
 namespace hmLib{
 	namespace properties{
 		namespace exceptions {

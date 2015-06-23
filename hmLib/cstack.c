@@ -2,7 +2,7 @@
 #define HMLIB_CSTACK_C_INC 200
 #
 #ifndef HMLIB_CSTACK_INC
-#	include <hmLib_v3_06/cstack.h>
+#	include <hmLib/cstack.h>
 #endif
 #ifdef __cplusplus
 extern "C"{

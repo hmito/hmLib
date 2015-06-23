@@ -3,7 +3,7 @@
 #
 #include<type_traits>
 #include<boost/lexical_cast.hpp>
-#include<hmLib_v3_06/exceptions.hpp>
+#include<hmLib/exceptions.hpp>
 namespace hmLib{
 	namespace typemanage{
 		template<typename T>

@@ -10,10 +10,10 @@ iterator_interface:v0_01/130308 hmIto
 */
 #include<iterator>
 #ifndef HMLIB_OPERATORINTERFACE_INC
-#	include<hmLib_v3_06/operator_interface.hpp>
+#	include<hmLib/operator_interface.hpp>
 #endif
 #ifndef HMLIB_OBJECTINTERFACE_INC
-#	include<hmLib_v3_06/object_interface.hpp>
+#	include<hmLib/object_interface.hpp>
 #endif
 namespace hmLib{
 	namespace basetype{

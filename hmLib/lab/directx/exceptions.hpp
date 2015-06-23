@@ -2,7 +2,7 @@
 #define HMLIB_DXLIB_EXCEPTIONS_INC 100
 #
 #ifndef HMLIB_EXCEPTIONS_EXCEPTION
-#	include<hmLib_v3_06/exceptions.hpp>
+#	include<hmLib/exceptions.hpp>
 #endif
 namespace hmLib{
 	namespace dxlib{

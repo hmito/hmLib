@@ -13,7 +13,7 @@ inquiries::signal_inquiry v1_00/130328 hmIto
 */
 #include<boost/signals2.hpp>
 #ifndef HMLIB_EXCEPTION_INC
-#	include<hmLib_v3_06/exception.hpp>
+#	include<hmLib/exception.hpp>
 #endif
 #ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
 #	include"inquiry_abstruct.hpp"

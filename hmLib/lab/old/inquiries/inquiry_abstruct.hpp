@@ -13,7 +13,7 @@ inquiries::inquiry_abstruct v1_00/130328 hmIto
 	inquiry‚©‚ç•ª—£
 */
 #ifndef HMLIB_EXCEPTION_INC
-#	include<hmLib_v3_06/exception.hpp>
+#	include<hmLib/exception.hpp>
 #endif
 namespace hmLib{
 	namespace inquiries{

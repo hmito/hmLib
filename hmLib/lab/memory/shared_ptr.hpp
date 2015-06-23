@@ -8,7 +8,7 @@ v1_01/140412 hmIto
 	allocator‚Ìrebind‚ğ—p‚¢‚½³‚µ‚¢‹LÚ‚Ö•ÏX
 */
 #include<memory>
-#include<hmLib_v3_06/lab/rvalue_reference.hpp>
+#include<hmLib/lab/rvalue_reference.hpp>
 #include"default_deleter.hpp"
 #include"unique_ptr.hpp"
 namespace hmLib {

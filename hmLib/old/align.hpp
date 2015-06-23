@@ -10,9 +10,9 @@
 #endif
 #ifndef HMLIB_NOLIB
 #	ifdef _DEBUG
-#		pragma comment(lib,"hmLib_v3_06/lib/Debug/align.lib")
+#		pragma comment(lib,"hmLib/lib/Debug/align.lib")
 #	else
-#		pragma comment(lib,"hmLib_v3_06/lib/Release/align.lib")
+#		pragma comment(lib,"hmLib/lib/Release/align.lib")
 #	endif
 #endif
 
