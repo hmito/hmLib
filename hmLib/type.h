@@ -1,206 +1,33 @@
 #ifndef HMLIB_TYPE_INC
 #define HMLIB_TYPE_INC 100
 #
-#ifndef HMLIB_CONFIG_INC
-#	include "hmLib_config.h"
-#endif
-#//StdTypeSize
-#if HMLIB_TYPE_SIZE_CHAR==1
-#	ifndef HMLIB_TYPE_SIZE_8
-#		define HMLIB_TYPE_SIZE_8
-		typedef unsigned char hmLib_uint8;
-		typedef signed char hmLib_sint8;
-#	endif
-#elif HMLIB_TYPE_SIZE_CHAR==2
-#	ifndef HMLIB_TYPE_SIZE_16
-#		define HMLIB_TYPE_SIZE_16
-		typedef unsigned char hmLib_uint16;
-		typedef signed char hmLib_sint16;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_SHORT==1
-#	ifndef HMLIB_TYPE_SIZE_8
-#		define HMLIB_TYPE_SIZE_8
-		typedef unsigned short hmLib_uint8;
-		typedef signed short hmLib_sint8;
-#	endif
-#elif HMLIB_TYPE_SIZE_SHORT==2
-#	ifndef HMLIB_TYPE_SIZE_16
-#		define HMLIB_TYPE_SIZE_16
-		typedef unsigned short hmLib_uint16;
-		typedef signed short hmLib_sint16;
-#	endif
-#elif HMLIB_TYPE_SIZE_SHORT==4
-#	ifndef HMLIB_TYPE_SIZE_32
-#		define HMLIB_TYPE_SIZE_32
-		typedef unsigned short hmLib_uint32;
-		typedef signed short hmLib_sint32;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_INT==1
-#	ifndef HMLIB_TYPE_SIZE_8
-#		define HMLIB_TYPE_SIZE_8
-		typedef unsigned int hmLib_uint8;
-		typedef signed int hmLib_sint8;
-#	endif
-#elif HMLIB_TYPE_SIZE_INT==2
-#	ifndef HMLIB_TYPE_SIZE_16
-#		define HMLIB_TYPE_SIZE_16
-		typedef unsigned int hmLib_uint16;
-		typedef signed int hmLib_sint16;
-#	endif
-#elif HMLIB_TYPE_SIZE_INT==4
-#	ifndef HMLIB_TYPE_SIZE_32
-#		define HMLIB_TYPE_SIZE_32
-		typedef unsigned int hmLib_uint32;
-		typedef signed int hmLib_sint32;
-#	endif
-#elif HMLIB_TYPE_SIZE_INT==8
-#	ifndef HMLIB_TYPE_SIZE_64
-#		define HMLIB_TYPE_SIZE_64
-		typedef unsigned int hmLib_uint64;
-		typedef signed int hmLib_sint64;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_LONG==1
-#	ifndef HMLIB_TYPE_SIZE_8
-#		define HMLIB_TYPE_SIZE_8
-		typedef unsigned long hmLib_uint8;
-		typedef signed long hmLib_sint8;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG==2
-#	ifndef HMLIB_TYPE_SIZE_16
-#		define HMLIB_TYPE_SIZE_16
-		typedef unsigned long hmLib_uint16;
-		typedef signed long hmLib_sint16;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG==4
-#	ifndef HMLIB_TYPE_SIZE_32
-#		define HMLIB_TYPE_SIZE_32
-		typedef unsigned long hmLib_uint32;
-		typedef signed long hmLib_sint32;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG==8
-#	ifndef HMLIB_TYPE_SIZE_64
-#		define HMLIB_TYPE_SIZE_64
-		typedef unsigned long hmLib_uint64;
-		typedef signed long hmLib_sint64;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG==16
-#	ifndef HMLIB_TYPE_SIZE_128
-#		define HMLIB_TYPE_SIZE_128
-		typedef unsigned long hmLib_uint128;
-		typedef signed long hmLib_sint128;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_LONG_LONG==1
-#	ifndef HMLIB_TYPE_SIZE_8
-#		define HMLIB_TYPE_SIZE_8
-		typedef unsigned long long hmLib_uint8;
-		typedef signed long long hmLib_sint8;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_LONG==2
-#	ifndef HMLIB_TYPE_SIZE_16
-#		define HMLIB_TYPE_SIZE_16
-		typedef unsigned long long hmLib_uint16;
-		typedef signed long long hmLib_sint16;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_LONG==4
-#	ifndef HMLIB_TYPE_SIZE_32
-#		define HMLIB_TYPE_SIZE_32
-		typedef unsigned long long hmLib_uint32;
-		typedef signed long long hmLib_sint32;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_LONG==8
-#	ifndef HMLIB_TYPE_SIZE_64
-#		define HMLIB_TYPE_SIZE_64
-		typedef unsigned long long hmLib_uint64;
-		typedef signed long long hmLib_sint64;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_LONG==16
-#	ifndef HMLIB_TYPE_SIZE_128
-#		define HMLIB_TYPE_SIZE_128
-		typedef unsigned long long hmLib_uint128;
-		typedef signed long long hmLib_sint128;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_FLOAT==1
-#	ifndef HMLIB_TYPE_SIZE_f8
-#		define HMLIB_TYPE_SIZE_f8
-		typedef float hmLib_float8;
-#	endif
-#elif HMLIB_TYPE_SIZE_FLOAT==2
-#	ifndef HMLIB_TYPE_SIZE_f16
-#		define HMLIB_TYPE_SIZE_f16
-		typedef float hmLib_float16;
-#	endif
-#elif HMLIB_TYPE_SIZE_FLOAT==4
-#	ifndef HMLIB_TYPE_SIZE_f32
-#		define HMLIB_TYPE_SIZE_f32
-		typedef float hmLib_float32;
-#	endif
-#elif HMLIB_TYPE_SIZE_FLOAT==8
-#	ifndef HMLIB_TYPE_SIZE_f64
-#		define HMLIB_TYPE_SIZE_f64
-		typedef float hmLib_float64;
-#	endif
-#elif HMLIB_TYPE_SIZE_FLOAT==16
-#	ifndef HMLIB_TYPE_SIZE_f128
-#		define HMLIB_TYPE_SIZE_f128
-		typedef float hmLib_f128;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_DOUBLE==1
-#	ifndef HMLIB_TYPE_SIZE_f8
-#		define HMLIB_TYPE_SIZE_f8
-		typedef double hmLib_float8;
-#	endif
-#elif HMLIB_TYPE_SIZE_DOUBLE==2
-#	ifndef HMLIB_TYPE_SIZE_f16
-#		define HMLIB_TYPE_SIZE_f16
-		typedef double hmLib_float16;
-#	endif
-#elif HMLIB_TYPE_SIZE_DOUBLE==4
-#	ifndef HMLIB_TYPE_SIZE_f32
-#		define HMLIB_TYPE_SIZE_f32
-		typedef double hmLib_float32;
-#	endif
-#elif HMLIB_TYPE_SIZE_DOUBLE==8
-#	ifndef HMLIB_TYPE_SIZE_f64
-#		define HMLIB_TYPE_SIZE_f64
-		typedef double hmLib_float64;
-#	endif
-#elif HMLIB_TYPE_SIZE_DOUBLE==16
-#	ifndef HMLIB_TYPE_SIZE_f128
-#		define HMLIB_TYPE_SIZE_f128
-		typedef double hmLib_f128;
-#	endif
-#endif
-#if HMLIB_TYPE_SIZE_LONG_DOUBLE==1
-#	ifndef HMLIB_TYPE_SIZE_f8
-#		define HMLIB_TYPE_SIZE_f8
-		typedef long double hmLib_float8;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_DOUBLE==2
-#	ifndef HMLIB_TYPE_SIZE_f16
-#		define HMLIB_TYPE_SIZE_f16
-		typedef long double hmLib_float16;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_DOUBLE==4
-#	ifndef HMLIB_TYPE_SIZE_f32
-#		define HMLIB_TYPE_SIZE_f32
-		typedef long double hmLib_float32;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_DOUBLE==8
-#	ifndef HMLIB_TYPE_SIZE_f64
-#		define HMLIB_TYPE_SIZE_f64
-		typedef long double hmLib_float64;
-#	endif
-#elif HMLIB_TYPE_SIZE_LONG_DOUBLE==16
-#	ifndef HMLIB_TYPE_SIZE_f128
-#		define HMLIB_TYPE_SIZE_f128
-		typedef long double hmLib_float128;
-#	endif
+#ifdef __cplusplus
+#	include<cstdint>
+using hmLib_uint8 = std::uint8_t;
+using hmLib_sint8 = std::int8_t;
+using hmLib_uint16 = std::uint16_t;
+using hmLib_sint16 = std::int16_t;
+using hmLib_uint32 = std::uint32_t;
+using hmLib_sint32 = std::int32_t;
+using hmLib_uint64 = std::uint64_t;
+using hmLib_sint64 = std::int64_t;
+using hmLib_float32 = float;
+using hmLib_float64 = double;
+using hmLib_float128 = long double;
+#elif
+#	include<stdint.h>
+#	include<stdbool.h>
+typedef hmLib_uint8 uint8_t;
+typedef hmLib_sint8 int8_t;
+typedef hmLib_uint16 uint16_t;
+typedef hmLib_sint16 int16_t;
+typedef hmLib_uint32 uint32_t;
+typedef hmLib_sint32 int32_t;
+typedef hmLib_uint64 uint64_t;
+typedef hmLib_sint64 int64_t;
+typedef float hmLib_float32;
+typedef double hmLib_float64;
+typedef long double hmLib_float128;
 #endif
 //boolian
 typedef unsigned char  hmLib_boolian;

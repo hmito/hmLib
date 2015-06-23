@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\..\hmLib\signals.hpp" />
     <ClInclude Include="..\..\..\hmLib\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\hmLib\stream_utility.hpp" />
+    <ClInclude Include="..\..\..\hmLib\type.h" />
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\version.h" />

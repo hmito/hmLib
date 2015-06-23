@@ -105,6 +105,9 @@
     <ClInclude Include="..\..\..\hmLib\version.h">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\type.h">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c">
