@@ -82,6 +82,7 @@
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate_exceptions.hpp" />
+    <ClInclude Include="..\..\..\hmLib\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
