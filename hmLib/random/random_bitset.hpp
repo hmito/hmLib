@@ -1,12 +1,12 @@
-#ifndef HMLIB_RANDOM_RANDOMBITSET_INC
+ï»¿#ifndef HMLIB_RANDOM_RANDOMBITSET_INC
 #define HMLIB_RANDOM_RANDOMBITSET_INC 100
 #
 /*===random_bitset===
-—”‚Å‰Šú‰»‚³‚ê‚½bitset‚ğ’ñ‹Ÿ‚·‚é
+ä¹±æ•°ã§åˆæœŸåŒ–ã•ã‚ŒãŸbitsetã‚’æä¾›ã™ã‚‹
 
 random_bitset:v1_00/130709 hmIto
-	—”‰Šú‰»‚ªs‚í‚ê‚½bitset¶¬ƒNƒ‰ƒXArandom_bitset‚ğ’Ç‰Á
-	random::uniform_boolŠÖ”‚ğ’Ç‰Á
+	ä¹±æ•°åˆæœŸåŒ–ãŒè¡Œã‚ã‚ŒãŸbitsetç”Ÿæˆã‚¯ãƒ©ã‚¹ã€random_bitsetã‚’è¿½åŠ 
+	random::uniform_boolé–¢æ•°ã‚’è¿½åŠ 
 	*/
 #include<bitset>
 #ifndef HMLIB_RANDOM_RANDOMENGINE_INC

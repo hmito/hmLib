@@ -1,13 +1,13 @@
-#ifndef HMLIB_RVALUEREFERENCE_INC
+﻿#ifndef HMLIB_RVALUEREFERENCE_INC
 #define HMLIB_RVALUEREFERENCE_INC 100
 #
 /*
-���O�̉E�Ӓl�Q��&���[�u�p�N���X
-C++03�������ł���A���R�{���͔񐄏�
+自前の右辺値参照&ムーブ用クラス
+C++03環境向けであり、当然本来は非推奨
 
 === rvalue_reference ===
 v1_00/140405 hmIto
-	�쐬
+	作成
 */
 namespace hmLib {
 	template<typename T>

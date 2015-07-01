@@ -1,11 +1,11 @@
-#ifndef HMLIB_EXCEPTIONS_EXCEPTION_INC
+ï»¿#ifndef HMLIB_EXCEPTIONS_EXCEPTION_INC
 #define HMLIB_EXCEPTIONS_EXCEPTION_INC 100
 #
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"
 #endif
 /*===exceptions::exception===
-Šî–{“I‚Èƒ}ƒNƒéŒ¾
+åŸºæœ¬çš„ãªãƒã‚¯ãƒ­å®£è¨€
 */
 #include <exception>
 #include <string>

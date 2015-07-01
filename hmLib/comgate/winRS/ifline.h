@@ -1,14 +1,14 @@
-// ifLine .. line ’PˆÊ‚ÌƒRƒ~ƒjƒ…ƒP[ƒVƒ‡ƒ“‚ğs‚¤’ÊM‰ñü‚ğ’è‹`‚·‚é
-// address, type, delimter ‚ğŠî–{“I‚È’è‹`‚Æ‚·‚é
+ï»¿// ifLine .. line å˜ä½ã®ã‚³ãƒŸãƒ‹ãƒ¥ã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’è¡Œã†é€šä¿¡å›ç·šã‚’å®šç¾©ã™ã‚‹
+// address, type, delimter ã‚’åŸºæœ¬çš„ãªå®šç¾©ã¨ã™ã‚‹
 
 #if !defined(_BCL_IfLineHeadder)
 #define      _BCL_IfLineHeadder
 
-class ifLineError  // ifLine ”z‰º‚Ì—áŠO
+class ifLineError  // ifLine é…ä¸‹ã®ä¾‹å¤–
 {
 };
 
-class portDuplex : public ifLineError // “¯ˆê‚Ìƒ|[ƒg‚ğ‚Qd‚ÉŠJ‚¢‚½‚Æ‚«‚É“Š‚°‚ç‚ê‚é—áŠO
+class portDuplex : public ifLineError // åŒä¸€ã®ãƒãƒ¼ãƒˆã‚’ï¼’é‡ã«é–‹ã„ãŸã¨ãã«æŠ•ã’ã‚‰ã‚Œã‚‹ä¾‹å¤–
 {
     private:
        int portNo;
@@ -29,12 +29,12 @@ class ifLine
 	  enum delim  {unknown = 0, crlf = 3, cr = 1, lf = 2, eoi = 16};
 
 	protected:
-	  int     hWait;  // ƒn[ƒhƒEƒGƒAƒEƒGƒCƒg‚Ì‚½‚ß‚Ì out ‰ñ”
-	  int     myAddr;              // ‘½‰ñü‚ğƒTƒ|[ƒg‚·‚é
-	  type    myType;              // ‰ñüƒ^ƒCƒv‚ğ’è‹`‚·‚é
-	  delim   myDelim;             // ƒfƒŠƒ~ƒ^’è‹`
+	  int     hWait;  // ãƒãƒ¼ãƒ‰ã‚¦ã‚¨ã‚¢ã‚¦ã‚¨ã‚¤ãƒˆã®ãŸã‚ã® out å›æ•°
+	  int     myAddr;              // å¤šå›ç·šã‚’ã‚µãƒãƒ¼ãƒˆã™ã‚‹
+	  type    myType;              // å›ç·šã‚¿ã‚¤ãƒ—ã‚’å®šç¾©ã™ã‚‹
+	  delim   myDelim;             // ãƒ‡ãƒªãƒŸã‚¿å®šç¾©
 
-      bool    ifaceValid;          // ©•ª©g‚Ìæ“¾‚É¬Œ÷‚µ‚½‚Æ‚« ture isValid() ‚Æ void *() ‚ªQÆ‚·‚é
+      bool    ifaceValid;          // è‡ªåˆ†è‡ªèº«ã®å–å¾—ã«æˆåŠŸã—ãŸã¨ã ture isValid() ã¨ void *() ãŒå‚ç…§ã™ã‚‹
 
 	public:
 	  enum spMode {fast, middle, slow};

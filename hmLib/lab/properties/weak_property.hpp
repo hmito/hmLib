@@ -1,25 +1,25 @@
-#ifndef HMLIB_PROPERTIES_WEAKPROPERTY_INC
+﻿#ifndef HMLIB_PROPERTIES_WEAKPROPERTY_INC
 #define HMLIB_PROPERTIES_WEAKPROPERTY_INC 101
 #
 /*
-property���Q�Ƃ��ăA�N�Z�X����Aweak_property�N���X
+propertyを参照してアクセスする、weak_propertyクラス
 
 === properties::weak_property ===
 v1_01/140621 hmIto
-	�ꉞ�A��������
+	一応、実装完了
 v1_00/140616 hmIto
-	property���Q�Ƃ���N���X�Ƃ��čĒ�`
+	propertyを参照するクラスとして再定義
 === inquiries::inquiry ===
 v2_00/130415 hmito
-	const�Q�Ƃ�߂�l�Ƃ���֐���ێ�����I�u�W�F�N�g�Ƃ��čĒ�`
+	const参照を戻り値とする関数を保持するオブジェクトとして再定義
 v1_02/130412 hmIto
-	try_lock�֐��̌Ăяo���ŌĂяo�������Ԉ���Ă��������C��
-	try_lock��mutex��ێ����Ă��Ȃ��ꍇ�Ƀ��b�N�Ɏ��s���Ă���悤�Ɍ����Ă��������C��
+	try_lock関数の呼び出しで呼び出し名が間違っていた問題を修正
+	try_lockでmutexを保持していない場合にロックに失敗しているように見えていた問題を修正
 v1_01/130329 hmIto
-	�R�s�[�R���X�g���N�^/������Z�q�𖾎��I��private��
-	�O���[�o���֐���connect�֐���ǉ�
+	コピーコンストラクタ/代入演算子を明示的にprivate化
+	グローバル関数にconnect関数を追加
  v1_00/130328 hmIto
-	inquiry���番��
+	inquiryから分離
 */
 #include<memory>
 #include<functional>

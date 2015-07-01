@@ -1,4 +1,4 @@
-#ifndef HMLIB_CQUEUE_C_INC
+ï»¿#ifndef HMLIB_CQUEUE_C_INC
 #define HMLIB_CQUEUE_C_INC 200
 #
 #ifndef HMLIB_CQUEUE_INC
@@ -15,23 +15,23 @@ extern "C"{
 namespace hmLib{
 extern "C"{
 #endif
-//ƒƒ‚ƒŠ‚Ì‰Šú‰»
+//ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ–
 void cqueue_format(hmLib_cqueue* ptr){
 	cdeque_format(ptr);
 }
-//‚·‚Å‚É‰Šú‰»‚³‚ê‚½‚©‚Ç‚¤‚©‚ÌŠm”F
+//ã™ã§ã«åˆæœŸåŒ–ã•ã‚ŒãŸã‹ã©ã†ã‹ã®ç¢ºèª
 hmLib_boolian cqueue_is_construct(hmLib_cqueue* ptr){
 	return cdeque_is_construct(ptr);
 }
-//“®“IŠm•Û‚É‚æ‚Á‚Äƒoƒbƒtƒ@Šm•Û
+//å‹•çš„ç¢ºä¿ã«ã‚ˆã£ã¦ãƒãƒƒãƒ•ã‚¡ç¢ºä¿
 void cqueue_construct(hmLib_cqueue* pStk, hmLib_cqueue_size_t Size, hmLib_cqueue_size_t ElemSize) {
 	cdeque_construct(pStk, Size, ElemSize);
 }
-//Ã“IŠm•Û‚É‚æ‚Á‚Äƒoƒbƒtƒ@Šm•Û
+//é™çš„ç¢ºä¿ã«ã‚ˆã£ã¦ãƒãƒƒãƒ•ã‚¡ç¢ºä¿
 void cqueue_placement_construct(hmLib_cqueue* pStk, hmLib_cqueue_size_t Size, hmLib_cqueue_size_t ElemSize, hmLib_pointer Ptr, hmLib_vFp_p Destructor) {
 	cdeque_placement_construct(pStk, Size, ElemSize, Ptr, Destructor);
 }
-//ƒoƒbƒtƒ@‰ğ•ú Ã“I/“®“I‚Í©“®”»’f
+//ãƒãƒƒãƒ•ã‚¡è§£æ”¾ é™çš„/å‹•çš„ã¯è‡ªå‹•åˆ¤æ–­
 void cqueue_destruct(hmLib_cqueue* pStk){
 	cdeque_destruct(pStk);
 }
@@ -43,47 +43,47 @@ void cqueue_move(hmLib_cqueue* from, hmLib_cqueue* to){
 void cqueue_swap(hmLib_cqueue* ptr1,hmLib_cqueue* ptr2){
 	cdeque_swap(ptr1,ptr2);
 }
-//ƒoƒbƒtƒ@‚Ìæ“ª‚ğæ“¾
+//ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã‚’å–å¾—
 void* cqueue_getptr(hmLib_cqueue* pStk){
 	return cdeque_frontptr(pStk);
 }
-//ƒoƒbƒtƒ@‚É“ü‚Á‚Ä‚¢‚éƒTƒCƒY
+//ãƒãƒƒãƒ•ã‚¡ã«å…¥ã£ã¦ã„ã‚‹ã‚µã‚¤ã‚º
 hmLib_cqueue_size_t cqueue_size(hmLib_cqueue* pStk){
 	return cdeque_size(pStk);
 }
-//ƒoƒbƒtƒ@‚Éc‚è“ü‚ê‚ç‚ê‚éƒTƒCƒY
+//ãƒãƒƒãƒ•ã‚¡ã«æ®‹ã‚Šå…¥ã‚Œã‚‰ã‚Œã‚‹ã‚µã‚¤ã‚º
 hmLib_cqueue_size_t cqueue_rest(hmLib_cqueue* pStk){
 	return cdeque_rest(pStk);
 }
-//ƒoƒbƒtƒ@‚ª‹ó‚©‚Ç‚¤‚©Šm”F
+//ãƒãƒƒãƒ•ã‚¡ãŒç©ºã‹ã©ã†ã‹ç¢ºèª
 hmLib_boolian cqueue_empty(hmLib_cqueue* pStk){
 	return cdeque_empty(pStk);
 }
-//ƒoƒbƒtƒ@‚ª‚¢‚Á‚Ï‚¢‚©‚Ç‚¤‚©Šm”F
+//ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã‹ã©ã†ã‹ç¢ºèª
 hmLib_boolian cqueue_full(hmLib_cqueue* pStk){
 	return cdeque_full(pStk);
 }
-//ƒoƒbƒtƒ@‚Éƒf[ƒ^‚ğ‘}“ü
+//ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿ã‚’æŒ¿å…¥
 hmLib_boolian cqueue_push(hmLib_cqueue* pStk,const void* Ptr){
 	return cdeque_push_back(pStk,Ptr);
 }
-//ƒoƒbƒtƒ@‚Ìƒf[ƒ^‚ğíœ
+//ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ãƒ¼ã‚¿ã‚’å‰Šé™¤
 hmLib_boolian cqueue_pop(hmLib_cqueue* pStk){
 	return cdeque_pop_front(pStk);
 }
-//ƒoƒbƒtƒ@‚ÌbeginŠÖ”
+//ãƒãƒƒãƒ•ã‚¡ã®beginé–¢æ•°
 hmLib_cqueue_iterator cqueue_begin(hmLib_cqueue* pStk){
 	return cdeque_begin(pStk);
 }
-//ƒoƒbƒtƒ@‚ÌendŠÖ”
+//ãƒãƒƒãƒ•ã‚¡ã®endé–¢æ•°
 hmLib_cqueue_iterator cqueue_end(hmLib_cqueue* pStk){
 	return cdeque_end(pStk);
 }
-//hmLib_cqueue_iterator‚ÌŸ‚Ìiterator‚ğ—^‚¦‚é
+//hmLib_cqueue_iteratorã®æ¬¡ã®iteratorã‚’ä¸ãˆã‚‹
 hmLib_cqueue_iterator cqueue_next(hmLib_cqueue* pStk,hmLib_cqueue_iterator itr){
 	return cdeque_next(pStk,itr);
 }
-//hmLib_cqueue_iterator‚Ì‘O‚Ìiterator‚ğ—^‚¦‚é
+//hmLib_cqueue_iteratorã®å‰ã®iteratorã‚’ä¸ãˆã‚‹
 hmLib_cqueue_iterator cqueue_prev(hmLib_cqueue* pStk,hmLib_cqueue_iterator itr){
 	return cdeque_prev(pStk,itr);
 }

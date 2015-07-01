@@ -1,11 +1,11 @@
-#ifndef HMLIB_DEBUGSTREAM_INC
+ï»¿#ifndef HMLIB_DEBUGSTREAM_INC
 #define HMLIB_DEBUGSTREAM_INC 101
 #
 /*===debugstream===
-VS‚ÌƒfƒoƒbƒO—po—Í‘‹‚É•¶š—ñ‚ğo—Í‚·‚é–‚ª‚Å‚«‚Ü‚·B
+VSã®ãƒ‡ãƒãƒƒã‚°ç”¨å‡ºåŠ›çª“ã«æ–‡å­—åˆ—ã‚’å‡ºåŠ›ã™ã‚‹äº‹ãŒã§ãã¾ã™ã€‚
 
 debugstream v1_01/130328 hmIto
-	streambuf_interface‚É‘Î‰
+	streambuf_interfaceã«å¯¾å¿œ
 */
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"

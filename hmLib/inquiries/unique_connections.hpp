@@ -1,13 +1,13 @@
-#ifndef HMLIB_INQUIRIES_UNIQUECONNECTIONS_INC
+ï»¿#ifndef HMLIB_INQUIRIES_UNIQUECONNECTIONS_INC
 #define HMLIB_INQUIRIES_UNIQUECONNECTIONS_INC 101
 #
 /*===inquiries::unique_connections===
-inquiryƒNƒ‰ƒX‚ÌÚ‘±‚ğŠÇ—‚µAdestructor‚Ådiconnect‚ğŒÄ‚ÔB
+inquiryã‚¯ãƒ©ã‚¹ã®æ¥ç¶šã‚’ç®¡ç†ã—ã€destructorã§diconnectã‚’å‘¼ã¶ã€‚
 
 inquiries::unique_connections v1_01/130421 hmIto
-	exceptions‚ğ’Ç‰Á
+	exceptionsã‚’è¿½åŠ 
 inquiries::unique_connections v1_00/130328 hmIto
-	inquiry‚©‚ç•ª—£
+	inquiryã‹ã‚‰åˆ†é›¢
 */
 #include<vector>
 #ifndef HMLIB_EXCEPTIONS_INC
@@ -18,7 +18,7 @@ inquiries::unique_connections v1_00/130328 hmIto
 #endif
 namespace hmLib{
 	namespace inquiries{
-		//connectionŠÇ——pƒNƒ‰ƒX
+		//connectionç®¡ç†ç”¨ã‚¯ãƒ©ã‚¹
 		class unique_connections{
 		private:
 			typedef unique_connections my_type;

@@ -1,4 +1,4 @@
-#ifndef HMLIB_POSITION_INC
+ï»¿#ifndef HMLIB_POSITION_INC
 #define HMLIB_POSITION_INC 100
 #include <cmath>
 #include <iostream>
@@ -136,7 +136,7 @@ namespace hmLib{
 			di_position<S> ans(*this);
 			return ans;
 		}
-		//friendŠÖ”ŒQ
+		//friendé–¢æ•°ç¾¤
 	//	friend bool operator==(const di_position<T>& _T1,const di_position<T>& _T2);
 		friend di_position<T> operator*(const di_position<T>& _T,const T& p){
 			di_position<T> ans(_T);
@@ -191,7 +191,7 @@ namespace hmLib{
 	inline pdouble operator*(const pdouble& d,const int& i){return d*double(i);}
 	inline pdouble operator/(const pdouble& d,const int& i){return d/double(i);}
 	inline pdouble operator*(const int& i,const pdouble& d){return d*double(i);}
-	//di_positionŠÖ˜AŠÖ”ŒQ
+	//di_positioné–¢é€£é–¢æ•°ç¾¤
 	template<class T>
 	inline di_position<T> di_positionX(const di_position<T>& p){return di_position<T>(p.x,0);}
 	template<class T>

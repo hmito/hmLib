@@ -1,20 +1,20 @@
-#ifndef HMLIB_VCOM_VIRTUALCOMGATEABSTRUCT_INC
+ï»¿#ifndef HMLIB_VCOM_VIRTUALCOMGATEABSTRUCT_INC
 #define HMLIB_VCOM_VIRTUALCOMGATEABSTRUCT_INC 100
 #
 /*===virtual_comgate_absturct===
-ƒXƒŒƒbƒh‚ğg‚Á‚Ä‰¼‘z“I‚Écom’ÊM‚ğÄŒ»‚·‚éƒNƒ‰ƒXŒQ
+ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ä½¿ã£ã¦ä»®æƒ³çš„ã«comé€šä¿¡ã‚’å†ç¾ã™ã‚‹ã‚¯ãƒ©ã‚¹ç¾¤
 */
 #include<hmLib/gate.hpp>
 namespace hmLib{
 	namespace vcom{
-		//‰¼‘zcom—pgate
+		//ä»®æƒ³comç”¨gate
 		class virtual_comgate_abstruct:public gate{
 		public:
 			virtual ~virtual_comgate_abstruct(){}
 		public: //virtaul_comgate_abstruct
-			//com‚Æ‚µ‚Ä‘—M‚·‚éƒf[ƒ^‚ğæ“¾‚·‚é
+			//comã¨ã—ã¦é€ä¿¡ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹
 			virtual size_type com_send(char* ptr_, size_type size_)=0;
-			//com‚Æ‚µ‚ÄóM‚³‚¹‚éƒf[ƒ^‚ğ—^‚¦‚é
+			//comã¨ã—ã¦å—ä¿¡ã•ã›ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ä¸ãˆã‚‹
 			virtual size_type com_recv(const char* ptr_, size_type size_)=0;
 		};
 	}

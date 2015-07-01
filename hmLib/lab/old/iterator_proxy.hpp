@@ -1,4 +1,4 @@
-#ifndef HMLIB_ITERATORPROXY_INC
+﻿#ifndef HMLIB_ITERATORPROXY_INC
 #define HMLIB_ITERATORPROXY_INC 100
 #
 #include<memory>

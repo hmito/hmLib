@@ -1,4 +1,4 @@
-#ifndef HMLIB_DXLIB_KERNEL_CPP_INC
+ï»¿#ifndef HMLIB_DXLIB_KERNEL_CPP_INC
 #define HMLIB_DXLIB_KERNEL_CPP_INC 100
 #
 #ifndef HMLIB_DXLIB_KERNEL_INC
@@ -18,27 +18,27 @@ namespace hmLib{
 
 			if(exist())hmLib_throw(exceptions::dxlib_exception, "DxLib have already been initialized.");
 
-			//“ñd‹N“®‚ğ—e”F‚·‚é
+			//äºŒé‡èµ·å‹•ã‚’å®¹èªã™ã‚‹
 			SetDoubleStartValidFlag(static_cast<int>(CanRunMultiDxLib));
 
-			//Active‚Å‚È‚­‚Ä‚à“®ì‚·‚é
+			//Activeã§ãªãã¦ã‚‚å‹•ä½œã™ã‚‹
 			SetAlwaysRunFlag(static_cast<int>(IsRunAlways));
 
-			//ƒƒOo—Í‚ğ–³Œø‚É‚·‚é
+			//ãƒ­ã‚°å‡ºåŠ›ã‚’ç„¡åŠ¹ã«ã™ã‚‹
 			SetOutApplicationLogValidFlag(static_cast<int>(IsOutputLog));
 
-			//double‚ğfloatƒŒƒxƒ‹‚Ü‚Å—‚Æ‚µ‚Ä‰‰Z‚µ‚È‚¢
+			//doubleã‚’floatãƒ¬ãƒ™ãƒ«ã¾ã§è½ã¨ã—ã¦æ¼”ç®—ã—ãªã„
 			SetUseFPUPreserveFlag(static_cast<int>(IsCalcLowPrecise));
 
-			//DxLib‹N“®
+			//DxLibèµ·å‹•
 			if(DxLib_Init() == -1)hmLib_throw(exceptions::dxlib_exception, "Failed to initialize DxLib.");
 		}
 		kernel::~kernel(){
-			//DxLibI—¹
+			//DxLibçµ‚äº†
 			DxLib_End();
 		}
 		bool kernel::operator()(void){
-			// Windows ƒVƒXƒeƒ€‚©‚ç‚­‚éî•ñ‚ğˆ—‚·‚é
+			// Windows ã‚·ã‚¹ãƒ†ãƒ ã‹ã‚‰ãã‚‹æƒ…å ±ã‚’å‡¦ç†ã™ã‚‹
 			return (ProcessMessage() != 0);
 		}
 		bool kernel::exist(){ return DxLib_IsInit(); }

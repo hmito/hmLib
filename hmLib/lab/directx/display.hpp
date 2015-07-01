@@ -1,4 +1,4 @@
-#ifndef HMLIB_DXLIB_DISPLAY_INC
+ï»¿#ifndef HMLIB_DXLIB_DISPLAY_INC
 #define HMLIB_DXLIB_DISPLAY_INC 100
 #
 #include<string>
@@ -12,14 +12,14 @@ namespace hmLib{
 			class cTask :public hm::cTask{
 				friend class cDisplay;
 			private:
-				//•`‰ææw’è—pƒTƒuƒ^ƒXƒN
+				//æç”»å…ˆæŒ‡å®šç”¨ã‚µãƒ–ã‚¿ã‚¹ã‚¯
 				class :public hm::cTask{
 				private:
 					int Handle;
 				protected://hm::cTask
-					//ƒ^ƒXƒN‰Šúˆ—
+					//ã‚¿ã‚¹ã‚¯åˆæœŸå‡¦ç†
 					virtual bool construct(){
-						// •`‰ææ‰æ–Ê‚ğ— ‰æ–Ê‚É‚·‚é
+						// æç”»å…ˆç”»é¢ã‚’è£ç”»é¢ã«ã™ã‚‹
 						SetDrawScreen(dx::cScreen::DefaultBackScreen.getHandle());
 
 					}
@@ -27,25 +27,25 @@ namespace hmLib{
 					void setHandle(int Handle_){ Handle=Handle_; }
 				};
 			protected://hm::cTask
-				//ƒ^ƒXƒN‰Šúˆ—
+				//ã‚¿ã‚¹ã‚¯åˆæœŸå‡¦ç†
 				virtual bool construct(){
-					//ƒEƒBƒ“ƒhƒEƒAƒCƒRƒ“•ÏX
+					//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¤ã‚³ãƒ³å¤‰æ›´
 					SetWindowIconID(1);
 
 					return false;
 				}
-				//ƒ^ƒXƒN’Êíˆ—
+				//ã‚¿ã‚¹ã‚¯é€šå¸¸å‡¦ç†
 				virtual bool task(){
-					// — ‰æ–Ê‚Ì“à—e‚ğ•\‰æ–Ê‚É”½‰f‚³‚¹‚é
+					// è£ç”»é¢ã®å†…å®¹ã‚’è¡¨ç”»é¢ã«åæ˜ ã•ã›ã‚‹
 					ScreenFlip();
-					//Á‹æ‚ğMainDisplay‚Ö•ÏX
+					//æ¶ˆå»å…ˆã‚’MainDisplayã¸å¤‰æ›´
 					dx::cScreen::scoped_active TmpScr(dx::cScreen::DefaultBackScreen);
-					//‰æ–Ê•`‰æ“à—eÁ‹
+					//ç”»é¢æç”»å†…å®¹æ¶ˆå»
 					ClearDrawScreen();
 
 					return false;
 				}
-				//ƒ^ƒXƒNI—¹ˆ—
+				//ã‚¿ã‚¹ã‚¯çµ‚äº†å‡¦ç†
 				virtual bool destruct(){ return false; }
 			public:
 				cTask() :hm::cTask(DX_DISPLAY_TASK){ return; }
@@ -64,25 +64,25 @@ namespace hmLib{
 
 				dxlib::screen::DefaultBackScreen.getHandle();
 
-				//‰ğ‘œ“x‚ğ•ÏX‚·‚é
+				//è§£åƒåº¦ã‚’å¤‰æ›´ã™ã‚‹
 				SetGraphMode(DisplaySize_.x, DisplaySize_.y, DisplayClrBit_);
 
-				//ƒEƒBƒ“ƒhƒEƒ‚[ƒh
+				//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰
 				ChangeWindowMode(IsWindowMode);
 
-				//ƒEƒBƒ“ƒhƒEƒTƒCƒY•ÏX‰Â”\ƒ‚[ƒh
+				//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºå¤‰æ›´å¯èƒ½ãƒ¢ãƒ¼ãƒ‰
 				SetWindowSizeChangeEnableFlag(IsWindowExtendMode);
 
-				//ƒEƒBƒ“ƒhƒE–¼‚ğ•ÏX
+				//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åã‚’å¤‰æ›´
 				SetMainWindowText(Name.c_str());
 
-				//ƒEƒBƒ“ƒhƒEƒAƒCƒRƒ“•ÏX
+				//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¤ã‚³ãƒ³å¤‰æ›´
 				SetWindowIconID(1);
 
 			}
 			void setDisplay(pint Size_, int ClrBit_){
 				if(Size==Size_ && ClrBit_==ClrBit)return;
-				//•`‰æ‰æ–Ê‚ğİ’è
+				//æç”»ç”»é¢ã‚’è¨­å®š
 				SetGraphMode(Size_.x, Size_.y, ClrBit_);
 				Size=Size_;
 				ClrBit=ClrBit_;
@@ -90,7 +90,7 @@ namespace hmLib{
 			pint getDisplaySize()const{ return Size; }
 			int getDisplayClrBit()const{ return ClrBit; }
 			bool setName(const std::string& Name_){
-				//ƒEƒBƒ“ƒhƒE–¼‚ğ•ÏX
+				//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åã‚’å¤‰æ›´
 				SetMainWindowText(Name_.c_str());
 				Name=Name_;
 				return false;

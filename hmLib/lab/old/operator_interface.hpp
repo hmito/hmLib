@@ -1,18 +1,18 @@
-#ifndef HMLIB_OPERATORINTERFACE_INC
+ï»¿#ifndef HMLIB_OPERATORINTERFACE_INC
 #define HMLIB_OPERATORINTERFACE_INC 1
 #
 /*===operator_interface===
-operatorŠÖ”ŒQ—p‚Ìinterface‚ğ’ñ‹Ÿ‚·‚é
+operatoré–¢æ•°ç¾¤ç”¨ã®interfaceã‚’æä¾›ã™ã‚‹
 
-friendéŒ¾‚ğg‚¤‚Ì‚ÍAˆø”‚É©•ª©g‚Å‚Í‚È‚­my_type‚ğg‚¤–‚ÅAQÆ‚ğ–ß‚·Û‚Émy_type‚Ö‚ÌƒLƒƒƒXƒg‚ğ”ğ‚¯‚é‚½‚ß
+friendå®£è¨€ã‚’ä½¿ã†ã®ã¯ã€å¼•æ•°ã«è‡ªåˆ†è‡ªèº«ã§ã¯ãªãmy_typeã‚’ä½¿ã†äº‹ã§ã€å‚ç…§ã‚’æˆ»ã™éš›ã«my_typeã¸ã®ã‚­ãƒ£ã‚¹ãƒˆã‚’é¿ã‘ã‚‹ãŸã‚
 my_type& operator++(){
 	increment();
 	return *this;	//Error cast from this_type to my_type
 }
 
 operator_interface:v0_01/130308 hmIto
-	operator_pattern‚©‚çŒp³
-	ŠÖ”–¼‚ğinterfaceƒ^ƒCƒv‚É“ˆê
+	operator_patternã‹ã‚‰ç¶™æ‰¿
+	é–¢æ•°åã‚’interfaceã‚¿ã‚¤ãƒ—ã«çµ±ä¸€
 */
 namespace hmLib{
 	namespace interfaces{

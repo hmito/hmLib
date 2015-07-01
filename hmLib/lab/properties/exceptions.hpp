@@ -1,4 +1,4 @@
-#ifndef HMLIB_PROPERTIES_EXCEPTIONS_INC
+ï»¿#ifndef HMLIB_PROPERTIES_EXCEPTIONS_INC
 #define HMLIB_PROPERTIES_EXCEPTIONS_INC 100
 #
 #include<hmLib/exceptions.hpp>
@@ -9,7 +9,7 @@ namespace hmLib{
 				class exception_identifier {};
 				class initialization_overap_identifier {};
 			}
-			//propertyŒn—ñ‚ÌŠî–{—áŠO
+			//propertyç³»åˆ—ã®åŸºæœ¬ä¾‹å¤–
 			typedef hmLib::exceptions::exception_pattern<exception_identifier> exception;
 			//requested initialization to an initialized property.
 			typedef hmLib::exceptions::exception_pattern<initialization_overap_identifier, exception> initialization_overlap;

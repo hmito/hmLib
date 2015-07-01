@@ -1,11 +1,11 @@
-#ifndef HMLIB_EXCEPTIONS_NUMERICEXCEPTIONS_INC
+ï»¿#ifndef HMLIB_EXCEPTIONS_NUMERICEXCEPTIONS_INC
 #define HMLIB_EXCEPTIONS_NUMERICEXCEPTIONS_INC 200
 #
 /*=== numeric excception ===
-numeric‚ÉŠÖ‚í‚é—áŠO
+numericã«é–¢ã‚ã‚‹ä¾‹å¤–
 
 v2_00/140214 hmIto
-	hmLib_v3_06‚Ì—áŠO‹KŠi‚É‘Î‰
+	hmLib_v3_06ã®ä¾‹å¤–è¦æ ¼ã«å¯¾å¿œ
 */
 #ifndef HMLIB_EXCEPTIONS_EXCEPTION_INC
 #	include"exception.hpp"
@@ -13,7 +13,7 @@ v2_00/140214 hmIto
 namespace hmLib{
 	namespace exceptions{
 		namespace numeric {
-			//”’l‰‰ZƒGƒ‰[
+			//æ•°å€¤æ¼”ç®—ã‚¨ãƒ©ãƒ¼
 			template<typename base_type_=exception>
 			class numeric_exception :public base_type_ {
 				typedef base_type_ base_type;
@@ -21,7 +21,7 @@ namespace hmLib{
 				explicit numeric_exception(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit numeric_exception(const char* Message_) :base_type(Message_) {}
 			};
-			//Å‰‚©‚çŠù’è‚Ì’l‚Ì”ÍˆÍŠO‚É’l‚ª‚ ‚éê‡
+			//æœ€åˆã‹ã‚‰æ—¢å®šã®å€¤ã®ç¯„å›²å¤–ã«å€¤ãŒã‚ã‚‹å ´åˆ
 			template<typename base_type_=exception>
 			class invalid_initialvalue :public numeric_exception<base_type_> {
 				typedef numeric_exception<base_type_> base_type;
@@ -29,7 +29,7 @@ namespace hmLib{
 				explicit invalid_initialvalue(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit invalid_initialvalue(const char* Message_) :base_type(Message_) {}
 			};
-			//ŒvZ‚ÌŒ‹‰ÊA‹K’è‚Ì’l‚Ì”ÍˆÍŠO‚É‚È‚Á‚½ê‡
+			//è¨ˆç®—ã®çµæœã€è¦å®šã®å€¤ã®ç¯„å›²å¤–ã«ãªã£ãŸå ´åˆ
 			template<typename base_type_=exception>
 			class out_of_valuerange :public numeric_exception<base_type_> {
 				typedef numeric_exception<base_type_> base_type;
@@ -37,7 +37,7 @@ namespace hmLib{
 				explicit out_of_valuerange(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit out_of_valuerange(const char* Message_) :base_type(Message_) {}
 			};
-			//•s“–‚ÈZp‰‰Z‚ğ—v‹‚µ‚½ê‡ 0œZ“™
+			//ä¸å½“ãªç®—è¡“æ¼”ç®—ã‚’è¦æ±‚ã—ãŸå ´åˆ 0é™¤ç®—ç­‰
 			template<typename base_type_=exception>
 			class incorrect_arithmetic_request :public numeric_exception<base_type_> {
 				typedef numeric_exception<base_type_> base_type;
@@ -45,7 +45,7 @@ namespace hmLib{
 				explicit incorrect_arithmetic_request(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit incorrect_arithmetic_request(const char* Message_) :base_type(Message_) {}
 			};
-			//•s“–‚ÈZp‰‰Z‚ªs‚í‚ê‚½ê‡ 0œZ“™
+			//ä¸å½“ãªç®—è¡“æ¼”ç®—ãŒè¡Œã‚ã‚ŒãŸå ´åˆ 0é™¤ç®—ç­‰
 			template<typename base_type_=exception>
 			class incorrect_arithmetic_occurrence :public numeric_exception<base_type_> {
 				typedef numeric_exception<base_type_> base_type;

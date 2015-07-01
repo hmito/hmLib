@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPEMANAGE_PARAMETER_INC
+ï»¿#ifndef HMLIB_TYPEMANAGE_PARAMETER_INC
 #define HMLIB_TYPEMANAGE_PARAMETER_INC 100
 #
 #include<type_traits>
@@ -18,7 +18,7 @@ namespace hmLib{
 				static_assert(std::false_type::value,"fail to detect parameter class.");
 			}
 		};
-		//ƒƒ“ƒoƒNƒ‰ƒX‚ÉparameterizerŒ^‚ª‚ ‚é‚©‚ğ”»’è‚·‚éƒƒ^ƒNƒ‰ƒX
+		//ãƒ¡ãƒ³ãƒã‚¯ãƒ©ã‚¹ã«parameterizerå‹ãŒã‚ã‚‹ã‹ã‚’åˆ¤å®šã™ã‚‹ãƒ¡ã‚¿ã‚¯ãƒ©ã‚¹
 		template<typename T>
 		std::true_type _have_type_parameter(T* ptr=nullptr,typename T::parameter* t=nullptr);
 		template<typename T>

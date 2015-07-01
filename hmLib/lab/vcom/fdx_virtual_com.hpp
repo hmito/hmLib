@@ -1,8 +1,8 @@
-#ifndef HMLIB_VCOM_THREADVIRTUALCOM_INC
+ï»¿#ifndef HMLIB_VCOM_THREADVIRTUALCOM_INC
 #define HMLIB_VCOM_THREADVIRTUALCOM_INC 100
 #
 /*===thread_virtual_com===
-ƒXƒŒƒbƒh‚ğg‚Á‚Ä‰¼‘z“I‚Écom’ÊM‚ğÄŒ»‚·‚éƒNƒ‰ƒXŒQ
+ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ä½¿ã£ã¦ä»®æƒ³çš„ã«comé€šä¿¡ã‚’å†ç¾ã™ã‚‹ã‚¯ãƒ©ã‚¹ç¾¤
 */
 #include<chrono>
 #include<mutex>
@@ -11,7 +11,7 @@
 #include"virtual_com_abstruct.hpp"
 namespace hmLib{
 	namespace vcom{
-		//ƒXƒŒƒbƒhƒx[ƒX‰¼‘zcom
+		//ã‚¹ãƒ¬ãƒƒãƒ‰ãƒ™ãƒ¼ã‚¹ä»®æƒ³com
 		class fdx_virtual_com:public virtual_com_abstruct{
 			typedef std::mutex mutex;
 			typedef std::lock_guard<mutex> lock;
@@ -44,18 +44,18 @@ namespace hmLib{
 					char Buf[1024];
 
 					while(true){
-						//I—¹—v‹‚ªs‚í‚ê‚Ä‚¢‚ê‚ÎAI—¹
+						//çµ‚äº†è¦æ±‚ãŒè¡Œã‚ã‚Œã¦ã„ã‚Œã°ã€çµ‚äº†
 						if(is_request_join())break;
 
-						//Ú‘±‚ªs‚í‚ê‚Ä‚¢‚È‚¯‚ê‚ÎAÅVó‘Ô‚É‚µ‚Ä‘Ò‹@
+						//æ¥ç¶šãŒè¡Œã‚ã‚Œã¦ã„ãªã‘ã‚Œã°ã€æœ€æ–°çŠ¶æ…‹ã«ã—ã¦å¾…æ©Ÿ
 						if(!ptr->is_connect()){
 							SendPos=SendNum;
 							continue;
 						}
 
-						//ŠÔ‚©‚ç‘—M‰Â”\‚È”‚ğ’²‚×‚é
+						//æ™‚é–“ã‹ã‚‰é€ä¿¡å¯èƒ½ãªæ•°ã‚’èª¿ã¹ã‚‹
 						SendNum=static_cast<unsigned int>(std::chrono::duration_cast<milliseconds>(clock::now()-time).count())*bps/8/1000;
-						//‘—M‰Â”\‚ÈŠÔ‚ª‚½‚Á‚Ä‚¢‚ê‚ÎA‚»‚ÌŠÔ•ª‚¾‚¯‘—M
+						//é€ä¿¡å¯èƒ½ãªæ™‚é–“ãŒãŸã£ã¦ã„ã‚Œã°ã€ãã®æ™‚é–“åˆ†ã ã‘é€ä¿¡
 						if(SendNum>SendPos){
 							lock Lock(ptr->ComMx);
 							unsigned int BufNum;
@@ -102,13 +102,13 @@ namespace hmLib{
 			}
 			bool is_start()const{return Engine!=nullptr;}
 		public: //virtual_com_abstruct
-			//virtual_comgate‚ğÚ‘±‚·‚é
+			//virtual_comgateã‚’æ¥ç¶šã™ã‚‹
 			void connect(virtual_comgate_abstruct* ptr)override{
 				lock Lock(ComMx);
 				if(com1==nullptr)com1=ptr;
 				else if(com2==nullptr)com2=ptr;
 			}
-			//virtual_comgate‚ğØ’f‚·‚é
+			//virtual_comgateã‚’åˆ‡æ–­ã™ã‚‹
 			void disconnect(virtual_comgate_abstruct* ptr=nullptr)override{
 				lock Lock(ComMx);
 				if(ptr==nullptr){
@@ -119,7 +119,7 @@ namespace hmLib{
 					else if(com2==ptr)com2=nullptr;
 				}
 			}
-			//virtual_comgate‚ªÚ‘±‚³‚ê‚Ä‚¢‚é‚©‚ğŠm”F‚·‚é
+			//virtual_comgateãŒæ¥ç¶šã•ã‚Œã¦ã„ã‚‹ã‹ã‚’ç¢ºèªã™ã‚‹
 			bool is_connect(virtual_comgate_abstruct* ptr=nullptr)override{
 				lock Lock(ComMx);
 				if(ptr==nullptr){

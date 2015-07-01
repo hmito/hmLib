@@ -1,29 +1,29 @@
-#ifndef HMLIB_COMGATE_INC
+ï»¿#ifndef HMLIB_COMGATE_INC
 #define HMLIB_COMGATE_INC 201
 #
 /*===comgate===
-COMƒ|[ƒg‚©‚ç‚ÌRS232c’ÊM‚ðƒTƒ|[ƒg
+COMãƒãƒ¼ãƒˆã‹ã‚‰ã®RS232cé€šä¿¡ã‚’ã‚µãƒãƒ¼ãƒˆ
 
 v2_00/131222 amby
-	ŽŸ¢‘ãŒ^comgate	
-	•¡”•¶Žš—ñ‚ðˆµ‚¤get/put‚ð”pŽ~‚µA’P”•¶Žš—ñ‚É“Á‰»
-	‚½‚¾‚µAgets/puts‚ÅŒø—¦‚Ì–â‘è‚ÅŽg‚¢‚½‚¢ê‡‚ÌŽè’i‚ÍŽc‚·
-	V‚½‚ÉAflowing/flush/is_open‚ð’Ç‰Á
-	flowing: !empty()‚É‘Î‰ž
-	flush: ŽÀ‘•‚È‚µ
+	æ¬¡ä¸–ä»£åž‹comgate	
+	è¤‡æ•°æ–‡å­—åˆ—ã‚’æ‰±ã†get/putã‚’å»ƒæ­¢ã—ã€å˜æ•°æ–‡å­—åˆ—ã«ç‰¹åŒ–
+	ãŸã ã—ã€gets/putsã§åŠ¹çŽ‡ã®å•é¡Œã§ä½¿ã„ãŸã„å ´åˆã®æ‰‹æ®µã¯æ®‹ã™
+	æ–°ãŸã«ã€flowing/flush/is_openã‚’è¿½åŠ 
+	flowing: !empty()ã«å¯¾å¿œ
+	flush: å®Ÿè£…ãªã—
 	
 comgate v1_09/131222 amby
-	Flow§Œä‚ÌÝ’è‚ª‚Å‚«‚é‚æ‚¤‚ÉAopenŠÖ”‚ð•ÏX
+	Flowåˆ¶å¾¡ã®è¨­å®šãŒã§ãã‚‹ã‚ˆã†ã«ã€opené–¢æ•°ã‚’å¤‰æ›´
 comgate v1_08/130622 hmIto
-	can_get/can_putŠÖ”‚ªempty/full‚ðŽQÆ‚µ‚È‚¢‚æ‚¤‚É•ÏX
+	can_get/can_puté–¢æ•°ãŒempty/fullã‚’å‚ç…§ã—ãªã„ã‚ˆã†ã«å¤‰æ›´
 comgate v1_07/130406 hmIto
-	liste/talkŠÖ”‚Å‚Í³í‚ÉŽæ“¾‚Å‚«‚È‚¢ê‡‚ª‚ ‚Á‚½‚Ì‚ÅAgetc1/putc1‚É•ÏX
+	liste/talké–¢æ•°ã§ã¯æ­£å¸¸ã«å–å¾—ã§ããªã„å ´åˆãŒã‚ã£ãŸã®ã§ã€getc1/putc1ã«å¤‰æ›´
 comgate v1_06/130324 hmIto
-	size_type‚ªstd::streamsize‚É•ÏX‚É‚È‚Á‚½‚Ì‚É‘Î‰ž
-		getŠÖ”‚Ì“à•”•Ï”‚ðsize_type‚©‚çunsigned int‚É•ÏX
-		putŠÖ”‚Ì“à•”‚Åstatic_cast‚ð“±“ü
+	size_typeãŒstd::streamsizeã«å¤‰æ›´ã«ãªã£ãŸã®ã«å¯¾å¿œ
+		geté–¢æ•°ã®å†…éƒ¨å¤‰æ•°ã‚’size_typeã‹ã‚‰unsigned intã«å¤‰æ›´
+		puté–¢æ•°ã®å†…éƒ¨ã§static_castã‚’å°Žå…¥
 comgate v1_05/130310 hmIto
-	fullŠÖ”‚ðˆø”‚È‚µ‚ÉC³
+	fullé–¢æ•°ã‚’å¼•æ•°ãªã—ã«ä¿®æ­£
 */
 #ifndef HMLIB_CONFIG_INC
 #	include "hmLib_config.h"
@@ -47,37 +47,37 @@ namespace hmLib{
 		int portnum;
 		int bps;
 	public://gate
-		// ƒQ[ƒg‚ªŠJ‚¢‚Ä‚¢‚é‚©‚ÌŠm”F
+		// ã‚²ãƒ¼ãƒˆãŒé–‹ã„ã¦ã„ã‚‹ã‹ã®ç¢ºèª
 		virtual bool is_open() override{ return port != 0; }
 		
-		//ŽóM‰Â”\ó‘Î‚©‚ÌŠm”F
+		//å—ä¿¡å¯èƒ½çŠ¶å¯¾ã‹ã®ç¢ºèª
 		virtual bool can_getc()override{
 			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
 			return (port->loc() != 0 && is_open());
 		}
-		// ŽóM‚ªŒp‘±‚µ‚Ä‚¢‚é‚©‚ÌŠm”F
+		// å—ä¿¡ãŒç¶™ç¶šã—ã¦ã„ã‚‹ã‹ã®ç¢ºèª
 		virtual bool flowing()override{
 			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
 			return (port->loc() != 0);
 		}
-		//1byteŽóM
+		//1byteå—ä¿¡
 		virtual char getc()override{
 			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
 			return port->getc1();
 		}
 
 
-		//‘—M‰Â”\ó‘Ô‚©‚ÌŠm”F
+		//é€ä¿¡å¯èƒ½çŠ¶æ…‹ã‹ã®ç¢ºèª
 		virtual bool can_putc()override{
 			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
 			return is_open();
 		}
-		//‘—M‚ð–³—‚â‚è‚â‚éBBƒRƒ}ƒ“ƒh‚È‚µ
+		//é€ä¿¡ã‚’ç„¡ç†ã‚„ã‚Šã‚„ã‚‹ã€‚ã€‚ã‚³ãƒžãƒ³ãƒ‰ãªã—
 		virtual void flush()override{
 			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
 			return;
 		}
-		//1byte‘—M
+		//1byteé€ä¿¡
 		virtual void  putc(char c)override{
 			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
 			port->putc1(c);

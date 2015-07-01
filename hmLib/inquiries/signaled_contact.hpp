@@ -1,11 +1,11 @@
-#ifndef HMLIB_INQUIRIES_SIGNALEDCONTACT_INC
+ï»¿#ifndef HMLIB_INQUIRIES_SIGNALEDCONTACT_INC
 #define HMLIB_INQUIRIES_SIGNALEDCONTACT_INC 101
 #
 /*===inquiries::signaled_contact===
-signal‚Åó‚¯æ‚Á‚½’l‚ğ•Û‚µ‚ÄAinquiry‚Å‚Ì—v‹‚É‚±‚½‚¦‚éƒNƒ‰ƒX
+signalã§å—ã‘å–ã£ãŸå€¤ã‚’ä¿æŒã—ã¦ã€inquiryã§ã®è¦æ±‚ã«ã“ãŸãˆã‚‹ã‚¯ãƒ©ã‚¹
 
 inquiries::signaled_contact v1_00/130421 hmIto
-	signaled_contact’Ç‰Á
+	signaled_contactè¿½åŠ 
 */
 #include<mutex>
 #include<boost/signals2.hpp>

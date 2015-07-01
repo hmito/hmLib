@@ -1,15 +1,15 @@
-#ifndef HMLIB_SIGNALS_CONNECT_INC
+ï»¿#ifndef HMLIB_SIGNALS_CONNECT_INC
 #define HMLIB_SIGNALS_CONNECT_INC 101
 #
 /*===signal::connect===
-boost::signals2::signal‚Ìconnection‚ğŠÇ—‚µAdestructor‚Ådisconnect‚·‚éƒNƒ‰ƒX
+boost::signals2::signalã®connectionã‚’ç®¡ç†ã—ã€destructorã§disconnectã™ã‚‹ã‚¯ãƒ©ã‚¹
 
 signals::connect v1_01/130421 hmIto
-	exceptions‚ğinclude‚©‚çœŠO
+	exceptionsã‚’includeã‹ã‚‰é™¤å¤–
 signals::connect v1_00/130328 hmIto
-	signals–¼‘O‹óŠÔƒtƒ@ƒCƒ‹‚ÉˆÚ“®
+	signalsåå‰ç©ºé–“ãƒ•ã‚¡ã‚¤ãƒ«ã«ç§»å‹•
 signal_unique_connections v1_00/130328 hmIto
-	ì¬
+	ä½œæˆ
 */
 #include<boost/signals2/signal.hpp>
 namespace hmLib{

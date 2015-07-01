@@ -1,9 +1,9 @@
-#ifndef HMLIB_FILTERBUF_INC
+﻿#ifndef HMLIB_FILTERBUF_INC
 #define HMLIB_FILTERBUF_INC 102
 #
 /*===filterbuf===
 filterbuf_v1_02/130101 hmIto
-	iostream�ɑΉ�
+	iostreamに対応
 */
 #include<streambuf>
 #include<iostream>

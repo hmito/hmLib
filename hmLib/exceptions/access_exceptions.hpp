@@ -1,4 +1,4 @@
-#ifndef HMLIB_EXCEPTIONS_ACCESSEXCEPTIONS_INC
+ï»¿#ifndef HMLIB_EXCEPTIONS_ACCESSEXCEPTIONS_INC
 #define HMLIB_EXCEPTIONS_ACCESSEXCEPTIONS_INC 100
 #
 #ifndef HMLIB_EXCEPTIONS_EXCEPTION_INC
@@ -7,7 +7,7 @@
 namespace hmLib{
 	namespace exceptions{
 		namespace access {
-			//ƒAƒNƒZƒX‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚ª‚Ì‚Æ‚«‚É“Š‚°‚ç‚ê‚é
+			//ã‚¢ã‚¯ã‚»ã‚¹ã—ã‚ˆã†ã¨ã—ã¦ã„ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒã®ã¨ãã«æŠ•ã’ã‚‰ã‚Œã‚‹
 			template<typename base_type_=exception>
 			class invalid_access :public base_type_ {
 				typedef base_type_ base_type;
@@ -15,7 +15,7 @@ namespace hmLib{
 				explicit invalid_access(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit invalid_access(const char* Message_) :base_type(Message_) {}
 			};
-			//”z—ñ—v‘fŠO‚ÉƒAƒNƒZƒX‚µ‚æ‚¤‚Æ‚µ‚½‚Æ‚«‚É“Š‚°‚ç‚ê‚é
+			//é…åˆ—è¦ç´ å¤–ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ã‚ˆã†ã¨ã—ãŸã¨ãã«æŠ•ã’ã‚‰ã‚Œã‚‹
 			template<typename base_type_=exception>
 			class out_of_range_access :public invalid_access<base_type_> {
 				typedef invalid_access<base_type_> base_type;
@@ -23,7 +23,7 @@ namespace hmLib{
 				explicit out_of_range_access(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit out_of_range_access(const char* Message_) :base_type(Message_) {}
 			};
-			//nullptr‚ÉƒAƒNƒZƒX‚µ‚æ‚¤‚Æ‚µ‚½‚Æ‚«‚É“Š‚°‚ç‚ê‚é
+			//nullptrã«ã‚¢ã‚¯ã‚»ã‚¹ã—ã‚ˆã†ã¨ã—ãŸã¨ãã«æŠ•ã’ã‚‰ã‚Œã‚‹
 			template<typename base_type_=exception>
 			class nullptr_dereference :public invalid_access<base_type_> {
 				typedef invalid_access<base_type_> base_type;
@@ -31,7 +31,7 @@ namespace hmLib{
 				explicit nullptr_dereference(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit nullptr_dereference(const char* Message_) :base_type(Message_) {}
 			};
-			//•s³‚ÈQÆ‚ÉƒAƒNƒZƒX‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚é
+			//ä¸æ­£ãªå‚ç…§ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ã‚ˆã†ã¨ã—ã¦ã„ã‚‹æ™‚
 			template<typename base_type_=exception>
 			class invalid_reference :public invalid_access<base_type_> {
 				typedef invalid_access<base_type_> base_type;

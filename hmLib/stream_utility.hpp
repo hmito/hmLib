@@ -1,4 +1,4 @@
-#ifndef HMLIB_STREAMUTILITY_INC
+﻿#ifndef HMLIB_STREAMUTILITY_INC
 #define HMLIB_STREAMUTILITY_INC 100
 #
 #include<fstream>

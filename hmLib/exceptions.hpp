@@ -1,11 +1,11 @@
-#ifndef HMLIB_EXCEPTIONS_INC
+﻿#ifndef HMLIB_EXCEPTIONS_INC
 #define HMLIB_EXCEPTIONS_INC 200
 #
 /*
-hmLib�̗�O�N���X�̊��N���X�Q��񋟂���
+hmLibの例外クラスの基底クラス群を提供する
 ===exceptions===
 v2_00/131115 hmIto
-	��O�@�\�Ē�`
+	例外機構再定義
 */
 #include<hmLib/exceptions/exception.hpp>
 #include<hmLib/exceptions/memory_exceptions.hpp>

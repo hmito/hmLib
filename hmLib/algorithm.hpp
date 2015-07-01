@@ -1,53 +1,53 @@
-#ifndef HMLIB_ALGORITHM_INC
+ï»¿#ifndef HMLIB_ALGORITHM_INC
 #define HMLIB_ALGORITHM_INC 111
 /*===algorithm===
-C++ algorthm‚ğ•â•‚·‚éƒAƒ‹ƒSƒŠƒYƒ€‚ğ’ñ‹Ÿ‚·‚é
+C++ algorthmã‚’è£œåŠ©ã™ã‚‹ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’æä¾›ã™ã‚‹
 
 algorithm v1_11/130529 hmito
-	algorithm–¼‘O‹óŠÔ‚ÌƒtƒHƒ‹ƒ_w’è–¼‚ªŠÔˆá‚Á‚Ä‚¢‚½–â‘è‚ğC³
+	algorithmåå‰ç©ºé–“ã®ãƒ•ã‚©ãƒ«ãƒ€æŒ‡å®šåãŒé–“é•ã£ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 algorithm v1_10/130328 hmito
-	algorithm–¼‘O‹óŠÔ‚ÉŠî‚Ã‚¢‚Äƒtƒ@ƒCƒ‹‚ğ‰ğ‘Ì
+	algorithmåå‰ç©ºé–“ã«åŸºã¥ã„ã¦ãƒ•ã‚¡ã‚¤ãƒ«ã‚’è§£ä½“
 algorithm:v1_09/130128 hmIto
-	roulette_sampler‚ÉsyncŠÖ”‚ğ’Ç‰Á
-		roulette_sampler©‘Ì‚ğÄ—˜—p‰Â”\‚É•ÏX
+	roulette_samplerã«syncé–¢æ•°ã‚’è¿½åŠ 
+		roulette_samplerè‡ªä½“ã‚’å†åˆ©ç”¨å¯èƒ½ã«å¤‰æ›´
 algorithm:v1_08/130109
-	roulette_sampler‚Ì‚‘¬‰»
-		“à•”‚Å”z—ñ‚ÌŒ`‚Å•Û‚µ‚Ä‚¨‚­‚±‚Æ‚ÅAŒJ‚è•Ô‚µ‚Ì“®ì‚ğ‚‘¬‰»
-		std::lower_bound‚ğ—˜—p‚·‚é–‚Å‚‘¬‰»
+	roulette_samplerã®é«˜é€ŸåŒ–
+		å†…éƒ¨ã§é…åˆ—ã®å½¢ã§ä¿æŒã—ã¦ãŠãã“ã¨ã§ã€ç¹°ã‚Šè¿”ã—æ™‚ã®å‹•ä½œã‚’é«˜é€ŸåŒ–
+		std::lower_boundã‚’åˆ©ç”¨ã™ã‚‹äº‹ã§é«˜é€ŸåŒ–
 algorithm.hpp v1_07
-		class roulette_sampler‚Ì‰Šú‰»‚ÅBegin‚ğ•s³‚É‘‚«Š·‚¦‚Ä‚¢‚½‚Ì‚ğC³
+		class roulette_samplerã®åˆæœŸåŒ–ã§Beginã‚’ä¸æ­£ã«æ›¸ãæ›ãˆã¦ã„ãŸã®ã‚’ä¿®æ­£
 algorithm.hpp v1_06
-		class random_sampler‚Ì’²®
+		class random_samplerã®èª¿æ•´
 algorithm.hpp v1_05
-	ƒ‰ƒ“ƒ_ƒ€‘I‘ğ‚ğs‚¤ˆÈ‰º‚ÌƒNƒ‰ƒX‚ÆŠÖ”‚ğ’Ç‰ÁB
-	//ƒ‹[ƒŒƒbƒg‘I‘ğƒNƒ‰ƒX
+	ãƒ©ãƒ³ãƒ€ãƒ é¸æŠã‚’è¡Œã†ä»¥ä¸‹ã®ã‚¯ãƒ©ã‚¹ã¨é–¢æ•°ã‚’è¿½åŠ ã€‚
+	//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠã‚¯ãƒ©ã‚¹
 	template<typename InputIterator,typename fnAssess>
 	class roulette_sampler{
 	public:
 		roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess FnAssess_);
 		OutputIterator operator()();
 	};
-	//ƒ‹[ƒŒƒbƒg‘I‘ğƒNƒ‰ƒX‚Ìƒrƒ‹ƒ_[
+	//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠã‚¯ãƒ©ã‚¹ã®ãƒ“ãƒ«ãƒ€ãƒ¼
 	template<typename InputIterator,typename fnAssess>
 	roulette_sampler<InputIterator,fnAssess> build_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess FnAssess_);
 algorithm.hpp v1_04
-	ƒ‰ƒ“ƒ_ƒ€‘I‘ğAƒ‹[ƒŒƒbƒg‘I‘ğ‚Åw’è”ÍˆÍ‚©‚ç”²‚«o‚·AˆÈ‰º‚Ì6ŠÖ”‚ğ’Ç‰ÁB
-	//ƒ‰ƒ“ƒ_ƒ€‘I‘ğ
+	ãƒ©ãƒ³ãƒ€ãƒ é¸æŠã€ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠã§æŒ‡å®šç¯„å›²ã‹ã‚‰æŠœãå‡ºã™ã€ä»¥ä¸‹ã®6é–¢æ•°ã‚’è¿½åŠ ã€‚
+	//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ
 	template<class InputIterator,class OutputIterator>
 	OutputIterator random_sample(InputIterator Begin,InputIterator End,OutputIterator Out);
-	//ƒ‰ƒ“ƒ_ƒ€‘I‘ğ OutputIterator‚Ì”ÍˆÍ‚ğ–„‚ß‚é‚Ü‚Å
+	//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ OutputIteratorã®ç¯„å›²ã‚’åŸ‹ã‚ã‚‹ã¾ã§
 	template<class InputIterator,class OutputIterator>
 	OutputIterator random_sample(InputIterator Begin,InputIterator End,OutputIterator OutBegin,OutputIterator OutEnd);
-	//ƒ‰ƒ“ƒ_ƒ€‘I‘ğ nŒÂ•ª
+	//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ nå€‹åˆ†
 	template<class InputIterator,class OutputIterator>
 	OutputIterator random_sample(InputIterator Begin,InputIterator End,OutputIterator Out,unsigned int n);
-	//ƒ‹[ƒŒƒbƒg‘I‘ğ
+	//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ
 	template<class InputIterator,class FnRealValue,class OutputIterator>
 	OutputIterator roulette_sample(InputIterator Begin,InputIterator End,FnRealValue Value,OutputIterator Out);
-	//ƒ‹[ƒŒƒbƒg‘I‘ğ OutputIterator‚Ì”ÍˆÍ‚ğ–„‚ß‚é‚Ü‚Å
+	//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ OutputIteratorã®ç¯„å›²ã‚’åŸ‹ã‚ã‚‹ã¾ã§
 	template<class InputIterator,class FnRealValue,class OutputIterator>
 	OutputIterator roulette_sample(InputIterator Begin,InputIterator End,FnRealValue Value,OutputIterator OutBegin,OutputIterator OutEnd);
-	//ƒ‹[ƒŒƒbƒg‘I‘ğ nŒÂ•ª
+	//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ nå€‹åˆ†
 	template<class InputIterator,class FnRealValue,class OutputIterator>
 	OutputIterator roulette_sample(InputIterator Begin,InputIterator End,FnRealValue Value,OutputIterator Out,unsigned int n);
 */

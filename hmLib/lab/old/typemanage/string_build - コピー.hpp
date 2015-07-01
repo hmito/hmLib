@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPEMANAGE_STRINGBUILD_INC
+ï»¿#ifndef HMLIB_TYPEMANAGE_STRINGBUILD_INC
 #define HMLIB_TYPEMANAGE_STRINGBUILD_INC 100
 #
 #include<type_traits>
@@ -18,7 +18,7 @@ namespace hmLib{
 			}
 			unsigned int size()const{return 1;}
 		};
-		//ƒƒ“ƒoƒNƒ‰ƒX‚Éstring_buildizerŒ^‚ª‚ ‚é‚©‚ğ”»’è‚·‚éƒƒ^ƒNƒ‰ƒX
+		//ãƒ¡ãƒ³ãƒã‚¯ãƒ©ã‚¹ã«string_buildizerå‹ãŒã‚ã‚‹ã‹ã‚’åˆ¤å®šã™ã‚‹ãƒ¡ã‚¿ã‚¯ãƒ©ã‚¹
 		template<typename T>
 		std::true_type _have_type_string_build(T* ptr=nullptr,typename T::string_build* t=nullptr);
 		template<typename T>

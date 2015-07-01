@@ -1,12 +1,12 @@
-#ifndef HMLIB_RANDOM_RANDOMBIT_INC
+ï»¿#ifndef HMLIB_RANDOM_RANDOMBIT_INC
 #define HMLIB_RANDOM_RANDOMBIT_INC 100
 #
 /*===random_bit===
-bit’PˆÊ‚Å—”‚ğ’ñ‹Ÿ‚·‚é
+bitå˜ä½ã§ä¹±æ•°ã‚’æä¾›ã™ã‚‹
 
 random_bit:v1_00/130321 hmIto
-	bit’PˆÊ‚Å‚Ì—”•Û‹@”\Arandom_bit‚ğ’Ç‰Á
-	random::uniform_boolŠÖ”‚ğ’Ç‰Á
+	bitå˜ä½ã§ã®ä¹±æ•°ä¿æŒæ©Ÿèƒ½ã€random_bitã‚’è¿½åŠ 
+	random::uniform_boolé–¢æ•°ã‚’è¿½åŠ 
 */
 #ifndef HMLIB_RANDOM_RANDOMENGINE_INC
 #	include"random_engine.hpp"

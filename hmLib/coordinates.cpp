@@ -1,14 +1,14 @@
-#ifndef HMLIB_COORDINATES_CPP_INC
+ï»¿#ifndef HMLIB_COORDINATES_CPP_INC
 #define HMLIB_COORDINATES_CPP_INC 100
 #
 /*===coordinate.cpp ===
 
-‚´‚Ğ‚å‚¤•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+ã–ã²ã‚‡ã†å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 
 hmrBufGate:v1_01/130519 amby
-	‚´‚Ğ‚å‚¤•ÏŠ·ƒNƒ‰ƒX‚ğÀ‘•
-	’Pƒ‚È“®ìƒ`ƒFƒbƒNÏ‚İ(Œ‹‰Ê‚Í³‚µ‚»‚¤)
-	‚È‚¨A•ÏŠ·‚Æ‹t•ÏŠ·‚µ‚½‚à‚Ì‚ğ‚©‚¯‚½Û‚ÉA”’lŒë·‚ªe^{-10}’ö“xo‚Ä‚µ‚Ü‚¤B–{—ˆ‚Í’PˆÊs—ñ‚É‚È‚é‚Í‚¸‚¾‚ªc
+	ã–ã²ã‚‡ã†å¤‰æ›ã‚¯ãƒ©ã‚¹ã‚’å®Ÿè£…
+	å˜ç´”ãªå‹•ä½œãƒã‚§ãƒƒã‚¯æ¸ˆã¿(çµæœã¯æ­£ã—ãã†)
+	ãªãŠã€å¤‰æ›ã¨é€†å¤‰æ›ã—ãŸã‚‚ã®ã‚’ã‹ã‘ãŸéš›ã«ã€æ•°å€¤èª¤å·®ãŒe^{-10}ç¨‹åº¦å‡ºã¦ã—ã¾ã†ã€‚æœ¬æ¥ã¯å˜ä½è¡Œåˆ—ã«ãªã‚‹ã¯ãšã ãŒâ€¦
 
 */
 
@@ -17,34 +17,34 @@ hmrBufGate:v1_01/130519 amby
 
 namespace hmLib{
     namespace coordinates3D{        
-		// ŠÖ”‚ÌÀ‘••”•ª
+		// é–¢æ•°ã®å®Ÿè£…éƒ¨åˆ†
 		angle coordinate_transfer(const position& pole_,const position& plane_){
-            // Œ‹‰Ê‚Æ‚µ‚Ä“¾‚ç‚ê‚é‚Ì‚Í,
-            //  V‚µ‚¢À•WŒn‚ÅŒ©‚½‚Æ‚«‚Ì‚ ‚é“_‚ÌˆÊ’u(ƒxƒNƒgƒ‹)‚ğ x_newcoordinate, ŒÃ‚¢À•WŒn‚ÅŒ©‚½‚Æ‚«‚ÌˆÊ’u‚ğ@x_oldcoordinate ‚Æ‚µ‚½‚Æ‚«‚É
-            //  x_newcoordinate = transfer(angle) * x_oldcoordinate ‚Æ‚¢‚¤Œ`‚ÅŠÖŒW‚Ã‚¯‚ç‚ê‚é‚±‚Æ‚É’ˆÓ
+            // çµæœã¨ã—ã¦å¾—ã‚‰ã‚Œã‚‹ã®ã¯,
+            //  æ–°ã—ã„åº§æ¨™ç³»ã§è¦‹ãŸã¨ãã®ã‚ã‚‹ç‚¹ã®ä½ç½®(ãƒ™ã‚¯ãƒˆãƒ«)ã‚’ x_newcoordinate, å¤ã„åº§æ¨™ç³»ã§è¦‹ãŸã¨ãã®ä½ç½®ã‚’ã€€x_oldcoordinate ã¨ã—ãŸã¨ãã«
+            //  x_newcoordinate = transfer(angle) * x_oldcoordinate ã¨ã„ã†å½¢ã§é–¢ä¿‚ã¥ã‘ã‚‰ã‚Œã‚‹ã“ã¨ã«æ³¨æ„
 
-            // ƒRƒR‚Å‚ÌŒvZ‚Ì•ûj
-            //  pole vector ‚ğ’PˆÊƒxƒNƒgƒ‹e1(VÀ•W‚Ìx²‘Š“–)‚É‚µCplene vector ‚©‚çCe1‚É’¼s‚·‚é’PˆÊƒxƒNƒgƒ‹e2(VÀ•W‚Ìy²‚É‘Î‰)‚ğì‚éD
-            //  ‚³‚ç‚É z²•ûŒü‚ÌƒxƒNƒgƒ‹e3‚ğ‹‚ßC‚±‚ê‚ç‚ÌƒxƒNƒgƒ‹‚ğ@VÀ•W‚Ìx,y,z‚É‚·‚é‚æ‚¤‚È•ÏŠ· T ‚ğˆÈ‰º‚Ì®‚Å‹‚ß‚é
-            //    I = T * (e1 e2 e3)@, ‚Â‚Ü‚èC@T^{-1} = (e1 e2 e3)
-            //  Œ‹‹Ç@T@‚ª‹‚ß‚é‚×‚« transfer(angle) ‚É‘Î‰‚·‚é‚Ì‚ÅC‚»‚ÌŠÖŒW‚©‚çangle ‚ğ‹‚ß‚é‚±‚Æ‚ª‚Å‚«‚éD
+            // ã‚³ã‚³ã§ã®è¨ˆç®—ã®æ–¹é‡
+            //  pole vector ã‚’å˜ä½ãƒ™ã‚¯ãƒˆãƒ«e1(æ–°åº§æ¨™ã®xè»¸ç›¸å½“)ã«ã—ï¼Œplene vector ã‹ã‚‰ï¼Œe1ã«ç›´è¡Œã™ã‚‹å˜ä½ãƒ™ã‚¯ãƒˆãƒ«e2(æ–°åº§æ¨™ã®yè»¸ã«å¯¾å¿œ)ã‚’ä½œã‚‹ï¼
+            //  ã•ã‚‰ã« zè»¸æ–¹å‘ã®ãƒ™ã‚¯ãƒˆãƒ«e3ã‚’æ±‚ã‚ï¼Œã“ã‚Œã‚‰ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã€€æ–°åº§æ¨™ã®x,y,zã«ã™ã‚‹ã‚ˆã†ãªå¤‰æ› T ã‚’ä»¥ä¸‹ã®å¼ã§æ±‚ã‚ã‚‹
+            //    I = T * (e1 e2 e3)ã€€, ã¤ã¾ã‚Šï¼Œã€€T^{-1} = (e1 e2 e3)
+            //  çµå±€ã€€Tã€€ãŒæ±‚ã‚ã‚‹ã¹ã transfer(angle) ã«å¯¾å¿œã™ã‚‹ã®ã§ï¼Œãã®é–¢ä¿‚ã‹ã‚‰angle ã‚’æ±‚ã‚ã‚‹ã“ã¨ãŒã§ãã‚‹ï¼
 
-            // ’PˆÊƒxƒNƒgƒ‹ŒvZ
+            // å˜ä½ãƒ™ã‚¯ãƒˆãƒ«è¨ˆç®—
             position e1 = pole_;
             e1 = e1 / sqrt( e1.x*e1.x + e1.y*e1.y + e1.z*e1.z );
 
-            // plane_@‚©‚ç@e2‚ğŒvZ
+            // plane_ã€€ã‹ã‚‰ã€€e2ã‚’è¨ˆç®—
             position e2 = plane_;
             e2 = e2 - e1 * (e1.x*e2.x + e1.y*e2.y + e1.z*e2.z );
             e2 = e2 / sqrt( e2.x*e2.x + e2.y*e2.y + e2.z*e2.z );
 
-            // ˆÈã‚©‚ç e3 ‚ğŠOÏ‚ÅŒvZ
+            // ä»¥ä¸Šã‹ã‚‰ e3 ã‚’å¤–ç©ã§è¨ˆç®—
             position e3;
             e3.x = e1.y*e2.z - e1.z*e2.y;
             e3.y = e1.z*e2.x - e1.x*e2.z;
             e3.z = e1.x*e2.y - e1.y*e2.x;
 
-            // ‚±‚±‚Ü‚Å‚ÌŒ‹‰Ê‚©‚çCT^{-1}‚ª‹‚Ü‚é
+            // ã“ã“ã¾ã§ã®çµæœã‹ã‚‰ï¼ŒT^{-1}ãŒæ±‚ã¾ã‚‹
             transfer trans;
             trans.x[0][0] = e1.x;
             trans.x[1][0] = e1.y;
@@ -56,12 +56,12 @@ namespace hmLib{
             trans.x[1][2] = e3.y;
             trans.x[2][2] = e3.z;
 
-            // ‚±‚Ì•ÏŠ·s—ñ‚Ìroll pitch yaw ‚ğ‹‚ß‚é
+            // ã“ã®å¤‰æ›è¡Œåˆ—ã®roll pitch yaw ã‚’æ±‚ã‚ã‚‹
             angle invAngle;
             position invPos;
             trans.getAngleAndPosition(invAngle, invPos);
 
-            // ÅŒã‚ÉŒ‹‰Ê‚ğ‹t‚É‚·‚é
+            // æœ€å¾Œã«çµæœã‚’é€†ã«ã™ã‚‹
             angle ans = ~invAngle;
             return ans;
         }
@@ -76,46 +76,46 @@ namespace hmLib{
 			phi=atan2(Pos_.y, Pos_.x);
 		}
 
-		//²•ÏŠ·‡¬
+		//è»¸å¤‰æ›åˆæˆ
         const angle& angle::operator&=(const angle& Agl_){
             transfer compositeTrans;
-            // ©•ª©g‚Å•ÏŠ·‚µ‚Ä‚©‚çC–Ú“I‚Ì•ÏŠ·ŠÖ”‚ğŠ|‚¯‡‚í‚¹‚é
+            // è‡ªåˆ†è‡ªèº«ã§å¤‰æ›ã—ã¦ã‹ã‚‰ï¼Œç›®çš„ã®å¤‰æ›é–¢æ•°ã‚’æ›ã‘åˆã‚ã›ã‚‹
             compositeTrans = transfer(Agl_) * transfer(*this);
-            // Šp“x•Ï‰»‚ğŒvZ
+            // è§’åº¦å¤‰åŒ–ã‚’è¨ˆç®—
             angle angle_;
             position pos_;
             compositeTrans.getAngleAndPosition(angle_, pos_);
 
-            // ‘ã“ü
+            // ä»£å…¥
             roll = angle_.roll;
             pitch = angle_.pitch;
             yaw = angle_.yaw;
 
             return *this;
         }
-		//‹t²•ÏŠ·
+		//é€†è»¸å¤‰æ›
         const angle angle::operator~()const{
-            //‹t²•ÏŠ·‚ÍŒ‹‹ÇCR(rollj R(pitch), R(yaw) ‚Ì•ÏŠ·‚ğ‹t‚É‚â‚é‚±‚Æ‚È‚Ì‚ÅC
+            //é€†è»¸å¤‰æ›ã¯çµå±€ï¼ŒR(rollï¼‰ R(pitch), R(yaw) ã®å¤‰æ›ã‚’é€†ã«ã‚„ã‚‹ã“ã¨ãªã®ã§ï¼Œ
             // x_inertial =  R(roll) * R(pitch) * R(yaw) * x_robot
-            // ‚±‚ê‚ğC
+            // ã“ã‚Œã‚’ï¼Œ
             // x_robot = R(-yaw) * R(-pitch) * R(-roll) * x_inertial
-            // ‚Æ‚µ‚ÄD‚±‚Ì•ÏŠ·s—ñ‚ğ‹‚ß‚é‚±‚Æ‚Æ“¯’l
+            // ã¨ã—ã¦ï¼ã“ã®å¤‰æ›è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ã“ã¨ã¨åŒå€¤
             transfer invTrans;
             invTrans = transfer(angle(0., 0., -yaw)) * transfer(angle(0., -pitch, 0.)) * transfer(angle(-roll, 0., 0.));
-            // Šp“x•Ï‰»‚ğŒvZ
+            // è§’åº¦å¤‰åŒ–ã‚’è¨ˆç®—
             angle angle_;
             position pos_;
             invTrans.getAngleAndPosition(angle_, pos_);
 
-            // ‘ã“ü
+            // ä»£å…¥
             return angle_;
         }
-		//À•W•ÏŠ·
+		//åº§æ¨™å¤‰æ›
 		const position& position::operator*=(const angle& Agl_){
 			*this = transfer(Agl_) * (*this);
 			return *this;
 		}
-		//À•W•ÏŠ·
+		//åº§æ¨™å¤‰æ›
 		const position& position::operator*=(const scale& Scl_) {
 			*this = transfer(Scl_) * (*this);
 			return *this;

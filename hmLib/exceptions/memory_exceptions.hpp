@@ -1,11 +1,11 @@
-#ifndef HMLIB_EXCEPTIONS_MEMORYEXCEPTIONS_INC
+ï»¿#ifndef HMLIB_EXCEPTIONS_MEMORYEXCEPTIONS_INC
 #define HMLIB_EXCEPTIONS_MEMORYEXCEPTIONS_INC 200
 #
 /*=== memory excception ===
-memory‚ÉŠÖ‚í‚é—áŠO
+memoryã«é–¢ã‚ã‚‹ä¾‹å¤–
 
 v2_00/140214 hmIto
-	hmLib_v3_06‚Ì—áŠO‹KŠi‚É‘Î‰
+	hmLib_v3_06ã®ä¾‹å¤–è¦æ ¼ã«å¯¾å¿œ
 */
 #ifndef HMLIB_EXCEPTIONS_EXCEPTION_INC
 #	include"exception.hpp"
@@ -14,7 +14,7 @@ v2_00/140214 hmIto
 namespace hmLib{
 	namespace exceptions{
 		namespace memory {
-			//ƒƒ‚ƒŠ[ƒGƒ‰[
+			//ãƒ¡ãƒ¢ãƒªãƒ¼ã‚¨ãƒ©ãƒ¼
 			template<typename base_type_=exception>
 			class memory_exception :public base_type_ {
 				typedef base_type_ base_type;
@@ -22,7 +22,7 @@ namespace hmLib{
 				explicit memory_exception(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit memory_exception(const char* Message_) :base_type(Message_) {}
 			};
-			//ƒƒ‚ƒŠŠ„‚è“–‚Ä‚É¸”s‚µ‚½ê‡
+			//ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦ã«å¤±æ•—ã—ãŸå ´åˆ
 			template<typename base_type_=exception>
 			class fail_allocation :public memory_exception<base_type_> {
 				typedef memory_exception<base_type_> base_type;
@@ -30,7 +30,7 @@ namespace hmLib{
 				explicit fail_allocation(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit fail_allocation(const char* Message_) :base_type(Message_) {}
 			};
-			//ƒƒ‚ƒŠ‰ğ•ú‚É¸”s‚µ‚½ê‡
+			//ãƒ¡ãƒ¢ãƒªè§£æ”¾ã«å¤±æ•—ã—ãŸå ´åˆ
 			template<typename base_type_=exception>
 			class fail_deallocation :public memory_exception<base_type_> {
 				typedef memory_exception<base_type_> base_type;
@@ -38,7 +38,7 @@ namespace hmLib{
 				explicit fail_deallocation(const std::string& Message_) :base_type(Message_.c_str()) {}
 				explicit fail_deallocation(const char* Message_) :base_type(Message_) {}
 			};
-			//“®“IƒLƒƒƒXƒg‚É¸”s‚µ‚½ê‡
+			//å‹•çš„ã‚­ãƒ£ã‚¹ãƒˆã«å¤±æ•—ã—ãŸå ´åˆ
 			template<typename base_type_=exception>
 			class incorrect_downcast_request :public memory_exception<base_type_> {
 				typedef memory_exception<base_type_> base_type;

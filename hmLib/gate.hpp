@@ -1,32 +1,32 @@
-#ifndef HMLIB_GATE_INC
+﻿#ifndef HMLIB_GATE_INC
 #define HMLIB_GATE_INC 201
 #
 /*===gate===
-��M���M���ȈՂōs���N���X
+受信送信を簡易で行うクラス
 
 === gate ===
 v2_01/131222 amby
-	����ɁAgate�̉��z�֐��Ƃ��� is_open()��ǉ�
-	gate���g���ۂ�is_open���m�F����͎̂g�p�҂̋`���ƂȂ�B
+	さらに、gateの仮想関数として is_open()を追加
+	gateを使う際にis_openを確認するのは使用者の義務となる。
 
 v2_00/131222 hmIto
-	������^gate
-		���������������get/put��p�~���A�P��������ɓ���
-			�������Agets/puts�Ō����̖��Ŏg�������ꍇ�̎�i�͎c��
-		�V���ɁAflowing/flush��ǉ�
-			flowing:��M���p�����Ă��邩�ǂ����B�P���ȏꍇ�͏�ɐ^�B
-			flush:���M�𔽉f����B�P���ȏꍇ�͉������Ȃ��B
-			flush���邩�ǂ�����flowing�Ŕ��f�ł���B
-			����ȋ�؂蓙��flowing/flush�Ŕ��ʂł���B
+	次世代型gate
+		複数文字列を扱うget/putを廃止し、単数文字列に特化
+			ただし、gets/putsで効率の問題で使いたい場合の手段は残す
+		新たに、flowing/flushを追加
+			flowing:受信が継続しているかどうか。単純な場合は常に真。
+			flush:送信を反映する。単純な場合は何もしない。
+			flushするかどうかをflowingで判断できる。
+			特殊な区切り等もflowing/flushで判別できる。
 v1_05/130421 hmIto
-	exceptions�ɑΉ�
+	exceptionsに対応
 v1_04/130329 hmIto
-	�ꕔstreambuf_interface�̏������z�֐����p������Ă��Ȃ������v���I�Ȗ����C��
+	一部streambuf_interfaceの純粋仮想関数が継承されていなかった致命的な問題を修正
 v1_03/130328 hmIto
-	streambuf_interface���p������`�ɏC��
+	streambuf_interfaceを継承する形に修正
 v1_02/130324 hmIto
-	iostream��include
-	basic_gatestreambuf�̏������Ƀ|�C���^�ł͂Ȃ��Q�Ƃ�n���Ă����v���I�Ȗ����C��
+	iostreamをinclude
+	basic_gatestreambufの初期化にポインタではなく参照を渡していた致命的な問題を修正
 */
 #include<iostream>
 #ifndef HMLIB_STREAMBUINTERFACE_INC
@@ -46,13 +46,13 @@ namespace hmLib{
 	public:
 		typedef std::streamsize size_type;
 	public://gate
-		//gate���J���Ă��邩�ǂ����̊m�F
+		//gateが開いているかどうかの確認
 		virtual bool is_open() = 0;
-		//��M�\��Ԃ��̊m�F
+		//受信可能状態かの確認
 		virtual bool can_getc()=0;
-		//�Pbyte��M
+		//単byte受信
 		virtual _Elem getc()=0;
-		//����byte��M�@��M�����A�h���X�ƁA��M�������������@���ۂ̎�M���������߂�l
+		//複数byte受信　受信文字アドレスと、受信文字数が引数　実際の受信文字数が戻り値
 		virtual size_type gets(_Elem* str, const size_type& size) {
 			for(size_type i=0; i<size; ++i) {
 				if(!can_getc())break;
@@ -60,13 +60,13 @@ namespace hmLib{
 			}
 			return size;
 		}
-		//��M���p�����Ă��邩���m�F����
+		//受信が継続しているかを確認する
 		virtual bool flowing()=0;
-		//���M�\��Ԃ��̊m�F
+		//送信可能状態かの確認
 		virtual bool can_putc()=0;
-		//�Pbyte���M
+		//単byte送信
 		virtual void putc(_Elem c)=0;
-		//����byte���M�@���M�����A�h���X�ƁA���M�������������@���ۂ̑��M���������߂�l
+		//複数byte送信　送信文字アドレスと、送信文字数が引数　実際の送信文字数が戻り値
 		virtual size_type puts(const _Elem* str, const size_type& size) {
 			for(size_type i=0; i<size; ++i) {
 				if(!can_putc())break;
@@ -74,7 +74,7 @@ namespace hmLib{
 			}
 			return size;
 		}
-		//���M��ł��؂�
+		//送信を打ち切る
 		virtual void flush()=0;
 	public:
 		virtual ~basic_gate(){}
@@ -87,7 +87,7 @@ namespace hmLib{
 		my_gate* gate;
 		_Elem buf;
 		bool bufflag;
-	public://�W���֐�
+	public://標準関数
 		basic_gatestreambuf():gate(/*C++0x_nullptr/*/NULL/**/),bufflag(false){return;}
 		basic_gatestreambuf(my_gate* gate_):gate(gate_),bufflag(false){return;}
 		~basic_gatestreambuf(){close();}

@@ -1,10 +1,10 @@
-#ifndef HMLIB_PROPERTIES_INC
+﻿#ifndef HMLIB_PROPERTIES_INC
 #define HMLIB_PROPERTIES_INC 100
 #
 /*
-�ϐ��ւ̃A�N�Z�b�T�����b�s���O���ĕϐ��̂悤�Ɉ�����Aproperty�N���X
+変数へのアクセッサをラッピングして変数のように扱える、propertyクラス
 v1_00/140621 hmIto
-	�����[�X
+	リリース
 */
 #include"properties/utility.hpp"
 #include"properties/exceptions.hpp"

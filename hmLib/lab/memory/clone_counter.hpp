@@ -1,4 +1,4 @@
-#ifndef HMLIB_MEMORY_CLONECOUNTER_INC
+ï»¿#ifndef HMLIB_MEMORY_CLONECOUNTER_INC
 #define HMLIB_MEMORY_CLONECOUNTER_INC 100
 #
 #include<memory>
@@ -26,36 +26,36 @@ namespace hmLib {
 	public:
 		clone_counter() :p(nullptr) {}
 		clone_counter(const clone_counter& Cnt_) :p(nullptr) {
-			//‘Šè‚ªnullptr‚¾‚Á‚½ê‡‚ÍA‚Ü‚¸ƒJƒEƒ“ƒ^¶¬
+			//ç›¸æ‰‹ãŒnullptrã ã£ãŸå ´åˆã¯ã€ã¾ãšã‚«ã‚¦ãƒ³ã‚¿ç”Ÿæˆ
 			if(Cnt_.p==nullptr) {
 				const_cast<clone_counter&>(Cnt_).p = new _clone_counter_base();
 			}
-			//ƒAƒ^ƒbƒ`
+			//ã‚¢ã‚¿ãƒƒãƒ
 			p=Cnt_.p;
 			p->attachCounter();
 		}
 		const clone_counter& operator=(const clone_counter& Cnt_) {
-			//QÆæ‚ª©•ª©g‚Å‚È‚¢ê‡
+			//å‚ç…§å…ˆãŒè‡ªåˆ†è‡ªèº«ã§ãªã„å ´åˆ
 			if(p != Cnt_.p) {
-				//©g‚Ì•ÛƒJƒEƒ“ƒ^‚ğƒfƒ^ƒbƒ`
+				//è‡ªèº«ã®ä¿æŒã‚«ã‚¦ãƒ³ã‚¿ã‚’ãƒ‡ã‚¿ãƒƒãƒ
 				if(p!=nullptr) {
 					p->detachCounter();
 					if(p==false)delete p;
 					p=nullptr;
 				}
-				//‘Šè‚ªnullptr‚¾‚Á‚½ê‡‚ÍA‚Ü‚¸ƒJƒEƒ“ƒ^¶¬
+				//ç›¸æ‰‹ãŒnullptrã ã£ãŸå ´åˆã¯ã€ã¾ãšã‚«ã‚¦ãƒ³ã‚¿ç”Ÿæˆ
 				if(Cnt_.p==nullptr) {
 					const_cast<clone_counter&>(Cnt_).p = new _clone_counter_base();
 				}
-				//ƒAƒ^ƒbƒ`
+				//ã‚¢ã‚¿ãƒƒãƒ
 				p=Cnt_.p;
 				p->attachCounter();
 
-			}//—¼ƒJƒEƒ“ƒ^‚Æ‚à‚Énullptr‚¾‚Á‚½ê‡
+			}//ä¸¡ã‚«ã‚¦ãƒ³ã‚¿ã¨ã‚‚ã«nullptrã ã£ãŸå ´åˆ
 			else if(Cnt_.p==nullptr) {
-				//‚Ü‚¸ƒJƒEƒ“ƒ^¶¬
+				//ã¾ãšã‚«ã‚¦ãƒ³ã‚¿ç”Ÿæˆ
 				const_cast<clone_counter&>(Cnt_).p = new _clone_counter_base();
-				//ƒAƒ^ƒbƒ`
+				//ã‚¢ã‚¿ãƒƒãƒ
 				p=Cnt_.p;
 				p->attachCounter();
 			}
@@ -63,26 +63,26 @@ namespace hmLib {
 			return *this;
 		}
 		clone_counter(clone_counter&& Cnt_) :p(nullptr) {
-			//”‚Ì•ÏX‚Í‚È‚¢‚Ì‚ÅA’P‚ÉƒXƒƒbƒv
+			//æ•°ã®å¤‰æ›´ã¯ãªã„ã®ã§ã€å˜ã«ã‚¹ãƒ¯ãƒƒãƒ—
 			std::swap(p, const_cast<clone_counter&>(Cnt_).p);
 		}
 		const clone_counter& operator=(clone_counter&& Cnt_) {
-			//QÆæ‚ª©•ª©g‚Å‚È‚¢ê‡
+			//å‚ç…§å…ˆãŒè‡ªåˆ†è‡ªèº«ã§ãªã„å ´åˆ
 			if(p != Cnt_.p) {
-				//©g‚Ì•ÛƒJƒEƒ“ƒ^‚ğƒfƒ^ƒbƒ`
+				//è‡ªèº«ã®ä¿æŒã‚«ã‚¦ãƒ³ã‚¿ã‚’ãƒ‡ã‚¿ãƒƒãƒ
 				if(p!=nullptr) {
 					p->detachCounter();
 					if(p==false)delete p;
 					p=nullptr;
 				}
-				//”‚Ì•ÏX‚Í‚È‚¢‚Ì‚ÅA’P‚ÉƒXƒƒbƒv
+				//æ•°ã®å¤‰æ›´ã¯ãªã„ã®ã§ã€å˜ã«ã‚¹ãƒ¯ãƒƒãƒ—
 				std::swap(p, const_cast<clone_counter&>(Cnt_).p);
 			}
 
 			return *this;
 		}
 		~clone_counter() {
-			//Š—LƒJƒEƒ“ƒ^‚ª‚ ‚éê‡Aƒfƒ^ƒbƒ`
+			//æ‰€æœ‰ã‚«ã‚¦ãƒ³ã‚¿ãŒã‚ã‚‹å ´åˆã€ãƒ‡ã‚¿ãƒƒãƒ
 			if(p!=nullptr) {
 				p->detachCounter();
 				if(p==false)delete p;
@@ -96,7 +96,7 @@ namespace hmLib {
 			return count();
 		}
 		void reset() {
-			//©g‚Ì•ÛƒJƒEƒ“ƒ^‚ğƒfƒ^ƒbƒ`
+			//è‡ªèº«ã®ä¿æŒã‚«ã‚¦ãƒ³ã‚¿ã‚’ãƒ‡ã‚¿ãƒƒãƒ
 			if(p!=nullptr) {
 				p->detachCounter();
 				if(p==false)delete p;
@@ -114,36 +114,36 @@ namespace hmLib {
 		_clone_counter_base* p;
 	public:
 		clone_observer(const clone_counter& Cnt_) :p(nullptr) {
-			//‘Šè‚ªnullptr‚¾‚Á‚½ê‡‚ÍA‚Ü‚¸ƒJƒEƒ“ƒ^¶¬
+			//ç›¸æ‰‹ãŒnullptrã ã£ãŸå ´åˆã¯ã€ã¾ãšã‚«ã‚¦ãƒ³ã‚¿ç”Ÿæˆ
 			if(Cnt_.p==nullptr) {
 				const_cast<clone_counter&>(Cnt_).p = new _clone_counter_base();
 			}
-			//ƒAƒ^ƒbƒ`
+			//ã‚¢ã‚¿ãƒƒãƒ
 			p=Cnt_.p;
 			p->attachObserver();
 		}
 		const clone_observer& operator=(const clone_counter& Cnt_) {
-			//QÆæ‚ª©•ª©g‚Å‚È‚¢ê‡
+			//å‚ç…§å…ˆãŒè‡ªåˆ†è‡ªèº«ã§ãªã„å ´åˆ
 			if(p != Cnt_.p) {
-				//©g‚Ì•ÛƒJƒEƒ“ƒ^‚ğƒfƒ^ƒbƒ`
+				//è‡ªèº«ã®ä¿æŒã‚«ã‚¦ãƒ³ã‚¿ã‚’ãƒ‡ã‚¿ãƒƒãƒ
 				if(p!=nullptr) {
 					p->detachObserver();
 					if(p==false)delete p;
 					p=nullptr;
 				}
-				//‘Šè‚ªnullptr‚¾‚Á‚½ê‡‚ÍA‚Ü‚¸ƒJƒEƒ“ƒ^¶¬
+				//ç›¸æ‰‹ãŒnullptrã ã£ãŸå ´åˆã¯ã€ã¾ãšã‚«ã‚¦ãƒ³ã‚¿ç”Ÿæˆ
 				if(Cnt_.p==nullptr) {
 					const_cast<clone_counter&>(Cnt_).p = new _clone_counter_base();
 				}
-				//ƒAƒ^ƒbƒ`
+				//ã‚¢ã‚¿ãƒƒãƒ
 				p=Cnt_.p;
 				p->attachObserver();
 
-			}//—¼ƒJƒEƒ“ƒ^‚Æ‚à‚Énullptr‚¾‚Á‚½ê‡
+			}//ä¸¡ã‚«ã‚¦ãƒ³ã‚¿ã¨ã‚‚ã«nullptrã ã£ãŸå ´åˆ
 			else if(Cnt_.p==nullptr) {
-				//‚Ü‚¸ƒJƒEƒ“ƒ^¶¬
+				//ã¾ãšã‚«ã‚¦ãƒ³ã‚¿ç”Ÿæˆ
 				const_cast<clone_counter&>(Cnt_).p = new _clone_counter_base();
-				//ƒAƒ^ƒbƒ`
+				//ã‚¢ã‚¿ãƒƒãƒ
 				p=Cnt_.p;
 				p->attachObserver();
 			}
@@ -151,7 +151,7 @@ namespace hmLib {
 			return *this;
 		}
 		~clone_observer() {
-			//Š—LƒJƒEƒ“ƒ^‚ª‚ ‚éê‡Aƒfƒ^ƒbƒ`
+			//æ‰€æœ‰ã‚«ã‚¦ãƒ³ã‚¿ãŒã‚ã‚‹å ´åˆã€ãƒ‡ã‚¿ãƒƒãƒ
 			if(p!=nullptr) {
 				p->detachObserver();
 				if(p==false)delete p;
@@ -165,7 +165,7 @@ namespace hmLib {
 			return count();
 		}
 		void reset() {
-			//©g‚Ì•ÛƒJƒEƒ“ƒ^‚ğƒfƒ^ƒbƒ`
+			//è‡ªèº«ã®ä¿æŒã‚«ã‚¦ãƒ³ã‚¿ã‚’ãƒ‡ã‚¿ãƒƒãƒ
 			if(p!=nullptr) {
 				p->detachObserver();
 				if(p==false)delete p;

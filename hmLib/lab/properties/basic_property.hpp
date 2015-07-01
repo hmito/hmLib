@@ -1,14 +1,14 @@
-#ifndef HMLIB_PROPERTIES_BASICPROPERTY_INC
+﻿#ifndef HMLIB_PROPERTIES_BASICPROPERTY_INC
 #define HMLIB_PROPERTIES_BASICPROPERTY_INC 101
 #
 /*
-�ϐ��ւ̃A�N�Z�X����\�ł���Ȃ���A�ϐ��̂悤�Ɉ�����Aproperty�ϐ����`
-�Q�Ɛ�̎����Ǘ��͂��Ă��Ȃ��̂ŁA�����Ƃ��āA����X�R�[�v�̕ϐ��̂ݎQ�Ɖ\
-�ʃX�R�[�v�̕ϐ��𗘗p����ۂ́Aweak_property�𗘗p����
+変数へのアクセス制御可能でありながら、変数のように扱える、property変数を定義
+参照先の寿命管理はしていないので、原則として、同一スコープの変数のみ参照可能
+別スコープの変数を利用する際は、weak_propertyを利用する
 
 === properties::basic_property ===
 v1_00/140616 hmIto
-�d�l����
+仕様策定
 */
 #include <functional>
 #include <type_traits>

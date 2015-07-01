@@ -1,4 +1,4 @@
-#ifndef HMLIB_PROPERTIES_MUTEXLOCKMIXIN_INC 
+Ôªø#ifndef HMLIB_PROPERTIES_MUTEXLOCKMIXIN_INC 
 #define HMLIB_PROPERTIES_MUTEXLOCKMIXIN_INC 100
 #
 #ifndef HMLIB_MUTEXPROXY_INC
@@ -12,10 +12,10 @@ namespace hmLib {
 			mutex_proxy mxprx;
 		protected:
 			mutex_lock_mixin() :locked(false), mxprx() {}
-			//ÉRÉsÅ[ã÷é~
+			//„Ç≥„Éî„ÉºÁ¶ÅÊ≠¢
 			mutex_lock_mixin(const mutex_lock_mixin& My_)=delete;
 			const mutex_lock_mixin& operator=(const mutex_lock_mixin& My_)=delete;
-			//ÉÄÅ[ÉuOK
+			//„É†„Éº„ÉñOK
 			mutex_lock_mixin(mutex_lock_mixin&& My_) :locked(false), mxprx(My_) {
 				std::swap(locked, My_.locked);
 				std::swap(mxprx, My_.mxprx);

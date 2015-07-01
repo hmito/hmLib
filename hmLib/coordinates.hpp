@@ -1,19 +1,19 @@
-#ifndef HMLIB_COORDINATES_INC
+ï»¿#ifndef HMLIB_COORDINATES_INC
 #define HMLIB_COORDINATES_INC 103
 #
 /*===coordinate.hpp ===
 
-‚´‚Ğ‚å‚¤•ÏŠ·‚ğs‚¤ƒNƒ‰ƒX
+ã–ã²ã‚‡ã†å¤‰æ›ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 
 === coodinates ===
 v1_03/150227 hmIto
-	polor‚ğ”’l”{‚µ‚½Û‚ÉŠp“x‚Ü‚ÅÏZ‚µ‚Ä‚µ‚Ü‚Á‚Ä‚¢‚½–â‘è‚ğC³
+	polorã‚’æ•°å€¤å€ã—ãŸéš›ã«è§’åº¦ã¾ã§ç©ç®—ã—ã¦ã—ã¾ã£ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 v1_02/141203 hmIto
-	boost::operators‚ÉˆË‘¶‚µ‚È‚¢Œ`‚É•ÏX
+	boost::operatorsã«ä¾å­˜ã—ãªã„å½¢ã«å¤‰æ›´
 v1_01/130519 amby
-	‚´‚Ğ‚å‚¤•ÏŠ·ƒNƒ‰ƒX‚ğÀ‘•
-	’Pƒ‚È“®ìƒ`ƒFƒbƒNÏ‚İ(Œ‹‰Ê‚Í³‚µ‚»‚¤)
-	‚È‚¨A•ÏŠ·‚Æ‹t•ÏŠ·‚µ‚½‚à‚Ì‚ğ‚©‚¯‚½Û‚ÉA”’lŒë·‚ªe^{-10}’ö“xo‚Ä‚µ‚Ü‚¤B–{—ˆ‚Í’PˆÊs—ñ‚É‚È‚é‚Í‚¸‚¾‚ªc
+	ã–ã²ã‚‡ã†å¤‰æ›ã‚¯ãƒ©ã‚¹ã‚’å®Ÿè£…
+	å˜ç´”ãªå‹•ä½œãƒã‚§ãƒƒã‚¯æ¸ˆã¿(çµæœã¯æ­£ã—ãã†)
+	ãªãŠã€å¤‰æ›ã¨é€†å¤‰æ›ã—ãŸã‚‚ã®ã‚’ã‹ã‘ãŸéš›ã«ã€æ•°å€¤èª¤å·®ãŒe^{-10}ç¨‹åº¦å‡ºã¦ã—ã¾ã†ã€‚æœ¬æ¥ã¯å˜ä½è¡Œåˆ—ã«ãªã‚‹ã¯ãšã ãŒâ€¦
 
 */
 #ifndef HMLIB_CONFIG_INC
@@ -35,7 +35,7 @@ namespace hmLib{
 		struct position;
 		struct scale;
 
-		//‰ñ“]ƒNƒ‰ƒX
+		//å›è»¢ã‚¯ãƒ©ã‚¹
 		struct angle{
 		public:
 			double roll; //
@@ -47,14 +47,14 @@ namespace hmLib{
 			angle(angle&& Agl_):pitch(Agl_.pitch),roll(Agl_.roll),yaw(Agl_.yaw){}
 			angle(double roll_,double pitch_,double yaw_):roll(roll_),pitch(pitch_),yaw(yaw_){}
 		public:
-			//“™‰¿‰‰Z
+			//ç­‰ä¾¡æ¼”ç®—
 			bool operator==(const angle& Agl_)const{
 				return pitch==Agl_.pitch && roll==Agl_.roll && yaw==Agl_.yaw;
 			}
 			bool operator!=(const angle& Agl_)const {
 				return !(*this==Agl_);
 			}
-			//²•ÏŠ·‰ÁZ
+			//è»¸å¤‰æ›åŠ ç®—
 			const angle& operator+=(const angle& Agl_){
 				pitch+=Agl_.pitch;
 				roll+=Agl_.roll;
@@ -65,7 +65,7 @@ namespace hmLib{
 				angle Src(Agl1_);
 				return Src+=Agl2_;
 			}
-			//²•ÏŠ·‰ÁZ
+			//è»¸å¤‰æ›åŠ ç®—
 			const angle& operator-=(const angle& Agl_){
 				pitch-=Agl_.pitch;
 				roll-=Agl_.roll;
@@ -76,7 +76,7 @@ namespace hmLib{
 				angle Src(Agl1_);
 				return Src-=Agl2_;
 			}
-			//²•ÏŠ·ÏZ
+			//è»¸å¤‰æ›ç©ç®—
 			const angle& operator*=(const double& Val_){
 				pitch*=Val_;
 				roll*=Val_;
@@ -87,7 +87,7 @@ namespace hmLib{
 				angle Src(Agl_);
 				return Src*=Val_;
 			}
-			//²•ÏŠ·ÏZ
+			//è»¸å¤‰æ›ç©ç®—
 			const angle& operator/=(const double& Val_){
 				pitch/=Val_;
 				roll/=Val_;
@@ -98,16 +98,16 @@ namespace hmLib{
 				angle Src(Agl_);
 				return Src/=Val_;
 			}
-			//²•ÏŠ·‡¬@À‘••”‚Í•Ê
+			//è»¸å¤‰æ›åˆæˆã€€å®Ÿè£…éƒ¨ã¯åˆ¥
 			const angle& operator&=(const angle& Agl_);			
 			friend angle operator&(const angle& Agl1_, const angle& Agl2_) {
 				angle Src(Agl1_);
 				return Src&=Agl2_;
 			}
-			//‹t²•ÏŠ·@@À‘••”‚Í•Ê
+			//é€†è»¸å¤‰æ›ã€€ã€€å®Ÿè£…éƒ¨ã¯åˆ¥
 			const angle operator~()const;
 		};
-		//Šg‘åƒNƒ‰ƒX
+		//æ‹¡å¤§ã‚¯ãƒ©ã‚¹
 		struct scale{
 		public:
 			double rx;
@@ -116,10 +116,10 @@ namespace hmLib{
 		public:
 			scale():rx(1.),ry(1.),rz(1.){}
 			scale(double rx_,double ry_,double rz_):rx(rx_),ry(ry_),rz(rz_){}
-			//‹t²•ÏŠ·@@À‘••”‚Í•Ê
+			//é€†è»¸å¤‰æ›ã€€ã€€å®Ÿè£…éƒ¨ã¯åˆ¥
 			const scale operator~()const{return scale(1/rx,1/ry,1/rz);}
 		};
-		//’¼ŒğÀ•WƒxƒNƒgƒ‹
+		//ç›´äº¤åº§æ¨™ãƒ™ã‚¯ãƒˆãƒ«
 		struct position{
 			double x;
 			double y;
@@ -131,14 +131,14 @@ namespace hmLib{
 			position(double x_,double y_,double z_):x(x_),y(y_),z(z_){}
 			position(const polar& Pol_);
 		public:
-			//“™‰¿‰‰Z
+			//ç­‰ä¾¡æ¼”ç®—
 			bool operator==(const position& Agl_)const{
 				return x==Agl_.x && y==Agl_.y && z==Agl_.z;
 			}
 			bool operator!=(const position& Agl_)const {
 				return !(*this==Agl_);
 			}
-			//²•ÏŠ·‰ÁZ
+			//è»¸å¤‰æ›åŠ ç®—
 			const position& operator+=(const position& Agl_){
 				x+=Agl_.x;
 				y+=Agl_.y;
@@ -149,7 +149,7 @@ namespace hmLib{
 				position Src(Agl1_);
 				return Src+=Agl2_;
 			}
-			//²•ÏŠ·‰ÁZ
+			//è»¸å¤‰æ›åŠ ç®—
 			const position& operator-=(const position& Agl_){
 				x-=Agl_.x;
 				y-=Agl_.y;
@@ -160,7 +160,7 @@ namespace hmLib{
 				position Src(Agl1_);
 				return Src-=Agl2_;
 			}
-			//²•ÏŠ·ÏZ
+			//è»¸å¤‰æ›ç©ç®—
 			const position& operator*=(const double& Val_){
 				x*=Val_;
 				y*=Val_;
@@ -171,7 +171,7 @@ namespace hmLib{
 				position Src(Agl_);
 				return Src*=Val_;
 			}
-			//²•ÏŠ·ÏZ
+			//è»¸å¤‰æ›ç©ç®—
 			const position& operator/=(const double& Val_){
 				x/=Val_;
 				y/=Val_;
@@ -182,13 +182,13 @@ namespace hmLib{
 				position Src(Agl_);
 				return Src/=Val_;
 			}
-			//À•W•ÏŠ· @À‘••”‚Í•Ê
+			//åº§æ¨™å¤‰æ› ã€€å®Ÿè£…éƒ¨ã¯åˆ¥
 			const position& operator*=(const angle& Agl_);
 			friend position operator*(const position& Pos_, const angle& Agl_) {
 				position Src(Pos_);
 				return Src*=Agl_;
 			}
-			//ƒXƒP[ƒ‹•ÏŠ·
+			//ã‚¹ã‚±ãƒ¼ãƒ«å¤‰æ›
 			const position& operator*=(const scale& Scl_);
 			friend position operator*(const position& Pos_, const scale& Scl_) {
 				position Src(Pos_);
@@ -197,12 +197,12 @@ namespace hmLib{
 		public:
 			double abs()const{return sqrt(x*x+y*y+z*z);}
 		};	
-		//‹ÉÀ•WƒxƒNƒgƒ‹
+		//æ¥µåº§æ¨™ãƒ™ã‚¯ãƒˆãƒ«
 		struct polar{
 		public:
 			double r;
-			double phi;		//x²‚©‚ç‚ÌŠp“xy‰EèŒn‰ñ“]•ûŒü@³z
-			double theta;	//z²‚©‚ç‚ÌŠp“x iz²‚©‚ç‚˜‚™•ûŒü‚ğ³)
+			double phi;		//xè»¸ã‹ã‚‰ã®è§’åº¦ã€å³æ‰‹ç³»å›è»¢æ–¹å‘ã€€æ­£ã€‘
+			double theta;	//zè»¸ã‹ã‚‰ã®è§’åº¦ ï¼ˆzè»¸ã‹ã‚‰ï½˜ï½™æ–¹å‘ã‚’æ­£)
 		public:
 			polar():r(0.),phi(0.),theta(0.){}
 			polar(const polar& Pol_):r(Pol_.r),phi(Pol_.phi),theta(Pol_.theta){}
@@ -210,7 +210,7 @@ namespace hmLib{
 			polar(double r_,double phi_,double theta_):r(r_),phi(phi_),theta(theta_){}
 			polar(const position& Pos_);
 		public:
-			//“™‰¿‰‰Z
+			//ç­‰ä¾¡æ¼”ç®—
 			bool operator==(const polar& Pol_)const{
 				if(r==0 && Pol_.r==0)return true;
 
@@ -233,7 +233,7 @@ namespace hmLib{
 			bool operator!=(const polar& Pol_)const {
 				return !(*this==Pol_);
 			}
-			//²•ÏŠ·‰ÁZ
+			//è»¸å¤‰æ›åŠ ç®—
 			const polar& operator+=(const polar& Pol_){
 				r+=Pol_.r;
 				phi+=Pol_.phi;
@@ -244,7 +244,7 @@ namespace hmLib{
 				polar Src(Pol1_);
 				return Src+=Pol2_;
 			}
-			//²•ÏŠ·‰ÁZ
+			//è»¸å¤‰æ›åŠ ç®—
 			const polar& operator-=(const polar& Pol_){
 				r-=Pol_.r;
 				phi-=Pol_.phi;
@@ -255,7 +255,7 @@ namespace hmLib{
 				polar Src(Pol1_);
 				return Src-=Pol2_;
 			}
-			//²•ÏŠ·ÏZ
+			//è»¸å¤‰æ›ç©ç®—
 			const polar& operator*=(const double& Val_){
 				r*=Val_;
 				return *this;
@@ -264,7 +264,7 @@ namespace hmLib{
 				polar Src(Pol_);
 				return Src*=Val_;
 			}
-			//²•ÏŠ·ÏZ
+			//è»¸å¤‰æ›ç©ç®—
 			const polar& operator/=(const double& Val_){
 				r/=Val_;
 				return *this;
@@ -276,12 +276,12 @@ namespace hmLib{
 		public:
 			double abs()const{return r;}
 		};
-		//À•W•ÏŠ·s—ñ
+		//åº§æ¨™å¤‰æ›è¡Œåˆ—
 		struct transfer{
 		public:
 			double x[4][4];
 		public:
-			//’PˆÊs—ñ
+			//å˜ä½è¡Œåˆ—
 			transfer(){
 				for(unsigned int r=0;r<4;++r){
 					for(unsigned int c=0;c<4;++c){
@@ -289,8 +289,8 @@ namespace hmLib{
 					}
 				}
 			}
-			//‰ñ“]
-			// ‚±‚ê‚Í@roll pitch yaw ‚Å‚ ‚ç‚í‚³‚ê‚é@ƒƒ{ƒbƒgÀ•WŒn‚ğCŠµ«À•WŒn‚É–ß‚·s—ñ
+			//å›è»¢
+			// ã“ã‚Œã¯ã€€roll pitch yaw ã§ã‚ã‚‰ã‚ã•ã‚Œã‚‹ã€€ãƒ­ãƒœãƒƒãƒˆåº§æ¨™ç³»ã‚’ï¼Œæ…£æ€§åº§æ¨™ç³»ã«æˆ»ã™è¡Œåˆ—
 			// x_{inertial frame} = Matrix * x_{robot frame}
 			transfer(const angle& Agl_){
 				x[0][0] = cos(Agl_.pitch) * cos(Agl_.yaw);
@@ -313,7 +313,7 @@ namespace hmLib{
 				x[3][2] = 0.;
 				x[3][3] = 1.;
 			}
-			//Šg‘å
+			//æ‹¡å¤§
 			transfer(const scale& Scl_){
 				for(int i = 0;i<4;++i){
 					for(int j = 0;j<4;++j){
@@ -324,8 +324,8 @@ namespace hmLib{
 				x[1][1] = Scl_.ry;
 				x[2][2] = Scl_.rz;
 			}
-			//ˆÚ“®
-			// Pos_ ‚Åw’è‚³‚ê‚é•ûŒü‚ÉˆÚ“®‚³‚ê‚½À•WŒn‚ÌÀ•W‚ğCŠµ«À•WŒn‚É–ß‚·s—ñ
+			//ç§»å‹•
+			// Pos_ ã§æŒ‡å®šã•ã‚Œã‚‹æ–¹å‘ã«ç§»å‹•ã•ã‚ŒãŸåº§æ¨™ç³»ã®åº§æ¨™ã‚’ï¼Œæ…£æ€§åº§æ¨™ç³»ã«æˆ»ã™è¡Œåˆ—
 			//  x_{inertial frame} = Matrix * x_{robot frame}
 			transfer(const position& Pos_){
 				for(int i = 0;i<4;++i){
@@ -338,24 +338,24 @@ namespace hmLib{
 				x[2][3] = Pos_.z;
 			}
 		public:
-			// •ÏŠ·s—ñ‚©‚çC•ÏŠ·Šp“xC•½sˆÚ“®‹——£‚ğ‹‚ß‚é
+			// å¤‰æ›è¡Œåˆ—ã‹ã‚‰ï¼Œå¤‰æ›è§’åº¦ï¼Œå¹³è¡Œç§»å‹•è·é›¢ã‚’æ±‚ã‚ã‚‹
 			void getAngleAndPosition(angle& angle_, position& pos_){
-				// position ŒvZ
+				// position è¨ˆç®—
 				pos_.x = x[0][3];
 				pos_.y = x[1][3];
 				pos_.z = x[2][3];
 
-				// angle ŒvZ
+				// angle è¨ˆç®—
 				double cos_pitch = fabs(sqrt(x[0][0]*x[0][0] +  x[0][1]*x[0][1]));
 
 				if( cos_pitch > 0.001 )
-				//  pitchŠp@‚ª@+-90“x‚Å‚È‚¢ê‡
+				//  pitchè§’ã€€ãŒã€€+-90åº¦ã§ãªã„å ´åˆ
 				{
 					angle_.pitch = atan2(x[0][2], cos_pitch);
 					angle_.roll = atan2(-x[1][2], x[2][2]);
 					angle_.yaw = atan2(-x[0][1], x[0][0]);
 				}else
-				// pitch Šp‚ª+- 90“x‚Ìê‡‚Í‘S‚Ä‚ÌŠp‚ğˆêˆÓ‚ÉŒˆ‚ß‚é‚±‚Æ‚ ‚Å‚«‚È‚¢‚Ì‚ÅCyawŠp‚ğ0‚É‚·‚é
+				// pitch è§’ãŒ+- 90åº¦ã®å ´åˆã¯å…¨ã¦ã®è§’ã‚’ä¸€æ„ã«æ±ºã‚ã‚‹ã“ã¨ã‚ã§ããªã„ã®ã§ï¼Œyawè§’ã‚’0ã«ã™ã‚‹
 				{
 					angle_.pitch = atan2(x[0][2], 0.);
 					angle_.roll = atan2(x[2][1], x[1][1]);
@@ -364,8 +364,8 @@ namespace hmLib{
 				return;
 			}
 		public:
-			//@s—ñ‰‰ZƒIƒyƒŒ[ƒ^
-			// •ÏŠ·s—ñ“¯m‚ÌÏ
+			//ã€€è¡Œåˆ—æ¼”ç®—ã‚ªãƒšãƒ¬ãƒ¼ã‚¿
+			// å¤‰æ›è¡Œåˆ—åŒå£«ã®ç©
 			transfer operator*(const transfer& Val_){
 				transfer ans;
 				for(int i=0;i<4;++i){
@@ -379,9 +379,9 @@ namespace hmLib{
 				}
 				return ans;
 			}
-			// •ÏŠ·s—ñ“¯m‚ÌŠ„‚èZi‹ts—ñj •Û—¯
+			// å¤‰æ›è¡Œåˆ—åŒå£«ã®å‰²ã‚Šç®—ï¼ˆé€†è¡Œåˆ—ï¼‰ ä¿ç•™
 			transfer operator/(const transfer& Val_);
-			// À•W‚Æ‚ÌÏ
+			// åº§æ¨™ã¨ã®ç©
 			position operator*(const position& Pos_){
 				position ans;
 				double ansVec[4] = {0.};
@@ -403,7 +403,7 @@ namespace hmLib{
 				return ans;
 			}
 		};		
-		//²•ÏŠ·‚Ìì¬ pole‚ªx²Aplane‚Æpole‚ªxy•½–Ê
+		//è»¸å¤‰æ›ã®ä½œæˆ poleãŒxè»¸ã€planeã¨poleãŒxyå¹³é¢
 		angle coordinate_transfer(const position& pole_, const position& plane_);
 	}
 }

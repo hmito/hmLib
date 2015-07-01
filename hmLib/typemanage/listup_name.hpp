@@ -1,11 +1,11 @@
-#ifndef HMLIB_TYPEMANAGE_LISTUPNAME_INC
+ï»¿#ifndef HMLIB_TYPEMANAGE_LISTUPNAME_INC
 #define HMLIB_TYPEMANAGE_LISTUPNAME_INC 100
 #
 /*===typemanage::listup_name===
-Ž©g‚ÆŽ©g‚Ì•ÛŽ‚·‚éƒNƒ‰ƒX‚Ì–¼‘Oî•ñ‚ðƒŠƒXƒgƒAƒbƒv‚·‚éƒNƒ‰ƒX
+è‡ªèº«ã¨è‡ªèº«ã®ä¿æŒã™ã‚‹ã‚¯ãƒ©ã‚¹ã®åå‰æƒ…å ±ã‚’ãƒªã‚¹ãƒˆã‚¢ãƒƒãƒ—ã™ã‚‹ã‚¯ãƒ©ã‚¹
 
 listup_name:v1_00/130711 hmIto
-	ƒŠƒŠ[ƒX
+	ãƒªãƒªãƒ¼ã‚¹
 */
 namespace hmLib{
 	namespace typemanage{

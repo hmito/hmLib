@@ -1,21 +1,21 @@
-#ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
+ï»¿#ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
 #define HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC 104
 #
 /*
 ===inquiries::inquiry_abstruct===
-inquiry‹@”\‚ÌŠî’êƒNƒ‰ƒX
-connection‚É‚Â‚¢‚Ä‚à‚±‚±‚ÅŠÇ—‚µ‚Ä‚¢‚é
+inquiryæ©Ÿèƒ½ã®åŸºåº•ã‚¯ãƒ©ã‚¹
+connectionã«ã¤ã„ã¦ã‚‚ã“ã“ã§ç®¡ç†ã—ã¦ã„ã‚‹
 v1_04/140503 hmIto
-	inquiryŒn—ñ‚ğmove‚·‚é‚ÆAdisconnect‚ªconnection‚©‚ç‚Å‚«‚È‚­‚È‚é–â‘è‚ğC³
-	shared_ptr‚ğg‚Á‚ÄAflag‚ğŠÇ—‚·‚é‚æ‚¤‚É•ÏX
+	inquiryç³»åˆ—ã‚’moveã™ã‚‹ã¨ã€disconnectãŒconnectionã‹ã‚‰ã§ããªããªã‚‹å•é¡Œã‚’ä¿®æ­£
+	shared_ptrã‚’ä½¿ã£ã¦ã€flagã‚’ç®¡ç†ã™ã‚‹ã‚ˆã†ã«å¤‰æ›´
 v1_03/130421 hmIto
-	connected/unconnected_exception’Ç‰Á
+	connected/unconnected_exceptionè¿½åŠ 
 v1_02/130410 hmIto
-	ƒ€[ƒu‘ã“ü‰‰Zq‚ÌswapŠÖ”‚Ìˆø”‚ğptr‚Å‚Í‚È‚­nullptr‚Æ‚µ‚Ä‚¢‚½–â‘è‚ğC³
+	ãƒ ãƒ¼ãƒ–ä»£å…¥æ¼”ç®—å­ã®swapé–¢æ•°ã®å¼•æ•°ã‚’ptrã§ã¯ãªãnullptrã¨ã—ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 v1_01/130329 hmIto
-	ƒ€[ƒuƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zqü•Ó‚Ì’v–½“I‚ÈƒoƒO‚ğC³
+	ãƒ ãƒ¼ãƒ–ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­å‘¨è¾ºã®è‡´å‘½çš„ãªãƒã‚°ã‚’ä¿®æ­£
 v1_00/130328 hmIto
-	inquiry‚©‚ç•ª—£
+	inquiryã‹ã‚‰åˆ†é›¢
 */
 #ifndef HMLIB_EXCEPTIONS_INC
 #	include<hmLib/exceptions.hpp>
@@ -30,7 +30,7 @@ namespace hmLib{
 		typedef exceptions::io::not_opened<inquiry_exception> unconnected_exception;
 		typedef exceptions::io::opened<inquiry_exception> connected_exception;
 
-		//connectionƒVƒXƒeƒ€‚ğ’ñ‹Ÿ‚·‚é‹@”\
+		//connectionã‚·ã‚¹ãƒ†ãƒ ã‚’æä¾›ã™ã‚‹æ©Ÿèƒ½
 		class inquiry_abstruct{
 			typedef std::shared_ptr<bool> shared_connecting_flag;
 		public:
@@ -61,7 +61,7 @@ namespace hmLib{
 		protected:
 			connection create_connection(void){
 				hmLib_assert(!is_connect(),connected_exception,"inquiry_abstruct have already connected");
-				//QÆ‚µ‚Ä‚él‚ª‚Ü‚¾‚¢‚ê‚ÎAV‚½‚Éì¬
+				//å‚ç…§ã—ã¦ã‚‹äººãŒã¾ã ã„ã‚Œã°ã€æ–°ãŸã«ä½œæˆ
 				if(!ConnectFlag || !ConnectFlag.unique())ConnectFlag.reset(new bool(true));
 				return connection(ConnectFlag);
 			}
@@ -76,10 +76,10 @@ namespace hmLib{
 			}
 		public:
 			inquiry_abstruct() :ConnectFlag() {}
-			//ƒRƒs[‹Ö~
+			//ã‚³ãƒ”ãƒ¼ç¦æ­¢
 			inquiry_abstruct(const inquiry_abstruct& My_)=delete;
 			const inquiry_abstruct& operator=(const inquiry_abstruct& My_)=delete;
-			//ƒ€[ƒu‹–‰Â
+			//ãƒ ãƒ¼ãƒ–è¨±å¯
 			inquiry_abstruct(inquiry_abstruct&& My_) :ConnectFlag(std::move(My_.ConnectFlag)) {}
 			const inquiry_abstruct& operator=(inquiry_abstruct&& My_) {
 				hmLib_assert(!is_connect(),connected_exception,"inquiry_abstruct have already connected");

@@ -1,15 +1,15 @@
-#ifndef HMLIB_INQUIRIES_SIGNALINQUIRY_INC
+ï»¿#ifndef HMLIB_INQUIRIES_SIGNALINQUIRY_INC
 #define HMLIB_INQUIRIES_SIGNALINQUIRY_INC 101
 #
 /*===inquiries::signal_inquiry===
-operator()(void)‚ÅAæ“¾‚µ‚½’l‚ğ•Ô‚³‚¸‚ÉASignal‚ğ”­M‚·‚éinquiry
+operator()(void)ã§ã€å–å¾—ã—ãŸå€¤ã‚’è¿”ã•ãšã«ã€Signalã‚’ç™ºä¿¡ã™ã‚‹inquiry
 
 inquiries::signal_inquiry v1_01/130329 hmIto
-	inquiry‚Å’læ“¾‚µ‚½Œ‹‰ÊA‘O‰ñ‚Ì’l‚Æ•Ï‚í‚è‚È‚¢ê‡‚Ísignal‚ğ”­M‚·‚éAchanged_signal_inquiry‚ğ’Ç‰Á
-	ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zq‚ğ–¾¦“I‚Éprivate‰»
-	ƒOƒ[ƒoƒ‹ŠÖ”‚ÉconnectŠÖ”‚ğ’Ç‰Á
+	inquiryã§å€¤å–å¾—ã—ãŸçµæœã€å‰å›ã®å€¤ã¨å¤‰ã‚ã‚Šãªã„å ´åˆã¯signalã‚’ç™ºä¿¡ã™ã‚‹ã€changed_signal_inquiryã‚’è¿½åŠ 
+	ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­ã‚’æ˜ç¤ºçš„ã«privateåŒ–
+	ã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°ã«connecté–¢æ•°ã‚’è¿½åŠ 
 inquiries::signal_inquiry v1_00/130328 hmIto
-	V‹Kì¬
+	æ–°è¦ä½œæˆ
 */
 #include<boost/signals2.hpp>
 #ifndef HMLIB_EXCEPTION_INC
