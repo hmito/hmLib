@@ -14,17 +14,17 @@ using hmLib_sint64 = std::int64_t;
 using hmLib_float32 = float;
 using hmLib_float64 = double;
 using hmLib_float128 = long double;
-#elif
+#else
 #	include<stdint.h>
 #	include<stdbool.h>
-typedef hmLib_uint8 uint8_t;
-typedef hmLib_sint8 int8_t;
-typedef hmLib_uint16 uint16_t;
-typedef hmLib_sint16 int16_t;
-typedef hmLib_uint32 uint32_t;
-typedef hmLib_sint32 int32_t;
-typedef hmLib_uint64 uint64_t;
-typedef hmLib_sint64 int64_t;
+typedef uint8_t hmLib_uint8;
+typedef int8_t hmLib_sint8;
+typedef uint16_t hmLib_uint16;
+typedef int16_t hmLib_sint16;
+typedef uint32_t hmLib_uint32;
+typedef int32_t hmLib_sint32;
+typedef uint64_t hmLib_uint64;
+typedef int64_t hmLib_sint64;
 typedef float hmLib_float32;
 typedef double hmLib_float64;
 typedef long double hmLib_float128;
@@ -60,47 +60,26 @@ typedef void(*hmLib_vFp_p)(hmLib_pointer);
 typedef hmLib_pointer(*hmLib_pFp_v)(void);
 
 //hmStd Type
-#ifdef HMLIB_TYPE_SIZE_8
 typedef void(*hmLib_vFp_u8)(hmLib_uint8);
 typedef void(*hmLib_vFp_s8)(hmLib_sint8);
 typedef hmLib_uint8(*hmLib_u8Fp_v)(void);
 typedef hmLib_sint8(*hmLib_s8Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_16
 typedef void(*hmLib_vFp_u16)(hmLib_uint16);
 typedef void(*hmLib_vFp_s16)(hmLib_sint16);
 typedef hmLib_uint16(*hmLib_u16Fp_v)(void);
 typedef hmLib_sint16(*hmLib_s16Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_32
 typedef void(*hmLib_vFp_u32)(hmLib_uint32);
 typedef void(*hmLib_vFp_s32)(hmLib_sint32);
 typedef hmLib_uint32(*hmLib_u32Fp_v)(void);
 typedef hmLib_sint32(*hmLib_s32Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_64
 typedef void(*hmLib_vFp_u64)(hmLib_uint64);
 typedef void(*hmLib_vFp_s64)(hmLib_sint64);
 typedef hmLib_uint64(*hmLib_u64Fp_v)(void);
 typedef hmLib_sint64(*hmLib_s64Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_128
-typedef void(*hmLib_vFp_u128)(hmLib_uint128);
-typedef void(*hmLib_vFp_s128)(hmLib_sint128);
-typedef hmLib_uint128(*hmLib_u128Fp_v)(void);
-typedef hmLib_sint128(*hmLib_s128Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_f32
 typedef void(*hmLib_vFp_f32)(hmLib_float32);
 typedef hmLib_float32(*hmLib_f32Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_f64
 typedef void(*hmLib_vFp_f64)(hmLib_float64);
 typedef hmLib_float64(*hmLib_f64Fp_v)(void);
-#endif
-#ifdef HMLIB_TYPE_SIZE_f128
-typedef hmLib_f128 float128;
-#endif
 
 //namespace_type
 #ifdef __cplusplus
@@ -145,7 +124,6 @@ namespace hmLib{
 		typedef hmLib_vFp_p vFp_p;
 
 		//hmStd Type
-		#ifdef HMLIB_TYPE_SIZE_8
 			typedef hmLib_uint8 uint8;
 			typedef hmLib_sint8 sint8;
 
@@ -153,8 +131,7 @@ namespace hmLib{
 			typedef hmLib_u8Fp_v u8Fp_v;
 			typedef hmLib_vFp_s8 vFp_s8;
 			typedef hmLib_s8Fp_v s8Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_16
+
 			typedef hmLib_uint16 uint16;
 			typedef hmLib_sint16 sint16;
 
@@ -162,8 +139,7 @@ namespace hmLib{
 			typedef hmLib_vFp_s16 vFp_s16;
 			typedef hmLib_u16Fp_v u16Fp_v;
 			typedef hmLib_s16Fp_v s16Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_32
+
 			typedef hmLib_uint32 uint32;
 			typedef hmLib_sint32 sint32;
 
@@ -171,8 +147,7 @@ namespace hmLib{
 			typedef hmLib_vFp_s32 vFp_s32;
 			typedef hmLib_u32Fp_v u32Fp_v;
 			typedef hmLib_s32Fp_v s32Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_64
+
 			typedef hmLib_uint64 uint64;
 			typedef hmLib_sint64 sint64;
 
@@ -180,32 +155,16 @@ namespace hmLib{
 			typedef hmLib_vFp_s64 vFp_s64;
 			typedef hmLib_u64Fp_v u64Fp_v;
 			typedef hmLib_s64Fp_v s64Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_128
-			typedef hmLib_uint128 uint128;
-			typedef hmLib_sint128 sint128;
 
-			typedef hmLib_vFp_u128 vFp_u128;
-			typedef hmLib_vFp_s128 vFp_s128;
-			typedef hmLib_u128Fp_v u128Fp_v;
-			typedef hmLib_s128Fp_v s128Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_f32
 			typedef hmLib_float32 float32;
 
 			typedef hmLib_vFp_f32 vFp_f32;
 			typedef hmLib_f32Fp_v f32Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_f64
+
 			typedef hmLib_float64 float64;
 
 			typedef hmLib_vFp_f64 vFp_f64;
 			typedef hmLib_f64Fp_v f64Fp_v;
-		#endif
-		#ifdef HMLIB_TYPE_SIZE_f128
-			typedef hmLib_f128 float128;
-		#endif
-
 	}
 }
 #endif
@@ -250,7 +209,6 @@ typedef hmLib_pFp_v pFp_v;
 typedef hmLib_vFp_p vFp_p;
 
 //hmStd Type
-#ifdef HMLIB_TYPE_SIZE_8
 typedef hmLib_uint8 uint8;
 typedef hmLib_sint8 sint8;
 
@@ -258,8 +216,7 @@ typedef hmLib_vFp_u8 vFp_u8;
 typedef hmLib_u8Fp_v u8Fp_v;
 typedef hmLib_vFp_s8 vFp_s8;
 typedef hmLib_s8Fp_v s8Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_16
+
 typedef hmLib_uint16 uint16;
 typedef hmLib_sint16 sint16;
 
@@ -267,8 +224,7 @@ typedef hmLib_vFp_u16 vFp_u16;
 typedef hmLib_vFp_s16 vFp_s16;
 typedef hmLib_u16Fp_v u16Fp_v;
 typedef hmLib_s16Fp_v s16Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_32
+
 typedef hmLib_uint32 uint32;
 typedef hmLib_sint32 sint32;
 
@@ -276,8 +232,7 @@ typedef hmLib_vFp_u32 vFp_u32;
 typedef hmLib_vFp_s32 vFp_s32;
 typedef hmLib_u32Fp_v u32Fp_v;
 typedef hmLib_s32Fp_v s32Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_64
+
 typedef hmLib_uint64 uint64;
 typedef hmLib_sint64 sint64;
 
@@ -285,31 +240,17 @@ typedef hmLib_vFp_u64 vFp_u64;
 typedef hmLib_vFp_s64 vFp_s64;
 typedef hmLib_u64Fp_v u64Fp_v;
 typedef hmLib_s64Fp_v s64Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_128
-typedef hmLib_uint128 uint128;
-typedef hmLib_sint128 sint128;
 
-typedef hmLib_vFp_u128 vFp_u128;
-typedef hmLib_vFp_s128 vFp_s128;
-typedef hmLib_u128Fp_v u128Fp_v;
-typedef hmLib_s128Fp_v s128Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_f32
 typedef hmLib_float32 float32;
 
 typedef hmLib_vFp_f32 vFp_f32;
 typedef hmLib_f32Fp_v f32Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_f64
+
 typedef hmLib_float64 float64;
 
 typedef hmLib_vFp_f64 vFp_f64;
 typedef hmLib_f64Fp_v f64Fp_v;
-#endif
-#ifdef HMLIB_TYPE_SIZE_f128
-typedef hmLib_f128 float128;
-#endif
+
 #endif
 
 #
