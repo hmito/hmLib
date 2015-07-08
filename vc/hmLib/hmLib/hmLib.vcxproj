@@ -69,6 +69,7 @@
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\cdeque.h" />
+    <ClInclude Include="..\..\..\hmLib\cell_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\config_vc.h" />
@@ -81,7 +82,6 @@
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\gate_exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
@@ -95,6 +95,7 @@
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\version.h" />
+    <ClInclude Include="csv.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c" />
