@@ -108,11 +108,11 @@
     <ClInclude Include="..\..\..\hmLib\gps.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cell_iterator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="csv.hpp">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp">
+      <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

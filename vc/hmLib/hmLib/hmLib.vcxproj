@@ -69,7 +69,7 @@
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\cdeque.h" />
-    <ClInclude Include="..\..\..\hmLib\cell_iterator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\config_vc.h" />
