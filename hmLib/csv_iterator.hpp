@@ -85,9 +85,31 @@ namespace hmLib{
 		my_pos Pos;
 		my_sstream sstream;
 		bool HasRead;
+		my_pos ReadPos;
 		bool IsLineHead;
 	private:
-		void skip();
+		void next(){
+			if(HasRead){
+				Pos = ReadPos;
+			} else{
+				Elem c;
+				if(pstream->tellg() != Pos) pstream->seekg(Pos);
+
+				while(true){
+					c = pstream->get();
+					++Pos;
+
+					if(c == Sep){
+						IsLineHead = false;
+						break;
+					}
+					if(c == End || c == 0){
+						IsLineHead = true;
+						break;
+					}
+				}
+			}
+		}
 		void read(){
 			Elem c;
 			sstream.str(my_string());
@@ -95,15 +117,17 @@ namespace hmLib{
 
 			if(pstream->tellg() != Pos) pstream->seekg(Pos);
 
+			ReadPos = Pos;
+
 			while(true){
 				c = pstream->get();
-				++Pos;
+				++ReadPos;
 
 				if(c == Sep){
 					IsLineHead = false;
 					break;
 				}
-				if(c == End){
+				if(c == End || c == 0){
 					IsLineHead = true;
 					break;
 				}
@@ -138,9 +162,13 @@ namespace hmLib{
 		}
 		icsv_iterator(const my_type& My_) = default;
 		my_type& operator=(const my_type& My_) = default;
-		input_proxy operator*(){return input_proxy(*this);}
+		input_proxy operator*(){
+			if(!HasRead)read();
+			return input_proxy(*this);
+		}
 		my_type& operator++(){
-			read();
+			if(!HasRead)skip();
+			else HasRead = false;
 			return *this;
 		}
 		my_type operator++(int){
@@ -161,30 +189,28 @@ namespace hmLib{
 		static my_type line_end(const my_type& My_){
 			my_type ans = My_;
 
-			my_type End = file_end();
+			advance_line(ans, 1);
 
-			while(End){
-				if(ans.pstream->get() == ans.End)break;
-			}
-
-			ans.Pos = ans.pstream->tellg();
+			return ans;
 		}
 		static my_type file_end(const my_type& My_){
 			my_type ans = My_;
 			ans.pstream->seekg(0, std::ios_base::end);
 			ans.Pos = ans.pstream->tellg();
+
+			return ans;
 		}
 	};
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	void file_end(const icsv_iterator<Elem, Traits>& itr){
-		unsigned int no = 0;
-		do{
-			++itr;
-			if(itr.eol())++no;
-		} while(no < num);
+	inline icsv_iterator<Elem, Traits> line_end(const icsv_iterator<Elem, Traits>& itr){
+		return icsv_iterator<Elem, Traits>::line_end(itr);
 	}
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	void advance_line(icsv_iterator<Elem, Traits>& itr, unsigned int num = 1){
+	inline icsv_iterator<Elem, Traits> file_end(const icsv_iterator<Elem, Traits>& itr){
+		return icsv_iterator<Elem, Traits>::file_end(itr);
+	}
+	template<class Elem = char, class Traits = std::char_traits<Elem> >
+	inline void advance_line(icsv_iterator<Elem, Traits>& itr, unsigned int num = 1){
 		unsigned int no = 0;
 		do{
 			++itr;
