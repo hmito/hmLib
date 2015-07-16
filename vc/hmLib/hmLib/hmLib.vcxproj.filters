@@ -140,5 +140,8 @@
     <ClCompile Include="..\..\..\hmLib\random.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
+    <ClCompile Include="run_csv.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

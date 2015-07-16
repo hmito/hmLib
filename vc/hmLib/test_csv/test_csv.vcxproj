@@ -11,22 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>
-    <RootNamespace>hmLib</RootNamespace>
+    <ProjectGuid>{A611C0C6-908F-43E1-996A-720AACF1CE72}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>test_csv</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -39,76 +42,59 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\hmIto\Documents\GitHub\hmLib;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UseFullPaths>true</UseFullPaths>
     </ClCompile>
     <Link>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UseFullPaths>true</UseFullPaths>
     </ClCompile>
     <Link>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\hmLib\algorithm.hpp" />
-    <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
-    <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
-    <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\cdeque.h" />
-    <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp" />
-    <ClInclude Include="..\..\..\hmLib\color.hpp" />
-    <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\config_vc.h" />
-    <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
-    <ClInclude Include="..\..\..\hmLib\cqueue.h" />
-    <ClInclude Include="..\..\..\hmLib\cstack.h" />
-    <ClInclude Include="..\..\..\hmLib\cstring.h" />
-    <ClInclude Include="..\..\..\hmLib\date.hpp" />
-    <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
-    <ClInclude Include="..\..\..\hmLib\gate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\gps.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
-    <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
-    <ClInclude Include="..\..\..\hmLib\position.hpp" />
-    <ClInclude Include="..\..\..\hmLib\random.hpp" />
-    <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />
-    <ClInclude Include="..\..\..\hmLib\signals.hpp" />
-    <ClInclude Include="..\..\..\hmLib\streambuf_interface.hpp" />
-    <ClInclude Include="..\..\..\hmLib\stream_utility.hpp" />
-    <ClInclude Include="..\..\..\hmLib\type.h" />
-    <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
-    <ClInclude Include="..\..\..\hmLib\utility.hpp" />
-    <ClInclude Include="..\..\..\hmLib\version.h" />
-    <ClInclude Include="csv.hpp" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\hmLib\cdeque.c" />
-    <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
-    <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
-    <ClCompile Include="..\..\..\hmLib\cqueue.c" />
-    <ClCompile Include="..\..\..\hmLib\cstack.c" />
-    <ClCompile Include="..\..\..\hmLib\cstring.c" />
-    <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
-    <ClCompile Include="..\..\..\hmLib\random.cpp" />
-    <ClCompile Include="run_csv.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="test_csv_iterator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test1.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
