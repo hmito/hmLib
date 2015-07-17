@@ -86,6 +86,7 @@
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
     <ClInclude Include="..\..\..\hmLib\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
+    <ClInclude Include="..\..\..\hmLib\iocsv.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
@@ -93,6 +94,7 @@
     <ClInclude Include="..\..\..\hmLib\signals.hpp" />
     <ClInclude Include="..\..\..\hmLib\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\hmLib\stream_utility.hpp" />
+    <ClInclude Include="..\..\..\hmLib\table.hpp" />
     <ClInclude Include="..\..\..\hmLib\type.h" />
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
