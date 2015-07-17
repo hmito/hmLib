@@ -7,31 +7,25 @@ int main(){
 	std::ifstream fin("test1.csv");
 
 	hmLib::icsv_iterator itr(fin);
+	hmLib::ocsv_iterator oitr(std::cout, '\t');
 
-	auto End = itr.get_file_end();
 
-	std::cout << End.pos() << std::endl;
-//	for(unsigned int i=0;i<10;++i){
+	hmLib::advance_line(itr);
+
 	while(!itr.eof()){
-		std::cout <<"["<<itr.pos()<<"]"<< *itr << "\t";
-		if(itr.eol())std::cout << std::endl;
-		++itr;
+
+		std::string Name;
+		unsigned int Val;
+		unsigned char Sex;
+		*itr++ >> Name;
+		*itr++ >> Val;
+		*itr++ >> Sex;
+
+		*oitr++ << Name;
+		*oitr++ << Val;
+		*oitr++ << Sex;
+		oitr.endl();
 	}
-
-	hmLib::ocsv_iterator oitr(std::cout);
-	*oitr = "na";
-	*oitr++ = "me";
-	*oitr++ = "value";
-
-	oitr.endl();
-
-	*oitr << 2.3;
-	++oitr;
-	*oitr << 23;
-	++oitr;
-	oitr.endl();
-
-
 
 	system("pause");
 	return 0;

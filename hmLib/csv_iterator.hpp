@@ -157,7 +157,7 @@ namespace hmLib{
 			}
 			template<typename T>
 			input_proxy& operator>>(T& Val){
-				Proxy_.My.read() >> Val;
+				My.read() >> Val;
 				return *this;
 			}
 			friend std::basic_ostream<Elem, Traits>& operator<<(std::basic_ostream<Elem, Traits>& out, input_proxy p){
