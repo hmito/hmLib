@@ -18,6 +18,21 @@ int main(){
 		++itr;
 	}
 
+	hmLib::ocsv_iterator oitr(std::cout);
+	*oitr = "na";
+	*oitr++ = "me";
+	*oitr++ = "value";
+
+	oitr.endl();
+
+	*oitr << 2.3;
+	++oitr;
+	*oitr << 23;
+	++oitr;
+	oitr.endl();
+
+
+
 	system("pause");
 	return 0;
 }

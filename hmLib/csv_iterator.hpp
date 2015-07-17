@@ -29,7 +29,7 @@ namespace hmLib{
 					My.IsCellHead = false;
 				}
 
-				*(My.pstream) << Str;
+				*(My.pstream) << Val;
 				return *this;
 			}
 		};
@@ -68,6 +68,7 @@ namespace hmLib{
 		void endl(){
 			(*pstream) << End;
 			IsLineHead = true;
+			IsCellHead = false;
 		}
 	};
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
