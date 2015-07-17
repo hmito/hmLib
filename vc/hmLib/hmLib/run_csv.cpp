@@ -1,5 +1,6 @@
 #include<fstream>
 #include<iostream>
+#include<sstream>
 #include<hmLib/csv_iterator.hpp>
 
 int main(){
@@ -8,8 +9,11 @@ int main(){
 	hmLib::icsv_iterator itr(fin);
 
 	auto End = itr.get_file_end();
-	while(itr != End){
-		std::cout << *itr << "\t";
+
+	std::cout << End.pos() << std::endl;
+//	for(unsigned int i=0;i<10;++i){
+	while(!itr.eof()){
+		std::cout <<"["<<itr.pos()<<"]"<< *itr << "\t";
 		if(itr.eol())std::cout << std::endl;
 		++itr;
 	}

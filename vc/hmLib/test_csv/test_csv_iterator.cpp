@@ -12,8 +12,7 @@ namespace hmLib{
 
 			hmLib::icsv_iterator itr(fin);
 
-			auto End = itr.get_file_end();
-			while(itr != End){
+			while(!itr.eof()){
 				std::cout << *itr<<"\t";
 				if(itr.eol())std::cout << std::endl;
 			}

@@ -95,16 +95,18 @@ namespace hmLib{
 				Pos = ReadPos;
 			} else{
 				Elem c;
-				if(pstream->tellg() != Pos) pstream->seekg(Pos);
+				pstream->seekg(0, std::ios::end);
+				auto EndPos = pstream->tellg();
+				pstream->seekg(Pos);
 
-				while(true){
+				while(pstream->tellg() != EndPos){
 					c = pstream->get();
 
 					if(c == Sep){
 						IsLineHead = false;
 						break;
 					}
-					if(c == End || c == 0){
+					if(c == End || c == EOF){
 						IsLineHead = true;
 						break;
 					}
@@ -119,9 +121,11 @@ namespace hmLib{
 				sstream.str(my_string());
 				sstream.clear();
 
-				if(pstream->tellg() != Pos) pstream->seekg(Pos);
+				pstream->seekg(0, std::ios::end);
+				auto EndPos = pstream->tellg();
+				pstream->seekg(Pos);
 
-				while(true){
+				while(pstream->tellg() != EndPos){
 					c = pstream->get();
 
 					if(c == Sep){
@@ -191,6 +195,11 @@ namespace hmLib{
 			return ans;
 		}
 		bool eol()const{ return IsLineHead; }
+		bool eof(){
+			pstream->seekg(0, std::ios::end);
+			return Pos == pstream->tellg();
+		}
+		my_pos pos()const{ return Pos; }
 		friend bool operator==(const my_type& my1, const my_type& my2){
 			if(&my1 == &my2)return true;
 
@@ -210,9 +219,10 @@ namespace hmLib{
 			my_type ans;
 			ans.End = End;
 			ans.Sep = Sep;
-			ans.Pos = EOF;
+			pstream->seekg(0, std::ios::end);
+			ans.Pos = pstream->tellg();
 			ans.HasRead = false;
-			ans.ReadPos = EOF;
+			ans.ReadPos = pstream->tellg();
 			ans.IsLineHead = true;
 
 			return ans;
