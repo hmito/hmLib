@@ -4,9 +4,9 @@
 #include<string>
 #include<vector>
 #include<algorithm>
+#include<limits>
 #include<boost/lexical_cast.hpp>
 #include<boost/iterator_adaptors.hpp>
-#include<hmLib/position.hpp>
 namespace hmLib{
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
 	class basic_table{
@@ -14,6 +14,7 @@ namespace hmLib{
 		using my_type = basic_table < Elem, Traits >;
 	public:
 		using size_type = unsigned int;
+		using diff_type = int;
 		using size_pair_type = std::pair<size_type,size_type>;
 		using string_type = std::basic_string < Elem, Traits >;
 		using column_type = std::vector < string_type >;
@@ -165,9 +166,9 @@ namespace hmLib{
 		};
 		struct const_column_proxy{
 		private:
-			data_type& rData;
+			const data_type& rData;
 		public:
-			const_column_proxy(data_type& rData_) :rData(rData_){}
+			const_column_proxy(const data_type& rData_) :rData(rData_){}
 			string_type name()const{ return rData.first; }
 			size_type size()const{ return rData.second.size(); }
 			const_element_proxy operator[](size_type Pos)const{ return const_element_proxy(rData.second.at(Pos)); }
@@ -226,7 +227,7 @@ namespace hmLib{
 			my_type& My;
 			size_type row_pos;
 		public:
-			row_proxy(my_type My_, size_type row_pos_) :My(My_), row_pos(row_pos_){}
+			row_proxy(my_type& My_, size_type row_pos_) :My(My_), row_pos(row_pos_){}
 			size_type size()const{return My.column_size()}
 			size_type pos()const{ return row_pos; }
 			element_proxy operator[](size_type Pos){ return My(row_pos, Pos); }
@@ -240,10 +241,10 @@ namespace hmLib{
 		};
 		struct const_row_proxy{
 		private:
-			my_type& My;
+			const my_type& My;
 			size_type row_pos;
 		public:
-			const_row_proxy(my_type My_, size_type row_pos_) :My(My_), row_pos(row_pos_){}
+			const_row_proxy(const my_type& My_, size_type row_pos_) :My(My_), row_pos(row_pos_){}
 			const_row_proxy(row_proxy Prx) :My(Prx.My), row_pos(Prx.row_pos){}
 			size_type size()const{ return My.column_size() }
 			size_type pos()const{ return row_pos; }
@@ -253,14 +254,76 @@ namespace hmLib{
 			const_row_element_iterator end()const{ return const_row_element_iterator(My.Data.end(), row_pos); }
 		};
 	public:
-		struct row_iterator;
-		struct const_row_iterator;
-		struct column_iterator;
-		struct const_column_iterator;
-		struct casted_column_iterator;
-		struct const_casted_column_iterator;
-		struct name_iterator;
-		struct const_name_iterator;
+		struct row_iterator
+			: public boost::iterator_facade<row_iterator, row_proxy, boost::random_access_traversal_tag, row_proxy, diff_type >{
+			using iterator_facade = boost::iterator_facade<row_iterator, row_proxy, boost::random_access_traversal_tag, row_proxy, diff_type >;
+			friend struct const_row_iterator;
+		private:
+			my_type& Ref;
+			size_type row_pos;
+		public:
+			row_iterator():row_pos(std:numeric_limits<size_type>::max()){}
+			row_iterator(my_type& Ref_,size_type row_pos_) : Ref(Ref_), row_pos(row_pos_){}
+			row_iterator(const_row_iterator itr) : Ref(itr.Ref), row_pos(itr.row_pos){}
+		private:
+			friend class boost::iterator_core_access;
+			row_proxy deference(){ return row_proxy(Ref, row_pos); }
+			bool equal(row_iterator itr_){ return (row_pos == itr_.row_pos) && (&Ref == &(itr_.Ref)); }
+			void increment(){ ++row_pos; }
+			void decrement(){ --row_pos; }
+			void advance(diff_type n){ row_pos += n; }
+			diff_type distance_to(row_iterator itr_){ return itr_.row_pos - row_itr; }
+		};
+		struct const_row_iterator
+			: public boost::iterator_facade<const_row_iterator, const_row_proxy, boost::random_access_traversal_tag, const_row_proxy, diff_type >{
+			using iterator_facade = boost::iterator_facade<const_row_iterator, const_row_proxy, boost::random_access_traversal_tag, const_row_proxy, diff_type >;
+		private:
+			const my_type& Ref;
+			size_type row_pos;
+		public:
+			const_row_iterator() :row_pos(std : numeric_limits<size_type>::max()){}
+			const_row_iterator(const my_type& Ref_, size_type row_pos_) : Ref(Ref_), row_pos(row_pos_){}
+		private:
+			friend class boost::iterator_core_access;
+			const_row_proxy deference(){ return row_proxy(Ref, row_pos); }
+			bool equal(row_iterator itr_){ return (row_pos == itr_.row_pos) && (&Ref == &(itr_.Ref)); }
+			void increment(){ ++row_pos; }
+			void decrement(){ --row_pos; }
+			void advance(diff_type n){ row_pos += n; }
+			diff_type distance_to(row_iterator itr_){ return itr_.row_pos - row_itr; }
+		};
+		struct column_iterator
+			: public boost::iterator_adaptor<column_iterator, basic_row_element_iterator, column_proxy, boost::random_access_traversal_tag, column_proxy>{
+			using iterator_adaptor = boost::iterator_adaptor<column_iterator, basic_row_element_iterator, column_proxy, boost::random_access_traversal_tag, column_proxy>;
+			friend struct const_column_iterator;
+		public:
+			column_iterator() = default;
+			column_iterator(basic_row_element_iterator  bitr) : iterator_adaptor(bitr){}
+			column_iterator(const_column_iterator itr) : iterator_adaptor(itr.base_reference()){}
+		private:
+			friend class boost::iterator_core_access;
+			bool equal(column_iterator itr_){
+				return (base_reference() == itr_.base_reference());
+			}
+			column_proxy dereference()const{
+				return column_proxy(base_reference()->second);
+			}
+		};
+		struct const_column_iterator
+			: public boost::iterator_adaptor<const_column_iterator, basic_row_element_iterator, const_column_proxy, boost::random_access_traversal_tag, const_column_proxy>{
+			using iterator_adaptor = boost::iterator_adaptor<const_column_iterator, basic_row_element_iterator, const_column_proxy, boost::random_access_traversal_tag, const_column_proxy>;
+		public:
+			const_column_iterator() = default;
+			const_column_iterator(basic_row_element_iterator  bitr) : iterator_adaptor(bitr){}
+		private:
+			friend class boost::iterator_core_access;
+			bool equal(const_column_iterator itr_){
+				return (base_reference() == itr_.base_reference());
+			}
+			const_column_proxy dereference()const{
+				return const_column_proxy(base_reference()->second);
+			}
+		};
 	public://access directoly
 		element_proxy at(size_type row_pos_, size_type column_pos_){ return element_proxy(Data.at(column_pos_).second.at(row_pos_)); }
 		const_element_proxy at(size_type row_pos_, size_type column_pos_)const{ return const_element_proxy(Data.at(column_pos_).second.at(row_pos_)); }
@@ -306,11 +369,13 @@ namespace hmLib{
 			for(auto& Column : Data)Column.second.reserve(row_size_);
 		}
 		void clear(){ Data.clear(); }
+	/*
 		column_iterator find_column(const string_type& column_name_){ return std::find_if(data_begin(), data_end(), [](const data_type& d)->bool{return d.first == column_name; }); }
 		void push_back_column(column_type column_ = column_type(), string_type column_name_ = ""){ Data.push_back(std::make_pair(column_name_, column_); }
 		void pop_back_column(){ Data.pop_back(); }
 		void insert_column(column_iterator itr, column_type column_ = column_type(), string_type column_name_ = "");
 		void erase_column(column_iterator itr);
+	*/
 	};
 	using table = basic_table<char, std::char_traits < char >> ;
 }
