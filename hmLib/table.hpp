@@ -58,7 +58,7 @@ namespace hmLib{
 		template<typename type>
 		struct casted_element_proxy:private element_proxy{
 		public:
-			element_proxy(string_type& Ref) :element_proxy(Ref){}
+			casted_element_proxy(string_type& Ref) :element_proxy(Ref){}
 			operator type()const{
 				type Val;
 				this->operator>>(Val);
@@ -111,7 +111,7 @@ namespace hmLib{
 		template<typename type>
 		struct casted_column_element_iterator
 			: public boost::iterator_adaptor<casted_column_element_iterator<type>, basic_column_element_iterator, casted_element_proxy<type>, boost::random_access_traversal_tag, casted_element_proxy<type> >{
-			using iterator_adaptor = boost::iterator_adaptor<casted_element_iterator<type>, basic_column_element_iterator, casted_element_proxy<type>, boost::random_access_traversal_tag, casted_element_proxy<type> >;
+			using iterator_adaptor = boost::iterator_adaptor<casted_column_element_iterator<type>, basic_column_element_iterator, casted_element_proxy<type>, boost::random_access_traversal_tag, casted_element_proxy<type> >;
 		public:
 			casted_column_element_iterator() = default;
 			casted_column_element_iterator(basic_column_element_iterator bitr) : iterator_adaptor(bitr){}
@@ -128,7 +128,7 @@ namespace hmLib{
 		public:
 			const_casted_column_element_iterator() = default;
 			const_casted_column_element_iterator(basic_const_column_element_iterator bitr) : iterator_adaptor(bitr){}
-			const_casted_column_element_iterator(casted_column_element_iterator itr) : iterator_adaptor(itr.base_reference()){}
+			const_casted_column_element_iterator(casted_column_element_iterator<type> itr) : iterator_adaptor(itr.base_reference()){}		private:
 		private:
 			friend class boost::iterator_core_access;
 			const_casted_element_proxy<type> dereference()const{
@@ -299,7 +299,6 @@ namespace hmLib{
 		public:
 			column_iterator() = default;
 			column_iterator(basic_row_element_iterator  bitr) : iterator_adaptor(bitr){}
-			column_iterator(const_column_iterator itr) : iterator_adaptor(itr.base_reference()){}
 		private:
 			friend class boost::iterator_core_access;
 			bool equal(column_iterator itr_){
@@ -315,6 +314,7 @@ namespace hmLib{
 		public:
 			const_column_iterator() = default;
 			const_column_iterator(basic_row_element_iterator  bitr) : iterator_adaptor(bitr){}
+			const_column_iterator(column_iterator itr) : iterator_adaptor(itr.base_reference()){}
 		private:
 			friend class boost::iterator_core_access;
 			bool equal(const_column_iterator itr_){
@@ -344,15 +344,17 @@ namespace hmLib{
 	public://access column
 		size_type column_size()const{ return Data.size(); }
 		column_proxy column(size_type column_pos_){ return column_proxy(Data.at(column_pos_)); }
-		const_column_proxy column(size_type column_pos_){ return const_column_proxy(Data.at(column_pos_)); }
-		column_iterator column_begin(){ return column_iterator(Data.at(column_no_).second.begin()); }
-		column_iterator column_end(){ return column_iterator(Data.at(column_no_).second.end()); }
-		const_column_iterator column_begin()const{ return const_column_iterator(Data.at(column_no_).second.begin()); }
-		const_column_iterator column_end()const{ return const_column_iterator(Data.at(column_no_).second.end()); }
+		column_iterator column_begin(){ return column_iterator(Data.begin()); }
+		column_iterator column_end(){ return column_iterator(Data.end()); }
+		const_column_proxy column(size_type column_pos_)const{ return const_column_proxy(Data.at(column_pos_)); }
+		const_column_iterator column_begin()const{ return const_column_iterator(Data.begin()); }
+		const_column_iterator column_end()const{ return const_column_iterator(Data.end()); }
 	public://access row
 		size_type row_size()const{ return Data.at(0).second.size(); }
+		row_proxy row(size_type row_pos_){ return row_proxy(*this, row_pos_); }
 		row_iterator row_begin(size_type row_pos_){ return row_iterator(Data.at(0).second.begin(),row_pos_); }
 		row_iterator row_end(size_type row_pos_){ return row_iterator(Data.at(0).second.end(), row_pos_); }
+		const_row_proxy row(size_type row_pos_)const{ return row_proxy(*this, row_pos_); }
 		const_row_iterator row_begin(size_type row_pos_)const{ return const_row_iterator(data_begin(), row_pos_); }
 		const_row_iterator row_end(size_type row_pos_)const{ return const_row_iterator(data_end(), row_pos_); }
 	public://change elements
@@ -361,8 +363,8 @@ namespace hmLib{
 			return size_pair_type(Data.size(), Data.at(0).second.size());
 		}
 		void assign(size_type row_size_, size_type col_size_){
-			Data.assign(col_size_);
-			for(auto& Column : Data)Column.second.assign(row_size_);
+			Data.assign(col_size_, data_type());
+			for(auto& Column : Data)Column.second.assign(row_size_,string_type());
 		}
 		void reserve(size_type row_size_, size_type col_size_){
 			Data.reserve(col_size_);
