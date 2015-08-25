@@ -44,7 +44,14 @@ namespace hmLib{
 		public:
 			angle():pitch(0.),roll(0.),yaw(0.){}
 			angle(const angle& Agl_):pitch(Agl_.pitch),roll(Agl_.roll),yaw(Agl_.yaw){}
-			angle(angle&& Agl_):pitch(Agl_.pitch),roll(Agl_.roll),yaw(Agl_.yaw){}
+			angle& operator=(const angle& Agl_){
+				if(this != &Agl_){
+					roll = Agl_.roll;
+					pitch = Agl_.pitch;
+					yaw = Agl_.yaw;
+				}
+				return *this;
+			}
 			angle(double roll_,double pitch_,double yaw_):roll(roll_),pitch(pitch_),yaw(yaw_){}
 		public:
 			//等価演算
@@ -116,6 +123,15 @@ namespace hmLib{
 		public:
 			scale():rx(1.),ry(1.),rz(1.){}
 			scale(double rx_,double ry_,double rz_):rx(rx_),ry(ry_),rz(rz_){}
+			scale(const scale& my_):rx(my_.rx),ry(my_.ry),rz(my_.rz){}
+			scale& operator=(const scale& my_){
+				if(this != &my_){
+					rx = my_.rx;
+					ry = my_.ry;
+					rz = my_.rz;
+				}
+				return *this;
+			}
 			//逆軸変換　　実装部は別
 			const scale operator~()const{return scale(1/rx,1/ry,1/rz);}
 		};
@@ -127,9 +143,16 @@ namespace hmLib{
 		public:
 			position():x(0.),y(0.),z(0.){}
 			position(const position& Pos_):x(Pos_.x),y(Pos_.y),z(Pos_.z){}
-			position(position&& Pos_):x(Pos_.x),y(Pos_.y),z(Pos_.z){}
 			position(double x_,double y_,double z_):x(x_),y(y_),z(z_){}
 			position(const polar& Pol_);
+			position& operator=(const position& my_){
+				if(this != &my_){
+					x = my_.x;
+					y = my_.y;
+					z = my_.z;
+				}
+				return *this;
+			}
 		public:
 			//等価演算
 			bool operator==(const position& Agl_)const{
@@ -206,7 +229,14 @@ namespace hmLib{
 		public:
 			polar():r(0.),phi(0.),theta(0.){}
 			polar(const polar& Pol_):r(Pol_.r),phi(Pol_.phi),theta(Pol_.theta){}
-			polar(polar&& Pol_):r(Pol_.r),phi(Pol_.phi),theta(Pol_.theta){}
+			polar& operator=(const polar& my_){
+				if(this != &my_){
+					r = my_.r;
+					phi = my_.phi;
+					theta = my_.theta;
+				}
+				return *this;
+			}
 			polar(double r_,double phi_,double theta_):r(r_),phi(phi_),theta(theta_){}
 			polar(const position& Pos_);
 		public:

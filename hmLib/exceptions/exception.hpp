@@ -25,7 +25,7 @@ namespace hmLib{
 #ifndef  HMLIB_NOEXCEPT
 #	define _hmLib_exceptions_to_str(num) #num
 #	define hmLib_exceptions_to_str(num) _hmLib_exceptions_to_str(num)
-#	define hmLib_throwformat(str) (std::string(__FILE__)+"("hmLib_exceptions_to_str(__LINE__)") in "__FUNCTION__": "+str)
+#	define hmLib_throwformat(str) (std::string(__FILE__)+"("+hmLib_exceptions_to_str(__LINE__)+") in "+__FUNCTION__+": "+str)
 #	define hmLib_throw(except,str) throw except((hmLib_throwformat(str)).c_str())
 #	define hmLib_thrownext(except,nextexcept,str) throw nextexcept((std::string(except.what())+"\n"+hmLib_throwformat(str)).c_str())
 #	define hmLib_assert(condition,except,str) if(!(condition))hmLib_throw(except,str)
