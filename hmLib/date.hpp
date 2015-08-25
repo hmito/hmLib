@@ -6,6 +6,7 @@ system_clockを日付型に変換する
 あくまで入出力用であり、加算等の演算はできない
 */
 #include<chrono>
+#include<ctime>
 namespace hmLib{
 	struct date{
 		typedef std::chrono::system_clock::time_point time_point;
