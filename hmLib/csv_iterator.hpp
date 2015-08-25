@@ -221,6 +221,7 @@ namespace hmLib{
 		}
 		my_type get_file_end(){
 			my_type ans;
+			ans.pstream = pstream;
 			ans.End = End;
 			ans.Sep = Sep;
 			pstream->seekg(0, std::ios::end);

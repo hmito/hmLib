@@ -30,6 +30,8 @@ namespace hmLib{
 			element_proxy(string_type& Ref):Str(Ref){}
 			operator string_type&(){ return Str; }
 			operator const string_type&()const{ return Str; }
+			string_type& ref(){ return Str; }
+			const string_type& cref()const{ return Str; }
 			element_proxy& operator=(const string_type& Str_){
 				Str = Str_;
 				return *this;
@@ -50,6 +52,7 @@ namespace hmLib{
 			const_element_proxy(const string_type& Ref) :Str(Ref){}
 			const_element_proxy(const element_proxy& Prx) :Str(Prx.Str){}
 			operator const string_type&()const{ return Str; }
+			const string_type& cref()const{ return Str; }
 			template<typename type>
 			void operator>>(type& Val)const{
 				Val = boost::lexical_cast<type>(Str);
@@ -64,6 +67,7 @@ namespace hmLib{
 				this->operator>>(Val);
 				return Val;
 			}
+			type val(){ return operator type(); }
 			casted_element_proxy<type>& operator=(const type& Val){
 				this->operator<<(Val);
 				return *this;
@@ -79,6 +83,7 @@ namespace hmLib{
 				this->operator>>(Val);
 				return Val;
 			}
+			type val(){ return operator type(); }
 		};
 	public://column proxy
 		using basic_column_element_iterator = typename data_type::second_type::iterator;
@@ -324,6 +329,18 @@ namespace hmLib{
 				return const_column_proxy(base_reference()->second);
 			}
 		};
+	public:
+		basic_table() = default;
+		basic_table(const my_type& my_) = default;
+		my_type& operator=(const my_type& my_) = default;
+		basic_table(my_type&& my_) = default;
+		my_type& operator=(my_type&& my_) = default;
+		basic_table(size_type row_size_, size_type col_size_) :basic_table(){
+			assign(row_size_, col_size_);
+		}
+		explicit basic_table(size_pair_type size_) :basic_table(){
+			assign(size_.first, size_.second);
+		}
 	public://access directoly
 		element_proxy at(size_type row_pos_, size_type column_pos_){ return element_proxy(Data.at(column_pos_).second.at(row_pos_)); }
 		const_element_proxy at(size_type row_pos_, size_type column_pos_)const{ return const_element_proxy(Data.at(column_pos_).second.at(row_pos_)); }

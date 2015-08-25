@@ -15,6 +15,12 @@ int main(){
 
 	std::cout <<Table.row_size()<<","<< Table.column_size() << std::endl;
 
+	for(unsigned int x = 0; x < Table.row_size(); ++x){
+		for(unsigned int y = 0; y < Table.column_size(); ++y){
+			std::cout << "[" << x << "," << y << "]: " << Table.at(x, y).ref() << std::endl;
+		}
+	}
+
 	system("pause");
 	
 	return 0;
