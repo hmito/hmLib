@@ -52,7 +52,6 @@ namespace hmLib{
 		
 		//受信可能状対かの確認
 		virtual bool can_getc()override{
-
 			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
 			return (port->loc() != 0 && is_open());
 		}
