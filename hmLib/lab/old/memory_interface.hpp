@@ -1,15 +1,15 @@
-#ifndef HMLIB_OBJECTINTERFACE_INC
+ï»¿#ifndef HMLIB_OBJECTINTERFACE_INC
 #define HMLIB_OBJECTINTERFACE_INC 1
 #
 /*===object_interface===
-object‚ª‚ÂŠî–{“IŠÖ”ŒQ‚ÌƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ’ñ‹Ÿ‚·‚é
+objectãŒæŒã¤åŸºæœ¬çš„é–¢æ•°ç¾¤ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’æä¾›ã™ã‚‹
 
 object_interface:v0_01/130308 hmIto
-	clone,copy,move‚ğ’Ç‰Á
+	clone,copy,moveã‚’è¿½åŠ 
 */
 namespace hmLib{
 	namespace interface{
-		//©g‚Ì’l‚ğ‘Šè‚Écopy‚·‚écopyŠÖ”
+		//è‡ªèº«ã®å€¤ã‚’ç›¸æ‰‹ã«copyã™ã‚‹copyé–¢æ•°
 		template<typename my_type>
 		struct copy_interface{
 		protected:
@@ -17,7 +17,7 @@ namespace hmLib{
 		public:
 			void copy(my_type& my_typeo_){itf_copy(my_typeo_);}
 		};
-		//©g‚Ì’l‚ğ‘Šè‚Émove‚·‚émoveŠÖ”
+		//è‡ªèº«ã®å€¤ã‚’ç›¸æ‰‹ã«moveã™ã‚‹moveé–¢æ•°
 		template<typename my_type>
 		struct move_interface{
 		protected:
@@ -25,7 +25,7 @@ namespace hmLib{
 		public:
 			void move(my_type& my_typeo_){itf_copy(my_typeo_);}
 		};
-		//“®“IŠm•Û‚ÅƒRƒs[‚ğì‚écloneŠÖ” :::allocator‚ğ‚Ç‚¤‚·‚é‚©–â‘è‚ªc‚Á‚Ä‚¢‚é
+		//å‹•çš„ç¢ºä¿ã§ã‚³ãƒ”ãƒ¼ã‚’ä½œã‚‹cloneé–¢æ•° :::allocatorã‚’ã©ã†ã™ã‚‹ã‹å•é¡ŒãŒæ®‹ã£ã¦ã„ã‚‹
 		template<typename my_type>
 		struct clone_interface{
 		protected:

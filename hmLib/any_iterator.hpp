@@ -1,18 +1,18 @@
-#ifndef HMLIB_ANYITERATOR_INC
+ï»¿#ifndef HMLIB_ANYITERATOR_INC
 #define HMLIB_ANYITERATOR_INC 101
 #
 /*===any_iterator.hpp===
-—lX‚Èiterator‚ğó‚¯æ‚èAƒIƒŠƒWƒiƒ‹‚Æ“¯—l‚É‚Ó‚é‚Ü‚¤–‚Ìo—ˆ‚é”Ä—piteratorƒNƒ‰ƒXB
-“à•”‚Å’lƒRƒs[‚É‚æ‚èiteratorƒf[ƒ^‚ğ•Û‚µ‚Ä‚¢‚éB
-‘¬“x–Ê‚Å‚ÍA’Êí‚Ìiterator‚É‚Í—ò‚éiˆ—‚É‚æ‚é‚ªA2`100”{‚Ù‚Çj
-ƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‘Î‰
+æ§˜ã€…ãªiteratorã‚’å—ã‘å–ã‚Šã€ã‚ªãƒªã‚¸ãƒŠãƒ«ã¨åŒæ§˜ã«ãµã‚‹ã¾ã†äº‹ã®å‡ºæ¥ã‚‹æ±ç”¨iteratorã‚¯ãƒ©ã‚¹ã€‚
+å†…éƒ¨ã§å€¤ã‚³ãƒ”ãƒ¼ã«ã‚ˆã‚Šiteratorãƒ‡ãƒ¼ã‚¿ã‚’ä¿æŒã—ã¦ã„ã‚‹ã€‚
+é€Ÿåº¦é¢ã§ã¯ã€é€šå¸¸ã®iteratorã«ã¯åŠ£ã‚‹ï¼ˆå‡¦ç†ã«ã‚ˆã‚‹ãŒã€2ï½100å€ã»ã©ï¼‰
+ãƒãƒ«ãƒã‚¹ãƒ¬ãƒƒãƒ‰å¯¾å¿œ
 
 any_iterator:v1_01/130328 hmIto
-	const_forward/const_bidirectional/const_random_access_any_iteratort‚ğ’Ç‰Á
-	forward_any_iterator‚Ì’v–½“I‚ÈƒoƒO‚ğC³
-		static destructŠÖ”‚ğdestroy‚Æ‘‚¢‚ÄŒÄ‚Ño‚µ‚Ä‚¢‚½–â‘è‚ğC³
+	const_forward/const_bidirectional/const_random_access_any_iteratortã‚’è¿½åŠ 
+	forward_any_iteratorã®è‡´å‘½çš„ãªãƒã‚°ã‚’ä¿®æ­£
+		static destructé–¢æ•°ã‚’destroyã¨æ›¸ã„ã¦å‘¼ã³å‡ºã—ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 any_iterator:v1_00/130326 hmIto
-	output/input/forward/bidirectional/random_access_any_iterator‚ğ’Ç‰Á
+	output/input/forward/bidirectional/random_access_any_iteratorã‚’è¿½åŠ 
 */
 #include<memory>
 #include<boost/iterator/iterator_facade.hpp>

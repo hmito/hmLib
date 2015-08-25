@@ -1,24 +1,24 @@
-#ifndef HMLIB_MEMORY_SHAREDARRAY_INC
+ï»¿#ifndef HMLIB_MEMORY_SHAREDARRAY_INC
 #define HMLIB_MEMORY_SHAREDARRAY_INC 104
 #
 /*
 === memory::shared_array ===
 v1_04/140719 hmIto
-	iterator‚ğ’Ç‰Á
+	iteratorã‚’è¿½åŠ 
 v1_03/140415 hmIto
-	unique_ptr‚Ìinclude–Y‚ê‚ğC³
+	unique_ptrã®includeå¿˜ã‚Œã‚’ä¿®æ­£
 v1_02/140412 hmIto
-	_shared_array_element‚ğ–³–¼–¼‘O‹óŠÔ‚ÖˆÚ“®
-	allocator‚Ìrebind‚ğ—p‚¢‚½³‚µ‚¢‹LÚ‚Ö•ÏX
+	_shared_array_elementã‚’ç„¡ååå‰ç©ºé–“ã¸ç§»å‹•
+	allocatorã®rebindã‚’ç”¨ã„ãŸæ­£ã—ã„è¨˜è¼‰ã¸å¤‰æ›´
 v1_01/140408 hmIto
-	shared_write_array‚ÉwriteŠÖ”‚ğ’Ç‰Á
-	flush‚ğ“¯‚É©“®‚Å‚â‚Á‚Ä‚­‚ê‚é
-	–ß‚è’l‚É‘‚«‚İÏ‚İ‚ÌƒTƒCƒY‚ª‹A‚Á‚Ä‚­‚é
-	shared_read_array‚ªpointer‚âunique_ptr‚©‚ç’¼Ú\’z‚Å‚«‚é‚æ‚¤‚ÉƒRƒ“ƒXƒgƒ‰ƒNƒ^,resetŠÖ”‚ğ’Ç‰Á
-	“à•”‚Å‚ÍAshared_write_array‚ğˆê“I‚Éì¬‚µ‚Ä‚©‚çó‚¯æ‚Á‚Ä‚¢‚é
-	shared_read_array‚Éflowing‚ğ’Ç‰Á
-	‘‚«‚İI—¹‚µ‚Ä‚¢‚é‚©‚ÌŠm”FB–Y‚ê‚Ä‚½B]
-	‚»‚Ì‘¼A‘S‘Ì“I‚ÉƒRƒƒ“ƒg’Ç‰Á
+	shared_write_arrayã«writeé–¢æ•°ã‚’è¿½åŠ 
+	flushã‚’åŒæ™‚ã«è‡ªå‹•ã§ã‚„ã£ã¦ãã‚Œã‚‹
+	æˆ»ã‚Šå€¤ã«æ›¸ãè¾¼ã¿æ¸ˆã¿ã®ã‚µã‚¤ã‚ºãŒå¸°ã£ã¦ãã‚‹
+	shared_read_arrayãŒpointerã‚„unique_ptrã‹ã‚‰ç›´æ¥æ§‹ç¯‰ã§ãã‚‹ã‚ˆã†ã«ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿,reseté–¢æ•°ã‚’è¿½åŠ 
+	å†…éƒ¨ã§ã¯ã€shared_write_arrayã‚’ä¸€æ™‚çš„ã«ä½œæˆã—ã¦ã‹ã‚‰å—ã‘å–ã£ã¦ã„ã‚‹
+	shared_read_arrayã«flowingã‚’è¿½åŠ 
+	æ›¸ãè¾¼ã¿çµ‚äº†ã—ã¦ã„ã‚‹ã‹ã®ç¢ºèªã€‚å¿˜ã‚Œã¦ãŸã€‚]
+	ãã®ä»–ã€å…¨ä½“çš„ã«ã‚³ãƒ¡ãƒ³ãƒˆè¿½åŠ 
 */
 #include<memory>
 #include<hmLib/lab/rvalue_reference.hpp>
@@ -161,7 +161,7 @@ namespace hmLib {
 	template<typename T, typename D=default_deleter<T>, typename Alloc=std::allocator<T> >
 	class shared_read_array;
 
-	//‘‚«‚İ‘¤‚Ì”z—ñŠÇ—ƒNƒ‰ƒX
+	//æ›¸ãè¾¼ã¿å´ã®é…åˆ—ç®¡ç†ã‚¯ãƒ©ã‚¹
 	template<typename T, typename D=default_deleter<T>, typename Alloc=std::allocator<T> >
 	class shared_write_array {
 		typedef shared_read_array<T, D, Alloc> read_type;
@@ -217,92 +217,92 @@ namespace hmLib {
 			if(ptrh)destroy();
 		}
 	public:
-		//”z—ñ‚ğŠÇ—‚µ‚Ä‚¢‚é‚©
+		//é…åˆ—ã‚’ç®¡ç†ã—ã¦ã„ã‚‹ã‹
 		operator bool() const { return ptrh!=0; }
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚Ìæ“ªƒAƒhƒŒƒX‚ğæ“¾
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 		pointer get() {
 			if(ptrh)return const_cast<T*>(ptrh->get());
 			else return 0;
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚Ìæ“ªƒAƒhƒŒƒX‚ğæ“¾
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 		const pointer get() const{
 			if(ptrh)return const_cast<T*>(ptrh->get());
 			else return 0;
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÌƒfƒŠ[ƒ^‚ğæ“¾
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®ãƒ‡ãƒªãƒ¼ã‚¿ã‚’å–å¾—
 		deleter get_deleter() const {
 			if(ptrh)return deleter();
 			return ptrh->get_deleter();
 		}
-		//”z—ñƒAƒNƒZƒX
+		//é…åˆ—ã‚¢ã‚¯ã‚»ã‚¹
 		reference operator[](unsigned int pos_) {
 			return (ptrh->get())[pos_];
 		}
-		//”z—ñƒAƒNƒZƒX
+		//é…åˆ—ã‚¢ã‚¯ã‚»ã‚¹
 		const reference operator[](unsigned int pos_) const {
 			return (ptrh->get())[pos_];
 		}
-		//w’èˆÊ’u‚Éval‚ğ‘‚«‚İA“¯‚Éflush‚·‚é@–ß‚è’l‚ÅAŒ»İ‚Ìflush_size‚ğ•Ô‚·
+		//æŒ‡å®šä½ç½®ã«valã‚’æ›¸ãè¾¼ã¿ã€åŒæ™‚ã«flushã™ã‚‹ã€€æˆ»ã‚Šå€¤ã§ã€ç¾åœ¨ã®flush_sizeã‚’è¿”ã™
 		unsigned int write(unsigned int pos_, const T& val_) {
 			if(prth==0)return 0;
 			(ptrh->get())[pos_]=val_;
 			prth->flush(pos_);
 			return prth->get_rsize();
 		}
-		//‘––”ö‚Éval‚ğ‘‚«‚İA“¯‚Éflush‚·‚é@–ß‚è’l‚ÅAŒ»İ‚Ìflush_size‚ğ•Ô‚·
+		//æ›¸è¾¼æœ«å°¾ã«valã‚’æ›¸ãè¾¼ã¿ã€åŒæ™‚ã«flushã™ã‚‹ã€€æˆ»ã‚Šå€¤ã§ã€ç¾åœ¨ã®flush_sizeã‚’è¿”ã™
 		unsigned int  write(const T& val_) {
 			return write(flush_size(), val_);
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚Ì‚ÌƒTƒCƒY‚ğ•Ô‚·
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®ã®ã‚µã‚¤ã‚ºã‚’è¿”ã™
 		unsigned int size() const {
 			if(ptrh==0)return 0;
 			return ptrh->get_wsize();
 		}
-		//‘Ï‚İƒTƒCƒY‚ğ•Ô‚·
+		//æ›¸è¾¼æ¸ˆã¿ã‚µã‚¤ã‚ºã‚’è¿”ã™
 		unsigned int flush_size()const {
 			if(ptrh==0)return 0;
 			return ptrh->get_rsize();
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÌƒTƒCƒY‚ğsize_‚Ü‚ÅŒ¸‚ç‚·
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®ã‚µã‚¤ã‚ºã‚’size_ã¾ã§æ¸›ã‚‰ã™
 		bool resize(unsigned int size_) {
 			if(ptrh==0)return true;
 			return ptrh->resize(size_);
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÌƒTƒCƒY‚ğŒ»İ‚ÌflushÏ‚İƒTƒCƒY‚Ü‚ÅŒ¸‚ç‚·
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®ã‚µã‚¤ã‚ºã‚’ç¾åœ¨ã®flushæ¸ˆã¿ã‚µã‚¤ã‚ºã¾ã§æ¸›ã‚‰ã™
 		bool resize() {
 			if(ptrh==0)return true;
 			return ptrh->resize();
 		}
-		//pos_‚Ü‚Å‚Í‘Ï‚İ‚É‚·‚é
+		//pos_ã¾ã§ã¯æ›¸è¾¼æ¸ˆã¿ã«ã™ã‚‹
 		void flush(unsigned int pos_) {
 			if(ptrh)ptrh->flush(pos_);
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ––”ö‚Ü‚Å‘Ï‚İ‚É‚·‚é
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—æœ«å°¾ã¾ã§æ›¸è¾¼æ¸ˆã¿ã«ã™ã‚‹
 		void flush() {
 			if(ptrh)ptrh->flush();
 		}
-		//Œ»İŠ—L‚µ‚Ä‚¢‚é”z—ñ‚ğŠÇ—‚µ‚Ä‚¢‚éshared_write/read_array‚Ì”‚ğ•Ô‚·
+		//ç¾åœ¨æ‰€æœ‰ã—ã¦ã„ã‚‹é…åˆ—ã‚’ç®¡ç†ã—ã¦ã„ã‚‹shared_write/read_arrayã®æ•°ã‚’è¿”ã™
 		unsigned int use_count()const {
 			if(ptrh==0)return 0;
 			return ptrh->get_read_count() + ptrh->get_write_count();
 		}
-		//ŠÇ—‚·‚é”z—ñ‚ğ—^‚¦‚È‚¨‚· ‚·‚Å‚ÉŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÍŠJ•ú‚·‚é
+		//ç®¡ç†ã™ã‚‹é…åˆ—ã‚’ä¸ãˆãªãŠã™ ã™ã§ã«ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã¯é–‹æ”¾ã™ã‚‹
 		void reset(pointer ptr_=0, unsigned int size_=0) {
 			if(ptrh)destroy();
 			construct(ptr_, size_, deleter());
 		}
-		//ŠÇ—‚·‚é”z—ñ‚ğ—^‚¦‚È‚¨‚· ‚·‚Å‚ÉŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÍŠJ•ú‚·‚éiƒfƒŠ[ƒ^•tj
+		//ç®¡ç†ã™ã‚‹é…åˆ—ã‚’ä¸ãˆãªãŠã™ ã™ã§ã«ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã¯é–‹æ”¾ã™ã‚‹ï¼ˆãƒ‡ãƒªãƒ¼ã‚¿ä»˜ï¼‰
 		void reset(pointer ptr_, unsigned int size_, deleter dlt_) {
 			if(ptrh)destroy();
 			construct(ptr_, size_, dlt_)
 		}
-		//ŠÇ—‚·‚é”z—ñ‚ğunique_ptr‚©‚ç—^‚¦‚È‚¨‚· ‚·‚Å‚ÉŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÍŠJ•ú‚·‚é
+		//ç®¡ç†ã™ã‚‹é…åˆ—ã‚’unique_ptrã‹ã‚‰ä¸ãˆãªãŠã™ ã™ã§ã«ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã¯é–‹æ”¾ã™ã‚‹
 		void reset(unique_ptr_rvalue_reference mptr_, unsigned int size_) {
 			if(ptrh)destroy();
 			construct(mptr_.ref.get(), size_, mptr_.ref.get_deleter());
 			mptr_.ref.release();
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ğŒğŠ·‚·‚é
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã‚’äº¤æ›ã™ã‚‹
 		void swap(my_type& My_) {
 			my_array_element* ptrh_=My_.ptrh;
 			allocator alloc_=My_.alloc;
@@ -311,16 +311,16 @@ namespace hmLib {
 			ptrh=ptrh_;
 			alloc=alloc_;
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ğŠJ•ú‚·‚éi”z—ñ‚Ìƒƒ‚ƒŠ‰ğ•ú©‘Ì‚ÍA‘S‚Ä‚ÌŠÇ—Ò‚ª‚¢‚È‚­‚È‚Á‚½‚És‚í‚ê‚éj
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã‚’é–‹æ”¾ã™ã‚‹ï¼ˆé…åˆ—ã®ãƒ¡ãƒ¢ãƒªè§£æ”¾è‡ªä½“ã¯ã€å…¨ã¦ã®ç®¡ç†è€…ãŒã„ãªããªã£ãŸæ™‚ã«è¡Œã‚ã‚Œã‚‹ï¼‰
 		void release() {
 			if(ptrh)destroy();
 		}
-		//iteratorŠÖ”
+		//iteratoré–¢æ•°
 		iterator begin() { return get(); }
 		iterator end() { return get()+size(); }
 		const_iterator begin()const { return get(); }
 		const_iterator end()const { return get()+size(); }
-	private://‚¢‚¸‚ê‚ÌŠÖ”‚àAptrh‚ª‘¶İ‚µ‚Ä‚¢‚é/‹ó‚Å‚ ‚é‚±‚Æ‚ÌŠm”F‚Í‚µ‚Ä‚¢‚È‚¢‚Ì‚Å’ˆÓ
+	private://ã„ãšã‚Œã®é–¢æ•°ã‚‚ã€ptrhãŒå­˜åœ¨ã—ã¦ã„ã‚‹/ç©ºã§ã‚ã‚‹ã“ã¨ã®ç¢ºèªã¯ã—ã¦ã„ãªã„ã®ã§æ³¨æ„
 		void construct(pointer ptr_, unsigned int size_, deleter dlt_) {
 			if(ptr_==0)return;
 			if(size_==0) {
@@ -348,7 +348,7 @@ namespace hmLib {
 			ptrh=tmp_prth;
 		}
 	};
-	//“Ç‚İ‚İ‘¤‚Ì”z—ñŠÇ—ƒNƒ‰ƒX
+	//èª­ã¿è¾¼ã¿å´ã®é…åˆ—ç®¡ç†ã‚¯ãƒ©ã‚¹
 	template<typename T, typename D, typename Alloc>
 	class shared_read_array {
 	private:
@@ -422,56 +422,56 @@ namespace hmLib {
 			if(ptrh)destroy();
 		}
 	public:
-		//”z—ñ‚ğŠÇ—‚µ‚Ä‚¢‚é‚©
+		//é…åˆ—ã‚’ç®¡ç†ã—ã¦ã„ã‚‹ã‹
 		operator bool() const{ return ptrh!=0; }
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚Ìæ“ªƒAƒhƒŒƒX‚ğæ“¾
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 		pointer get() const {
 			if(ptrh==0)return 0;
 			return const_cast<T*>(ptrh->get());
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÌƒfƒŠ[ƒ^‚ğæ“¾
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®ãƒ‡ãƒªãƒ¼ã‚¿ã‚’å–å¾—
 		deleter get_deleter() const {
 			if(prth==0)return deleter();
 			return ptrh->get_deleter();
 		}
-		//”z—ñƒAƒNƒZƒX
+		//é…åˆ—ã‚¢ã‚¯ã‚»ã‚¹
 		reference operator[](unsigned int pos)const { return (ptrh->get())[pos]; }
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚Ì“Ç‰Â”\‚ÈƒTƒCƒY‚ğ•Ô‚·
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®èª­è¾¼å¯èƒ½ãªã‚µã‚¤ã‚ºã‚’è¿”ã™
 		unsigned int size() const {
 			if(ptrh==0)return 0;
 			return ptrh->get_rsize();
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÌƒTƒCƒY‚ğ•Ô‚·
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã®ã‚µã‚¤ã‚ºã‚’è¿”ã™
 		unsigned int maxsize()const {
 			if(ptrh==0)return 0;
 			return ptrh->get_wsize();
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ª‘‚«‚İI—¹‚µ‚Ä‚¢‚é‚©‚ğæ“¾‚·‚é
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ãŒæ›¸ãè¾¼ã¿çµ‚äº†ã—ã¦ã„ã‚‹ã‹ã‚’å–å¾—ã™ã‚‹
 		bool flowing()const {
 			if(ptrh==0)return 0;
 			ptrh->flowing();
 		}
-		//Œ»İŠ—L‚µ‚Ä‚¢‚é”z—ñ‚ğŠÇ—‚µ‚Ä‚¢‚éshared_write/read_array‚Ì”‚ğ•Ô‚·
+		//ç¾åœ¨æ‰€æœ‰ã—ã¦ã„ã‚‹é…åˆ—ã‚’ç®¡ç†ã—ã¦ã„ã‚‹shared_write/read_arrayã®æ•°ã‚’è¿”ã™
 		unsigned int use_count()const {
 			if(ptrh==0)return 0;
 			return ptrh->get_write_count() + ptrh->get_read_count();
 		}
-		//ŠÇ—‚·‚é”z—ñ‚ğ—^‚¦‚È‚¨‚· ‚·‚Å‚ÉŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÍŠJ•ú‚·‚é
+		//ç®¡ç†ã™ã‚‹é…åˆ—ã‚’ä¸ãˆãªãŠã™ ã™ã§ã«ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã¯é–‹æ”¾ã™ã‚‹
 		void reset(pointer ptr_=0, unsigned int size_=0) {
 			if(ptrh)destroy();
 			*this=hmLib::move(shared_write_array(ptr_, size_));
 		}
-		//ŠÇ—‚·‚é”z—ñ‚ğ—^‚¦‚È‚¨‚· ‚·‚Å‚ÉŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÍŠJ•ú‚·‚éiƒfƒŠ[ƒ^•tj
+		//ç®¡ç†ã™ã‚‹é…åˆ—ã‚’ä¸ãˆãªãŠã™ ã™ã§ã«ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã¯é–‹æ”¾ã™ã‚‹ï¼ˆãƒ‡ãƒªãƒ¼ã‚¿ä»˜ï¼‰
 		void reset(pointer ptr_, unsigned int size_, deleter dlt_) {
 			if(ptrh)destroy();
 			*this=hmLib::move(shared_write_array(ptr_, size_, dlt_));
 		}
-		//ŠÇ—‚·‚é”z—ñ‚ğunique_ptr‚©‚ç—^‚¦‚È‚¨‚· ‚·‚Å‚ÉŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ÍŠJ•ú‚·‚é
+		//ç®¡ç†ã™ã‚‹é…åˆ—ã‚’unique_ptrã‹ã‚‰ä¸ãˆãªãŠã™ ã™ã§ã«ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã¯é–‹æ”¾ã™ã‚‹
 		void reset(unique_ptr_rvalue_reference mptr_, unsigned int size_) {
 			if(ptrh)destroy();
 			*this=hmLib::move(shared_write_array(mptr_, size_));
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ğŒğŠ·‚·‚é
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã‚’äº¤æ›ã™ã‚‹
 		void swap(my_type& My_) {
 			my_array_element* ptrh_=My_.ptrh;
 			allocator alloc_=My_.alloc;
@@ -480,14 +480,14 @@ namespace hmLib {
 			ptrh=ptrh_;
 			alloc=alloc_;
 		}
-		//ŠÇ—‚µ‚Ä‚¢‚é”z—ñ‚ğŠJ•ú‚·‚éi”z—ñ‚Ìƒƒ‚ƒŠ‰ğ•ú©‘Ì‚ÍA‘S‚Ä‚ÌŠÇ—Ò‚ª‚¢‚È‚­‚È‚Á‚½‚És‚í‚ê‚éj
+		//ç®¡ç†ã—ã¦ã„ã‚‹é…åˆ—ã‚’é–‹æ”¾ã™ã‚‹ï¼ˆé…åˆ—ã®ãƒ¡ãƒ¢ãƒªè§£æ”¾è‡ªä½“ã¯ã€å…¨ã¦ã®ç®¡ç†è€…ãŒã„ãªããªã£ãŸæ™‚ã«è¡Œã‚ã‚Œã‚‹ï¼‰
 		void release() {
 			if(ptrh)destroy();
 		}
-		//iteratorŠÖ”
+		//iteratoré–¢æ•°
 		const_iterator begin()const { return get(); }
 		const_iterator end()const { return get()+size(); }
-	private://‚¢‚¸‚ê‚ÌŠÖ”‚àAptrh‚ª‘¶İ‚µ‚Ä‚¢‚é/‹ó‚Å‚ ‚é‚±‚Æ‚ÌŠm”F‚Í‚µ‚Ä‚¢‚È‚¢‚Ì‚Å’ˆÓ
+	private://ã„ãšã‚Œã®é–¢æ•°ã‚‚ã€ptrhãŒå­˜åœ¨ã—ã¦ã„ã‚‹/ç©ºã§ã‚ã‚‹ã“ã¨ã®ç¢ºèªã¯ã—ã¦ã„ãªã„ã®ã§æ³¨æ„
 		void destroy() {
 			if(ptrh->read_detach()) {
 				alloc.destroy(ptrh);

@@ -1,16 +1,16 @@
-#ifndef HMLIB_BUFGATE_INC
+ï»¿#ifndef HMLIB_BUFGATE_INC
 #define HMLIB_BUFGATE_INC 200
 #
 /*===bufgate===
-ƒoƒbƒtƒ@‚Éƒf[ƒ^‚ğˆê“I‚É‚½‚ßAoperator()‚Å‘—óM‚·‚égateƒNƒ‰ƒX‚Å‚·B
+ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿ã‚’ä¸€æ™‚çš„ã«ãŸã‚ã€operator()ã§é€å—ä¿¡ã™ã‚‹gateã‚¯ãƒ©ã‚¹ã§ã™ã€‚
 bufgate_v2_00/130422 hmIto
-	limbufgate‚ğ”p~
-	exception‚É‘Î‰
-		ŠJ‚©‚ê‚Ä‚¢‚È‚¢gate‚Ö‚Ìˆ——v‹‚É‚ÍA—áŠO‚ğ•Ô‚·‚æ‚¤‚É•ÏX
+	limbufgateã‚’å»ƒæ­¢
+	exceptionã«å¯¾å¿œ
+		é–‹ã‹ã‚Œã¦ã„ãªã„gateã¸ã®å‡¦ç†è¦æ±‚ã«ã¯ã€ä¾‹å¤–ã‚’è¿”ã™ã‚ˆã†ã«å¤‰æ›´
 bufgate v1_02/130329 hmIto
-	ˆê•”•Ï”–¼‚Ì‹Lqƒ~ƒX‚ÅƒRƒ“ƒpƒCƒ‹ƒGƒ‰[‚ªo‚Ä‚¢‚½–â‘è‚ğC³
+	ä¸€éƒ¨å¤‰æ•°åã®è¨˜è¿°ãƒŸã‚¹ã§ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã‚¨ãƒ©ãƒ¼ãŒå‡ºã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 bufgate v1_01/130328 hmIto
-	workŠÖ”‚ğoperator()(unsigned int GetMaxNum,unsigned int PutMaxNum)‚É•ÏX‚µ‚Ü‚µ‚½B
+	worké–¢æ•°ã‚’operator()(unsigned int GetMaxNum,unsigned int PutMaxNum)ã«å¤‰æ›´ã—ã¾ã—ãŸã€‚
 */
 #ifndef HMLIB_GATE_INC
 #	include <hmLib/gate.hpp>
@@ -18,7 +18,7 @@ bufgate v1_01/130328 hmIto
 #include <deque>
 #include <vector>
 namespace hmLib{
-	//ƒoƒbƒtƒ@Gate
+	//ãƒãƒƒãƒ•ã‚¡Gate
 	class bufgate:public gate{
 	private:
 		gate* pGate;
@@ -91,11 +91,11 @@ namespace hmLib{
 		void pclear(){oBuf.clear();}
 		void gclear(){iBuf.clear();}
 	public://itfGate
-		//óM‘Òƒf[ƒ^
+		//å—ä¿¡å¾…ãƒ‡ãƒ¼ã‚¿
 		virtual bool empty(){return iBuf.empty();}
-		//óM‰Â”\
+		//å—ä¿¡å¯èƒ½
 		virtual bool can_get(){return !empty();}
-		//•¡”byteóM
+		//è¤‡æ•°byteå—ä¿¡
 		virtual bool get(char* str_,size_type& size_){
 			size_type max=size_;
 			for(size_=0;size_<max;++size_){
@@ -106,11 +106,11 @@ namespace hmLib{
 			}
 			return false;
 		}
-		//‘—M‘Òƒf[ƒ^
+		//é€ä¿¡å¾…ãƒ‡ãƒ¼ã‚¿
 		virtual bool full(){return false;}
-		//‘—M‰Â”\
+		//é€ä¿¡å¯èƒ½
 		virtual bool can_put(){return !full();}
-		//•¡”byte‘—M
+		//è¤‡æ•°byteé€ä¿¡
 		virtual bool put(const char* str_,size_type& size_){
 			size_type max=size_;
 			for(size_=0;size_<max;++size_){
@@ -121,7 +121,7 @@ namespace hmLib{
 			return false;
 		}
 	};
-/*	//—LŒÀƒoƒbƒtƒ@Gate
+/*	//æœ‰é™ãƒãƒƒãƒ•ã‚¡Gate
 	class limbufgate:public itfGate{
 	private:
 		itfGate* pGate;
@@ -131,19 +131,19 @@ namespace hmLib{
 		limbufgate():pGate(0){return;}
 		~limbufgate(){close();}
 		bool open(itfGate& rGate_,unsigned int oBufSize,unsigned int iBufSize){
-			//‚·‚Å‚ÉŠJ‚©‚ê‚Ä‚¢‚½‚çAƒGƒ‰[‚ğ•Ô‚·
+			//ã™ã§ã«é–‹ã‹ã‚Œã¦ã„ãŸã‚‰ã€ã‚¨ãƒ©ãƒ¼ã‚’è¿”ã™
 			if(is_open())return true;
 
 			pGate=&rGate_;
 
-			//BufŠm•Û
+			//Bufç¢ºä¿
 			oBuf.create(oBufSize);
 			iBuf.create(iBufSize);
 
 			return false;
 		}
 		bool close(){
-			//‚·‚Å‚É•Â‚¶‚ç‚ê‚Ä‚¢‚½‚çAƒGƒ‰[‚ğ•Ô‚·
+			//ã™ã§ã«é–‰ã˜ã‚‰ã‚Œã¦ã„ãŸã‚‰ã€ã‚¨ãƒ©ãƒ¼ã‚’è¿”ã™
 			if(!is_open())return true;
 
 			pGate=0;
@@ -185,11 +185,11 @@ namespace hmLib{
 		void pclear(){oBuf.clear();}
 		void gclear(){iBuf.clear();}
 	public://itfGate
-		//óM‘Òƒf[ƒ^
+		//å—ä¿¡å¾…ãƒ‡ãƒ¼ã‚¿
 		virtual bool empty(){return iBuf.empty();}
-		//óM‰Â”\
+		//å—ä¿¡å¯èƒ½
 		virtual bool can_get(){return !empty();}
-		//•¡”byteóM
+		//è¤‡æ•°byteå—ä¿¡
 		virtual bool get(char* str_,size_type& size_){
 			size_type max=size_;
 			for(size_=0;size_<max;++size_){
@@ -200,11 +200,11 @@ namespace hmLib{
 			}
 			return false;
 		}
-		//‘—M‘Òƒf[ƒ^
+		//é€ä¿¡å¾…ãƒ‡ãƒ¼ã‚¿
 		virtual bool full(){return oBuf.full();}
-		//‘—M‰Â”\
+		//é€ä¿¡å¯èƒ½
 		virtual bool can_put(){return !full();}
-		//•¡”byte‘—M
+		//è¤‡æ•°byteé€ä¿¡
 		virtual bool put(const char* str_,size_type& size_){
 			size_type max=size_;
 			for(size_=0;size_<max;++size_){

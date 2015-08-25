@@ -1,4 +1,4 @@
-#ifndef HMLIB_MEMORY_OBSERVEDPTR_INC
+Ôªø#ifndef HMLIB_MEMORY_OBSERVEDPTR_INC
 #define HMLIB_MEMORY_OBSERVEDPTR_INC 100
 #
 #include<type_traits>
@@ -12,14 +12,14 @@ namespace hmLib {
 			using element_type = W;
 			using pointer = std::add_pointer_t<W>; // exposition-only
 			using reference = std::add_lvalue_reference_t<W>; // exposition-only
-			// default cÅftor
+			// default c‚Äôtor
 			observer_ptr() :Ptr(nullptr){}
-			// pointer-accepting cÅftors
+			// pointer-accepting c‚Äôtors
 			observer_ptr(nullptr_t):Ptr(nullptr){}
 			explicit observer_ptr(pointer ptr_) :Ptr(ptr_){}
-			// copying cÅftors (in addition to compiler-generated copy cÅftor)
+			// copying c‚Äôtors (in addition to compiler-generated copy c‚Äôtor)
 			template <class W2> observer_ptr(const observer_ptr<W2>& optr_) : Ptr(optr_.Ptr){}
-			// copying cÅftors (in addition to compiler-generated copy cÅftor)
+			// copying c‚Äôtors (in addition to compiler-generated copy c‚Äôtor)
 			template <class W2> observer_ptr(const std::unique_ptr<W2>& uptr_) : Ptr(uptr_.get()){}
 			// observers
 			pointer get() const {return Ptr;}
@@ -33,7 +33,7 @@ namespace hmLib {
 				return ReleasedPtr;
 			}
 			void reset(pointer ptr_= nullptr) {Ptr=ptr_;}
-			// copying cÅftors (in addition to compiler-generated copy cÅftor)
+			// copying c‚Äôtors (in addition to compiler-generated copy c‚Äôtor)
 			template <class W2> void reset(const std::unique_ptr<W2>& uptr_){ Ptr = uptr_.get(); }
 			void swap(observer_ptr& optr_) { std::swap(Ptr, optr_.Ptr); }
 		private:

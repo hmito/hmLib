@@ -1,13 +1,13 @@
-#ifndef HMLIB_RANDOM_CPP_INC
+ï»¿#ifndef HMLIB_RANDOM_CPP_INC
 #define HMLIB_RANDOM_CPP_INC 207
 #
 /*
 ===random===
-C++11‚Ì—”ƒ‰ƒCƒuƒ‰ƒŠ‚ğƒ‰ƒbƒsƒ“ƒO‚µ‚Ä’ñ‹Ÿ
+C++11ã®ä¹±æ•°ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’ãƒ©ãƒƒãƒ”ãƒ³ã‚°ã—ã¦æä¾›
 random:v2_07/130709 hmIto
-	random_bitset‚ğ’Ç‰Á
+	random_bitsetã‚’è¿½åŠ 
 random:v2_06/121128 hmIto
-	Šg’£q‚ğh‚©‚çhpp‚É•ÏXB
+	æ‹¡å¼µå­ã‚’hã‹ã‚‰hppã«å¤‰æ›´ã€‚
 */
 #include<hmLib/random/random_engine.cpp>
 #include<hmLib/random/random_bit.cpp>

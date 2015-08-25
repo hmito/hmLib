@@ -1,4 +1,4 @@
-#ifndef HMLIB_CDEQUE_C_INC
+ï»¿#ifndef HMLIB_CDEQUE_C_INC
 #define HMLIB_CDEQUE_C_INC 200
 #
 #ifndef HMLIB_CDEQUE_INC
@@ -16,7 +16,7 @@ namespace hmLib{
 extern "C"{
 #endif
 void _cdeque_default_destructor(hmLib_pointer Ptr) { free(Ptr); }
-//ƒƒ‚ƒŠ‚Ì‰Šú‰»
+//ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ–
 void cdeque_format(hmLib_cdeque* ptr){
 	ptr->ElemSize=0;
 	ptr->BufBegin=0;
@@ -25,11 +25,11 @@ void cdeque_format(hmLib_cdeque* ptr){
 	ptr->End=0;
 	ptr->Destructor=0;
 }
-//‚·‚Å‚É‰Šú‰»‚³‚ê‚½‚©‚Ç‚¤‚©‚ÌŠm”F
+//ã™ã§ã«åˆæœŸåŒ–ã•ã‚ŒãŸã‹ã©ã†ã‹ã®ç¢ºèª
 hmLib_boolian cdeque_is_construct(hmLib_cdeque* ptr){
 	return ptr->BufBegin==0;
 }
-//“®“IŠm•Û‚É‚æ‚Á‚Äƒoƒbƒtƒ@Šm•Û
+//å‹•çš„ç¢ºä¿ã«ã‚ˆã£ã¦ãƒãƒƒãƒ•ã‚¡ç¢ºä¿
 void cdeque_construct(hmLib_cdeque* pDque, hmLib_cdeque_size_t Size, hmLib_cdeque_size_t ElemSize) {
 	pDque->ElemSize=ElemSize;
 	pDque->BufBegin=malloc(ElemSize*(Size+1));
@@ -38,7 +38,7 @@ void cdeque_construct(hmLib_cdeque* pDque, hmLib_cdeque_size_t Size, hmLib_cdequ
 	pDque->End=pDque->BufBegin;
 	pDque->Destructor=_cdeque_default_destructor;
 }
-//Ã“IŠm•Û‚É‚æ‚Á‚Äƒoƒbƒtƒ@Šm•Û
+//é™çš„ç¢ºä¿ã«ã‚ˆã£ã¦ãƒãƒƒãƒ•ã‚¡ç¢ºä¿
 void cdeque_placement_construct(hmLib_cdeque* pDque, hmLib_cdeque_size_t Size, hmLib_cdeque_size_t ElemSize, hmLib_pointer Ptr, hmLib_vFp_p Destructor) {
 	pDque->ElemSize=ElemSize;
 	pDque->BufBegin=Ptr;
@@ -47,7 +47,7 @@ void cdeque_placement_construct(hmLib_cdeque* pDque, hmLib_cdeque_size_t Size, h
 	pDque->End=pDque->BufBegin;
 	pDque->Destructor=Destructor;
 }
-//ƒoƒbƒtƒ@‰ð•ú
+//ãƒãƒƒãƒ•ã‚¡è§£æ”¾
 void cdeque_destruct(hmLib_cdeque* pDque){
 	if(pDque->Destructor) {
 		pDque->Destructor(pDque->BufBegin);
@@ -89,11 +89,11 @@ void cdeque_swap(hmLib_cdeque* ptr1,hmLib_cdeque* ptr2){
 	ptr2->BufBegin=tmp.BufBegin;
 	ptr2->BufEnd=tmp.BufEnd;
 }
-//ƒoƒbƒtƒ@‚Ìæ“ª‚Ì—v‘fƒAƒhƒŒƒX‚ðŽæ“¾
+//ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã®è¦ç´ ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 void* cdeque_frontptr(hmLib_cdeque* pDque){return pDque->Begin;}
-//ƒoƒbƒtƒ@‚Ì––”ö‚Ì—v‘fƒAƒhƒŒƒX‚ðŽæ“¾
+//ãƒãƒƒãƒ•ã‚¡ã®æœ«å°¾ã®è¦ç´ ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 void* cdeque_backptr(hmLib_cdeque* pDque){return cdeque_prev(pDque,pDque->End);}
-//ƒoƒbƒtƒ@‚Éƒf[ƒ^‚ð‘}“ü
+//ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿ã‚’æŒ¿å…¥
 hmLib_boolian cdeque_push_front(hmLib_cdeque* pDque,const void* Ptr){
 	hmLib_cdeque_size_t cnt=0;
 
@@ -107,7 +107,7 @@ hmLib_boolian cdeque_push_front(hmLib_cdeque* pDque,const void* Ptr){
 
 	return 0;
 }
-//ƒoƒbƒtƒ@‚Ìæ“ª‚Ìƒf[ƒ^íœ
+//ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿å‰Šé™¤
 hmLib_boolian cdeque_pop_front(hmLib_cdeque* pDque){
 	if(cdeque_empty(pDque))return 1;
 
@@ -115,7 +115,7 @@ hmLib_boolian cdeque_pop_front(hmLib_cdeque* pDque){
 
 	return 0;
 }
-//ƒoƒbƒtƒ@‚Ì––”ö‚Éƒf[ƒ^‚ð‘}“ü
+//ãƒãƒƒãƒ•ã‚¡ã®æœ«å°¾ã«ãƒ‡ãƒ¼ã‚¿ã‚’æŒ¿å…¥
 hmLib_boolian cdeque_push_back(hmLib_cdeque* pDque,const void* Ptr){
 	hmLib_cdeque_size_t cnt=0;
 
@@ -129,7 +129,7 @@ hmLib_boolian cdeque_push_back(hmLib_cdeque* pDque,const void* Ptr){
 
 	return 0;
 }
-//ƒoƒbƒtƒ@‚Ì––”ö‚Ìƒf[ƒ^íœ
+//ãƒãƒƒãƒ•ã‚¡ã®æœ«å°¾ã®ãƒ‡ãƒ¼ã‚¿å‰Šé™¤
 hmLib_boolian cdeque_pop_back(hmLib_cdeque* pDque){
 	if(cdeque_empty(pDque))return 1;
 
@@ -137,25 +137,25 @@ hmLib_boolian cdeque_pop_back(hmLib_cdeque* pDque){
 
 	return 0;
 }
-//ƒoƒbƒtƒ@‚É“ü‚Á‚Ä‚¢‚éƒTƒCƒY
+//ãƒãƒƒãƒ•ã‚¡ã«å…¥ã£ã¦ã„ã‚‹ã‚µã‚¤ã‚º
 hmLib_cdeque_size_t cdeque_size(hmLib_cdeque* pDque){return (((hmLib_uint8*)(pDque->End)-(hmLib_uint8*)(pDque->Begin)+(hmLib_uint8*)(pDque->BufEnd)-(hmLib_uint8*)(pDque->BufBegin))%((hmLib_uint8*)(pDque->BufEnd)-(hmLib_uint8*)(pDque->BufBegin)))/pDque->ElemSize;}
-//ƒoƒbƒtƒ@‚É“ü‚Á‚Ä‚¢‚éƒTƒCƒY
+//ãƒãƒƒãƒ•ã‚¡ã«å…¥ã£ã¦ã„ã‚‹ã‚µã‚¤ã‚º
 hmLib_cdeque_size_t cdeque_rest(hmLib_cdeque* pDque){return ((hmLib_uint8*)(pDque->BufEnd)-(hmLib_uint8*)(pDque->BufBegin))/pDque->ElemSize-cdeque_size(pDque)-1;}
-//ƒoƒbƒtƒ@‚ª‹ó‚©‚Ç‚¤‚©Šm”F
+//ãƒãƒƒãƒ•ã‚¡ãŒç©ºã‹ã©ã†ã‹ç¢ºèª
 hmLib_boolian cdeque_empty(hmLib_cdeque* pDque){return (pDque->Begin==pDque->End);}
-//ƒoƒbƒtƒ@‚ª‚¢‚Á‚Ï‚¢‚©‚Ç‚¤‚©Šm”F
+//ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã‹ã©ã†ã‹ç¢ºèª
 hmLib_boolian cdeque_full(hmLib_cdeque* pDque){return (pDque->Begin==cdeque_next(pDque,pDque->End));}
-//ƒoƒbƒtƒ@‚ÌbeginŠÖ”
+//ãƒãƒƒãƒ•ã‚¡ã®beginé–¢æ•°
 hmLib_cdeque_iterator cdeque_begin(hmLib_cdeque* pDque){return pDque->Begin;}
-//ƒoƒbƒtƒ@‚ÌendŠÖ”
+//ãƒãƒƒãƒ•ã‚¡ã®endé–¢æ•°
 hmLib_cdeque_iterator cdeque_end(hmLib_cdeque* pDque){return pDque->End;}
-//hmLib_cdeque_iterator‚ÌŽŸ‚ÌhmLib_cdeque_iterator‚ð•Ô‚·
+//hmLib_cdeque_iteratorã®æ¬¡ã®hmLib_cdeque_iteratorã‚’è¿”ã™
 hmLib_cdeque_iterator cdeque_next(hmLib_cdeque* pDque,hmLib_cdeque_iterator itr){
 	itr=(hmLib_uint8*)(itr)+pDque->ElemSize;
 	if(pDque->BufEnd == itr)itr=pDque->BufBegin;
 	return itr;
 }
-//hmLib_cdeque_iterator‚Ì‘O‚ÌhmLib_cdeque_iterator‚ð•Ô‚·
+//hmLib_cdeque_iteratorã®å‰ã®hmLib_cdeque_iteratorã‚’è¿”ã™
 hmLib_cdeque_iterator cdeque_prev(hmLib_cdeque* pDque,hmLib_cdeque_iterator itr){
 	if(pDque->BufBegin == itr)itr=pDque->BufEnd;
 	itr=(hmLib_uint8*)(itr)-pDque->ElemSize;

@@ -1,12 +1,12 @@
-#ifndef HMR_PROPERTIES_UTILITY_INC
+ï»¿#ifndef HMR_PROPERTIES_UTILITY_INC
 #define HMR_PROPERTIES_UTILITY_INC 100
 #
 /*
-property‚Ì”Ä—p‹@”\‚ğ’è‹`
+propertyã®æ±ç”¨æ©Ÿèƒ½ã‚’å®šç¾©
 
 === properties::utility ===
 v1_00/140621 hmIto
-	‰Šú‰»ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÅŠÖ”’è‹`‚µ‚È‚¢‚±‚Æ‚ğ–¾¦“I‚É¦‚·Ano_initialization‚ğ’Ç‰Á
+	åˆæœŸåŒ–ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§é–¢æ•°å®šç¾©ã—ãªã„ã“ã¨ã‚’æ˜ç¤ºçš„ã«ç¤ºã™ã€no_initializationã‚’è¿½åŠ 
 */
 namespace hmLib {
 	namespace properties {

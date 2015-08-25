@@ -1,15 +1,15 @@
-#ifndef HMLIB_MUTEXPROXY_INC
+﻿#ifndef HMLIB_MUTEXPROXY_INC
 #define HMLIB_MUTEXPROXY_INC 102
 #
 /*===mutex_proxy===
-�ėpMutex���󂯎���đ㗝�I�ɋ@�\����
+汎用Mutexを受け取って代理的に機能する
 
 mutex_proxy v1_02/130420 hmIto
-	�󃊃t�@�����X�����e����悤�ɏC��
+	空リファレンスを許容するように修正
 mutex_proxy v1_01/130412 hmIto
-	try_lock��try_locki�ƂȂ��Ă����v���I�Ȗ����C��
+	try_lockがtry_lockiとなっていた致命的な問題を修正
 mutex_proxy:v1_00/130308 hmIto
-	�ėpmutex�Q�ƃN���X�Amutex_proxy��ǉ�
+	汎用mutex参照クラス、mutex_proxyを追加
 */
 #include<functional>
 #include<hmLib/exceptions.hpp>

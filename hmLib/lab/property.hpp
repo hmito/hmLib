@@ -1,19 +1,19 @@
-#ifndef HMLIB_PROPERTY_INC
+﻿#ifndef HMLIB_PROPERTY_INC
 #define HMLIB_PROPERTY_INC 101
 #
 /*=== property ===
-�v�]
-�Eoperator +=���ɑΉ����Ăق���
-�Edefault�ł́A���ʂɐݒ�ł���悤�ɂ��Ăق���
-�E�Ƃ������A�f�t�H���g�Ŏg���Ȃ��Ȃ�R���X�g���N�^�Őݒ肳�����
-=>�R���X�g���N�^�𗘗p����ƁA�R�s�[�R���X�g���N�^���g�p�ł��Ȃ��Ȃ��Ă��܂��d�l���ۂ�
-���Ă��A���ꂩ�Ȃ�v���I�ȃo�O�𐶂ށB
-����������Z�q�͂����Ƃ��Ă��A�R�s�[�R���X�g���N�^�͈�؂̒l�̃R�s�[���s���Ă��Ȃ��͗l�B
-���A�ł�propety�ȊO�̖{�����̒l������΂����̂��ȁH
+要望
+・operator +=等に対応してほしい
+・defaultでは、普通に設定できるようにしてほしい
+・というか、デフォルトで使えないならコンストラクタで設定させろよ
+=>コンストラクタを利用すると、コピーコンストラクタが使用できなくなってしまう仕様っぽい
+ってか、これかなり致命的なバグを生む。
+等価代入演算子はいいとしても、コピーコンストラクタは一切の値のコピーを行っていない模様。
+あ、でもpropety以外の本ちゃんの値があればいいのかな？
 
-��̕��@�́A�l��ێ�����^�C�v�B
-������̕��@�́A�l�̎Q�Ƃ�ێ�����^�C�v�B
-�Ƃ肠�����A�Q�ƌ^�ɂ��Ă����܂��񂩁H
+一つの方法は、値を保持するタイプ。
+もう一つの方法は、値の参照を保持するタイプ。
+とりあえず、参照型にしておきませんか？
 */
 //#include <memory>
 #include<functional>

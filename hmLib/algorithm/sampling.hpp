@@ -1,23 +1,23 @@
-#ifndef HMLIB_ALGORITHM_SAMPLING_INC
+ï»¿#ifndef HMLIB_ALGORITHM_SAMPLING_INC
 #define HMLIB_ALGORITHM_SAMPLING_INC 104
 #
 /*
 ===algorithm::sampling===
-‚ ‚é”ÍˆÍ‚Ì’†‚©‚ç’l‚ğ‘I‘ğ‚·‚éƒAƒ‹ƒSƒŠƒYƒ€‚ğ’ñ‹Ÿ‚·‚é
+ã‚ã‚‹ç¯„å›²ã®ä¸­ã‹ã‚‰å€¤ã‚’é¸æŠã™ã‚‹ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’æä¾›ã™ã‚‹
 algorithm::sampling:v1_04/140731 hmIto
-	‰Â”\‚Èsampler‚ÉAadd/clearŠÖ”‚ğ’Ç‰Á
-		è“®‚ÅˆêŒÂ‚¸‚Âƒf[ƒ^‚ğ’Ç‰Á / ‚·‚×‚ÄƒNƒŠƒA‚·‚éŠÖ”
+	å¯èƒ½ãªsamplerã«ã€add/clearé–¢æ•°ã‚’è¿½åŠ 
+		æ‰‹å‹•ã§ä¸€å€‹ãšã¤ãƒ‡ãƒ¼ã‚¿ã‚’è¿½åŠ  / ã™ã¹ã¦ã‚¯ãƒªã‚¢ã™ã‚‹é–¢æ•°
 algorithm::sampling:v1_03/140708 hmIto
-	shuffle_sampler‚ğ’Ç‰Á
-		ƒCƒeƒŒ[ƒ^‚ÅƒŒƒ“ƒW‚ğó‚¯æ‚èAƒVƒƒƒbƒtƒ‹‚µ‚Ä‡‚É•Ô‚·
-		ŒÍŠ‰‚·‚é‚ÆAend‚ğ•Ô‚·
+	shuffle_samplerã‚’è¿½åŠ 
+		ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã§ãƒ¬ãƒ³ã‚¸ã‚’å—ã‘å–ã‚Šã€ã‚·ãƒ£ãƒƒãƒ•ãƒ«ã—ã¦é †ã«è¿”ã™
+		æ¯æ¸‡ã™ã‚‹ã¨ã€endã‚’è¿”ã™
 algorithm::sampling:v1_02/130917 hmIto
-	—áŠOˆ—‚Ìƒwƒbƒ_‚ª•s‘«‚µ‚Ä‚¢‚½–â‘è‚ğC³
+	ä¾‹å¤–å‡¦ç†ã®ãƒ˜ãƒƒãƒ€ãŒä¸è¶³ã—ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 algorithm::sampling:v1_01/130711 hmIto
-	random_sampler’Ç‰Á
-		ƒCƒeƒŒ[ƒ^‚ÅƒŒƒ“ƒW‚ğó‚¯æ‚èA‚»‚Ì’†‚©‚çoperator()‚Åƒ‰ƒ“ƒ_ƒ€‚É•Ô‚·
+	random_samplerè¿½åŠ 
+		ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã§ãƒ¬ãƒ³ã‚¸ã‚’å—ã‘å–ã‚Šã€ãã®ä¸­ã‹ã‚‰operator()ã§ãƒ©ãƒ³ãƒ€ãƒ ã«è¿”ã™
 algorithm::sampling:v1_00/130328 hmIto
-	algorithm‚©‚ç•ª—£
+	algorithmã‹ã‚‰åˆ†é›¢
 */
 #include<algorithm>
 #include<vector>
@@ -29,7 +29,7 @@ algorithm::sampling:v1_00/130328 hmIto
 #endif
 namespace hmLib{
 	namespace algorithm{
-		//ƒ‰ƒ“ƒ_ƒ€‘I‘ğ
+		//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ
 		template<class InputIterator,class OutputIterator>
 		OutputIterator random_sample(InputIterator Begin,InputIterator End,OutputIterator Out){
 			unsigned int Size=0;
@@ -44,7 +44,7 @@ namespace hmLib{
 
 			return Out;
 		}
-		//ƒ‰ƒ“ƒ_ƒ€‘I‘ğ OutputIterator‚Ì”ÍˆÍ‚ğ–„‚ß‚é‚Ü‚Å
+		//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ OutputIteratorã®ç¯„å›²ã‚’åŸ‹ã‚ã‚‹ã¾ã§
 		template<class InputIterator,class OutputIterator>
 		OutputIterator random_sample(InputIterator Begin,InputIterator End,OutputIterator OutBegin,OutputIterator OutEnd){
 			unsigned int Size=0;
@@ -60,7 +60,7 @@ namespace hmLib{
 
 			return OutBegin;
 		}
-		//ƒ‰ƒ“ƒ_ƒ€‘I‘ğ nŒÂ•ª
+		//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ nå€‹åˆ†
 		template<class InputIterator,class OutputIterator>
 		OutputIterator random_sample(InputIterator Begin,InputIterator End,OutputIterator Out,unsigned int n){
 			unsigned int Size=0;
@@ -77,7 +77,7 @@ namespace hmLib{
 
 			return Out;
 		}
-		//ƒ‰ƒ“ƒ_ƒ€‘I‘ğƒNƒ‰ƒX
+		//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠã‚¯ãƒ©ã‚¹
 		template<typename InputIterator>
 		class random_sampler{
 		private:
@@ -95,12 +95,12 @@ namespace hmLib{
 				End=End_;
 			}
 		};
-		//ƒ‰ƒ“ƒ_ƒ€‘I‘ğƒNƒ‰ƒX‚Ìƒrƒ‹ƒ_[
+		//ãƒ©ãƒ³ãƒ€ãƒ é¸æŠã‚¯ãƒ©ã‚¹ã®ãƒ“ãƒ«ãƒ€ãƒ¼
 		template<typename InputIterator>
 		random_sampler<InputIterator> build_random_sampler(InputIterator Begin_,InputIterator End_){
 			return random_sampler<InputIterator>(Begin_,End_);
 		}
-		//ƒ‹[ƒŒƒbƒg‘I‘ğ
+		//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ
 		template<class InputIterator,class FnRealValue,class OutputIterator>
 		OutputIterator roulette_sample(InputIterator Begin,InputIterator End,FnRealValue Value,OutputIterator Out){
 			double TotalFitness=0.;
@@ -119,7 +119,7 @@ namespace hmLib{
 
 			return Out;
 		}
-		//ƒ‹[ƒŒƒbƒg‘I‘ğ OutputIterator‚Ì”ÍˆÍ‚ğ–„‚ß‚é‚Ü‚Å
+		//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ OutputIteratorã®ç¯„å›²ã‚’åŸ‹ã‚ã‚‹ã¾ã§
 		template<class InputIterator,class FnRealValue,class OutputIterator>
 		OutputIterator roulette_sample(InputIterator Begin,InputIterator End,FnRealValue Value,OutputIterator OutBegin,OutputIterator OutEnd){
 			double TotalFitness=0.;
@@ -140,7 +140,7 @@ namespace hmLib{
 
 			return OutBegin;
 		}
-		//ƒ‹[ƒŒƒbƒg‘I‘ğ nŒÂ•ª
+		//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠ nå€‹åˆ†
 		template<class InputIterator,class FnRealValue,class OutputIterator>
 		OutputIterator roulette_sample(InputIterator Begin,InputIterator End,FnRealValue Value,OutputIterator Out,unsigned int n){
 			double TotalFitness=0.;
@@ -161,7 +161,7 @@ namespace hmLib{
 
 			return Out;
 		}
-		//ƒ‹[ƒŒƒbƒg‘I‘ğƒNƒ‰ƒX
+		//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠã‚¯ãƒ©ã‚¹
 		template<typename InputIterator>
 		class roulette_sampler{
 			struct assess_itr{
@@ -204,12 +204,12 @@ namespace hmLib{
 				AssessVec.push_back(assess_itr(Itr_,Assess_+assess()));
 			}
 		};
-		//ƒ‹[ƒŒƒbƒg‘I‘ğƒNƒ‰ƒX‚Ìƒrƒ‹ƒ_[
+		//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠã‚¯ãƒ©ã‚¹ã®ãƒ“ãƒ«ãƒ€ãƒ¼
 		template<typename InputIterator,typename fnAssess>
 		roulette_sampler<InputIterator> build_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess FnAssess_){
 			return roulette_sampler<InputIterator>(Begin_,End_,FnAssess_);
 		}
-		//ƒVƒƒƒbƒtƒ‹‘I‘ğƒNƒ‰ƒX
+		//ã‚·ãƒ£ãƒƒãƒ•ãƒ«é¸æŠã‚¯ãƒ©ã‚¹
 		template<typename InputIterator>
 		class shuffle_sampler {
 			typedef typename std::vector<InputIterator>::iterator iterator;
@@ -252,7 +252,7 @@ namespace hmLib{
 				if(!SuppressShuffle_)shuffle();
 			}
 		};
-		//ƒ‹[ƒŒƒbƒg‘I‘ğƒNƒ‰ƒX‚Ìƒrƒ‹ƒ_[
+		//ãƒ«ãƒ¼ãƒ¬ãƒƒãƒˆé¸æŠã‚¯ãƒ©ã‚¹ã®ãƒ“ãƒ«ãƒ€ãƒ¼
 		template<typename InputIterator>
 		shuffle_sampler<InputIterator> build_shuffle_sampler(InputIterator Begin_, InputIterator End_) {
 			return shuffle_sampler<InputIterator>(Begin_, End_);

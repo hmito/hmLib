@@ -1,16 +1,16 @@
-#ifndef HMLIB_UTILITY_INC
+ï»¿#ifndef HMLIB_UTILITY_INC
 #define HMLIB_UTILITY_INC 100
 #
 /*===utility===
-å‚ÉƒIƒuƒWƒFƒNƒg‚Ì‘€ì“™‚ÉŠÖ‚í‚é”Ä—pƒNƒ‰ƒX/ƒ}ƒNƒ—Ş‚ğéŒ¾‚·‚é
+ä¸»ã«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ“ä½œç­‰ã«é–¢ã‚ã‚‹æ±ç”¨ã‚¯ãƒ©ã‚¹/ãƒã‚¯ãƒ­é¡ã‚’å®£è¨€ã™ã‚‹
 
 v1_00/130717
-	hmLib_static_restrict‚ğ’Ç‰Á
-		templateˆø”‚ÉéŒ¾‚·‚é‚±‚Æ‚ÅAtemplateˆø”‚ÌÀsğŒ‚É§–ñ‚ğ‚©‚¯‚éƒ}ƒNƒ
-	cloneŠÖ”‚ğ’Ç‰Á
-		ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/ƒRƒs[ƒtƒ@ƒ“ƒNƒ^‚ğŒÄ‚Ño‚µ‚ÄƒNƒ[ƒ“‚ğ¶¬‚·‚é
-	exchangeŠÖ”‚ğ’Ç‰Á
-		’l‚ğ“ü‚ê‘Ö‚¦‚Â‚ÂA‘O‰ñ‚Ì’l‚ğ•Ô‚·
+	hmLib_static_restrictã‚’è¿½åŠ 
+		templateå¼•æ•°ã«å®£è¨€ã™ã‚‹ã“ã¨ã§ã€templateå¼•æ•°ã®å®Ÿè¡Œæ¡ä»¶ã«åˆ¶ç´„ã‚’ã‹ã‘ã‚‹ãƒã‚¯ãƒ­
+	cloneé–¢æ•°ã‚’è¿½åŠ 
+		ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ã‚³ãƒ”ãƒ¼ãƒ•ã‚¡ãƒ³ã‚¯ã‚¿ã‚’å‘¼ã³å‡ºã—ã¦ã‚¯ãƒ­ãƒ¼ãƒ³ã‚’ç”Ÿæˆã™ã‚‹
+	exchangeé–¢æ•°ã‚’è¿½åŠ 
+		å€¤ã‚’å…¥ã‚Œæ›¿ãˆã¤ã¤ã€å‰å›ã®å€¤ã‚’è¿”ã™
 */
 namespace hmLib{
 	namespace utility{
@@ -21,12 +21,12 @@ namespace hmLib{
 }
 #define hmLib_static_restrict(condition) typename std::enable_if<condition>::type *& = hmLib::utility::_enabler::enabler
 namespace hmLib{
-	//ƒNƒ[ƒ“ŠÖ”
+	//ã‚¯ãƒ­ãƒ¼ãƒ³é–¢æ•°
 	template<typename T>
 	T clone(const T& t_){return T(t_);}
 	template<typename T,template Fn>
 	T clone(const T& t_,Fn Func){return Func(t_);}
-	//’l“ü‚ê‘Ö‚¦ŠÖ”
+	//å€¤å…¥ã‚Œæ›¿ãˆé–¢æ•°
 	template<typename T, typename U>
 	T exchange(T& obj, U&& new_val) {
 		T old_val = std::move(obj);

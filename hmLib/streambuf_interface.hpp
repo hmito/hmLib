@@ -1,15 +1,15 @@
-#ifndef HMLIB_STREAMBUFINTERFACE_INC
+ï»¿#ifndef HMLIB_STREAMBUFINTERFACE_INC
 #define HMLIB_STREAMBUFINTERFACE_INC 102
 /*===streambuf_interface===
-streambufì¬x‰‡—p‚ÌƒNƒ‰ƒX‚Å‚·B
+streambufä½œæˆæ”¯æ´ç”¨ã®ã‚¯ãƒ©ã‚¹ã§ã™ã€‚
 
 streambuf_interface:v1_02/130328 hmIto
-	ˆê•”ŠÖ”–¼‚ª•ÏX‚µ‚«‚ê‚Ä‚¢‚È‚©‚Á‚½–â‘è‚ğC³
+	ä¸€éƒ¨é–¢æ•°åãŒå¤‰æ›´ã—ãã‚Œã¦ã„ãªã‹ã£ãŸå•é¡Œã‚’ä¿®æ­£
 streambuf_interface:v1_01/130104 hmIto
-	nonbuf_streambuf_interface‚Æbuf_streambuf_interface‚ğ”p~
-	streambuf_interface‚ğ’Ç‰Á
-	ŠÖ”–¼‚ğ“ˆê“I‚É®—
-		obuf/ibuf§Œä—pƒCƒ“ƒ^[ƒtƒF[ƒX‚ğobuf_/ibuf_‚É“ˆê
+	nonbuf_streambuf_interfaceã¨buf_streambuf_interfaceã‚’å»ƒæ­¢
+	streambuf_interfaceã‚’è¿½åŠ 
+	é–¢æ•°åã‚’çµ±ä¸€çš„ã«æ•´ç†
+		obuf/ibufåˆ¶å¾¡ç”¨ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’obuf_/ibuf_ã«çµ±ä¸€
 */
 #include <iostream>
 #include <streambuf>
@@ -18,77 +18,77 @@ streambuf_interface:v1_01/130104 hmIto
 public:
 	pos_type pubseekoff(off_type _Off, ios_base::seekdir _Way, ios_base::openmode _Mode = ios_base::in | ios_base::out);
 	pos_type pubseekoff(off_type _Off, ios_base::seek_dir _Way, ios_base::open_mode _Mode);
-		pointˆÊ’u‚ğ‘Š‘ÎˆÊ’u‚ÅØ‚è‘Ö‚¦‚é
-		‚½‚¾‚Ìseekoff
+		pointä½ç½®ã‚’ç›¸å¯¾ä½ç½®ã§åˆ‡ã‚Šæ›¿ãˆã‚‹
+		ãŸã ã®seekoff
 	pos_type pubseekpos(pos_type _Pos, ios_base::openmode _Mode = ios_base::in | ios_base::out);
 	pos_type pubseekpos(pos_type _Pos, ios_base::open_mode _Mode);
-		pointˆÊ’u‚ğâ‘ÎˆÊ’u‚ÅØ‚è‘Ö‚¦‚é
-		‚½‚¾‚Ìseekpos
+		pointä½ç½®ã‚’çµ¶å¯¾ä½ç½®ã§åˆ‡ã‚Šæ›¿ãˆã‚‹
+		ãŸã ã®seekpos
 	_Myt* pubsetbuf(_Elem *_Buffer, streamsize _Count);
-		•s–¾
-		setbuf‚ğŒÄ‚Ño‚µ‚Ä‚¢‚é
+		ä¸æ˜
+		setbufã‚’å‘¼ã³å‡ºã—ã¦ã„ã‚‹
 	locale pubimbue(const locale &_Newlocale);
-		•s–¾
-		imbue‚ğŒÄ‚Ño‚µ‚Ä‚¢‚é
+		ä¸æ˜
+		imbueã‚’å‘¼ã³å‡ºã—ã¦ã„ã‚‹
 	locale getloc() const;
-		•s–¾
-		locale‚ğæ“¾‚·‚éŠÖ”?
+		ä¸æ˜
+		localeã‚’å–å¾—ã™ã‚‹é–¢æ•°?
 	streamsize in_avail();
-		ibuf’†‚É•¶š‚ª‚ ‚ê‚Î‚»‚Ì”A‚È‚¯‚ê‚Îshowmanyc()‚Ì’l‚ğ•Ô‚·
+		ibufä¸­ã«æ–‡å­—ãŒã‚ã‚Œã°ãã®æ•°ã€ãªã‘ã‚Œã°showmanyc()ã®å€¤ã‚’è¿”ã™
 	int pubsync();
-		obuf‚Ì’†g‚ğŠO•”‚Ö”½‰f
-		sync()‚ğŒÄ‚Ño‚·
+		obufã®ä¸­èº«ã‚’å¤–éƒ¨ã¸åæ˜ 
+		sync()ã‚’å‘¼ã³å‡ºã™
 	int_type sbumpc();
-		1•¶š“Ç‚İo‚µApoint‚ği‚ß‚é
+		1æ–‡å­—èª­ã¿å‡ºã—ã€pointã‚’é€²ã‚ã‚‹
 	int_type sgetc();
-		1•¶š“Ç‚İo‚·‚ªApoint‚ği‚ß‚È‚¢
+		1æ–‡å­—èª­ã¿å‡ºã™ãŒã€pointã‚’é€²ã‚ãªã„
 	streamsize sgetn(_Elem *_Ptr, streamsize _Count);
-		n•¶š“Ç‚İo‚µApoint‚ği‚ß‚é
-		xsgetn‚ğŒÄ‚Ño‚µ‚Ä‚¢‚é‚¾‚¯‚È‚Ì‚ÅAoverflow‚µ‚Ä‚à‰½‚à‚µ‚È‚¢–Í—l
+		næ–‡å­—èª­ã¿å‡ºã—ã€pointã‚’é€²ã‚ã‚‹
+		xsgetnã‚’å‘¼ã³å‡ºã—ã¦ã„ã‚‹ã ã‘ãªã®ã§ã€overflowã—ã¦ã‚‚ä½•ã‚‚ã—ãªã„æ¨¡æ§˜
 	int_type snextc();
-		Œ»İ‚Ìpoint‚ÌŸ‚Ì1•¶š‚ğ“Ç‚İo‚µApoint‚ği‚ß‚È‚¢
+		ç¾åœ¨ã®pointã®æ¬¡ã®1æ–‡å­—ã‚’èª­ã¿å‡ºã—ã€pointã‚’é€²ã‚ãªã„
 	int_type sputbackc(_Elem _Ch);
-		1•¶š‚ğ“Ç‚İo‚·‘O‚É–ß‚·
+		1æ–‡å­—ã‚’èª­ã¿å‡ºã™å‰ã«æˆ»ã™
 	void stossc();
-		“Ç‚İo‚µ—p‚Ìpoint‚ği‚ß‚é
+		èª­ã¿å‡ºã—ç”¨ã®pointã‚’é€²ã‚ã‚‹
 	int_type sungetc();
-		“Ç‚İo‚µ—p‚Ìpoint‚ğ–ß‚·?
+		èª­ã¿å‡ºã—ç”¨ã®pointã‚’æˆ»ã™?
 	int_type sputc(_Elem _Ch);
-		1•¶š‘‚«‚Ş
+		1æ–‡å­—æ›¸ãè¾¼ã‚€
 	streamsize sputn(const _Elem *_Ptr, streamsize _Count);
-		n•¶š‘‚«‚Ş
-		xsputn‚ğŒÄ‚Ño‚µ‚Ä‚¢‚é‚¾‚¯‚È‚Ì‚ÅAoverflow‚µ‚Ä‚à‰½‚à‚µ‚È‚¢–Í—l
+		næ–‡å­—æ›¸ãè¾¼ã‚€
+		xsputnã‚’å‘¼ã³å‡ºã—ã¦ã„ã‚‹ã ã‘ãªã®ã§ã€overflowã—ã¦ã‚‚ä½•ã‚‚ã—ãªã„æ¨¡æ§˜
 	virtual void _Lock();
 	virtual void _Unlock();
-		threadŠÖ˜A
+		threadé–¢é€£
 protected:
 	int_type overflow(int_type = _Traits::eof());
-		obuf‚ª‚ ‚Ó‚ê‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚éB
-		obuf‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡Aí‚ÉŒÄ‚Î‚ê‚éB
+		obufãŒã‚ãµã‚ŒãŸã¨ãã«å‘¼ã°ã‚Œã‚‹ã€‚
+		obufãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆã€å¸¸ã«å‘¼ã°ã‚Œã‚‹ã€‚
 	int_type pbackfail(int_type = _Traits::eof());
-		ibuf‚Ìæ“ª‚Éˆê•¶š’Ç‰Á‚·‚éB
-		¸”s‚µ‚½ê‡‚Íeof‚ğ•Ô‚·B
+		ibufã®å…ˆé ­ã«ä¸€æ–‡å­—è¿½åŠ ã™ã‚‹ã€‚
+		å¤±æ•—ã—ãŸå ´åˆã¯eofã‚’è¿”ã™ã€‚
 	streamsize showmanyc();
-		ibuf‚Ö‚Ì“ü—Í•¶š”‚ğ•Ô‚·?
+		ibufã¸ã®å…¥åŠ›æ–‡å­—æ•°ã‚’è¿”ã™?
 	int_type underflow();
-		ibuf‚©‚ç“Ç‚İo‚·‚ªApoint‚Í“®‚©‚³‚È‚¢B
+		ibufã‹ã‚‰èª­ã¿å‡ºã™ãŒã€pointã¯å‹•ã‹ã•ãªã„ã€‚
 	int_type uflow();
-		ibuf‚©‚ç“Ç‚İo‚µApoint‚ğ“®‚©‚·B
+		ibufã‹ã‚‰èª­ã¿å‡ºã—ã€pointã‚’å‹•ã‹ã™ã€‚
 	streamsize xsgetn(_Elem * _Ptr, streamsize _Count);
-		ibuf‚©‚çCount•¶š‚¾‚¯ó‚¯æ‚èApoint‚ğ“®‚©‚·B
+		ibufã‹ã‚‰Countæ–‡å­—ã ã‘å—ã‘å–ã‚Šã€pointã‚’å‹•ã‹ã™ã€‚
 	streamsize xsputn(const _Elem *_Ptr, streamsize _Count);
-		obuf‚ÖCount•¶š‚¾‚¯‘‚«‚İApoint‚ğ“®‚©‚·B
+		obufã¸Countæ–‡å­—ã ã‘æ›¸ãè¾¼ã¿ã€pointã‚’å‹•ã‹ã™ã€‚
 	pos_type seekoff(off_type, ios_base::seekdir, ios_base::openmode = ios_base::in | ios_base::out);
-		obuf/ibuf‚Ìpoint‚ğoff‚Å•ÏX‚·‚éB
+		obuf/ibufã®pointã‚’offã§å¤‰æ›´ã™ã‚‹ã€‚
 	pos_type seekpos(pos_type, ios_base::openmode = ios_base::in | ios_base::out);
-		obuf/ibuf‚Ìpoint‚ğpos‚Å•ÏX‚·‚éB
+		obuf/ibufã®pointã‚’posã§å¤‰æ›´ã™ã‚‹ã€‚
 	_Myt *setbuf(_Elem *, streamsize);
-		ŠO•”agent‚©‚ç’ñ‹Ÿ‚³‚ê‚éƒoƒbƒtƒ@‚ğ—˜—p‚·‚é “à•”‚Å
+		å¤–éƒ¨agentã‹ã‚‰æä¾›ã•ã‚Œã‚‹ãƒãƒƒãƒ•ã‚¡ã‚’åˆ©ç”¨ã™ã‚‹ å†…éƒ¨ã§
 	int sync();
-		ŠO•”agent‚Æ“¯Šú?
-		flush‚É‘Š“–B
+		å¤–éƒ¨agentã¨åŒæœŸ?
+		flushã«ç›¸å½“ã€‚
 	void imbue(const locale&);
-		locale‚ğİ’è?
+		localeã‚’è¨­å®š?
 */
 namespace hmLib{
 	template<class _Elem,class _Traits=std::char_traits<_Elem> >
@@ -116,25 +116,25 @@ namespace hmLib{
 		typedef typename my_streambuf::off_type off_type;
 		typedef typename my_streambuf::int_type int_type;
 	protected://common virtual functions
-		//–ß‚è’l‚ÍˆÚ“®Œã‚Ìâ‘ÎˆÊ’u
+		//æˆ»ã‚Šå€¤ã¯ç§»å‹•å¾Œã®çµ¶å¯¾ä½ç½®
 		virtual pos_type iobuf_seekpos(pos_type abspos,std::ios_base::openmode which=std::ios_base::in|std::ios_base::out)=0;
-		//–ß‚è’l‚ÍˆÚ“®Œã‚Ìâ‘ÎˆÊ’u
+		//æˆ»ã‚Šå€¤ã¯ç§»å‹•å¾Œã®çµ¶å¯¾ä½ç½®
 		virtual pos_type iobuf_seekoff(off_type relpos,std::ios_base::seekdir dir,std::ios_base::openmode which=std::ios_base::in|std::ios_base::out)=0;
 	protected://ibuf virtual functions
-		//–ß‚è’l‚ÍŸ‚Ì•¶š
+		//æˆ»ã‚Šå€¤ã¯æ¬¡ã®æ–‡å­—
 		virtual _Elem ibuf_overflow()=0;
-		//–ß‚è’l‚Í¬Œ÷‚µ‚½•¶š”
+		//æˆ»ã‚Šå€¤ã¯æˆåŠŸã—ãŸæ–‡å­—æ•°
 		virtual streamsize ibuf_gets(_Elem* str,streamsize size)=0;
-		//–ß‚è’l‚Í¸”s‚µ‚½ê‡‚Ítrue
+		//æˆ»ã‚Šå€¤ã¯å¤±æ•—ã—ãŸå ´åˆã¯true
 		virtual bool ibuf_unget(_Elem c)=0;
-		//–ß‚è’l‚ÍŸ‚Ì•¶š
+		//æˆ»ã‚Šå€¤ã¯æ¬¡ã®æ–‡å­—
 		virtual _Elem ibuf_peek()=0;
 	protected://obuf virtual functions
-		//–ß‚è’l‚Í¸”s‚µ‚½ê‡‚Ítrue
+		//æˆ»ã‚Šå€¤ã¯å¤±æ•—ã—ãŸå ´åˆã¯true
 		virtual bool obuf_overflow(_Elem c)=0;
-		//–ß‚è’l‚Í¬Œ÷‚µ‚½•¶š”
+		//æˆ»ã‚Šå€¤ã¯æˆåŠŸã—ãŸæ–‡å­—æ•°
 		virtual streamsize obuf_puts(const _Elem* str,streamsize size)=0;
-		//–ß‚è’l‚Í¸”s‚µ‚½ê‡‚Ítrue
+		//æˆ»ã‚Šå€¤ã¯å¤±æ•—ã—ãŸå ´åˆã¯true
 		virtual bool obuf_flush()=0;
 	protected://ibuf functions
 		void ibuf_set(_Elem* pstrt,_Elem* pend){setg(pstrt,pstrt,pend);}

@@ -1,15 +1,15 @@
-#ifndef HMLIB_SIGNALS_INC
+ï»¿#ifndef HMLIB_SIGNALS_INC
 #define HMLIB_SIGNALS_INC 100
 #
 /*===signals===
-boost::signals2‚ğŠÇ—/•â•‚·‚é‚½‚ß‚ÌƒNƒ‰ƒXŒQ
+boost::signals2ã‚’ç®¡ç†/è£œåŠ©ã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹ç¾¤
 
-’ñ‹Ÿ‹@”\
+æä¾›æ©Ÿèƒ½
 	unique_connections
-		destructor‚Ådisconnect‚ğŒÄ‚Ôconnection•ÛƒNƒ‰ƒX
-		•¡”‚Ìconnection‚ğ•Û‰Â”\
+		destructorã§disconnectã‚’å‘¼ã¶connectionä¿æŒã‚¯ãƒ©ã‚¹
+		è¤‡æ•°ã®connectionã‚’ä¿æŒå¯èƒ½
 	connect
-		”Ä—pÚ‘±ƒOƒ[ƒoƒ‹ŠÖ”
+		æ±ç”¨æ¥ç¶šã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°
 */
 #include<hmLib/config_vc.h>
 #include<boost/signals2.hpp>

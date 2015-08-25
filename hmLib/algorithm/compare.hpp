@@ -1,20 +1,20 @@
-#ifndef HMLIB_ALGORITHM_COMPARE_INC
+ï»¿#ifndef HMLIB_ALGORITHM_COMPARE_INC
 #define HMLIB_ALGORITHM_COMPARE_INC 100
 #
 /*===algorithm::compare===
-‘å¬ŠÖŒW‚ÌƒAƒ‹ƒSƒŠƒYƒ€‚ğ’ñ‹Ÿ
+å¤§å°é–¢ä¿‚ã®ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’æä¾›
 
 algorithm::compare v1_00/130328 hmIto
-	algorthm‚©‚ç•ª—£
+	algorthmã‹ã‚‰åˆ†é›¢
 */
 #include<algorithm>
 
 namespace hmLib{
 	namespace algorithm{
-		//2—v‘f‚Ìsort
+		//2è¦ç´ ã®sort
 		template<class T>
 		inline void sort_swap(T& val1,T& val2){if(val1>val2)swap(val1,val2);}
-		//3—v‘f‚Ìsort
+		//3è¦ç´ ã®sort
 		template<class T>
 		inline void sort_swap(T& val1,T& val2,T& val3){
 			if(val1>val2)swap(val1,val2);
@@ -23,7 +23,7 @@ namespace hmLib{
 				if(val1>val2)swap(val1,val2);
 			}
 		}
-		//3—v‘f‚Ìmedian
+		//3è¦ç´ ã®median
 		template<class T>
 		inline T med(T val1,T val2,T val3){
 			if(val1>val2){
@@ -36,13 +36,13 @@ namespace hmLib{
 				else return val2;
 			}
 		}
-		//3—v‘f‚Ìmin
+		//3è¦ç´ ã®min
 		template<class T>
 		inline T min(T val1,T val2,T val3){return std::min(val1,std::min(val2,val3));}
-		//3—v‘f‚Ìmax
+		//3è¦ç´ ã®max
 		template<class T>
 		inline T max(T val1,T val2,T val3){return std::max(val1,std::max(val2,val3));}
-		//•‰‚É‚È‚ç‚È‚¢—]‚è
+		//è² ã«ãªã‚‰ãªã„ä½™ã‚Š
 		template<class T>
 		inline T positive_mod(T num,T divisor){
 			if(num>=0)return num%divisor;

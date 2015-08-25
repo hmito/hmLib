@@ -1,11 +1,11 @@
-#ifndef HMLIB_SHAREDPTR_INC
+ï»¿#ifndef HMLIB_SHAREDPTR_INC
 #define HMLIB_SHAREDPTR_INC 101
 #
 /*
 ===shared_ptr===
 v1_01/140412 hmIto
-	_shared_array_element‚ğ–³–¼–¼‘O‹óŠÔ‚ÖˆÚ“®
-	allocator‚Ìrebind‚ğ—p‚¢‚½³‚µ‚¢‹LÚ‚Ö•ÏX
+	_shared_array_elementã‚’ç„¡ååå‰ç©ºé–“ã¸ç§»å‹•
+	allocatorã®rebindã‚’ç”¨ã„ãŸæ­£ã—ã„è¨˜è¼‰ã¸å¤‰æ›´
 */
 #include<memory>
 #include<hmLib/lab/rvalue_reference.hpp>
@@ -184,7 +184,7 @@ namespace hmLib {
 			my_.reset(prth);
 			
 		}
-	private://‚¢‚¸‚ê‚ÌŠÖ”‚àAptrh‚ª‘¶İ‚µ‚Ä‚¢‚é/‹ó‚Å‚ ‚é‚±‚Æ‚ÌŠm”F‚Í‚µ‚Ä‚¢‚È‚¢‚Ì‚Å’ˆÓ
+	private://ã„ãšã‚Œã®é–¢æ•°ã‚‚ã€ptrhãŒå­˜åœ¨ã—ã¦ã„ã‚‹/ç©ºã§ã‚ã‚‹ã“ã¨ã®ç¢ºèªã¯ã—ã¦ã„ãªã„ã®ã§æ³¨æ„
 		void construct(pointer ptr_, deleter dlt_) {
 			ptrh=alloc.allocate(std::size_t(1));
 			alloc.construct(ptrh, move(my_ptr_element(ptr_, dlt_)));
@@ -311,7 +311,7 @@ namespace hmLib {
 			ptrh=ptrh_;
 			alloc=alloc_;
 		}
-	private://‚¢‚¸‚ê‚ÌŠÖ”‚àAptrh‚ª‘¶İ‚µ‚Ä‚¢‚é/‹ó‚Å‚ ‚é‚±‚Æ‚ÌŠm”F‚Í‚µ‚Ä‚¢‚È‚¢‚Ì‚Å’ˆÓ
+	private://ã„ãšã‚Œã®é–¢æ•°ã‚‚ã€ptrhãŒå­˜åœ¨ã—ã¦ã„ã‚‹/ç©ºã§ã‚ã‚‹ã“ã¨ã®ç¢ºèªã¯ã—ã¦ã„ãªã„ã®ã§æ³¨æ„
 		void construct(pointer ptr_, deleter dlt_) {
 			ptrh=alloc.allocate(std::size_t(1));
 			alloc.construct(ptrh, move(my_ptr_element(ptr_, dlt_)));

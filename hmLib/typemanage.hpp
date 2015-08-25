@@ -1,12 +1,12 @@
-#ifndef HMLIB_TYPEMANAGE_INC
+ï»¿#ifndef HMLIB_TYPEMANAGE_INC
 #define HMLIB_TYPEMANAGE_INC 1
 #
 /*===type_manage===
-Œ^‚Ì‘€ì‚ÉŠÖ‚í‚é§Œä‚ğs‚¤
+å‹ã®æ“ä½œã«é–¢ã‚ã‚‹åˆ¶å¾¡ã‚’è¡Œã†
 typemanage:v0_01/130711 hmIto
-	listup_name‚ğ’Ç‰Á
+	listup_nameã‚’è¿½åŠ 
 typemanage:v0_00/130705 hmIto
-	parameter‚ğ‰ğ‘Ì‚µA”ñŒp³Œ^‚É‚·‚éŒ`‚Åì¬
+	parameterã‚’è§£ä½“ã—ã€éç¶™æ‰¿å‹ã«ã™ã‚‹å½¢ã§ä½œæˆ
 */
 #include"typemanage/type_manage.hpp"
 #include"typemanage/type_name.hpp"

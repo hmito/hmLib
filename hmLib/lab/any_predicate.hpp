@@ -1,9 +1,9 @@
-#ifndef HMLIB_ANYPREDICATE_INC
+﻿#ifndef HMLIB_ANYPREDICATE_INC
 #define HMLIB_ANYPREDICATE_INC
 #
 /*===any_predicate===
-���q�֐�(bool��Ԃ��֐��I�u�W�F�N�g�j�Ȃ�Ȃ�ł��󂯎���N���X
-�R�s�[�s�A���[�u��
+叙述関数(boolを返す関数オブジェクト）ならなんでも受け取れるクラス
+コピー不可、ムーブ可
 */
 #include<memory>
 //#include <typeinfo>

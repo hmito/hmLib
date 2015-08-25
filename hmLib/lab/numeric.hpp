@@ -1,15 +1,15 @@
-#ifndef HMLIB_NUMERIC_INC
+ï»¿#ifndef HMLIB_NUMERIC_INC
 #define HMLIB_NUMERIC_INC 102
 #
 /*===hmLib::numeric===
-”’l‰‰Z‚ÉŠÖ‚·‚éA•W€ƒ‰ƒCƒuƒ‰ƒŠ‚Ì•â•ŠÖ”ŒQ
+æ•°å€¤æ¼”ç®—ã«é–¢ã™ã‚‹ã€æ¨™æº–ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®è£œåŠ©é–¢æ•°ç¾¤
 v1_02/140709
-	‰“ªŒ^—Ê‚ğZo‚·‚éstatistics‚ğ’Ç‰Á
+	åˆé ­å‹é‡ã‚’ç®—å‡ºã™ã‚‹statisticsã‚’è¿½åŠ 
 v1_01/140618 hmIto
-	–¢’²®‚Ìcovariance‚ğ”p~
-	varianceŠÖ”‚ÍAAverage‚ğ‰ÁZ‚·‚éŒ`‚É•ÏX
+	æœªèª¿æ•´ã®covarianceã‚’å»ƒæ­¢
+	varianceé–¢æ•°ã¯ã€Averageã‚’åŠ ç®—ã™ã‚‹å½¢ã«å¤‰æ›´
 v1_00/130805 hmIto
-	•½‹ÏA•ªUA‹¤•ªU‚ğ’Ç‰Á
+	å¹³å‡ã€åˆ†æ•£ã€å…±åˆ†æ•£ã‚’è¿½åŠ 
 */
 #include<iterator>
 #include<numeric>
@@ -33,7 +33,7 @@ namespace hmLib{
 		T variance(input_iterator Begin, input_iterator End, T Init, T Ave, square_accumulate_functor Func) {
 			return average(Begin, End, Init, Func)-Ave*Ave;
 		}
-		//l•ªˆÊ”‚ğZo‚·‚é
+		//å››åˆ†ä½æ•°ã‚’ç®—å‡ºã™ã‚‹
 		class  statistics {			
 			double Low5;
 			double Q1;

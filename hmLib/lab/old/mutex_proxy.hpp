@@ -1,13 +1,13 @@
-#ifndef HMLIB_MUTEXPROXY_INC
+ï»¿#ifndef HMLIB_MUTEXPROXY_INC
 #define HMLIB_MUTEXPROXY_INC 101
 #
 /*===mutex_proxy===
-”Ä—pMutex‚ğó‚¯æ‚Á‚Ä‘ã—“I‚É‹@”\‚·‚é
+æ±ç”¨Mutexã‚’å—ã‘å–ã£ã¦ä»£ç†çš„ã«æ©Ÿèƒ½ã™ã‚‹
 
 mutex_proxy v1_01/130412 hmIto
-	try_lock‚ªtry_locki‚Æ‚È‚Á‚Ä‚¢‚½’v–½“I‚È–â‘è‚ğC³
+	try_lockãŒtry_lockiã¨ãªã£ã¦ã„ãŸè‡´å‘½çš„ãªå•é¡Œã‚’ä¿®æ­£
 mutex_proxy:v1_00/130308 hmIto
-	”Ä—pmutexQÆƒNƒ‰ƒXAmutex_proxy‚ğ’Ç‰Á
+	æ±ç”¨mutexå‚ç…§ã‚¯ãƒ©ã‚¹ã€mutex_proxyã‚’è¿½åŠ 
 */
 #include<functional>
 #include<hmLib/exception.hpp>

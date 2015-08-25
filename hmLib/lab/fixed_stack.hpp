@@ -1,11 +1,11 @@
-#ifndef HMLIB_FIXEDSTACK_INC
+ï»¿#ifndef HMLIB_FIXEDSTACK_INC
 #define HMLIB_FIXEDSTACK_INC 100
 /*=== fixed_stack ===
-ŒÅ’è’·‚ÌŠÈˆÕ”z—ñ
+å›ºå®šé•·ã®ç°¡æ˜“é…åˆ—
 
 === fixed_stack ===
 v1_00/140329 hmIto
-ì¬
+ä½œæˆ
 */
 #ifndef HMLIB_FIXEDVECTOR_INC
 #	include<hmLib/lab/fixed_vector.hpp>
@@ -25,7 +25,7 @@ namespace hmLib {
 	private:
 		base_type Base;
 	public:
-		//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		fixed_stack() :Base() {
 		}
 		fixed_stack(unsigned int Size_)
@@ -37,41 +37,41 @@ namespace hmLib {
 		~fixed_stack() {
 		}
 	private:
-		//ƒRƒs[‹Ö~
+		//ã‚³ãƒ”ãƒ¼ç¦æ­¢
 		fixed_stack(const my_type& My_);
 		const my_type& operator=(const my_type& My_);
 	public:
-		//ƒoƒbƒtƒ@‚ğÄŠm•Û
+		//ãƒãƒƒãƒ•ã‚¡ã‚’å†ç¢ºä¿
 		void reset(unsigned int Size_) {
 			Base.reset(Size_);
 		}
 		void reset(T* BufBegin_, T* BufEnd_, destructor Destructor_) {
 			Base.reset(BufBegin_, BufEnd_, Destructor_);
 		}
-		//ƒoƒbƒtƒ@‚ª‹ó‚©
+		//ãƒãƒƒãƒ•ã‚¡ãŒç©ºã‹
 		bool empty()const { return Base.empty(); }
-		//ƒoƒbƒtƒ@‚ª‚¢‚Á‚Ï‚¢‚©
+		//ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã‹
 		bool full()const { return Base.full(); }
-		//ƒoƒbƒtƒ@ƒTƒCƒY
+		//ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
 		unsigned int size()const { return Base.size(); }
-		//Å‘åƒTƒCƒY
+		//æœ€å¤§ã‚µã‚¤ã‚º
 		unsigned int maxsize()const { return Base.maxsize(); }
-		//ƒoƒbƒtƒ@‚ÌŠm•Û‚Ì—L–³
+		//ãƒãƒƒãƒ•ã‚¡ã®ç¢ºä¿ã®æœ‰ç„¡
 		operator bool()const { return static_cast<bool>(Base); }
-		//ƒXƒƒbƒv
+		//ã‚¹ãƒ¯ãƒƒãƒ—
 		void swap(my_type& My_) { Base.swap(My_.Base); }
-		//ƒNƒŠƒA
+		//ã‚¯ãƒªã‚¢
 		void clear() { Base.clear(); }
 	public:
 		void pop() { Base.pop_back(); }
 		void push(const T& val_) { Base.push_back(val_); }
 	public:
-		//æ“ªƒAƒhƒŒƒX‚ğæ“¾
+		//å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 		T* data() { return Base.data(); }
-		//æ“ª‚Ìƒf[ƒ^‚ğæ“¾
+		//å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 		T& next() { return Base.back(); }
 		const T& next()const { return Base.back(); }
-		//ƒCƒeƒŒ[ƒ^‚ğæ“¾
+		//ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã‚’å–å¾—
 		iterator begin() { return Base.begin(); }
 		iterator end() { return Base.end(); }
 		const_iterator begin()const { return Base.begin(); }

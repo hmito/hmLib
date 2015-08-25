@@ -1,10 +1,10 @@
-#ifndef HMLIB_ANYMUTEX_INC
+ï»¿#ifndef HMLIB_ANYMUTEX_INC
 #define HMLIB_ANTMUTEX_INC 100
 #
 /*===any_mutex===
-—lX‚ÈmutexŒ^‚ğó‚¯æ‚é•û
+æ§˜ã€…ãªmutexå‹ã‚’å—ã‘å–ã‚‹æ–¹
 any_mutex:v1_00/130327 hmIto
-	ƒŠƒŠ[ƒX
+	ãƒªãƒªãƒ¼ã‚¹
 */
 #include<memory>
 #include<boost/pool/pool_alloc.hpp>

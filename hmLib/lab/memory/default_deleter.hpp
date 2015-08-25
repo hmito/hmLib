@@ -1,11 +1,11 @@
-#ifndef HMLIB_MEMORY_DEFAULTDELETER_INC
+﻿#ifndef HMLIB_MEMORY_DEFAULTDELETER_INC
 #define HMLIB_MEMORY_DEFAULTDELETER_INC 100
 #
 /*
-�z�񂩂ǂ������f���āAdelete������@�������ŕς���N���X
+配列かどうか判断して、deleteする方法を自分で変えるクラス
 === memory::default_deleter ===
 v1_00/140405 hmIto
-	�쐬
+	作成
 */
 namespace hmLib {
 	template<typename T>

@@ -1,4 +1,4 @@
-#ifndef HMLIB_COLOR_INC
+ï»¿#ifndef HMLIB_COLOR_INC
 #define HMLIB_COLOR_INC 100
 #ifndef HMLIB_BYTEBASETYPE_INC
 #	include "bytebase_type.hpp"
@@ -9,12 +9,12 @@
 #include <algorithm>
 namespace hmLib{
 	namespace color{
-		class rgb_color;	//RGBŒ^ƒJƒ‰[	r:Ô‹­“x g:—Î‹­“x b:Â‹­“x ‚ğw’è
-		class hsv_color;	//HSVŒ^ƒJƒ‰[	hue:F‘Š sat:Ê“x vlu:‹­“x ‚ğw’è
-		class hls_color;	//HLSŒ^ƒJƒ‰[	hue:F‘Š lgt:Ê“x sat:–¾“x ‚ğw’è
-		class rgba_color;	//RGBAŒ^ƒJƒ‰[	r:Ô‹­“x g:—Î‹­“x b:Â‹­“x a:“§‰ß“x ‚ğw’è
-		class hsva_color;	//HSVAŒ^ƒJƒ‰[	hue:F‘Š sat:Ê“x vlu:‹­“x a:“§‰ß“x ‚ğw’è
-		class hlsa_color;	//HLSAŒ^ƒJƒ‰[	hue:F‘Š lgt:Ê“x sat:–¾“x a:“§‰ß“x ‚ğw’è
+		class rgb_color;	//RGBå‹ã‚«ãƒ©ãƒ¼	r:èµ¤å¼·åº¦ g:ç·‘å¼·åº¦ b:é’å¼·åº¦ ã‚’æŒ‡å®š
+		class hsv_color;	//HSVå‹ã‚«ãƒ©ãƒ¼	hue:è‰²ç›¸ sat:å½©åº¦ vlu:å¼·åº¦ ã‚’æŒ‡å®š
+		class hls_color;	//HLSå‹ã‚«ãƒ©ãƒ¼	hue:è‰²ç›¸ lgt:å½©åº¦ sat:æ˜åº¦ ã‚’æŒ‡å®š
+		class rgba_color;	//RGBAå‹ã‚«ãƒ©ãƒ¼	r:èµ¤å¼·åº¦ g:ç·‘å¼·åº¦ b:é’å¼·åº¦ a:é€éåº¦ ã‚’æŒ‡å®š
+		class hsva_color;	//HSVAå‹ã‚«ãƒ©ãƒ¼	hue:è‰²ç›¸ sat:å½©åº¦ vlu:å¼·åº¦ a:é€éåº¦ ã‚’æŒ‡å®š
+		class hlsa_color;	//HLSAå‹ã‚«ãƒ©ãƒ¼	hue:è‰²ç›¸ lgt:å½©åº¦ sat:æ˜åº¦ a:é€éåº¦ ã‚’æŒ‡å®š
 		class rgb_color:
 			public pattern::add_pattern<rgb_color>,
 			public pattern::sub_pattern<rgb_color>,

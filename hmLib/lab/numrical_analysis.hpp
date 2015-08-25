@@ -1,11 +1,11 @@
-#ifndef HMLIB_NUMERICALANALYSIS_INC
+ï»¿#ifndef HMLIB_NUMERICALANALYSIS_INC
 #define HMLIB_NUMERICALANALYSIS_INC 100
 #
 /*
-”’l‰ğÍ‚Ìè–@‚ğ’ñ‹Ÿ‚·‚éƒ‰ƒCƒuƒ‰ƒŠ
+æ•°å€¤è§£æã®æ‰‹æ³•ã‚’æä¾›ã™ã‚‹ãƒ©ã‚¤ãƒ–ãƒ©ãƒª
 ===numerical_analysis===
 v1_00/131004 hmIto	
-	small_step–@, “ñ•ª–@‚ğ’Ç‰Á
+	small_stepæ³•, äºŒåˆ†æ³•ã‚’è¿½åŠ 
 */
 #include<utility>
 //#include<hmLib/parameter.hpp>
@@ -33,12 +33,12 @@ namespace hmLib{
 				double Pos=(End_+Begin_)/2;
 
 				Val=Fn(Pos);
-				//ƒ[ƒ“_‚ğŒ©‚Â‚¯‚½ê‡
+				//ã‚¼ãƒ­ç‚¹ã‚’è¦‹ã¤ã‘ãŸå ´åˆ
 				if(Val==0.){
 					double CheckLow=Fn((Begin_+Pos)/2.);
 					double CheckHgh=Fn((End_+Pos)/2.);
 
-					//Å’†ŠÔ“_‚àƒ[ƒ‚Æ‚È‚Á‚Ä‚µ‚Ü‚í‚È‚¢‚©Šm”F
+					//æœ€ä¸­é–“ç‚¹ã‚‚ã‚¼ãƒ­ã¨ãªã£ã¦ã—ã¾ã‚ãªã„ã‹ç¢ºèª
 					if(CheckHgh==0. || CheckLow==0.){
 						if(CheckLow!=0.)Begin_=(Begin_+Pos)/2.;
 						if(CheckHgh!=0.)End_=(Begin_+Pos)/2.;

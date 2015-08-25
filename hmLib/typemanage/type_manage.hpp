@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPEMANAGE_TYPEMANAGE_INC
+ï»¿#ifndef HMLIB_TYPEMANAGE_TYPEMANAGE_INC
 #define HMLIB_TYPEMANAGE_TYPEMANAGE_INC 100
 #
 #include<string>
@@ -9,7 +9,7 @@ namespace hmLib{
 		struct default_type_manage:public my_type::type_manage{};
 		template<>
 		struct default_type_manage<bool>{
-			//ƒNƒ‰ƒX–¼‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã‚’è¿”ã™
 			std::string name()const{return "bool";}
 			template<typename output_iterator>
 			void name_list(output_iterator itr,const std::string& pre)const{
@@ -21,7 +21,7 @@ namespace hmLib{
 		};
 		template<>
 		struct default_type_manage<unsigned int>{
-			//ƒNƒ‰ƒX–¼‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã‚’è¿”ã™
 			std::string name()const{return "unsigned int";}
 			template<typename output_iterator>
 			void name_list(output_iterator itr,const std::string& pre)const{
@@ -33,7 +33,7 @@ namespace hmLib{
 		};
 		template<>
 		struct default_type_manage<int>{
-			//ƒNƒ‰ƒX–¼‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã‚’è¿”ã™
 			std::string name()const{return "int";}
 			template<typename output_iterator>
 			void name_list(output_iterator itr,const std::string& pre)const{
@@ -45,7 +45,7 @@ namespace hmLib{
 		};
 		template<>
 		struct default_type_manage<double>{
-			//ƒNƒ‰ƒX–¼‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã‚’è¿”ã™
 			std::string name()const{return "double";}
 			template<typename output_iterator>
 			void name_list(output_iterator itr,const std::string& pre)const{
@@ -56,31 +56,31 @@ namespace hmLib{
 			}
 		};
 /*		struct type_manage{
-			//ƒNƒ‰ƒX–¼‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã‚’è¿”ã™
 			std::string name()const;
-			//ƒNƒ‰ƒX–¼‚ğ—…—ñ‚·‚é
+			//ã‚¯ãƒ©ã‚¹åã‚’ç¾…åˆ—ã™ã‚‹
 			template<typename output_iterator>
 			void name_label(output_iterator itr,const std::string& pre)const;
-			//ƒNƒ‰ƒX–¼‚ğ—…—ñ‚·‚é
+			//ã‚¯ãƒ©ã‚¹åã‚’ç¾…åˆ—ã™ã‚‹
 			template<typename output_iterator>
 			void name_list(output_iterator itr)const;
-			//ƒNƒ‰ƒX–¼‚Ì—…—ñ”‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã®ç¾…åˆ—æ•°ã‚’è¿”ã™
 			unsigned int name_list_size()const;
-			//•¶š—ñ‚©‚çƒRƒ“ƒXƒgƒ‰ƒNƒg‚·‚é
+			//æ–‡å­—åˆ—ã‹ã‚‰ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ãƒˆã™ã‚‹
 			template<typename input_iterator>
 			my_type string_build(input_iterator begin,input_iterator end)const;
-			//ì¬‚É•K—v‚È•¶š—ñ
+			//ä½œæˆã«å¿…è¦ãªæ–‡å­—åˆ—
 			template<typename output_iterator>
 			void string_build_list(output_iterator itr,const std::string& pre)const:
-			//ì¬‚É•K—v‚È•¶š—ñ‚Ì”
+			//ä½œæˆã«å¿…è¦ãªæ–‡å­—åˆ—ã®æ•°
 			unsigned int string_build_list_size()const;
-			//ƒpƒ‰ƒ[ƒ^‚Ì’l‚ğ—^‚¦‚é
+			//ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®å€¤ã‚’ä¸ãˆã‚‹
 			template<typename output_iterator>
 			void parameter_label(output_iterator itr,const my_type& val)const;
-			//ƒpƒ‰ƒ[ƒ^‚Ì–¼‘O‚ğ—^‚¦‚é
+			//ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®åå‰ã‚’ä¸ãˆã‚‹
 			template<typename output_iterator>
 			void parameter_list(output_iterator itr, const std::string& pre)const;
-			//ƒpƒ‰ƒ[ƒ^‚Ì”‚ğ—^‚¦‚é
+			//ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®æ•°ã‚’ä¸ãˆã‚‹
 			unsigned int parameter_list_size()const;
 		};
 */

@@ -1,22 +1,22 @@
-#ifndef HMLIB_INQUIRIES_INQUIRY_INC
+ï»¿#ifndef HMLIB_INQUIRIES_INQUIRY_INC
 #define HMLIB_INQUIRIES_INQUIRY_INC 200
 #
 /*===inquiries::inquiry===
-inquiryƒNƒ‰ƒX
-	‚ ‚ç‚ä‚éƒIƒuƒWƒFƒNƒg‚ÆÚ‘±‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-	operator()(void)‚ÅAÚ‘±‚µ‚½ƒIƒuƒWƒFƒNƒg‚ğconst‚Åæ“¾‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-	lock/unlock/try_lockŠÖ”‚ÅAƒIƒuƒWƒFƒNƒg‚ğˆê“I‚ÉƒXƒŒƒbƒh”r‘¼“I‚É—˜—p‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
+inquiryã‚¯ãƒ©ã‚¹
+	ã‚ã‚‰ã‚†ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨æ¥ç¶šã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+	operator()(void)ã§ã€æ¥ç¶šã—ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’constã§å–å¾—ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+	lock/unlock/try_locké–¢æ•°ã§ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä¸€æ™‚çš„ã«ã‚¹ãƒ¬ãƒƒãƒ‰æ’ä»–çš„ã«åˆ©ç”¨ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
 
 inquiries::inquiry_v2_00/130415 hmito
-	constQÆ‚ğ–ß‚è’l‚Æ‚·‚éŠÖ”‚ğ•Û‚·‚éƒIƒuƒWƒFƒNƒg‚Æ‚µ‚ÄÄ’è‹`
+	constå‚ç…§ã‚’æˆ»ã‚Šå€¤ã¨ã™ã‚‹é–¢æ•°ã‚’ä¿æŒã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ã—ã¦å†å®šç¾©
 inquiries::inquiry v1_02/130412 hmIto
-	try_lockŠÖ”‚ÌŒÄ‚Ño‚µ‚ÅŒÄ‚Ño‚µ–¼‚ªŠÔˆá‚Á‚Ä‚¢‚½–â‘è‚ğC³
-	try_lock‚Åmutex‚ğ•Û‚µ‚Ä‚¢‚È‚¢ê‡‚ÉƒƒbƒN‚É¸”s‚µ‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¦‚Ä‚¢‚½–â‘è‚ğC³
+	try_locké–¢æ•°ã®å‘¼ã³å‡ºã—ã§å‘¼ã³å‡ºã—åãŒé–“é•ã£ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
+	try_lockã§mutexã‚’ä¿æŒã—ã¦ã„ãªã„å ´åˆã«ãƒ­ãƒƒã‚¯ã«å¤±æ•—ã—ã¦ã„ã‚‹ã‚ˆã†ã«è¦‹ãˆã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 inquiries::inquiry v1_01/130329 hmIto
-	ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zq‚ğ–¾¦“I‚Éprivate‰»
-	ƒOƒ[ƒoƒ‹ŠÖ”‚ÉconnectŠÖ”‚ğ’Ç‰Á
+	ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­ã‚’æ˜ç¤ºçš„ã«privateåŒ–
+	ã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°ã«connecté–¢æ•°ã‚’è¿½åŠ 
 inquiries::inquiry v1_00/130328 hmIto
-	inquiry‚©‚ç•ª—£
+	inquiryã‹ã‚‰åˆ†é›¢
 */
 #include<memory>
 #include<functional>
@@ -31,7 +31,7 @@ inquiries::inquiry v1_00/130328 hmIto
 #endif
 namespace hmLib{
 	namespace inquiries{
-		//•Ï”‚Ö‚ÌQÆinquiry
+		//å¤‰æ•°ã¸ã®å‚ç…§inquiry
 		template<typename T>
 		class inquiry:public inquiry_abstruct{
 		private:

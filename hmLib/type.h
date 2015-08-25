@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPE_INC
+﻿#ifndef HMLIB_TYPE_INC
 #define HMLIB_TYPE_INC 100
 #
 #ifdef __cplusplus

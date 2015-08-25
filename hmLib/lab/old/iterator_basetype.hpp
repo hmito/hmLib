@@ -1,12 +1,12 @@
-#ifndef HMLIB_ITERATORINTERFACE_INC
+ï»¿#ifndef HMLIB_ITERATORINTERFACE_INC
 #define HMLIB_ITERATORINTERFACE_INC 1
 #
 /*===iterator_interface===
-iterator‚ÌŠî–{ƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ’ñ‹Ÿ‚·‚é
+iteratorã®åŸºæœ¬ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’æä¾›ã™ã‚‹
 
 iterator_interface:v0_01/130308 hmIto
-	iterator_pattern‚©‚çŒp³
-	operator_interface‚É‘Î‰
+	iterator_patternã‹ã‚‰ç¶™æ‰¿
+	operator_interfaceã«å¯¾å¿œ
 */
 #include<iterator>
 #ifndef HMLIB_OPERATORINTERFACE_INC

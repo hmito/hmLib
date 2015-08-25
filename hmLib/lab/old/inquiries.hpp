@@ -1,59 +1,59 @@
-#ifndef HMLIB_INQUIRIES_INC
+ï»¿#ifndef HMLIB_INQUIRIES_INC
 #define HMLIB_INQUIRIES_INC 101
 #
 /*===inquiries::inquiry===
-’l‚ğ”\“®“I‚ÉQÆæ“¾‚·‚é‚½‚ß‚Ì‹¤’ÊƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ’ñ‹Ÿ‚·‚é
-	ˆÀ‘S‚Ì‚½‚ßA‚¢‚¸‚ê‚ÌinquiryƒNƒ‰ƒXƒpƒ^[ƒ“‚Å‚àconst‚È§Œä‚µ‚©‹–‚³‚ê‚Ä‚¢‚È‚¢B
-	Ú‘±‘Šè‚Ì’l‚ğ”\“®“I‚É§Œä‚·‚é‚½‚ß‚É‚ÍAsignal/slotƒpƒ^[ƒ“‚Ì—˜—p‚ğ„§‚µ‚Ä‚¢‚éB
-	‚•p“x‚Ìsignal/slot”­M‚ğ‰ñ”ğ‚·‚é–Ú“I‚Å‚ ‚ê‚ÎAsignal_inquiry‚Ì—˜—p‚ğ„§‚µ‚Ä‚¢‚éB
+å€¤ã‚’èƒ½å‹•çš„ã«å‚ç…§å–å¾—ã™ã‚‹ãŸã‚ã®å…±é€šã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’æä¾›ã™ã‚‹
+	å®‰å…¨ã®ãŸã‚ã€ã„ãšã‚Œã®inquiryã‚¯ãƒ©ã‚¹ãƒ‘ã‚¿ãƒ¼ãƒ³ã§ã‚‚constãªåˆ¶å¾¡ã—ã‹è¨±ã•ã‚Œã¦ã„ãªã„ã€‚
+	æ¥ç¶šç›¸æ‰‹ã®å€¤ã‚’èƒ½å‹•çš„ã«åˆ¶å¾¡ã™ã‚‹ãŸã‚ã«ã¯ã€signal/slotãƒ‘ã‚¿ãƒ¼ãƒ³ã®åˆ©ç”¨ã‚’æ¨å¥¨ã—ã¦ã„ã‚‹ã€‚
+	é«˜é »åº¦ã®signal/slotç™ºä¿¡ã‚’å›é¿ã™ã‚‹ç›®çš„ã§ã‚ã‚Œã°ã€signal_inquiryã®åˆ©ç”¨ã‚’æ¨å¥¨ã—ã¦ã„ã‚‹ã€‚
 	
-’ñ‹ŸƒNƒ‰ƒX
-	inquiryƒNƒ‰ƒX
-		‚ ‚ç‚ä‚éƒIƒuƒWƒFƒNƒg‚ÆÚ‘±‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-		operator()(void)‚ÅAÚ‘±‚µ‚½ƒIƒuƒWƒFƒNƒg‚ğconst‚Åæ“¾‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-		lock/unlock/try_lockŠÖ”‚ÅAƒIƒuƒWƒFƒNƒg‚ğˆê“I‚ÉƒXƒŒƒbƒh”r‘¼“I‚É—˜—p‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-	range_inquiryƒNƒ‰ƒX
-		begin/endŠÖ”‚ğ—˜—p‚Å‚«‚éƒIƒuƒWƒFƒNƒg‚ÆÚ‘±‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-		begin/endŠÖ”‚ÅAiterator_‚ğæ“¾‚Å‚«‚éB
-		lock/unlock/try_lockŠÖ”‚ÅAƒIƒuƒWƒFƒNƒg‚ğˆê“I‚ÉƒXƒŒƒbƒh”r‘¼“I‚É—˜—p‚·‚é‚±‚Æ‚ª‚Å‚«‚éB
-	signal_inquiryƒNƒ‰ƒX
-		’l‚ğ•Ô‚³‚¸‚Éboost::signals2‚ğ”­M‚·‚éinquiryB
-	unique_contactsƒNƒ‰ƒX
-		ƒRƒ“ƒ^ƒNƒg‚ğ•¡”•Û‚µAdestructorŒÄ‚Ño‚µ‚Édisconnect‚ğŒÄ‚Ño‚·‚æ‚¤‚ÈƒNƒ‰ƒXB
+æä¾›ã‚¯ãƒ©ã‚¹
+	inquiryã‚¯ãƒ©ã‚¹
+		ã‚ã‚‰ã‚†ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨æ¥ç¶šã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+		operator()(void)ã§ã€æ¥ç¶šã—ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’constã§å–å¾—ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+		lock/unlock/try_locké–¢æ•°ã§ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä¸€æ™‚çš„ã«ã‚¹ãƒ¬ãƒƒãƒ‰æ’ä»–çš„ã«åˆ©ç”¨ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+	range_inquiryã‚¯ãƒ©ã‚¹
+		begin/endé–¢æ•°ã‚’åˆ©ç”¨ã§ãã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨æ¥ç¶šã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+		begin/endé–¢æ•°ã§ã€iterator_ã‚’å–å¾—ã§ãã‚‹ã€‚
+		lock/unlock/try_locké–¢æ•°ã§ã€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä¸€æ™‚çš„ã«ã‚¹ãƒ¬ãƒƒãƒ‰æ’ä»–çš„ã«åˆ©ç”¨ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+	signal_inquiryã‚¯ãƒ©ã‚¹
+		å€¤ã‚’è¿”ã•ãšã«boost::signals2ã‚’ç™ºä¿¡ã™ã‚‹inquiryã€‚
+	unique_contactsã‚¯ãƒ©ã‚¹
+		ã‚³ãƒ³ã‚¿ã‚¯ãƒˆã‚’è¤‡æ•°ä¿æŒã—ã€destructorå‘¼ã³å‡ºã—æ™‚ã«disconnectã‚’å‘¼ã³å‡ºã™ã‚ˆã†ãªã‚¯ãƒ©ã‚¹ã€‚
 
 inquiries v1_01/130329 hmIto
 	inquiries::inquiry_abstruct v1_01/130329 hmIto
-		ƒ€[ƒuƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zqü•Ó‚Ì’v–½“I‚ÈƒoƒO‚ğC³
+		ãƒ ãƒ¼ãƒ–ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­å‘¨è¾ºã®è‡´å‘½çš„ãªãƒã‚°ã‚’ä¿®æ­£
 	inquiries::inquiry v1_01/130329 hmIto
-		ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zq‚ğ–¾¦“I‚Éprivate‰»
-		ƒOƒ[ƒoƒ‹ŠÖ”‚ÉconnectŠÖ”‚ğ’Ç‰Á
+		ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­ã‚’æ˜ç¤ºçš„ã«privateåŒ–
+		ã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°ã«connecté–¢æ•°ã‚’è¿½åŠ 
 	inquiries::range_inquiry:v1_01/130329 hmIto
-		ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zq‚ğ–¾¦“I‚Éprivate‰»
-		ƒOƒ[ƒoƒ‹ŠÖ”‚ÉconnectŠÖ”‚ğ’Ç‰Á
+		ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­ã‚’æ˜ç¤ºçš„ã«privateåŒ–
+		ã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°ã«connecté–¢æ•°ã‚’è¿½åŠ 
 	inquiries::signal_inquiry v1_01/130329 hmIto
-		inquiry‚Å’læ“¾‚µ‚½Œ‹‰ÊA‘O‰ñ‚Ì’l‚Æ•Ï‚í‚è‚È‚¢ê‡‚Ísignal‚ğ”­M‚·‚éAchanged_signal_inquiry‚ğ’Ç‰Á
-		ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zq‚ğ–¾¦“I‚Éprivate‰»
-		ƒOƒ[ƒoƒ‹ŠÖ”‚ÉconnectŠÖ”‚ğ’Ç‰Á
+		inquiryã§å€¤å–å¾—ã—ãŸçµæœã€å‰å›ã®å€¤ã¨å¤‰ã‚ã‚Šãªã„å ´åˆã¯signalã‚’ç™ºä¿¡ã™ã‚‹ã€changed_signal_inquiryã‚’è¿½åŠ 
+		ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­ã‚’æ˜ç¤ºçš„ã«privateåŒ–
+		ã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°ã«connecté–¢æ•°ã‚’è¿½åŠ 
 inquieies v1_00/130328 hmIto
-	inquiry‚ğŒp³A•ªŠ„‚µ‚Ä¬—§B
+	inquiryã‚’ç¶™æ‰¿ã€åˆ†å‰²ã—ã¦æˆç«‹ã€‚
 inquiry:v1_00/130328 hmIto
-	inquiry‚Ì’è‹`‚ğ•ÏX
-		”\“®Œ^signal‚Æ‚µ‚Ä‚Ìinquiry‚©‚çAconstQÆ’læ“¾ƒNƒ‰ƒX‚Æ‚µ‚Ä‚Ìinquiry‚Ö’è‹`•ÏXB
-	inquiry’Ç‰Á
-		operator()‚Å’lQÆ‹@”\‚ğ’ñ‹Ÿ‚·‚éƒNƒ‰ƒX
-		mutexƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ”õ‚¦‚é
-	range_inquiry’Ç‰Á
-		w’è‚Ìiterator‚Ìbegin/end‚ğ’ñ‹Ÿ‚·‚éƒNƒ‰ƒXB
-		mutexƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ”õ‚¦‚é
-	unique_connections’Ç‰Á
-		connectionƒNƒ‰ƒX‚ğ•Û‚µAdestructor‚Ådisconnect‚ğŒÄ‚Ño‚·B
+	inquiryã®å®šç¾©ã‚’å¤‰æ›´
+		èƒ½å‹•å‹signalã¨ã—ã¦ã®inquiryã‹ã‚‰ã€constå‚ç…§å€¤å–å¾—ã‚¯ãƒ©ã‚¹ã¨ã—ã¦ã®inquiryã¸å®šç¾©å¤‰æ›´ã€‚
+	inquiryè¿½åŠ 
+		operator()ã§å€¤å‚ç…§æ©Ÿèƒ½ã‚’æä¾›ã™ã‚‹ã‚¯ãƒ©ã‚¹
+		mutexã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’å‚™ãˆã‚‹
+	range_inquiryè¿½åŠ 
+		æŒ‡å®šã®iteratorã®begin/endã‚’æä¾›ã™ã‚‹ã‚¯ãƒ©ã‚¹ã€‚
+		mutexã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’å‚™ãˆã‚‹
+	unique_connectionsè¿½åŠ 
+		connectionã‚¯ãƒ©ã‚¹ã‚’ä¿æŒã—ã€destructorã§disconnectã‚’å‘¼ã³å‡ºã™ã€‚
 inquiry:v0_03/130324 hmIto
-	inquiry‚Édefault_value‚ğ’Ç‰Á
+	inquiryã«default_valueã‚’è¿½åŠ 
 inquiry:v0_02/130224 hmIto
-	inquiry_astruct::connection(inquiry_abstruct*)‚Ì•Ï”–¼‚ªŠÔˆá‚Á‚Ä‚¢‚½’v–½“IƒoƒO‚ğC³
+	inquiry_astruct::connection(inquiry_abstruct*)ã®å¤‰æ•°åãŒé–“é•ã£ã¦ã„ãŸè‡´å‘½çš„ãƒã‚°ã‚’ä¿®æ­£
 inquiry:v0_01/130224 hmIto
-	inquiry‚É‚Â‚¢‚Ä‚Í’ñ‹ŸŠJn
-	range_inquiry‚ÍAiterator_proxy‘Ò‚¿
+	inquiryã«ã¤ã„ã¦ã¯æä¾›é–‹å§‹
+	range_inquiryã¯ã€iterator_proxyå¾…ã¡
 */
 #include "inquiries/inquiry.hpp"
 #include "inquiries/range_inquiry.hpp"

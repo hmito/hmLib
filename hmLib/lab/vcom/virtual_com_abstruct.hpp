@@ -1,23 +1,23 @@
-#ifndef HMLIB_VCOM_VIRTUALCOMABSTRUCT_INC
+ï»¿#ifndef HMLIB_VCOM_VIRTUALCOMABSTRUCT_INC
 #define HMLIB_VCOM_VIRTUALCOMABSTRUCT_INC 100
 #
 /*===virtual_com===
-ƒXƒŒƒbƒh‚ğg‚Á‚Ä‰¼‘z“I‚Écom’ÊM‚ğÄŒ»‚·‚éƒNƒ‰ƒXŒQ
+ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ä½¿ã£ã¦ä»®æƒ³çš„ã«comé€šä¿¡ã‚’å†ç¾ã™ã‚‹ã‚¯ãƒ©ã‚¹ç¾¤
 */
 #include<deque>
 #include"virtual_comgate_abstruct.hpp"
 namespace hmLib{
 	namespace vcom{
-		//‰¼‘zcom
+		//ä»®æƒ³com
 		class virtual_com_abstruct{
 		public:
 			virtual ~virtual_com_abstruct(){}
 		public: //virtual_com_abstruct
-			//virtual_comgate‚ğÚ‘±‚·‚é
+			//virtual_comgateã‚’æ¥ç¶šã™ã‚‹
 			virtual void connect(virtual_comgate_abstruct* ptr)=0;
-			//virtual_comgate‚ğØ’f‚·‚é
+			//virtual_comgateã‚’åˆ‡æ–­ã™ã‚‹
 			virtual void disconnect(virtual_comgate_abstruct* ptr)=0;
-			//virtual_comgate‚ªÚ‘±‚³‚ê‚Ä‚¢‚é‚©‚ğŠm”F‚·‚é
+			//virtual_comgateãŒæ¥ç¶šã•ã‚Œã¦ã„ã‚‹ã‹ã‚’ç¢ºèªã™ã‚‹
 			virtual bool is_connect(virtual_comgate_abstruct* ptr=nullptr)=0;
 		};
 	}

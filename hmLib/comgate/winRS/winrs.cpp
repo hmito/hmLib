@@ -1,4 +1,4 @@
-#ifndef WINRS_WINRS_CPP
+ï»¿#ifndef WINRS_WINRS_CPP
 #define WINRS_WINRS_CPP
 #
 #ifndef HMLIB_CONFIG_INC
@@ -14,7 +14,7 @@
 
 //
 // 20131222 Ver 1.01
-//  ƒtƒ[§Œä‚Ìƒtƒ‰ƒO•Ï‰»‚Ì•”•ª‚ÉƒoƒO‚ğ”­Œ©‚µ‚½‚Ì‚ÅC³ 
+//  ãƒ•ãƒ­ãƒ¼åˆ¶å¾¡ã®ãƒ•ãƒ©ã‚°å¤‰åŒ–ã®éƒ¨åˆ†ã«ãƒã‚°ã‚’ç™ºè¦‹ã—ãŸã®ã§ä¿®æ­£ 
 //
 
 std::set<int> WinRS::portSet;
@@ -22,14 +22,14 @@ std::set<int> WinRS::portSet;
 WinRS::WinRS(int addr, int bps, ifLine::delim delim, char *mode, bool rsFlow)
 : ifLine(addr, rsline,  delim)
 {
-   myAddr = addr; // ƒfƒXƒgƒ‰ƒNƒ^‚Åg‚¤
+   myAddr = addr; // ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§ä½¿ã†
    myRSFlow = rsFlow;
    if (portSet.find(addr) == portSet.end())
-   { // ‚±‚Ìƒ|[ƒg‚Í‚Ü‚¾ open ‚³‚ê‚Ä‚¢‚È‚¢
+   { // ã“ã®ãƒãƒ¼ãƒˆã¯ã¾ã  open ã•ã‚Œã¦ã„ãªã„
      init(addr, bps, mode);
      if (ifaceValid) portSet.insert(addr);
    }
-   else  // ‘½dƒI[ƒvƒ“‚É‚Í‘Î‰‚Å‚«‚È‚¢
+   else  // å¤šé‡ã‚ªãƒ¼ãƒ—ãƒ³ã«ã¯å¯¾å¿œã§ããªã„
      throw portDuplex(addr);
 
 }

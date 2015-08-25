@@ -1,4 +1,4 @@
-#ifndef HMLIB_ENUMERATORS_INC
+ï»¿#ifndef HMLIB_ENUMERATORS_INC
 #define HMLIB_ENUMERATORS_INC 100
 #
 #include"enumerators/enumerator.hpp"
@@ -95,7 +95,7 @@ namespace hmLib {
 		};
 
 		void sample1(){
-			//ƒRƒ“ƒeƒi‚É‘Î‚µ‚Ä
+			//ã‚³ãƒ³ãƒ†ãƒŠã«å¯¾ã—ã¦
 			std::vector<int> Vector;
 
 			foward_iterator_concept<int>::holder<std::vector<int>::iterator> IteratorConcept(Vector.begin(),Vector.end());

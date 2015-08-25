@@ -1,32 +1,32 @@
-#ifndef HMLIB_TYPEMANAGE_TYPEMANAGE_INC
+ï»¿#ifndef HMLIB_TYPEMANAGE_TYPEMANAGE_INC
 #define HMLIB_TYPEMANAGE_TYPEMANAGE_INC 100
 #
 namespace hmLib{
 	namespace typemanage{
 		struct type_manage{
 /*
-			//ƒNƒ‰ƒX–¼‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã‚’è¿”ã™
 			std::string name()const;
-			//ƒNƒ‰ƒX–¼‚ğ—…—ñ‚·‚é
+			//ã‚¯ãƒ©ã‚¹åã‚’ç¾…åˆ—ã™ã‚‹
 			template<typename output_iterator>
 			void name_list(output_iterator itr,const std::string& pre)const;
-			//ƒNƒ‰ƒX–¼‚Ì—…—ñ”‚ğ•Ô‚·
+			//ã‚¯ãƒ©ã‚¹åã®ç¾…åˆ—æ•°ã‚’è¿”ã™
 			unsigned int name_list_size()const;
-			//•¶š—ñ‚©‚çƒRƒ“ƒXƒgƒ‰ƒNƒg‚·‚é
+			//æ–‡å­—åˆ—ã‹ã‚‰ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ãƒˆã™ã‚‹
 			template<typename input_iterator>
 			my_type string_build(input_iterator begin,input_iterator end)const;
-			//ì¬‚É•K—v‚È•¶š—ñ
+			//ä½œæˆã«å¿…è¦ãªæ–‡å­—åˆ—
 			template<typename output_iterator>
 			void string_build_list(output_iterator itr,const std::string& pre)const:
-			//ì¬‚É•K—v‚È•¶š—ñ‚Ì”
+			//ä½œæˆã«å¿…è¦ãªæ–‡å­—åˆ—ã®æ•°
 			unsigned int string_build_list_size()const;
-			//ƒpƒ‰ƒ[ƒ^‚Ì’l‚ğ—^‚¦‚é
+			//ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®å€¤ã‚’ä¸ãˆã‚‹
 			template<typename output_iterator>
 			void parameter_label(output_iterator itr,const my_type& val)const;
-			//ƒpƒ‰ƒ[ƒ^‚Ì–¼‘O‚ğ—^‚¦‚é
+			//ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®åå‰ã‚’ä¸ãˆã‚‹
 			template<typename output_iterator>
 			void parameter_list(output_iterator itr, const std::string& pre)const;
-			//ƒpƒ‰ƒ[ƒ^‚Ì”‚ğ—^‚¦‚é
+			//ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®æ•°ã‚’ä¸ãˆã‚‹
 			unsigned int parameter_list_size()const;
 */
 		};

@@ -1,23 +1,23 @@
-#ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
+ï»¿#ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
 #define HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC 102
 #
 /*===inquiries::inquiry_abstruct===
-inquiry‹@”\‚ÌŠî’êƒNƒ‰ƒX
-connection‚É‚Â‚¢‚Ä‚à‚±‚±‚ÅŠÇ—‚µ‚Ä‚¢‚é
+inquiryæ©Ÿèƒ½ã®åŸºåº•ã‚¯ãƒ©ã‚¹
+connectionã«ã¤ã„ã¦ã‚‚ã“ã“ã§ç®¡ç†ã—ã¦ã„ã‚‹
 
 inquiries::inquiry_abstruct v1_02/130410 hmIto
-	ƒ€[ƒu‘ã“ü‰‰Zq‚ÌswapŠÖ”‚Ìˆø”‚ğptr‚Å‚Í‚È‚­nullptr‚Æ‚µ‚Ä‚¢‚½–â‘è‚ğC³
+	ãƒ ãƒ¼ãƒ–ä»£å…¥æ¼”ç®—å­ã®swapé–¢æ•°ã®å¼•æ•°ã‚’ptrã§ã¯ãªãnullptrã¨ã—ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 inquiries::inquiry_abstruct v1_01/130329 hmIto
-	ƒ€[ƒuƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zqü•Ó‚Ì’v–½“I‚ÈƒoƒO‚ğC³
+	ãƒ ãƒ¼ãƒ–ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­å‘¨è¾ºã®è‡´å‘½çš„ãªãƒã‚°ã‚’ä¿®æ­£
 inquiries::inquiry_abstruct v1_00/130328 hmIto
-	inquiry‚©‚ç•ª—£
+	inquiryã‹ã‚‰åˆ†é›¢
 */
 #ifndef HMLIB_EXCEPTION_INC
 #	include<hmLib/exception.hpp>
 #endif
 namespace hmLib{
 	namespace inquiries{
-		//connectionƒVƒXƒeƒ€‚ğ’ñ‹Ÿ‚·‚é‹@”\
+		//connectionã‚·ã‚¹ãƒ†ãƒ ã‚’æä¾›ã™ã‚‹æ©Ÿèƒ½
 		class inquiry_abstruct{
 		public:
 			class connection{

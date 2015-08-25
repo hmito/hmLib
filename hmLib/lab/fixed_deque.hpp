@@ -1,11 +1,11 @@
-#ifndef HMLIB_FIXEDDEQUE_INC
+ï»¿#ifndef HMLIB_FIXEDDEQUE_INC
 #define HMLIB_FIXEDDEQUE_INC 100
 /*=== fixed_deque ===
-ŒÅ’è’·‚ÌŠÈˆÕ”z—ñ
+å›ºå®šé•·ã®ç°¡æ˜“é…åˆ—
 
 === fixed_deque ===
 v1_00/140329 hmIto
-ì¬
+ä½œæˆ
 */
 #ifndef HMLIB_TYPE_INC
 #	include <hmLib/type.h>
@@ -22,7 +22,7 @@ namespace hmLib {
 	private:
 		static void default_destructor(T* Ptr) { delete[] Ptr; }
 	public:
-		//ƒCƒeƒŒ[ƒ^
+		//ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿
 		struct iterator {
 			friend struct const_iterator;
 		private:
@@ -74,7 +74,7 @@ namespace hmLib {
 				return Ptr==My_.Ptr;
 			}
 		};
-		//constƒCƒeƒŒ[ƒ^
+		//constã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿
 		struct const_iterator {
 			friend struct const_const_iterator;
 		private:
@@ -134,7 +134,7 @@ namespace hmLib {
 		unsigned int Size;
 		destructor Destructor;
 	public:
-		//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		fixed_deque()
 			: BufBegin(0)
 			, BufEnd(0)
@@ -177,11 +177,11 @@ namespace hmLib {
 			if(BufBegin && Destructor)Destructor(BufBegin);
 		}
 	private:
-		//ƒRƒs[‹Ö~
+		//ã‚³ãƒ”ãƒ¼ç¦æ­¢
 		fixed_deque(const my_type& My_);
 		const my_type& operator=(const my_type& My_);
 	public:
-		//ƒoƒbƒtƒ@‚ğÄŠm•Û
+		//ãƒãƒƒãƒ•ã‚¡ã‚’å†ç¢ºä¿
 		void reset(unsigned int Size_) {
 			this->~fixed_deque();
 			this->fixed_deque(Size_);
@@ -190,23 +190,23 @@ namespace hmLib {
 			this->~fixed_deque();
 			this->fixed_deque(BufBegin_, BufEnd_, Destructor_);
 		}
-		//ƒoƒbƒtƒ@‚ª‹ó‚©
+		//ãƒãƒƒãƒ•ã‚¡ãŒç©ºã‹
 		bool empty()const { return Begin==End; }
-		//ƒoƒbƒtƒ@‚ª‚¢‚Á‚Ï‚¢‚©
+		//ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã‹
 		bool full()const { return begin()==(++end());}
-		//ƒoƒbƒtƒ@ƒTƒCƒY
+		//ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
 		unsigned int size()const {
 			return Size;
 		}
-		//Å‘åƒTƒCƒY
+		//æœ€å¤§ã‚µã‚¤ã‚º
 		unsigned int maxsize()const {
 			return BufEnd-BufBegin;
 		}
-		//ƒoƒbƒtƒ@‚ÌŠm•Û‚Ì—L–³
+		//ãƒãƒƒãƒ•ã‚¡ã®ç¢ºä¿ã®æœ‰ç„¡
 		operator bool()const {
 			return BufBegin!=0;
 		}
-		//ƒXƒƒbƒv
+		//ã‚¹ãƒ¯ãƒƒãƒ—
 		void swap(fixed_deque& My_) {
 			T* tmpBufBegin=BufBegin;
 			T* tmpBufEnd=BufEnd;
@@ -226,7 +226,7 @@ namespace hmLib {
 			My_.End=tmpEnd;
 			My_.Destructor=tmpDestructor;
 		}
-		//ƒNƒŠƒA
+		//ã‚¯ãƒªã‚¢
 		void clear() {
 			Begin=BufBegin;
 			End=BufBegin;
@@ -259,9 +259,9 @@ namespace hmLib {
 			--Size;
 		}
 	public:
-		//æ“ªƒAƒhƒŒƒX‚ğæ“¾
+		//å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 		T* data() { return BufBegin; }
-		//æ“ª‚Ìƒf[ƒ^‚ğæ“¾
+		//å…ˆé ­ã®ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 		T& front() {
 			hmLib_assert_any(!empty(), "out of range");
 			return *Begin;
@@ -270,7 +270,7 @@ namespace hmLib {
 			hmLib_assert_any(!empty(), "out of range");
 			return *Begin;
 		}
-		//––”ö‚Ìƒf[ƒ^‚ğæ“¾
+		//æœ«å°¾ã®ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 		T& back() {
 			hmLib_assert_any(End>BufBegin, "out of range");
 			return *(--end());
@@ -279,7 +279,7 @@ namespace hmLib {
 			hmLib_assert_any(End>BufBegin, "out of range");
 			return *(--end());
 		}
-		//ƒCƒeƒŒ[ƒ^‚ğæ“¾
+		//ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã‚’å–å¾—
 		iterator begin() {
 			return iterator(Begin,BufBegin,BufEnd);
 		}

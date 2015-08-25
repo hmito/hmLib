@@ -1,12 +1,12 @@
-#ifndef HMLIB_RANDOM_RANDOMENGINE_INC
+ï»¿#ifndef HMLIB_RANDOM_RANDOMENGINE_INC
 #define HMLIB_RANDOM_RANDOMENGINE_INC 100
 #
 /*
 ===random_engine===
-C++11‚Ì—”ƒ‰ƒCƒuƒ‰ƒŠ‚ğƒ‰ƒbƒsƒ“ƒO‚µ‚Ä’ñ‹Ÿ
+C++11ã®ä¹±æ•°ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’ãƒ©ãƒƒãƒ”ãƒ³ã‚°ã—ã¦æä¾›
 
 random_engine v1_00/130328 hmIto
-	random‚©‚ç•ª—£
+	randomã‹ã‚‰åˆ†é›¢
 */
 #include<algorithm>
 #include<functional>
@@ -30,16 +30,16 @@ namespace hmLib{
 	class random_engine:public random_engine_type{
 	public:
 		random_engine(){
-			// ƒ‰ƒ“ƒ_ƒ€ƒfƒoƒCƒX
+			// ãƒ©ãƒ³ãƒ€ãƒ ãƒ‡ãƒã‚¤ã‚¹
 			std::random_device rnd ;
 
-			// ‰Šú‰»—pƒxƒNƒ^
+			// åˆæœŸåŒ–ç”¨ãƒ™ã‚¯ã‚¿
 			std::vector< unsigned int> v(10) ;
 
-			// ƒxƒNƒ^‚Ì‰Šú‰»
+			// ãƒ™ã‚¯ã‚¿ã®åˆæœŸåŒ–
 			std::generate( v.begin(), v.end(), std::ref(rnd) ) ;
 
-			//ƒV[ƒh‚Å‰Šú‰»
+			//ã‚·ãƒ¼ãƒ‰ã§åˆæœŸåŒ–
 			seed(std::seed_seq( v.begin(), v.end() ));
 		}
 		template<class InputIterator>

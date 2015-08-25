@@ -1,26 +1,26 @@
-#ifndef HMLIB_CSTACK_INC
+ï»¿#ifndef HMLIB_CSTACK_INC
 #define HMLIB_CSTACK_INC 200
 #
 /*
 ===hmLib/cstack===
-ƒXƒ^ƒbƒN‹@”\‚ğ’ñ‹Ÿ
+ã‚¹ã‚¿ãƒƒã‚¯æ©Ÿèƒ½ã‚’æä¾›
 cstack:v2_00/140214 hmIto
-	”j‰ó“I•ÏX
-	construct‚ğstatic/dynamic‚Ì·‚ğ”p~Bmalloc/free‚ÅŠÇ—‚·‚éconstruct‚Æƒ|ƒCƒ“ƒ^‚ğ—^‚¦‚éplacement_construct‚É•ÏX
-	Œ^–¼‚ÉhmLib_Prefix‚ğ’Ç‰ÁB‚½‚¾‚µAHMLIB_CDEQUE_NOPREFIX‚ÅƒvƒŒƒtƒBƒbƒNƒX–³‚µƒo[ƒWƒ‡ƒ“‚àg‚¦‚éB
+	ç ´å£Šçš„å¤‰æ›´
+	constructã‚’static/dynamicã®å·®ã‚’å»ƒæ­¢ã€‚malloc/freeã§ç®¡ç†ã™ã‚‹constructã¨ãƒã‚¤ãƒ³ã‚¿ã‚’ä¸ãˆã‚‹placement_constructã«å¤‰æ›´
+	å‹åã«hmLib_Prefixã‚’è¿½åŠ ã€‚ãŸã ã—ã€HMLIB_CDEQUE_NOPREFIXã§ãƒ—ãƒ¬ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç„¡ã—ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚‚ä½¿ãˆã‚‹ã€‚
 cstack:v1_03/130204
-	ˆê•”ŠÖ”‚Ì–ß‚è’l‚ÌŒ^–¼‚ÌƒoƒO‚ğC³
-		hmLib_bool‚ğhmLib_boolian‚É’ù³
+	ä¸€éƒ¨é–¢æ•°ã®æˆ»ã‚Šå€¤ã®å‹åã®ãƒã‚°ã‚’ä¿®æ­£
+		hmLib_boolã‚’hmLib_boolianã«è¨‚æ­£
 cstack:v1_02/130105 hmIto
-	formatŠÖ”‚ğ’Ç‰Á
-		•Ï”‚ğ‰Šú‰»‚Å‚«‚é destruct‚Å•K—v‚Èˆ—‚ğs‚í‚È‚¢
-	is_constructŠÖ”‚ğ’Ç‰Á
-		construct‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ”»’è‚Å‚«‚é
-		format‚³‚ê‚Ä‚¢‚é‚±‚Æ‚ªğŒ
-	moveŠÖ”‚ğ’Ç‰Á
-		ˆê•û‚Ìƒ|ƒCƒ“ƒ^‚©‚ç‚à‚¤ˆê•û‚Ìƒ|ƒCƒ“ƒ^‚ÉƒIƒuƒWƒFƒNƒg©‘Ì‚ğˆÚ“®‚·‚é
-	swapŠÖ”‚ğ’Ç‰Á
-		“ñ‚Â‚Ìƒ|ƒCƒ“ƒ^‚Ì’†g‚ğ“ü‚ê‘Ö‚¦‚é
+	formaté–¢æ•°ã‚’è¿½åŠ 
+		å¤‰æ•°ã‚’åˆæœŸåŒ–ã§ãã‚‹ destructã§å¿…è¦ãªå‡¦ç†ã‚’è¡Œã‚ãªã„
+	is_constructé–¢æ•°ã‚’è¿½åŠ 
+		constructã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’åˆ¤å®šã§ãã‚‹
+		formatã•ã‚Œã¦ã„ã‚‹ã“ã¨ãŒæ¡ä»¶
+	moveé–¢æ•°ã‚’è¿½åŠ 
+		ä¸€æ–¹ã®ãƒã‚¤ãƒ³ã‚¿ã‹ã‚‰ã‚‚ã†ä¸€æ–¹ã®ãƒã‚¤ãƒ³ã‚¿ã«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè‡ªä½“ã‚’ç§»å‹•ã™ã‚‹
+	swapé–¢æ•°ã‚’è¿½åŠ 
+		äºŒã¤ã®ãƒã‚¤ãƒ³ã‚¿ã®ä¸­èº«ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 */
 //#undef __cplusplus
 #ifndef HMLIB_CDEQUE_INC
@@ -43,41 +43,41 @@ typedef hmLib_cdeque hmLib_cstack;
 namespace hmLib{
 extern "C"{
 #endif
-//ƒƒ‚ƒŠ‚Ì‰Šú‰»
+//ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ–
 void cstack_format(hmLib_cstack* ptr);
-//‚·‚Å‚É‰Šú‰»‚³‚ê‚½‚©‚Ç‚¤‚©‚ÌŠm”F
+//ã™ã§ã«åˆæœŸåŒ–ã•ã‚ŒãŸã‹ã©ã†ã‹ã®ç¢ºèª
 hmLib_boolian cstack_is_construct(hmLib_cstack* ptr);
-//“®“IŠm•Û‚É‚æ‚Á‚Äƒoƒbƒtƒ@Šm•Û
+//å‹•çš„ç¢ºä¿ã«ã‚ˆã£ã¦ãƒãƒƒãƒ•ã‚¡ç¢ºä¿
 void cstack_construct(hmLib_cstack* pStk, hmLib_cstack_size_t Size, hmLib_cstack_size_t ElemSize);
-//Ã“IŠm•Û‚É‚æ‚Á‚Äƒoƒbƒtƒ@Šm•Û
+//é™çš„ç¢ºä¿ã«ã‚ˆã£ã¦ãƒãƒƒãƒ•ã‚¡ç¢ºä¿
 void cstack_placement_construct(hmLib_cstack* pStk, hmLib_cstack_size_t Size, hmLib_cstack_size_t ElemSize, hmLib_pointer Ptr, hmLib_vFp_p Destructor);
-//ƒoƒbƒtƒ@‰ğ•ú Ã“I/“®“I‚Í©“®”»’f
+//ãƒãƒƒãƒ•ã‚¡è§£æ”¾ é™çš„/å‹•çš„ã¯è‡ªå‹•åˆ¤æ–­
 void cstack_destruct(hmLib_cstack* pStk);
 //move
 void cstack_move(hmLib_cstack* from, hmLib_cstack* to);
 //copy
 void cstack_swap(hmLib_cstack* ptr1,hmLib_cstack* ptr2);
-//ƒoƒbƒtƒ@‚Ìæ“ª‚ğæ“¾
+//ãƒãƒƒãƒ•ã‚¡ã®å…ˆé ­ã‚’å–å¾—
 void* cstack_getptr(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚É“ü‚Á‚Ä‚¢‚éƒTƒCƒY
+//ãƒãƒƒãƒ•ã‚¡ã«å…¥ã£ã¦ã„ã‚‹ã‚µã‚¤ã‚º
 hmLib_cstack_size_t cstack_size(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚Éc‚è“ü‚ê‚ç‚ê‚éƒTƒCƒY
+//ãƒãƒƒãƒ•ã‚¡ã«æ®‹ã‚Šå…¥ã‚Œã‚‰ã‚Œã‚‹ã‚µã‚¤ã‚º
 hmLib_cstack_size_t cstack_rest(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚ª‹ó‚©‚Ç‚¤‚©Šm”F
+//ãƒãƒƒãƒ•ã‚¡ãŒç©ºã‹ã©ã†ã‹ç¢ºèª
 hmLib_boolian cstack_empty(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚ª‚¢‚Á‚Ï‚¢‚©‚Ç‚¤‚©Šm”F
+//ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã‹ã©ã†ã‹ç¢ºèª
 hmLib_boolian cstack_full(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚Éƒf[ƒ^‚ğ‘}“ü
+//ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿ã‚’æŒ¿å…¥
 hmLib_boolian cstack_push(hmLib_cstack* pStk,const void* Ptr);
-//ƒoƒbƒtƒ@‚Ìƒf[ƒ^‚ğíœ
+//ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ãƒ¼ã‚¿ã‚’å‰Šé™¤
 hmLib_boolian cstack_pop(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚ÌbeginŠÖ”
+//ãƒãƒƒãƒ•ã‚¡ã®beginé–¢æ•°
 hmLib_cstack_iterator cstack_begin(hmLib_cstack* pStk);
-//ƒoƒbƒtƒ@‚ÌendŠÖ”
+//ãƒãƒƒãƒ•ã‚¡ã®endé–¢æ•°
 hmLib_cstack_iterator cstack_end(hmLib_cstack* pStk);
-//hmLib_cstack_iterator‚ÌŸ‚Ìiterator‚ğ—^‚¦‚é
+//hmLib_cstack_iteratorã®æ¬¡ã®iteratorã‚’ä¸ãˆã‚‹
 hmLib_cstack_iterator cstack_next(hmLib_cstack* pStk,hmLib_cstack_iterator itr);
-//hmLib_cstack_iterator‚Ì‘O‚Ìiterator‚ğ—^‚¦‚é
+//hmLib_cstack_iteratorã®å‰ã®iteratorã‚’ä¸ãˆã‚‹
 hmLib_cstack_iterator cstack_prev(hmLib_cstack* pStk,hmLib_cstack_iterator itr);
 #ifdef __cplusplus
 }	//extern "C"

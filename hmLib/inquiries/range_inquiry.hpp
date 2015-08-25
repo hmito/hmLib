@@ -1,22 +1,22 @@
-#ifndef HMLIB_INQUIRIES_RANGEINQUIRY_INC
+ï»¿#ifndef HMLIB_INQUIRIES_RANGEINQUIRY_INC
 #define HMLIB_INQUIRIES_RANGEINQUIRY_INC 104
 #
 /*===inquiries::range_inquiry===
-ƒRƒ“ƒeƒiƒ^ƒCƒv‚Ì•Ï”‚É‘Î‚µ‚ÄAiterator‚ğbegin/endŠÖ”‚É‚æ‚Á‚ÄŠÔÚ“I‚Éæ“¾‚·‚éƒNƒ‰ƒXA
-inquiries::range_inquiry‚ğ’ñ‹ŸB
+ã‚³ãƒ³ãƒ†ãƒŠã‚¿ã‚¤ãƒ—ã®å¤‰æ•°ã«å¯¾ã—ã¦ã€iteratorã‚’begin/endé–¢æ•°ã«ã‚ˆã£ã¦é–“æ¥çš„ã«å–å¾—ã™ã‚‹ã‚¯ãƒ©ã‚¹ã€
+inquiries::range_inquiryã‚’æä¾›ã€‚
 
 inquiries::range_inquiry v1_04/130531 hmIto
-	iterator‚ğ•Ô‚·ŠÖ”ƒIƒuƒWƒFƒNƒg‚ğˆø”‚Ææ‚éconnectŠÖ”‚ğ’Ç‰Á
+	iteratorã‚’è¿”ã™é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å¼•æ•°ã¨å–ã‚‹connecté–¢æ•°ã‚’è¿½åŠ 
 inquiries::range_inquiry v1_03/130420 hmIto
-	mutex_proxy‚ğ•Ï”‚É•ÏX
+	mutex_proxyã‚’å¤‰æ•°ã«å¤‰æ›´
 inquiries::range_inquiry v1_02/130412 hmIto
-	try_lockŠÖ”‚ÌŒÄ‚Ño‚µ‚ÅŒÄ‚Ño‚µ–¼‚ªŠÔˆá‚Á‚Ä‚¢‚½–â‘è‚ğC³
-	try_lock‚Åmutex‚ğ•Û‚µ‚Ä‚¢‚È‚¢ê‡‚ÉƒƒbƒN‚É¸”s‚µ‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¦‚Ä‚¢‚½–â‘è‚ğC³
+	try_locké–¢æ•°ã®å‘¼ã³å‡ºã—ã§å‘¼ã³å‡ºã—åãŒé–“é•ã£ã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
+	try_lockã§mutexã‚’ä¿æŒã—ã¦ã„ãªã„å ´åˆã«ãƒ­ãƒƒã‚¯ã«å¤±æ•—ã—ã¦ã„ã‚‹ã‚ˆã†ã«è¦‹ãˆã¦ã„ãŸå•é¡Œã‚’ä¿®æ­£
 inquiries::range_inquiry:v1_01/130329 hmIto
-	ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^/‘ã“ü‰‰Zq‚ğ–¾¦“I‚Éprivate‰»
-	ƒOƒ[ƒoƒ‹ŠÖ”‚ÉconnectŠÖ”‚ğ’Ç‰Á
+	ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿/ä»£å…¥æ¼”ç®—å­ã‚’æ˜ç¤ºçš„ã«privateåŒ–
+	ã‚°ãƒ­ãƒ¼ãƒãƒ«é–¢æ•°ã«connecté–¢æ•°ã‚’è¿½åŠ 
 inquiries::range_inquiry:v1_00/130328 hmIto
-	inquiry‚©‚ç•ª—£
+	inquiryã‹ã‚‰åˆ†é›¢
 */
 #include<memory>
 #include<functional>
@@ -31,7 +31,7 @@ inquiries::range_inquiry:v1_00/130328 hmIto
 #endif
 namespace hmLib{
 	namespace inquiries{
-		//iterator‚Ö‚ÌQÆinquiry
+		//iteratorã¸ã®å‚ç…§inquiry
 		template<typename iterator_>
 		class range_inquiry:public inquiry_abstruct{
 			typedef range_inquiry<iterator_> my_type;

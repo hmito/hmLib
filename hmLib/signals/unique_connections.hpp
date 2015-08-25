@@ -1,15 +1,15 @@
-#ifndef HMLIB_SIGNALS_UNIQUECONNECTIONS_INC
+ï»¿#ifndef HMLIB_SIGNALS_UNIQUECONNECTIONS_INC
 #define HMLIB_SIGNALS_UNIQUECONNECTIONS_INC 101
 #
 /*===signal_unique_connections===
-boost::signals2::signal‚Ìconnection‚ğŠÇ—‚µAdestructor‚Ådisconnect‚·‚éƒNƒ‰ƒX
+boost::signals2::signalã®connectionã‚’ç®¡ç†ã—ã€destructorã§disconnectã™ã‚‹ã‚¯ãƒ©ã‚¹
 
 signals::unique_connections v1_01/130421 hmIto
-	exceptions‚É‘Î‰
+	exceptionsã«å¯¾å¿œ
 signals::unique_connections v1_00/130328 hmIto
-	signals–¼‘O‹óŠÔƒtƒ@ƒCƒ‹‚ÉˆÚ“®
+	signalsåå‰ç©ºé–“ãƒ•ã‚¡ã‚¤ãƒ«ã«ç§»å‹•
 signal_unique_connections v1_00/130328 hmIto
-	ì¬
+	ä½œæˆ
 */
 #include<boost/signals2/connection.hpp>
 #ifndef HMLIB_EXCEPTIONS_INC
@@ -17,7 +17,7 @@ signal_unique_connections v1_00/130328 hmIto
 #endif
 namespace hmLib{
 	namespace signals{
-		//connectionŠÇ——pƒNƒ‰ƒX
+		//connectionç®¡ç†ç”¨ã‚¯ãƒ©ã‚¹
 		class unique_connections{
 		private:
 			typedef unique_connections my_type;

@@ -1,24 +1,24 @@
-#ifndef HMLIB_EXCEPTIONS_APPLICATIONEXCEPTIONS_INC
+ï»¿#ifndef HMLIB_EXCEPTIONS_APPLICATIONEXCEPTIONS_INC
 #define HMLIB_EXCEPTIONS_APPLICATIONEXCEPTIONS_INC 100
 #
 #include"exception.hpp"
 namespace hmLib{
 	namespace application_exceptions {
-		//application‚ÉŠÖ‚í‚é—áŠOˆ—
+		//applicationã«é–¢ã‚ã‚‹ä¾‹å¤–å‡¦ç†
 		class application_exception :public exceptions::exception {
 			typedef exceptions::exception base_type;
 		public:
 			explicit application_exception(const std::string& Message_) :base_type(Message_.c_str()) {}
 			explicit application_exception(const char* Message_) :base_type(Message_) {}
 		};
-		//Àsˆø”‚Ì”‚ªˆÙí
+		//å®Ÿè¡Œå¼•æ•°ã®æ•°ãŒç•°å¸¸
 		class invalid_arguments_number :public application_exception {
 			typedef application_exception base_type;
 		public:
 			explicit invalid_arguments_number(const std::string& Message_) :base_type(Message_.c_str()) {}
 			explicit invalid_arguments_number(const char* Message_) :base_type(Message_) {}
 		};
-		//Àsˆø”‚Ì’l‚ªˆÙí
+		//å®Ÿè¡Œå¼•æ•°ã®å€¤ãŒç•°å¸¸
 		class invalid_argument_value :public application_exception {
 			typedef application_exception base_type;
 		public:

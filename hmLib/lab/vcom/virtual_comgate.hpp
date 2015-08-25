@@ -1,8 +1,8 @@
-#ifndef HMLIB_VCOM_VIRTUALCOMGATE_INC
+ï»¿#ifndef HMLIB_VCOM_VIRTUALCOMGATE_INC
 #define HMLIB_VCOM_VIRTUALCOMGATE_INC 100
 #
 /*===virtual_comgate===
-ƒXƒŒƒbƒh‚ğg‚Á‚Ä‰¼‘z“I‚Écom’ÊM‚ğÄŒ»‚·‚éƒNƒ‰ƒXŒQ
+ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ä½¿ã£ã¦ä»®æƒ³çš„ã«comé€šä¿¡ã‚’å†ç¾ã™ã‚‹ã‚¯ãƒ©ã‚¹ç¾¤
 */
 #include<deque>
 #include<mutex>
@@ -10,7 +10,7 @@
 #include"virtual_comgate_abstruct.hpp"
 namespace hmLib{
 	namespace vcom{
-		//‰¼‘zcomgate
+		//ä»®æƒ³comgate
 		class virtual_comgate:public virtual_comgate_abstruct{
 			typedef std::mutex mutex;
 			typedef std::lock_guard<mutex> lock;
@@ -37,11 +37,11 @@ namespace hmLib{
 				ptr=nullptr;
 			}
 		public: //gate
-			//óM‰Â”\ó‘Ô‚©‚ÌŠm”F
+			//å—ä¿¡å¯èƒ½çŠ¶æ…‹ã‹ã®ç¢ºèª
 			bool can_get()override{return is_open();}
-			//óM‰Â”\ƒf[ƒ^‚Ì—L–³
+			//å—ä¿¡å¯èƒ½ãƒ‡ãƒ¼ã‚¿ã®æœ‰ç„¡
 			bool empty()override{return ibuf.size()==0;}
-			//•¡”byteóM@óM•¶šƒAƒhƒŒƒX‚ÆAóM•¶š”‚ªˆø”@ÀÛ‚ÌóM•¶š”‚ª–ß‚è’l
+			//è¤‡æ•°byteå—ä¿¡ã€€å—ä¿¡æ–‡å­—ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ã€å—ä¿¡æ–‡å­—æ•°ãŒå¼•æ•°ã€€å®Ÿéš›ã®å—ä¿¡æ–‡å­—æ•°ãŒæˆ»ã‚Šå€¤
 			size_type get(char* str_,const size_type& size_)override{
 				lock Lock(Mx);
 				for(size_type i=0;i<size_;++i){
@@ -51,11 +51,11 @@ namespace hmLib{
 				}
 				return size_;	
 			}
-			//‘—M‰Â”\ó‘Ô‚©‚ÌŠm”F
+			//é€ä¿¡å¯èƒ½çŠ¶æ…‹ã‹ã®ç¢ºèª
 			bool can_put()override{return is_open();}
-			//‘—M‰Â”\ƒf[ƒ^‚Ì—L–³
+			//é€ä¿¡å¯èƒ½ãƒ‡ãƒ¼ã‚¿ã®æœ‰ç„¡
 			bool full()override{return false;}
-			//•¡”byte‘—M@‘—M•¶šƒAƒhƒŒƒX‚ÆA‘—M•¶š”‚ªˆø”@ÀÛ‚Ì‘—M•¶š”‚ª–ß‚è’l
+			//è¤‡æ•°byteé€ä¿¡ã€€é€ä¿¡æ–‡å­—ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ã€é€ä¿¡æ–‡å­—æ•°ãŒå¼•æ•°ã€€å®Ÿéš›ã®é€ä¿¡æ–‡å­—æ•°ãŒæˆ»ã‚Šå€¤
 			size_type put(const char* str_,const size_type& size_)override{
 				lock Lock(Mx);
 				for(size_type i=0;i<size_;++i){
@@ -64,7 +64,7 @@ namespace hmLib{
 				return size_;
 			}
 		public: //virtaul_comgate_abstruct
-			//com‚Æ‚µ‚Ä‘—M‚·‚éƒf[ƒ^‚ğæ“¾‚·‚é
+			//comã¨ã—ã¦é€ä¿¡ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹
 			size_type com_send(char* ptr_, size_type size_){
 				lock Lock(Mx);
 				for(size_type i=0;i<size_;++i){
@@ -74,7 +74,7 @@ namespace hmLib{
 				}
 				return size_;
 			}
-			//com‚Æ‚µ‚ÄóM‚³‚¹‚éƒf[ƒ^‚ğ—^‚¦‚é
+			//comã¨ã—ã¦å—ä¿¡ã•ã›ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ä¸ãˆã‚‹
 			size_type com_recv(const char* ptr_, size_type size_){
 				lock Lock(Mx);
 				for(size_type i=0;i<size_;++i){

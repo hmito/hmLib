@@ -1,4 +1,4 @@
-#ifndef HMLIB_PREDICATE_INC
+﻿#ifndef HMLIB_PREDICATE_INC
 #define HMLIB_PREDICATE_INC 100
 #
 namespace hmLib{
