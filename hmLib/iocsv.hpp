@@ -12,12 +12,12 @@ namespace hmLib{
 		using my_icsv_iterator = basic_icsv_iterator<Elem, Traits>;
 
 		//open CSV file, or return null data
-		my_ifstream fin(FileNmae);
+		my_ifstream fin(FileName);
 		if(!fin.is_open())return my_table();
 	
 		//get iterator
 		my_icsv_iterator beg(fin, SepChar, EndChar);
-		my_icsv_iterator end = itr.get_file_end();
+		my_icsv_iterator end = beg.get_file_end();
 
 		//count row and column
 		unsigned int RowNum = 0;
@@ -40,7 +40,7 @@ namespace hmLib{
 		unsigned int RowCnt = 0;
 		ColumnCnt = 0;
 		for(my_icsv_iterator itr = beg; itr != end;){
-			Table(RowCnt, ColCnt) = *itr;
+			Table(RowCnt, ColumnCnt) = *itr;
 			++itr;
 
 			if(itr.eol()){

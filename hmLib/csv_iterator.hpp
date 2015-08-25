@@ -1,4 +1,7 @@
-﻿#include<iterator>
+﻿#ifndef HMLIB_CSVITERATOR_INC
+#define HMLIB_CSVITERATOR_INC 100
+#
+#include<iterator>
 #include<iostream>
 #include<sstream>
 namespace hmLib{
@@ -251,3 +254,5 @@ namespace hmLib{
 	using ocsv_iterator = basic_ocsv_iterator < char, std::char_traits<char> >;
 	using icsv_iterator = basic_icsv_iterator < char, std::char_traits<char> >; 
 }
+#
+#endif
