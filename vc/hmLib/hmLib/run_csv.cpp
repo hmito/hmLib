@@ -11,7 +11,17 @@
 int main(){
 	std::ifstream fin("test1.csv");
 
-	auto Table = hmLib::read_csv("test1.csv");
+	auto Table = hmLib::read_csv("test1.csv",',','\n',true);
+
+	Table.push_back_column();
+	Table.insert_column(Table.column_begin() + 2);
+
+	Table.push_back_row();
+	Table.insert_row(Table.row_begin() + 2);
+
+	Table.swap_column(Table.column_begin(), Table.column_begin() + 1);
+
+	Table.swap_row(Table.row_begin(), Table.row_begin() + 1);
 
 	std::cout <<Table.row_size()<<","<< Table.column_size() << std::endl;
 
