@@ -5,6 +5,47 @@
 #include<iostream>
 #include<sstream>
 namespace hmLib{
+	namespace csv{
+		template<class Elem = char, class Traits = std::char_traits<Elem> >
+		std::basic_string < Elem, Traits > cell_encode(std::basic_string < Elem, Traits > Str, Elem Sep_, Elem Esc){
+			if(Str.find(Sep_) < Str.size() || Str.find(Esc) < Str.size()){
+				for(auto itr = Str.begin(); itr != Str.end(); ++itr){
+					if(*itr == Esc){
+						itr = Str.insert(++itr, Esc);
+					}
+				}
+
+				Str.insert(Str.begin(), Esc);
+				Str.push_back(Esc);
+			}
+
+			return std::move(Str);
+		}
+		template<class Elem = char, class Traits = std::char_traits<Elem> >
+		std::basic_string < Elem, Traits > cell_decode(std::basic_string < Elem, Traits > Str, Elem Sep_, Elem Esc){
+			if(Str.size()>1 && Str.front()==Esc && Str.back()==Esc){
+				Str.erase(Str.begin());
+				Str.pop_back();
+
+				bool EscFlag=false;
+				for(auto itr = Str.begin(); itr != Str.end(); ++itr){
+					if(*itr == Esc){
+						if(EscFlag){
+							itr = Str.erase(itr);
+							--itr;
+							EscFlag = false;
+						} else{
+							EscFlag = true;
+						}
+					} else{
+						EscFlag = false;
+					}
+				}
+			}
+
+			return std::move(Str);
+		}
+	}
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
 	class basic_ocsv_iterator : public std::iterator < std::output_iterator_tag, void, void, void, void > {
 	private:
@@ -18,6 +59,14 @@ namespace hmLib{
 		public:
 			output_proxy(my_type& My_) :My(My_){}
 			void operator=(const my_string& Str){
+				if(My.IsCellHead && !My.IsLineHead){
+					*(My.pstream) << My.Sep;
+					My.IsCellHead = false;
+				}
+
+				*(My.pstream) << csv::cell_encode(Str,My.Sep,My.Esc);
+			}
+			void raw_str(const my_string& Str){
 				if(My.IsCellHead && !My.IsLineHead){
 					*(My.pstream) << My.Sep;
 					My.IsCellHead = false;
@@ -40,16 +89,18 @@ namespace hmLib{
 		my_ostream* pstream;
 		Elem Sep;
 		Elem End;
+		Elem Esc;
 		bool IsCellHead;
 		bool IsLineHead;
 	public:
 		basic_ocsv_iterator()
 			: pstream(nullptr){
 		}
-		basic_ocsv_iterator(my_ostream& Stream_, Elem Sep_ = ',', Elem End_ = '\n')
+		basic_ocsv_iterator(my_ostream& Stream_, Elem Sep_ = ',', Elem End_ = '\n', Elem Esc_ = '"')
 			: pstream(&Stream_)
 			, Sep(Sep_)
 			, End(End_)
+			, Esc(Esc_)
 			, IsCellHead(false)
 			, IsLineHead(true){
 		}
@@ -87,6 +138,7 @@ namespace hmLib{
 		my_istream* pstream;
 		Elem Sep;
 		Elem End;
+		Elem Esc;
 		my_pos Pos;
 		my_sstream sstream;
 		bool HasRead;
@@ -103,16 +155,22 @@ namespace hmLib{
 				auto EndPos = pstream->tellg();
 				pstream->seekg(Pos);
 
+				bool EscFlag = false;
 				while(pstream->tellg() != EndPos){
 					c = pstream->get();
 
-					if(c == Sep){
-						IsLineHead = false;
-						break;
-					}
 					if(c == End || c == EOF){
 						IsLineHead = true;
 						break;
+					}
+
+					if(c == Sep && !EscFlag){
+						IsLineHead = false;
+						break;
+					}
+
+					if(c == Esc){
+						EscFlag = !EscFlag;
 					}
 				}
 
@@ -129,18 +187,24 @@ namespace hmLib{
 				auto EndPos = pstream->tellg();
 				pstream->seekg(Pos);
 
+				bool EscFlag=false;
 				while(pstream->tellg() != EndPos){
 					c = pstream->get();
 
-					if(c == Sep){
-						IsLineHead = false;
-						break;
-					}
 					if(c == End || c == EOF){
 						IsLineHead = true;
 						break;
 					}
 
+					if(c == Sep && !EscFlag){
+						IsLineHead = false;
+						break;
+					}
+
+					if(c == Esc){
+						EscFlag = !EscFlag;
+					}
+					
 					sstream << c;
 				}
 
@@ -155,9 +219,8 @@ namespace hmLib{
 			my_type& My;
 		public:
 			input_proxy(my_type& My_) :My(My_){}
-			operator my_string(){
-				return My.read().str();
-			}
+			operator my_string(){ return csv::cell_decode(My.read().str(), My.Sep, My.Esc); }
+			my_string raw_str(){return My.read().str();}
 			template<typename T>
 			input_proxy& operator>>(T& Val){
 				My.read() >> Val;
@@ -169,10 +232,11 @@ namespace hmLib{
 		};
 	public:
 		basic_icsv_iterator() :pstream(nullptr){}
-		basic_icsv_iterator(my_istream& Stream_, Elem Sep_ = ',', Elem End_ = '\n')
+		basic_icsv_iterator(my_istream& Stream_, Elem Sep_ = ',', Elem End_ = '\n', Elem Esc_ = '"')
 			: pstream(&Stream_)
 			, Sep(Sep_)
 			, End(End_)
+			, Esc(Esc_)
 			, Pos(Stream_.tellg())
 			, sstream()
 			, HasRead(false)
@@ -182,12 +246,26 @@ namespace hmLib{
 			: pstream(My_.pstream)
 			, Sep(My_.Sep)
 			, End(My_.End)
+			, Esc(My_.Esc)
 			, Pos(My_.Pos)
 			, sstream(My_.sstream.str())
 			, HasRead(My_.HasRead)
+			, ReadPos(My_.ReadPos)
 			, IsLineHead(My_.IsLineHead){
 		}
-		my_type& operator=(const my_type& My_) = default;
+		my_type& operator=(const my_type& My_){
+			if(this != &My_){
+				pstream = My_.pstream;
+				Sep = My_.Sep;
+				End = My_.End;
+				Esc = My_.Esc;
+				Pos = My_.Pos;
+				sstream = My_.sstream.str();
+				HasRead = My_.HasRead;
+				ReadPos = My_.ReadPos;
+				IsLineHead = My_.IsLineHead;
+			}
+		}
 		input_proxy operator*(){return input_proxy(*this);}
 		my_type& operator++(){
 			next();

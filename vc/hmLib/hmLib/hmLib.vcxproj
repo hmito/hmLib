@@ -112,6 +112,9 @@
     <ClCompile Include="..\..\..\hmLib\random.cpp" />
     <ClCompile Include="run_csv.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="test1.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

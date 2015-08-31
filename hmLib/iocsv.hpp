@@ -12,7 +12,7 @@ namespace hmLib{
 	using iocsv_exception = hmLib::exceptions::exception_pattern<iocsv_identifier>;
 
 	template<typename Elem=char, typename Traits=std::char_traits<Elem> >
-	basic_table<Elem, Traits> read_csv(std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false, Elem SepChar = ',', Elem EndChar = '\n'){
+	basic_table<Elem, Traits> read_csv(std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false, Elem SepChar = ',', Elem EndChar = '\n', Elem EscChar ='"'){
 		using my_ifstream = std::basic_ifstream<Elem, Traits>;
 		using my_table = basic_table<Elem, Traits>;
 		using my_icsv_iterator = basic_icsv_iterator<Elem, Traits>;
@@ -22,7 +22,7 @@ namespace hmLib{
 		if(!fin.is_open())return my_table();
 
 		//get iterator
-		my_icsv_iterator beg(fin, SepChar, EndChar);
+		my_icsv_iterator beg(fin, SepChar, EndChar, EscChar);
 		my_icsv_iterator end = beg.get_file_end();
 
 		//count row and column
@@ -111,7 +111,7 @@ namespace hmLib{
 		return std::move(Table);
 	}
 	template<typename Elem = char, typename Traits = std::char_traits<Elem> >
-	void write_csv(const basic_table<Elem, Traits>& Table,std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false, Elem SepChar = ',', Elem EndChar = '\n'){
+	void write_csv(const basic_table<Elem, Traits>& Table,std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false, Elem SepChar = ',', Elem EndChar = '\n', Elem EscChar = '"'){
 		using my_ofstream = std::basic_ofstream<Elem, Traits>;
 		using my_ocsv_iterator = basic_ocsv_iterator<Elem, Traits>;
 
@@ -120,7 +120,7 @@ namespace hmLib{
 		hmLib_assert(fout.is_open(), iocsv_exception, "fail to open \"" + FileName + "\" for csv file");
 
 		//get iterator
-		my_ocsv_iterator itr(fout, SepChar, EndChar);
+		my_ocsv_iterator itr(fout, SepChar, EndChar, EscChar);
 
 		if(IsHorizontalColumn){
 			for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt){

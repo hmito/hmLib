@@ -57,6 +57,8 @@ int main(){
 	std::cout << "===ritr===" << std::endl;
 	output_table_ritr(Table);
 
+	hmLib::write_csv(Table, "test1_o.csv", true, false);
+
 	system("pause");
 	
 	return 0;
