@@ -57,5 +57,8 @@ algorithm.hpp v1_04
 #ifndef HMLIB_ALGORITHM_SAMPLING_INC
 #	include"algorithm/sampling.hpp"
 #endif
+#ifndef HMLIB_ALGORITHM_NONREPEATRANDOMINTEGRALS_INC
+#	include"algorithm/nonrepeat_random_integrals.hpp"
+#endif
 #
 #endif

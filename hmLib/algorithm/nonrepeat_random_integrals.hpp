@@ -9,21 +9,28 @@
 #include <functional>
 #include <limits>
 #include <type_traits>
+#include <hmLib/exceptions.hpp>
+
+#ifndef hmLib_assert
+#	define hmLib_assert(condition,except,str)
+#endif
 
 namespace hmLib{
 	namespace algorithm{
 		template<typename type,typename generator>
-		std::vector<type> nonrepeat_random_integrals_by_unique(const unsigned int size, type rand_min, type rand_max, generator& Engine){
+		std::vector<type> nonrepeat_random_integrals_by_unique(const std::size_t size, type rand_min, type rand_max, generator& Engine){
+			using unsigned_type = std::make_unsigned<type>::type;
+
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
-			const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-			if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+			const unsigned_type max_min_diff = rand_max - rand_min + 1;
+			hmLib_assert(size<=max_min_diff,std::runtime_error,"rand_max - rand_min is smaller than requested size.");
 
 			std::vector<type> tmp;
 			std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 
 			//ひとまず、size/5だけ多めに作ってから、重複を消す。
 			//この数字に根拠はないので、より最適な値がある可能性あり
-			const unsigned int make_size = (std::numeric_limits<unsigned int>::max() - size / 5) < size) ? size : size + size / 5;
+			const std::size_t make_size = (std::numeric_limits<std::size_t>::max() - size / 5) < size ? size : size + size / 5;
 
 			tmp.reserve(make_size);
 			while(tmp.size() < size){
@@ -31,7 +38,7 @@ namespace hmLib{
 				std::sort(tmp.begin(), tmp.end());
 				auto unique_end = std::unique(tmp.begin(), tmp.end());
 
-				if(size < static_cast<unsigned int>(std::distance(tmp.begin(), unique_end))){
+				if(size < static_cast<std::size_t>(std::distance(tmp.begin(), unique_end))){
 					unique_end = std::next(tmp.begin(), size);
 				}
 				tmp.erase(unique_end, tmp.end());
@@ -41,21 +48,22 @@ namespace hmLib{
 			return tmp;
 		}
 		template<typename type, typename generator>
-		std::vector<type> nonrepeat_random_integrals_by_select(const unsigned int size, type rand_min, type rand_max, generator& Engine){
+		std::vector<type> nonrepeat_random_integrals_by_select(const std::size_t size, type rand_min, type rand_max, generator& Engine){
+			using unsigned_type = std::make_unsigned<type>::type;
+
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
-			const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-			if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+			const unsigned_type max_min_diff = rand_max - rand_min + 1;
+			hmLib_assert(size <= max_min_diff, std::runtime_error, "rand_max - rand_min is smaller than requested size.");
 
 			std::vector<type> tmp;
-			tmp.reserve(max_min_diff);
+			tmp.assign(max_min_diff,0);
+			auto val = rand_min;
+			std::generate(tmp.begin(), tmp.end(), [&val](){return val++; });
 
-			for(auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
-
-			auto engine = create_rand_engine();
 			std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 
-			for(unsigned int cnt = 0; cnt < size; ++cnt){
-				unsigned int pos = std::uniform_int_distribution<unsigned int>(cnt, tmp.size() - 1)(Engine);
+			for(std::size_t cnt = 0; cnt < size; ++cnt){
+				std::size_t pos = std::uniform_int_distribution<std::size_t>(cnt, tmp.size() - 1)(Engine);
 
 				if(cnt != pos) std::swap(tmp[cnt], tmp[pos]);
 			}
@@ -64,7 +72,12 @@ namespace hmLib{
 			return tmp;
 		}
 		template<typename type, typename generator>
-		std::vector<type> nonrepeat_random_integrals(const unsigned int size, type rand_min, type rand_max, generator& Engine){
+		std::vector<type> nonrepeat_random_integrals(const std::size_t size, type rand_min, type rand_max, generator& Engine){
+			using unsigned_type = std::make_unsigned<type>::type;
+
+			if(rand_min > rand_max) std::swap(rand_min, rand_max);
+			const unsigned_type max_min_diff = rand_max - rand_min + 1;
+
 			if(size < max_min_diff / 33){
 				return nonrepeat_random_integrals_by_unique(size, rand_min, rand_max, Engine);
 			} else{

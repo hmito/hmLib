@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\hmIto\Documents\GitHub\hmLib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,8 +116,6 @@
     <ClCompile Include="..\..\..\hmLib\cstring.c" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
     <ClCompile Include="..\..\..\hmLib\random.cpp" />
-    <ClCompile Include="..\..\..\hmLib\random\random_bit.cpp" />
-    <ClCompile Include="..\..\..\hmLib\random\random_engine.cpp" />
     <ClCompile Include="run_csv.cpp" />
   </ItemGroup>
   <ItemGroup>
