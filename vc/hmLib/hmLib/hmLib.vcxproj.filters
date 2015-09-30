@@ -16,6 +16,12 @@
     <Filter Include="hmLib">
       <UniqueIdentifier>{5c40190c-7a39-4404-8867-626d545f0ebb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\random">
+      <UniqueIdentifier>{dfcd2d27-54f0-40d5-9bba-6ffbc5af820b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\algorithm">
+      <UniqueIdentifier>{f0c8bbe1-a33e-4d10-8d2d-cd72b377d857}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm.hpp">
@@ -120,6 +126,24 @@
     <ClInclude Include="..\..\..\hmLib\iocsv.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\random\random_bit.hpp">
+      <Filter>hmLib\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp">
+      <Filter>hmLib\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\random\random_engine.hpp">
+      <Filter>hmLib\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\algorithm\compare.hpp">
+      <Filter>hmLib\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\algorithm\sampling.hpp">
+      <Filter>hmLib\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\algorithm\nonrepeat_random_integrals.hpp">
+      <Filter>hmLib\algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c">
@@ -148,6 +172,12 @@
     </ClCompile>
     <ClCompile Include="run_csv.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hmLib\random\random_bit.cpp">
+      <Filter>hmLib\random</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hmLib\random\random_engine.cpp">
+      <Filter>hmLib\random</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
