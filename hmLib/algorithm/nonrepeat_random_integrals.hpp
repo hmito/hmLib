@@ -11,10 +11,6 @@
 #include <type_traits>
 #include <hmLib/exceptions.hpp>
 
-#ifndef hmLib_assert
-#	define hmLib_assert(condition,except,str)
-#endif
-
 namespace hmLib{
 	namespace algorithm{
 		template<typename type,typename generator>
@@ -23,7 +19,7 @@ namespace hmLib{
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
 			const unsigned_type max_min_diff = rand_max - rand_min + 1;
-			hmLib_assert(size<=max_min_diff,std::runtime_error,"rand_max - rand_min is smaller than requested size.");
+			hmLib_assert(size<=max_min_diff,hmLib::numeric_exceptions::invalid_initialvalue,"rand_max - rand_min is smaller than requested size.");
 
 			std::vector<type> tmp;
 			std::uniform_int_distribution<type> distribution(rand_min, rand_max);
@@ -53,7 +49,7 @@ namespace hmLib{
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
 			const unsigned_type max_min_diff = rand_max - rand_min + 1;
-			hmLib_assert(size <= max_min_diff, std::runtime_error, "rand_max - rand_min is smaller than requested size.");
+			hmLib_assert(size <= max_min_diff, hmLib::numeric_exceptions::invalid_initialvalue, "rand_max - rand_min is smaller than requested size.");
 
 			std::vector<type> tmp;
 			tmp.assign(max_min_diff,0);
