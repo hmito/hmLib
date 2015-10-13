@@ -39,8 +39,11 @@ namespace hmLib{
 			// ベクタの初期化
 			std::generate( v.begin(), v.end(), std::ref(rnd) ) ;
 
+			//シード配列作成
+			std::seed_seq Seq( v.begin(), v.end() );
+			
 			//シードで初期化
-			seed(std::seed_seq( v.begin(), v.end() ));
+			seed(Seq);
 		}
 		template<class InputIterator>
 		random_engine(InputIterator Begin,InputIterator End){
