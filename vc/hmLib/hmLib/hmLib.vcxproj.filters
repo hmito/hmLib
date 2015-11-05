@@ -144,6 +144,9 @@
     <ClInclude Include="..\..\..\hmLib\algorithm\nonrepeat_random_integrals.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerator.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c">
