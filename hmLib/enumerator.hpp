@@ -1,6 +1,7 @@
 ﻿#ifndef HMLIB_ENUMERATOR_INC
 #define HMLIB_ENUMERATOR_INC 100
 #
+#include<functional>
 /*
 ターゲット
 ・iteratorクラスを非template関数で使いたい
@@ -25,31 +26,27 @@ protected:
 */
 namespace hmLib{
 	namespace enumerators{
+		enum class return_target{begin,end,current};
+		template<typename iterator_holder_>
+		iterator_holder_::iterator& target_iterator(iterator_holder_& Holder, return_target Target){
+			if(Target == return_target::current)return Holder.itr;
+			else if(Target == return_target::begin)return Holder.begin;
+			else return Holder.end;
+		}
+
 		template<typename T>
 		struct default_concept{};
 		template<typename T>
 		struct find_concept{
 		public:
-			struct mixin_interface{
-			public:
-				virtual ~mixin_interface(){}
-			public:
-				virtual void find(T Val_) = 0;
-				virtual void find_begin(T Val_) = 0;
-				virtual void find_end(T Val_) = 0;
-			};
-		public:
 			template<typename iterator_holder_>
 			struct mixin :public mixin_interface{
 			public:
-				void find(iterator_holder_& Holder, T Val) override{
-					Holder.itr = std::find(Holder.begin, Holder.end, Val);
+				void find(iterator_holder_& Holder, return_target Target, T Val) override{
+					target_iterator(Holder, Target) = std::find(Holder.begin, Holder.end, Val);
 				}
-				void find_begin(iterator_holder_& Holder, T Val) override{
-					Holder.begin = std::find(Holder.begin, Holder.end, Val);
-				}
-				void find_end(iterator_holder_& Holder, T Val) override{
-					Holder.end = std::find(Holder.begin, Holder.end, Val);
+				void find_if(iterator_holder_& Holder, std::function<bool(const T&)> Pred) override{
+					target_iterator(Holder, Target) = std::find_if(Holder.begin, Holder.end, Pred);
 				}
 			};
 		public:
