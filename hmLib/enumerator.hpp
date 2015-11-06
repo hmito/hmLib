@@ -26,35 +26,66 @@ protected:
 */
 namespace hmLib{
 	namespace enumerators{
-		enum class return_target{begin,end,current};
-		template<typename iterator_holder_>
-		iterator_holder_::iterator& target_iterator(iterator_holder_& Holder, return_target Target){
-			if(Target == return_target::current)return Holder.itr;
-			else if(Target == return_target::begin)return Holder.begin;
-			else return Holder.end;
-		}
+		enum class return_target{ begin, end, current };
+		template<typename iterator>
+		struct iterator_holder{
+			iterator begin;
+			iterator end;
+			iterator current;
+			iterator& ref(return_target Target){
+				if(Target == return_target::current)return current;
+				else if(Target = -return_target::begin)return begin;
+				else return end;
+			}
+		};
+
+		template<class... concepts>
+		struct concept_pack{};
+		template<class concept, class... concepts>
+		struct concept_pack<concept, concepts...> :public concept, public concept_pack<concepts...>{
+			struct mixin_interface : public concept::mixin_interface, public concept_pack<concepts...>::mixin_interface{};
+			struct mixin : public concept::mixin, public concept_pack<concepts...>::mixin{};
+		};
 
 		template<typename T>
 		struct default_concept{};
+
 		template<typename T>
+		struct foward_iterator_concept{
+
+		};
+		template<typename enumerator_>
 		struct find_concept{
+			using T = enumerator_::type;
 		public:
 			template<typename iterator_holder_>
 			struct mixin :public mixin_interface{
 			public:
-				void find(iterator_holder_& Holder, return_target Target, T Val) override{
-					target_iterator(Holder, Target) = std::find(Holder.begin, Holder.end, Val);
+				void find(T Val, return_target Target){
+					auto Ptr = static_cast<iterator_holder_*>(this);
+					Ptr->ref(Target) = std::find(Ptr->cur, Ptr->end, Val);
 				}
-				void find_if(iterator_holder_& Holder, std::function<bool(const T&)> Pred) override{
-					target_iterator(Holder, Target) = std::find_if(Holder.begin, Holder.end, Pred);
+				void find_if(std::function<bool(const T&)> Pred, return_target Target){
+					auto Ptr = static_cast<iterator_holder_*>(this);
+					Ptr->ref(Target) = std::find_if(Ptr->cur, Ptr->end, Pred);
 				}
 			};
 		public:
-			void find(T Val_){ ref.find(Val_); }
-			void find_begin(T Val_){ ref.find_begin(Val_); }
-			void find_end(T Val_){ ref.find_end(Val_); }
+			void find(const T& Val, return_target Target = return_target::current){
+				static_cast<enumerator_*>(this)->Concept.find(Val, Target);
+			}
+			void find_if(std::function<bool(const T&)> Pred, return_target Target = return_target::current){
+				static_cast<enumerator_*>(this)->Concept.find_if(std::move(Pred), Target);
+			}
 		};
 	}
+	template<typename T, typename Concept>
+	struct enumerator : public Concept{
+		using enumerable_interface = Concept::mixin_interface;
+		template<typename iterator>
+		struct enumerable : public enumerators::iterator_holder<iterator>, public Concept::mixin{};
+	};
+
 	template<typename T, typename Concept = enumerators::default_concept<T>>
 	struct foward_enumeratort: public Concept{
 	private:
