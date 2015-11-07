@@ -37,7 +37,17 @@ struct use :public concept_pack< func_mixin<use>, punc_mixin<use>, dunc_mixin<us
 	}
 };
 
+#include<hmLib/enumerator.hpp>
 
+struct user_interface{
+	using my_enumerator = hmLib::enumerator<std::string, hmLib::enumerators::foward_iterator_concept>;
+
+	template<typename iterator>
+	void output(iterator Begin, iterator End){
+		output_enum(my_enumerator::make_range(Begin, End));
+	}
+	virtual void output_enum(my_enumerator etr) = 0;
+};
 
 int main(){
 	use Use;
@@ -48,15 +58,3 @@ int main(){
 	system("pause");
 	return 0;
 }
-
-//‡@
-template <class... Args>
-class tuple{};
-
-//‡A
-template <class First, class... Body>
-class tuple<First, Body...>{
-public:
-	First value;
-	tuple<Body...> child;
-};

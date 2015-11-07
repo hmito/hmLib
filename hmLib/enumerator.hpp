@@ -81,9 +81,7 @@ namespace hmLib{
 	}
 	template<typename T, typename Concept>
 	struct enumerator : public Concept{
-		using enumerable_interface = Concept::mixin_interface;
-		template<typename iterator>
-		struct enumerable : public enumerators::iterator_holder<iterator>, public Concept::mixin{};
+		static enumerators::iterator_holder<
 	};
 
 	template<typename T, typename Concept = enumerators::default_concept<T>>
