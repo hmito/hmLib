@@ -29,6 +29,8 @@ namespace hmLib{
 		enum class return_target{ begin, end, current };
 		template<typename iterator>
 		struct iterator_holder{
+			using type = decltype(*iterator());
+		public:
 			iterator begin;
 			iterator end;
 			iterator current;
@@ -47,12 +49,38 @@ namespace hmLib{
 			struct mixin : public concept::mixin, public concept_pack<concepts...>::mixin{};
 		};
 
-		template<typename T>
-		struct default_concept{};
-
-		template<typename T>
+		struct default_concept{
+		};
 		struct foward_iterator_concept{
-
+			template<typename T>
+			struct concept_interface{
+			public:
+				virtual const T& operator()(void) const = 0;
+				virtual T& operator()(void) = 0;
+				virtual operator bool()const = 0;
+				virtual void operator++() = 0;
+				virtual void reset() = 0;
+			};
+			template<typename iterator_holder>
+			struct concept :public concept_interface<iterator_holder::type>{
+				using type = iterator_holder::type;
+			public:
+				const T& operator()(void) const override{ const auto& ref = static_cast<const iterator_holder&>(*this); return *(ref.itr); }
+				T& operator()(void) override{ auto& ref = static_cast<iterator_holder&>(*this); return *(ref.itr); }
+				operator bool()const override{ const auto& ref = static_cast<const iterator_holder&>(*this); return ref.itr != ref.end; }
+				void operator++() override{ auto& ref = static_cast<iterator_holder&>(*this); ++(ref.itr); }
+				void reset() override{ auto& ref = static_cast<iterator_holder&>(*this);  ref.begin = ref.itr; }
+			};
+			template<typename enumerator>
+			struct mixin : public enumerator{
+				using type = enumerator::type;
+			public:
+				const type& operator()(void) const{ const auto& ref = static_cast<const concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); return ref(); }
+				type& operator()(void){ auto& ref = static_cast<concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); return ref(); }
+				operator bool()const{ const auto& ref = static_cast<const concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); return static_cast<bool>(ref()); }
+				void operator++(){ auto& ref = static_cast<concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); ++ref; }
+				void reset(){ auto& ref = static_cast<concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); ref.reset(); }
+			};
 		};
 		template<typename enumerator_>
 		struct find_concept{
@@ -80,8 +108,16 @@ namespace hmLib{
 		};
 	}
 	template<typename T, typename Concept>
-	struct enumerator : public Concept{
-		static enumerators::iterator_holder<
+	struct enumerator : public Concept::mixin<enumerator<T, Concept>>{
+		using mixin = Concept::mixin;
+
+		template<typename iterator>
+		static iterator_holder
+			: public enumerators::iterator_holder<iterator>
+			, public Concept::concept<iterator_holder<iterator>>{
+		};
+
+
 	};
 
 	template<typename T, typename Concept = enumerators::default_concept<T>>
