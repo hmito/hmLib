@@ -25,7 +25,7 @@ namespace hmLib{
 		}
 		//3要素のmedian
 		template<class T>
-		inline T med(T val1,T val2,T val3){
+		inline T clamp(T val1,T val2,T val3){
 			if(val1>val2){
 				if(val2>val3)return val2;
 				else if(val1>val3)return val3;
