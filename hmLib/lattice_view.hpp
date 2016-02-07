@@ -1,11 +1,70 @@
 ﻿#ifndef HMLIB_LATTICEVIEW_INC
 #define HMLIB_LATTICEVIEW_INC 100
 #
+#include<vector>
 #include<iterator>
+namespace hmLib{
+	template<typename iterator_, unsigned int dim_, typename iterator_category = iterator_::iterator_category>
+	struct lattice_iterator{
+		using this_type = lattice_iterator<iterator_, dim_, iterator_category>;
+		using basic_iterator = lattice_iterator<iterator_,dim_-1,iterator_category>;
+		constexpr static unsigned int dim(){return dim_;}
+	private:
+		basic_iterator Itr;
+		unsigned int Pos;
+		unsigned int Size;
+		unsigned int Step;
+	private:
+		void advance(int Diff = 1){
+			if(Pos + Diff > Size){
+
+			}
+		}
+	public:
+		this_type& operator++(){
+			++Itr;
+			++Pos;
+
+			if(Pos == Size){
+				std::advance(Itr, LatticeSize - Size);
+				Pos = 0;
+			}
+			
+			return *this;
+		}
+	};
+	template<typename iterator_, typename iterator_category = iterator_::iterator_category>
+	struct lattice_iterator<iterator_, 0, iterator_category>{};
+
+	template<typename iterator_, typename iterator_category = iterator_::iterator_category>
+	struct lattice_iterator<iterator_, 1,iterator_category>: public iterator_{
+		using this_type = lattice_iterator<iterator_, 1, iterator_category>;
+		using basic_iterator = iterator_;
+		constexpr static unsigned int dim(){ return dim_; }
+	};
+
+	template<typename container_, unsigned int dim_>
+	struct lattice_view{
+		using container = container_;
+		static constexpr unsigned int dim(){ return dim_; }
+		using return_type = (decltype(*base_iterator()));
+	public:
+		struct iterator{
+			std::array<unsigned int, dim_ -1>;
+		};
+		using iterator = base_iterator;
+		struct point{
+		};
+	public:
+		iterator begin();
+		iterator end();
+		point pos();
+	};
+}
+/*
 #include<hmLib/exceptions.hpp>
 #include<hmLib/position.hpp>
-namespace hmLib{
-	namespace lattice_views{
+namespace lattice_views{
 		namespace{
 			class exception_identifier {};
 		}
@@ -27,21 +86,17 @@ namespace hmLib{
 		iterator_ lattice_next(iterator_& itr, unsigned int latxsize, unsigned int x, unsigned int y){
 		return std::next(itr, x + y*latsize);
 	}
-	template<typename iterator_>
+	template<typename iterator_, unsigned int dim_>
 	struct lattice_view{
 	private:
 		using iterator = iterator_;
 		using my_type = lattice_view <iterator>;
 		using value_type = decltype(*(iterator()));
 	private:
-		iterator viewbegin;
-		iterator viewend;
-		unsigned int xlatsize;
-		unsigned int ylatsize;
-		unsigned int xpos;
-		unsigned int ypos;
-		unsigned int xsize;
-		unsigned int ysize;
+		iterator Begin;
+		unsigned int Pos;
+		unsigned int Size;
+		unsigned int Skip;
 	public:
 		struct row_iterator{
 		private:
@@ -213,6 +268,7 @@ namespace hmLib{
 	++(itr.y);
 	if(itr == Lattice.point_row_end();
 }
-}
+*/
+
 #
 #endif
