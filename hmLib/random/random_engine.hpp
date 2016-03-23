@@ -44,7 +44,7 @@ namespace hmLib{
 	private:
 		using my_type = singleton_random_engine<tag, random_engine_type>;
 	public:
-		using result_type = random_engine_type::result_type;
+		using result_type = typename random_engine_type::result_type;
 	private:
 		static random_engine_type Engine;
 	public:

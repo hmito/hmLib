@@ -114,7 +114,6 @@
     <ClCompile Include="..\..\..\hmLib\cstack.c" />
     <ClCompile Include="..\..\..\hmLib\cstring.c" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
-    <ClCompile Include="..\..\..\hmLib\random.cpp" />
     <ClCompile Include="run_csv.cpp" />
   </ItemGroup>
   <ItemGroup>
