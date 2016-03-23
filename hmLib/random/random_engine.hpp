@@ -14,22 +14,13 @@ random_engine v1_00/130328 hmIto
 #include<random>
 #include<numeric>
 #
-#ifndef HMLIB_CONFIG_INC
-#	include "hmLib_config.h"
-#endif
-#if !(defined(HMLIB_NOLIB) || defined(HMLIB_RANDOM_NOLIB))
-#	ifdef _DEBUG
-#		pragma comment(lib,"hmLib/lib/Debug/random.lib")
-#	else
-#		pragma comment(lib,"hmLib/lib/Release/random.lib")
-#	endif
-#endif
 
 namespace hmLib{
-	template<class random_engine_type = std::mt19937_64>
-	class random_engine:public random_engine_type{
-	public:
-		random_engine(){
+	namespace random{
+		template<typename engine_type>
+		engine_type randomized_engine(){
+			engine_type Engine;
+			
 			// ランダムデバイス
 			std::random_device rnd ;
 
@@ -43,21 +34,41 @@ namespace hmLib{
 			std::seed_seq Seq( v.begin(), v.end() );
 			
 			//シードで初期化
-			seed(Seq);
+			Engine.seed(Seq);
+			
+			return Engine;
 		}
-		template<class InputIterator>
-		random_engine(InputIterator Begin,InputIterator End){
-			seed(std::seed_seq(Begin,End));
-		}
-		int uniform_int(int Min,int Max){return std::uniform_int_distribution<int>(Min,Max)(*this);}
-		double uniform_real(double Min=0.0,double Max=1.0){return std::uniform_real_distribution<double>(Min,Max)(*this);}
-		double normal(double meen,double sigma){return std::normal_distribution<double>(meen,sigma)(*this);}
+	}
+	template<typename tag, typename random_engine_type = std::mt19937_64>
+	struct singleton_random_engine{
+	private:
+		using my_type = singleton_random_engine<tag, random_engine_type>;
+	public:
+		using result_type = random_engine_type::result_type;
+	private:
+		static random_engine_type Engine;
+	public:
+		constexpr static result_type min() { return random_engine_type::min(); }
+		constexpr static result_type max() { return random_engine_type::max(); }
+		static void singleton_seed(){Engine.seed();}
+		static void singleton_seed(result_type Seed){Engine.seed(Seed);}
+	public:
+		singleton_random_engine()=default;
+		result_type operator()(void){return Engine();}
+		void discard(unsigned long long z){Engine.discard(z);}
 	};
+	template<typename tag, typename random_engine_type>
+	random_engine_type singleton_random_engine<tag,random_engine_type>::Engine = random::randomized_engine<random_engine_type>();
+	
 	namespace random{
-		extern random_engine<> Engine;
-		inline int uniform_int(int Min,int Max){return Engine.uniform_int(Min,Max);}
-		inline double uniform_real(double Min=0.0,double Max=1.0){return Engine.uniform_real(Min,Max);}
-		inline double normal(double meen,double sigma){return Engine.normal(meen,sigma);}
+		struct default_engine_tag{};
+		using defaul_engine = singleton_random_engine<default_engine_tag>;
+		template<typename value_type>
+		value_type uniform_int(value_type Min,value_type Max){return std::uniform_int_distribution<value_type>(Min,Max)(defaul_engine());}
+		template<typename value_type>
+		value_type uniform_real(value_type Min, value_type Max){return std::uniform_real_distribution<value_type>(Min,Max)(defaul_engine());}
+		template<typename value_type>
+		value_type normal(value_type meen, value_type sigma){return std::normal_distribution<value_type>(meen,sigma)(defaul_engine());}
 	}
 }
 #

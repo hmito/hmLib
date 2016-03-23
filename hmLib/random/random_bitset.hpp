@@ -9,16 +9,14 @@ random_bitset:v1_00/130709 hmIto
 	random::uniform_bool関数を追加
 	*/
 #include<bitset>
-#ifndef HMLIB_RANDOM_RANDOMENGINE_INC
-#	include"random_engine.hpp"
-#endif
+#include"random_engine.hpp"
 namespace hmLib{
 	template<unsigned int bit_num>
 	class random_bitset{
 	public:
 		template<typename random_engine_>
 		std::bitset<bit_num> operator()(random_engine_& Engine_){
-			unsigned int random_bits=sizeof(random_engine_::result_type)*8;
+			static constexpr unsigned int random_bits=sizeof(random_engine_::result_type)*8;
 
 			std::bitset<bit_num> BitSet;
 			for(unsigned int Cnt=0;Cnt<bit_num;Cnt+=random_bits){

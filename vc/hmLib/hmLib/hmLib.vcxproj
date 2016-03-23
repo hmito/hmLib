@@ -93,7 +93,6 @@
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
-    <ClInclude Include="..\..\..\hmLib\random\random_bit.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />

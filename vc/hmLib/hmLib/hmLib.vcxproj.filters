@@ -126,9 +126,6 @@
     <ClInclude Include="..\..\..\hmLib\iocsv.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\random\random_bit.hpp">
-      <Filter>hmLib\random</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp">
       <Filter>hmLib\random</Filter>
     </ClInclude>
