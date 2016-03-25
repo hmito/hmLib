@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\hmIto\Documents\GitHub\hmLib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -70,14 +70,10 @@
     <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\cdeque.h" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\config_vc.h" />
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
-    <ClInclude Include="..\..\..\hmLib\cqueue.h" />
-    <ClInclude Include="..\..\..\hmLib\cstack.h" />
-    <ClInclude Include="..\..\..\hmLib\cstring.h" />
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
@@ -97,16 +93,14 @@
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\version.h" />
+    <ClInclude Include="lattice_iterator.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\hmLib\cdeque.c" />
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
-    <ClCompile Include="..\..\..\hmLib\cqueue.c" />
-    <ClCompile Include="..\..\..\hmLib\cstack.c" />
-    <ClCompile Include="..\..\..\hmLib\cstring.c" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
     <ClCompile Include="..\..\..\hmLib\random.cpp" />
+    <ClCompile Include="main_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
