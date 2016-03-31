@@ -99,7 +99,7 @@
     <ClInclude Include="..\..\..\hmLib\lattice_view.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="lattice_iterator.hpp">
+    <ClInclude Include="..\..\..\hmLib\lattice_iterator.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -116,7 +116,7 @@
     <ClCompile Include="..\..\..\hmLib\random.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
-    <ClCompile Include="main_test.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
