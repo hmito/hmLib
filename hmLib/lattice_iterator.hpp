@@ -112,189 +112,208 @@ namespace hmLib{
 		iterator_& ref(){return Itr;}
 		const iterator_& ref()const{return Itr;}
 	};
+	template<typename iterator_>
+	struct basic_lattice_iterator<iterator_, 0>{};
 
-	template<typename iterator_, unsigned int dim_, typename iterator_category_ = iterator_::iterator_category>
+	template<typename this_type, typename iterator_category_ = this_type::iterator_category, bool is_const_ = std::is_const<this_type::value_type>::value>
+	struct lattice_iterator_mixin{};
+	template<typename this_type, bool is_const_>
+	struct lattice_iterator_mixin<this_type, std::output_iterator_tag, is_const_>{
+		this_type& operator++(){
+			static_cast<this_type*>(this)->advance(1);
+			return *this;
+		}
+		this_type operator++(int){
+			this_type Prev = *this;
+			++(*this);
+			return Prev;
+		}
+		this_type::reference operator*(){
+			return static_cast<this_type*>(this)->ref().operator*();
+		}
+		const this_type::reference operator*()const{
+			return static_cast<this_type*>(this)->ref().operator*();
+		}
+		this_type::pointer operator->(){
+			return static_cast<this_type*>(this)->ref().operator->();
+		}
+		const this_type::pointer operator->()const{
+			return static_cast<this_type*>(this)->ref().operator->();
+		}
+	};
+	template<typename this_type, bool is_const_>
+	struct lattice_iterator_mixin<this_type, std::input_iterator_tag, is_const_>{
+		this_type& operator++(){
+			static_cast<this_type*>(this)->advance(1);
+			return *this;
+		}
+		this_type operator++(int){
+			this_type Prev = *this;
+			++(*this);
+			return Prev;
+		}
+		const this_type::reference operator*()const{
+			return static_cast<this_type*>(this)->ref().operator*();
+		}
+		const this_type::pointer operator->()const{
+			return static_cast<this_type*>(this)->ref().operator->();
+		}
+		friend bool operator==(const this_type& val1, const this_type& val2){
+			return val1.ref() == val2.ref();
+		}
+		friend bool operator!=(const this_type& val1, const this_type& val2){
+			return val1.ref() != val2.ref();
+		}
+	};
+	template<typename this_type>
+	struct lattice_iterator_mixin<this_type, std::forward_iterator_tag, false>
+		: public lattice_iterator_mixin<this_type, std::output_iterator_tag, false>{
+		friend bool operator==(const this_type& val1, const this_type& val2){
+			return val1.ref() == val2.ref();
+		}
+		friend bool operator!=(const this_type& val1, const this_type& val2){
+			return val1.ref() != val2.ref();
+		}
+	};
+	template<typename this_type>
+	struct lattice_iterator_mixin<this_type, std::forward_iterator_tag, true>
+		: public lattice_iterator_mixin<this_type, std::input_iterator_tag, true>{
+	};
+	template<typename this_type, bool is_const_>
+	struct lattice_iterator_mixin<this_type, std::bidirectional_iterator_tag, is_const_>
+		: public lattice_iterator_mixin<this_type, std::forward_iterator_tag, is_const_>{
+		this_type& operator--(){
+			static_cast<this_type*>(this)->advance(-1);
+			return *this;
+		}
+		this_type operator--(int){
+			this_type Prev = *this;
+			--(*this);
+			return Prev;
+		}
+	};
+	template<typename this_type>
+	struct lattice_iterator_mixin<this_type, std::random_access_iterator_tag, true>
+		: public lattice_iterator_mixin<this_type, std::bidirectional_iterator_tag, true>{
+		const this_type::reference operator[](this_type::difference_type pos)const{
+			this_type other = *static_cast<const this_type*>(this);
+			other += pos;
+			return *other;
+		}
+		this_type& operator+=(this_type::difference_type pos){
+			static_cast<this_type*>(this)->advance(pos1);
+			return *this;
+
+		}
+		friend this_type operator+(const this_type& val, this_type::difference_type pos){
+			this_type other = val;
+			other += pos;
+			return other;
+		}
+		friend this_type operator+(this_type::difference_type pos, const this_type& val){
+			this_type other = val;
+			other += pos;
+			return other;
+		}
+		friend this_type::difference_type operator-(const this_type& val1, const this_type& val2){
+			return val1.ref() - val2.ref();
+		}
+		friend bool operator<(const this_type& val1, const this_type& val2){
+			return val1.ref() < val2.ref();
+		}
+		friend bool operator>(const this_type& val1, const this_type& val2){
+			return val1.ref() > val2.ref();
+		}
+		friend bool operator<=(const this_type& val1, const this_type& val2){
+			return val1.ref() <= val2.ref();
+		}
+		friend bool operator>=(const this_type& val1, const this_type& val2){
+			return val1.ref() >= val2.ref();
+		}
+	};
+	template<typename this_type>
+	struct lattice_iterator_mixin<this_type, std::random_access_iterator_tag, false>
+		: public lattice_iterator_mixin<this_type, std::bidirectional_iterator_tag, false>{
+		this_type::reference operator[](this_type::difference_type pos){
+			this_type other = *static_cast<this_type*>(this);
+			other += pos;
+			return *other;
+		}
+		const this_type::reference operator[](this_type::difference_type pos)const{
+			this_type other = *static_cast<const this_type*>(this);
+			other += pos;
+			return *other;
+		}
+		this_type& operator+=(this_type::difference_type pos){
+			static_cast<this_type*>(this)->advance(pos1);
+			return *this;
+
+		}
+		friend this_type operator+(const this_type& val, this_type::difference_type pos){
+			this_type other = val;
+			other += pos;
+			return other;
+		}
+		friend this_type operator+(this_type::difference_type pos, const this_type& val){
+			this_type other = val;
+			other += pos;
+			return other;
+		}
+		friend this_type::difference_type operator-(const this_type& val1, const this_type& val2){
+			return val1.ref() - val2.ref();
+		}
+		friend bool operator<(const this_type& val1, const this_type& val2){
+			return val1.ref() < val2.ref();
+		}
+		friend bool operator>(const this_type& val1, const this_type& val2){
+			return val1.ref() > val2.ref();
+		}
+		friend bool operator<=(const this_type& val1, const this_type& val2){
+			return val1.ref() <= val2.ref();
+		}
+		friend bool operator>=(const this_type& val1, const this_type& val2){
+			return val1.ref() >= val2.ref();
+		}
+	};
+
+	template<typename iterator_, unsigned int dim_, typename iterator_category_ = iterator_::iterator_category, bool is_const_ = std::is_const<iterator_::value_type>::value>
 	struct lattice_iterator
-		: public std::iterator<iterator_::iterator_category,iterator_::value_type,iterator_::difference_type,iterator_::pointer,iterator_::reference>{
-	};
-
-	template<typename iterator_, unsigned int dim_>
-	struct lattice_iterator<iterator_, dim_, std::output_iterator_tag>
 		: public std::iterator<iterator_::iterator_category, iterator_::value_type, iterator_::difference_type, iterator_::pointer, iterator_::reference>
-		, private basic_lattice_iterator<iterator_, dim_>{
+		, public basic_lattice_iterator<iterator_,dim_>
+		, public lattice_iterator_mixin<lattice_iterator<iterator_, dim_, iterator_category_, is_const_>,iterator_category_, is_const_>{
 	private:
-		using this_type = lattice_iterator<iterator_, dim_, iterator_category>;
-		using base_type = basic_lattice_iterator<iterator_, dim_>;
+		using this_type = lattice_iterator<iterator_, dim_, iterator_category_, is_const_>;
 	public:
-		this_type& operator++(){
-			base_type::advance(1);
-			return *this;
+		lattice_iterator() = default;
+		template<typename iterator_pos, typename iterator_size, typename iterator_step>
+		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
+			: basic_lattice_iterator<iterator_, dim_>(basic_lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_step + 1, end_size, begin_step + 1, end_step), *begin_pos, *begin_size, *begin_step){
 		}
-		this_type operator++(int){
-			this_type Prev = *this;
-			base_type::advance(1);
-			return Prev;
-		}
-		reference operator*(){
-			return base_type::ref().operator*();
+		template<typename container_pos, typename container_size, typename container_step>
+		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_step& set_step)
+			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
 		}
 	};
-	template<typename iterator_, unsigned int dim_>
-	struct lattice_iterator<iterator_, dim_, std::input_iterator_tag>
+	template<typename iterator_, typename iterator_category_ = iterator_::iterator_category, bool is_const_ = std::is_const<iterator_::value_type>::value>
+	struct lattice_iterator<iterator_, 1, iterator_category_, is_const_>
 		: public std::iterator<iterator_::iterator_category, iterator_::value_type, iterator_::difference_type, iterator_::pointer, iterator_::reference>
-		, private basic_lattice_iterator<iterator_, dim_>{
+		, public basic_lattice_iterator<iterator_, 1>
+		, public lattice_iterator_mixin<lattice_iterator<iterator_, 1, iterator_category_, is_const_>, iterator_category_, is_const_>{
 	private:
-		using this_type = lattice_iterator<iterator_, dim_, iterator_category>;
-		using base_type = basic_lattice_iterator<iterator_, dim_>;
+		using this_type = lattice_iterator<iterator_, 1, iterator_category_, is_const_>;
 	public:
-		this_type& operator++(){
-			base_type::advance(1);
-			return *this;
+		lattice_iterator() = default;
+		template<typename iterator_pos, typename iterator_size, typename iterator_step>
+		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
+			: basic_lattice_iterator<iterator_, 1>(itr, *begin_pos, *begin_size, *begin_step){
 		}
-		this_type operator++(int){
-			this_type Prev = *this;
-			base_type::advance(1);
-			return Prev;
-		}
-		const reference operator*()const{
-			return base_type::ref().operator*();
-		}
-		const pointer operator->()const{
-			return base_type::ref().operator->();
-		}
-		friend bool operator==(const this_type& val1, const this_type& val2){
-			return val1.ref() == val2.ref();
-		} 
-		friend bool operator!=(const this_type& val1, const this_type& val2){
-			return val1.ref() != val2.ref();
+		template<typename container_pos, typename container_size, typename container_step>
+		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_step& set_step)
+			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
 		}
 	};
-	template<typename iterator_, unsigned int dim_>
-	struct lattice_iterator<iterator_, dim_, std::forward_iterator_tag>
-		: public std::iterator<iterator_::iterator_category, iterator_::value_type, iterator_::difference_type, iterator_::pointer, iterator_::reference>
-		, private basic_lattice_iterator<iterator_, dim_>{
-	private:
-		using this_type = lattice_iterator<iterator_, dim_, iterator_category>;
-		using base_type = basic_lattice_iterator<iterator_, dim_>;
-	public:
-		this_type& operator++(){
-			base_type::advance(1);
-			return *this;
-		}
-		this_type operator++(int){
-			this_type Prev = *this;
-			base_type::advance(1);
-			return Prev;
-		}
-		reference operator*(){
-			return base_type::ref().operator*();
-		}
-		const reference operator*()const{
-			return base_type::ref().operator*();
-		}
-		pointer operator->(){
-			return base_type::ref().operator->();
-		}
-		const pointer operator->()const{
-			return base_type::ref().operator->();
-		}
-		friend bool operator==(const this_type& val1, const this_type& val2){
-			return val1.ref() == val2.ref();
-		} 
-		friend bool operator!=(const this_type& val1, const this_type& val2){
-			return val1.ref() != val2.ref();
-		}
-	};
-	template<typename iterator_, unsigned int dim_>
-	struct lattice_iterator<iterator_, dim_, std::bidirectional_iterator_tag>
-		: public std::iterator<iterator_::iterator_category, iterator_::value_type, iterator_::difference_type, iterator_::pointer, iterator_::reference>
-		, private basic_lattice_iterator<iterator_, dim_>{
-	private:
-		using this_type = lattice_iterator<iterator_, dim_, iterator_category>;
-		using base_type = basic_lattice_iterator<iterator_, dim_>;
-	public:
-		this_type& operator++(){
-			base_type::advance(1);
-			return *this;
-		}
-		this_type operator++(int){
-			this_type Prev = *this;
-			this->operator++();
-			return Prev;
-		}
-		this_type& operator--(){
-			base_type::advance(-1);
-			return *this;
-		}
-		this_type operator--(int){
-			this_type Prev = *this;
-			this->operator--();
-			return Prev;
-		}
-		reference operator*(){
-			return base_type::ref().operator*();
-		}
-		const reference operator*()const{
-			return base_type::ref().operator*();
-		}
-		pointer operator->(){
-			return base_type::ref().operator->();
-		}
-		const pointer operator->()const{
-			return base_type::ref().operator->();
-		}
-		friend bool operator==(const this_type& val1, const this_type& val2){
-			return val1.ref() == val2.ref();
-		} 
-		friend bool operator!=(const this_type& val1, const this_type& val2){
-			return val1.ref() != val2.ref();
-		}
-	};
-	template<typename iterator_, unsigned int dim_>
-	struct lattice_iterator<iterator_, dim_, std::random_access_iterator_tag>
-		: public std::iterator<iterator_::iterator_category, iterator_::value_type, iterator_::difference_type, iterator_::pointer, iterator_::reference>
-		, private basic_lattice_iterator<iterator_, dim_>{
-	private:
-		using this_type = lattice_iterator<iterator_, dim_, iterator_category>;
-		using base_type = basic_lattice_iterator<iterator_, dim_>;
-	public:
-		this_type& operator++(){
-			base_type::advance(1);
-			return *this;
-		}
-		this_type operator++(int){
-			this_type Prev = *this;
-			this->operator++();
-			return Prev;
-		}
-		this_type& operator--(){
-			base_type::advance(-1);
-			return *this;
-		}
-		this_type operator--(int){
-			this_type Prev = *this;
-			this->operator--();
-			return Prev;
-		}
-		reference operator*(){
-			return base_type::ref().operator*();
-		}
-		const reference operator*()const{
-			return base_type::ref().operator*();
-		}
-		pointer operator->(){
-			return base_type::ref().operator->();
-		}
-		const pointer operator->()const{
-			return base_type::ref().operator->();
-		}
-		friend bool operator==(const this_type& val1, const this_type& val2){
-			return val1.ref() == val2.ref();
-		} 
-		friend bool operator!=(const this_type& val1, const this_type& val2){
-			return val1.ref() != val2.ref();
-		}
-	};
+	template<typename iterator_, typename iterator_category_ = iterator_::iterator_category, bool is_const_ = std::is_const<iterator_::value_type>::value>
+	struct lattice_iterator<iterator_, 0, iterator_category_, is_const_>{};
 }
 #
 #endif
