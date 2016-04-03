@@ -9,30 +9,29 @@ namespace hmLib{
 			friend struct basic_lattice_iterator<iterator_, dim_ + 1>;
 			using iterator_category = std::forward_iterator_tag;
 			using difference_type = typename iterator_::difference_type;
-			using size_type = std::size_t;
 			using this_type = basic_lattice_iterator<iterator_, dim_>;
 			using iterator_type = basic_lattice_iterator<iterator_, dim_ - 1>;
 			constexpr static unsigned int dim(){ return dim_; }
 		private:
 			iterator_type Itr;
-			size_type Pos;
-			size_type Size;
-			size_type Step;
+			difference_type Pos;
+			difference_type Size;
+			difference_type Gap;
 		public:
 			basic_lattice_iterator() = default;
-			basic_lattice_iterator(iterator_type Itr_, size_type Pos_, size_type Size_, size_type Step_)
+			basic_lattice_iterator(iterator_type Itr_, difference_type Pos_, difference_type Size_, difference_type Gap_)
 				: Itr(Itr_)
 				, Pos(Pos_)
 				, Size(Size_)
-				, Step(Step_){}
+				, Gap(Gap_){}
 		private:
 			difference_type advance_pos(difference_type& RequestedStep){
-				difference_type RawStep = 0;
+				difference_type RawStep = Itr.advance_pos(RequestedStep);
 
-				size_type NewPos = (Pos + RequestedStep) % Size;
+				difference_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep = (NewPos - Pos) * Step;
+				RawStep += (NewPos - Pos) * step_distance();
 
 				if(RequestedStep > 0 && NewPos < Pos){
 					RequestedStep = (RequestedStep / lattice_size()) + 1;
@@ -48,8 +47,12 @@ namespace hmLib{
 			}
 			void advance_itr(difference_type RawStep){ std::advance(Itr.ref(), RawStep); }
 		public:
-			size_type size()const{ return Size; }
-			size_type lattice_size()const{ return size()*Itr.lattice_size(); }
+			difference_type pos()const{ return Pos; }
+			difference_type size()const{ return Size; }
+			difference_type step_size()const{ return Itr.lattice_size(); }
+			difference_type lattice_size()const{ return Itr.lattice_size()*size(); }
+			difference_type gap()const{ return Gap; }
+			difference_type step_distance()const{ return gap() + step_size(); }
 			void advance(difference_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep);
@@ -61,30 +64,29 @@ namespace hmLib{
 		struct basic_lattice_iterator<iterator_, 1>{
 			friend struct basic_lattice_iterator<iterator_, 2>;
 			using difference_type = typename iterator_::difference_type;
-			using size_type = std::size_t;
 			using this_type = basic_lattice_iterator<iterator_, 1>;
 			using iterator_type = iterator_;
 			constexpr static unsigned int dim(){ return 1; }
 		private:
 			iterator_type Itr;
-			size_type Pos;
-			size_type Size;
-			size_type Step;
+			difference_type Pos;
+			difference_type Size;
+			difference_type Gap;
 		public:
 			basic_lattice_iterator() = default;
-			basic_lattice_iterator(iterator_type Itr_, size_type Pos_, size_type Size_, size_type Step_)
+			basic_lattice_iterator(iterator_type Itr_, difference_type Pos_, difference_type Size_, difference_type Gap_)
 				: Itr(Itr_)
 				, Pos(Pos_)
 				, Size(Size_)
-				, Step(Step_){}
+				, Gap(Gap_){}
 		private:
 			difference_type advance_pos(difference_type& RequestedStep){
 				difference_type RawStep = 0;
 
-				size_type NewPos = (Pos + RequestedStep) % Size;
+				difference_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep = (NewPos - Pos) * Step;
+				RawStep = (NewPos - Pos) * step_distance();
 
 				if(RequestedStep > 0 && NewPos < Pos){
 					RequestedStep = (RequestedStep / lattice_size()) + 1;
@@ -100,8 +102,12 @@ namespace hmLib{
 			}
 			void advance_itr(difference_type RawStep){ std::advance(Itr, RawStep); }
 		public:
-			size_type size()const{ return Size; }
-			size_type lattice_size()const{ return size(); }
+			difference_type pos()const{ return Pos; }
+			difference_type size()const{ return Size; }
+			difference_type step_size()const{ return 1; }
+			difference_type lattice_size()const{ return size(); }
+			difference_type gap()const{ return Gap; }
+			difference_type step_distance()const{ return gap() + step_size(); }
 			void advance(difference_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep);
@@ -285,7 +291,7 @@ namespace hmLib{
 		lattice_iterator() = default;
 		template<typename iterator_pos, typename iterator_size, typename iterator_step>
 		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
-			: basic_lattice_iterator<iterator_, dim_>(basic_lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_step + 1, end_size, begin_step + 1, end_step), *begin_pos, *begin_size, *begin_step){
+			: basic_lattice_iterator<iterator_, dim_>(basic_lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_size + 1, end_size, begin_step + 1, end_step), *begin_pos, *begin_size, *begin_step){
 		}
 		template<typename container_pos, typename container_size, typename container_step>
 		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_step& set_step)

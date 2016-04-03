@@ -15,7 +15,7 @@ namespace hmLib{
 			container Con(1000);
 
 			auto val = std::begin({0, 2});
-			lattice_iterator<iterator, 1> Itr(Con.begin(), {0,2}, {0,3}, {0,4});
+			basic_lattice_iterator<iterator, 1> Itr(Con.begin(), 0, 3, 0);
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()),L"Position Error");
 			Itr.advance(1);
@@ -29,7 +29,7 @@ namespace hmLib{
 
 			container Con(1000);
 
-			basic_lattice_iterator<iterator, 1> Itr(Con.begin(), 0, 3, 2);
+			basic_lattice_iterator<iterator, 1> Itr(Con.begin(), 0, 3, 1);
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 			Itr.advance(1);
@@ -43,7 +43,7 @@ namespace hmLib{
 
 			container Con(1000);
 
-			basic_lattice_iterator<iterator, 1> Itr(Con.begin(), 0, 30, 1);
+			basic_lattice_iterator<iterator, 1> Itr(Con.begin(), 0, 30, 0);
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 			Itr.advance(11);
@@ -57,8 +57,8 @@ namespace hmLib{
 
 			container Con(1000);
 
-			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 1);
-			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 4);
+			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 0);
+			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 1);
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 			Itr.advance(1);
@@ -78,8 +78,8 @@ namespace hmLib{
 
 			container Con(1000);
 
-			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 2);
-			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 7);
+			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 1);
+			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 1);
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 			Itr.advance(1);
@@ -101,8 +101,8 @@ namespace hmLib{
 
 			container Con(1000);
 
-			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 2);
-			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 7);
+			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 1);
+			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 1);
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 			Itr.advance(4);
