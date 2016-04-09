@@ -312,8 +312,11 @@ namespace hmLib{
 		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
 			: basic_lattice_iterator<iterator_, 1>(itr, *begin_pos, *begin_size, *begin_step){
 		}
-		lattice_iterator(iterator_ itr, std::initializer_list<std::size_t> set_pos, std::initializer_list<std::size_t> set_size, std::initializer_list<std::size_t> set_step)
+		lattice_iterator(iterator_ itr, std::initializer_list<difference_type> set_pos, std::initializer_list<difference_type> set_size, std::initializer_list<difference_type> set_step)
 			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
+		}
+		lattice_iterator(iterator_ itr, difference_type Pos_, difference_type Size_, difference_type Gap_)
+			: basic_lattice_iterator<iterator_, 1>(itr, Pos_, Size_, Gap_){
 		}
 	};
 	template<typename iterator_, typename iterator_category_, bool is_const_>
