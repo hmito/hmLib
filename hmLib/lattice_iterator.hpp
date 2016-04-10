@@ -8,30 +8,30 @@ namespace hmLib{
 		struct basic_lattice_iterator{
 			friend struct basic_lattice_iterator<iterator_, dim_ + 1>;
 			using iterator_category = std::forward_iterator_tag;
-			using difference_type = typename iterator_::difference_type;
+			using lattice_difference_type = typename iterator_::difference_type;
 			using this_type = basic_lattice_iterator<iterator_, dim_>;
 			using iterator_type = basic_lattice_iterator<iterator_, dim_ - 1>;
 			constexpr static unsigned int dim(){ return dim_; }
 		private:
 			iterator_type Itr;
-			difference_type Pos;
-			difference_type Size;
-			difference_type Gap;
+			lattice_difference_type Pos;
+			lattice_difference_type Size;
+			lattice_difference_type Gap;
 		public:
 			basic_lattice_iterator() = default;
-			basic_lattice_iterator(iterator_type Itr_, difference_type Pos_, difference_type Size_, difference_type Gap_)
+			basic_lattice_iterator(iterator_type Itr_, lattice_difference_type Pos_, lattice_difference_type Size_, lattice_difference_type Gap_)
 				: Itr(Itr_)
 				, Pos(Pos_)
 				, Size(Size_)
 				, Gap(Gap_){}
 		private:
-			difference_type advance_pos(difference_type& RequestedStep){
-				difference_type RawStep = Itr.advance_pos(RequestedStep);
+			lattice_difference_type advance_pos(lattice_difference_type& RequestedStep){
+				lattice_difference_type RawStep = Itr.advance_pos(RequestedStep);
 
-				difference_type NewPos = (Pos + RequestedStep) % Size;
+				lattice_difference_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep += (NewPos - Pos) * step_distance();
+				RawStep += (NewPos - Pos) * step();
 
 				if(RequestedStep > 0 && NewPos < Pos){
 					RequestedStep = (RequestedStep / lattice_size()) + 1;
@@ -45,48 +45,58 @@ namespace hmLib{
 
 				return RawStep;
 			}
-			void advance_itr(difference_type RawStep){ std::advance(Itr.ref(), RawStep); }
+			void advance_itr(lattice_difference_type RawStep){ std::advance(Itr.ref(), RawStep); }
 		public:
-			difference_type pos()const{ return Pos; }
-			difference_type size()const{ return Size; }
-			difference_type step_size()const{ return Itr.lattice_size(); }
-			difference_type lattice_size()const{ return Itr.lattice_size()*size(); }
-			difference_type gap()const{ return Gap; }
-			difference_type step_distance()const{ return gap() + step_size(); }
-			void advance(difference_type Diff){
+			iterator_& ref(){ return Itr.ref(); }
+			const iterator_& ref()const{ return Itr.ref(); }
+			lattice_difference_type pos()const{ return Pos; }
+			lattice_difference_type size()const{ return Size; }
+			lattice_difference_type gap()const{ return Gap; }
+			lattice_difference_type step()const{ return gap() + Itr.lattice_size(); }
+			lattice_difference_type lattice_size()const{ return Itr.lattice_size()*size(); }
+			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep);
 			}
-			iterator_& ref(){ return Itr.ref(); }
-			const iterator_& ref()const{ return Itr.ref(); }
+			bool is_equal(const this_type& Other)const{
+				if(!Itr.is_equal(Other.Itr))return false;
+				return Pos == Other.Pos;
+			}
+			bool is_less(const this_type& Other)const{
+				if(!Itr.is_less(Other.Itr))return false;
+				return Pos < Other.Pos;
+			}
+			lattice_difference_type distance(const this_type& Other)const{
+				return (Pos - Other.Pos) * Size + Itr.distance(Other.Itr);
+			}
 		};
 		template<typename iterator_>
 		struct basic_lattice_iterator<iterator_, 1>{
 			friend struct basic_lattice_iterator<iterator_, 2>;
-			using difference_type = typename iterator_::difference_type;
+			using lattice_difference_type = typename iterator_::difference_type;
 			using this_type = basic_lattice_iterator<iterator_, 1>;
 			using iterator_type = iterator_;
 			constexpr static unsigned int dim(){ return 1; }
 		private:
 			iterator_type Itr;
-			difference_type Pos;
-			difference_type Size;
-			difference_type Gap;
+			lattice_difference_type Pos;
+			lattice_difference_type Size;
+			lattice_difference_type Gap;
 		public:
 			basic_lattice_iterator() = default;
-			basic_lattice_iterator(iterator_type Itr_, difference_type Pos_, difference_type Size_, difference_type Gap_)
+			basic_lattice_iterator(iterator_type Itr_, lattice_difference_type Pos_, lattice_difference_type Size_, lattice_difference_type Gap_)
 				: Itr(Itr_)
 				, Pos(Pos_)
 				, Size(Size_)
 				, Gap(Gap_){}
 		private:
-			difference_type advance_pos(difference_type& RequestedStep){
-				difference_type RawStep = 0;
+			lattice_difference_type advance_pos(lattice_difference_type& RequestedStep){
+				lattice_difference_type RawStep = 0;
 
-				difference_type NewPos = (Pos + RequestedStep) % Size;
+				lattice_difference_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep = (NewPos - Pos) * step_distance();
+				RawStep = (NewPos - Pos) * step();
 
 				if(RequestedStep > 0 && NewPos < Pos){
 					RequestedStep = (RequestedStep / lattice_size()) + 1;
@@ -100,20 +110,29 @@ namespace hmLib{
 
 				return RawStep;
 			}
-			void advance_itr(difference_type RawStep){ std::advance(Itr, RawStep); }
+			void advance_itr(lattice_difference_type RawStep){ std::advance(Itr, RawStep); }
 		public:
-			difference_type pos()const{ return Pos; }
-			difference_type size()const{ return Size; }
-			difference_type step_size()const{ return 1; }
-			difference_type lattice_size()const{ return size(); }
-			difference_type gap()const{ return Gap; }
-			difference_type step_distance()const{ return gap() + step_size(); }
-			void advance(difference_type Diff){
+			iterator_& ref(){ return Itr; }
+			const iterator_& ref()const{ return Itr; }
+			lattice_difference_type pos()const{ return Pos; }
+			lattice_difference_type size()const{ return Size; }
+			lattice_difference_type gap()const{ return Gap; }
+			lattice_difference_type step()const{ return gap() + step_size(); }
+			lattice_difference_type step_size()const{ return 1; }
+			lattice_difference_type lattice_size()const{ return size(); }
+			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep);
 			}
-			iterator_& ref(){ return Itr; }
-			const iterator_& ref()const{ return Itr; }
+			bool is_equal(const this_type& Other)const{
+				return Pos == Other.Pos;
+			}
+			bool is_less(const this_type& Other)const{
+				return Pos < Other.Pos;
+			}
+			lattice_difference_type distance(const this_type& Other)const{
+				return (Pos - Other.Pos) * Size;
+			}
 		};
 		template<typename iterator_>
 		struct basic_lattice_iterator<iterator_, 0>{};
@@ -124,7 +143,7 @@ namespace hmLib{
 		struct lattice_iterator_mixin<this_type, std::output_iterator_tag, is_const_ ,reference, pointer, difference_type>{
 			this_type& operator++(){
 				static_cast<this_type*>(this)->advance(1);
-				return *this;
+				return *static_cast<this_type*>(this);
 			}
 			this_type operator++(int){
 				this_type Prev = *this;
@@ -135,20 +154,20 @@ namespace hmLib{
 				return static_cast<this_type*>(this)->ref().operator*();
 			}
 			const reference operator*()const{
-				return static_cast<this_type*>(this)->ref().operator*();
+				return static_cast<const this_type*>(this)->ref().operator*();
 			}
 			pointer operator->(){
 				return static_cast<this_type*>(this)->ref().operator->();
 			}
 			const pointer operator->()const{
-				return static_cast<this_type*>(this)->ref().operator->();
+				return static_cast<const this_type*>(this)->ref().operator->();
 			}
 		};
 		template<typename this_type, bool is_const_, typename reference, typename pointer, typename difference_type>
 		struct lattice_iterator_mixin<this_type, std::input_iterator_tag, is_const_, reference, pointer, difference_type>{
 			this_type& operator++(){
 				static_cast<this_type*>(this)->advance(1);
-				return *this;
+				return *static_cast<this_type*>(this);
 			}
 			this_type operator++(int){
 				this_type Prev = *this;
@@ -156,26 +175,26 @@ namespace hmLib{
 				return Prev;
 			}
 			const reference operator*()const{
-				return static_cast<this_type*>(this)->ref().operator*();
+				return static_cast<const this_type*>(this)->ref().operator*();
 			}
 			const pointer operator->()const{
-				return static_cast<this_type*>(this)->ref().operator->();
+				return static_cast<const this_type*>(this)->ref().operator->();
 			}
 			friend bool operator==(const this_type& val1, const this_type& val2){
-				return val1.ref() == val2.ref();
+				return val1.is_equal(val2);
 			}
 			friend bool operator!=(const this_type& val1, const this_type& val2){
-				return val1.ref() != val2.ref();
+				return !val1.is_equal(val2);
 			}
 		};
 		template<typename this_type, typename reference, typename pointer, typename difference_type>
 		struct lattice_iterator_mixin<this_type, std::forward_iterator_tag, false, reference, pointer, difference_type>
 			: public lattice_iterator_mixin<this_type, std::output_iterator_tag, false, reference, pointer, difference_type>{
 			friend bool operator==(const this_type& val1, const this_type& val2){
-				return val1.ref() == val2.ref();
+				return val1.is_equal(val2);
 			}
 			friend bool operator!=(const this_type& val1, const this_type& val2){
-				return val1.ref() != val2.ref();
+				return !val1.is_equal(val2);
 			}
 		};
 		template<typename this_type, typename reference, typename pointer, typename difference_type>
@@ -187,7 +206,7 @@ namespace hmLib{
 			: public lattice_iterator_mixin<this_type, std::forward_iterator_tag, is_const_, reference, pointer, difference_type>{
 			this_type& operator--(){
 				static_cast<this_type*>(this)->advance(-1);
-				return *this;
+				return *static_cast<this_type*>(this);
 			}
 			this_type operator--(int){
 				this_type Prev = *this;
@@ -204,8 +223,8 @@ namespace hmLib{
 				return *other;
 			}
 			this_type& operator+=(difference_type pos){
-				static_cast<this_type*>(this)->advance(pos1);
-				return *this;
+				static_cast<this_type*>(this)->advance(pos);
+				return static_cast<this_type*>(this);
 
 			}
 			friend this_type operator+(const this_type& val, difference_type pos){
@@ -219,19 +238,19 @@ namespace hmLib{
 				return other;
 			}
 			friend difference_type operator-(const this_type& val1, const this_type& val2){
-				return val1.ref() - val2.ref();
+				return val1.distance(val2);
 			}
 			friend bool operator<(const this_type& val1, const this_type& val2){
-				return val1.ref() < val2.ref();
+				return val1.is_less(val2);
 			}
 			friend bool operator>(const this_type& val1, const this_type& val2){
-				return val1.ref() > val2.ref();
+				return val2.is_less(val1);
 			}
 			friend bool operator<=(const this_type& val1, const this_type& val2){
-				return val1.ref() <= val2.ref();
+				return val1.is_equal(val2) || val1.is_less(val2);;
 			}
 			friend bool operator>=(const this_type& val1, const this_type& val2){
-				return val1.ref() >= val2.ref();
+				return val1.is_equal(val2) || val2.is_less(val1);;
 			}
 		};
 		template<typename this_type, typename reference, typename pointer, typename difference_type>
@@ -248,8 +267,8 @@ namespace hmLib{
 				return *other;
 			}
 			this_type& operator+=(difference_type pos){
-				static_cast<this_type*>(this)->advance(pos1);
-				return *this;
+				static_cast<this_type*>(this)->advance(pos);
+				return *static_cast<this_type*>(this);
 
 			}
 			friend this_type operator+(const this_type& val, difference_type pos){
@@ -263,19 +282,19 @@ namespace hmLib{
 				return other;
 			}
 			friend difference_type operator-(const this_type& val1, const this_type& val2){
-				return val1.ref() - val2.ref();
+				return val1.distance(val2);
 			}
 			friend bool operator<(const this_type& val1, const this_type& val2){
-				return val1.ref() < val2.ref();
+				return val1.is_less(val2);
 			}
 			friend bool operator>(const this_type& val1, const this_type& val2){
-				return val1.ref() > val2.ref();
+				return val2.is_less(val1);
 			}
 			friend bool operator<=(const this_type& val1, const this_type& val2){
-				return val1.ref() <= val2.ref();
+				return val1.is_equal(val2) || val1.is_less(val2);;
 			}
 			friend bool operator>=(const this_type& val1, const this_type& val2){
-				return val1.ref() >= val2.ref();
+				return val1.is_equal(val2) || val2.is_less(val1);;
 			}
 		};
 	}
@@ -291,10 +310,13 @@ namespace hmLib{
 		lattice_iterator() = default;
 		template<typename iterator_pos, typename iterator_size, typename iterator_step>
 		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
-			: basic_lattice_iterator<iterator_, dim_>(basic_lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_size + 1, end_size, begin_step + 1, end_step), *begin_pos, *begin_size, *begin_step){
+			: basic_lattice_iterator<iterator_, dim_>(lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_size + 1, end_size, begin_step + 1, end_step), *begin_pos, *begin_size, *begin_step){
 		}
-		template<typename container_pos, typename container_size, typename container_step>
-		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_step& set_step)
+//		template<typename container_pos, typename container_size, typename container_step>
+//		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_step& set_step)
+//			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
+//		}
+		lattice_iterator(iterator_ itr, std::initializer_list<difference_type> set_pos, std::initializer_list<difference_type> set_size, std::initializer_list<difference_type> set_step)
 			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
 		}
 	};
