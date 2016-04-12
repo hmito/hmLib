@@ -72,7 +72,7 @@ namespace hmLib{
 			Itr.advance(1);
 			Assert::AreEqual(6, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 		}
-		TEST_METHOD(lattice_itr24){
+/*		TEST_METHOD(lattice_itr24){
 			using container = std::vector<int>;
 			using iterator = container::iterator;
 
@@ -110,7 +110,7 @@ namespace hmLib{
 			Itr.advance(2);
 			Assert::AreEqual(14, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 		}
-	};
+*/	};
 	TEST_CLASS(test_lattice_iterator){
 	public:
 		TEST_METHOD(lattice_itr1){
@@ -164,38 +164,40 @@ namespace hmLib{
 			lattice_iterator<iterator, 2> Itr(Con.begin(), {0,0}, {4,3}, {1,0});
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(1, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(2, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(4, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(5, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(6, std::distance(Con.begin(), Itr.ref()), L"Position Error");
+			++Itr;
+			Assert::AreEqual(8, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 		}
-		TEST_METHOD(lattice_itr24){
+/*		TEST_METHOD(lattice_itr24){
 			using container = std::vector<int>;
 			using iterator = container::iterator;
 
 			container Con(1000);
 
-			basic_lattice_iterator<iterator, 1> Itr1(Con.begin(), 0, 3, 1);
-			basic_lattice_iterator<iterator, 2> Itr(Itr1, 0, 4, 1);
+			lattice_iterator<iterator, 2> Itr(Con.begin(), {0,0}, {4,3}, {1,1});
+			
 
 			Assert::AreEqual(0, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(2, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(4, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(7, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(9, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(11, std::distance(Con.begin(), Itr.ref()), L"Position Error");
-			Itr.advance(1);
+			++Itr;
 			Assert::AreEqual(14, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 		}
 		TEST_METHOD(lattice_itr24_somestep){
@@ -213,5 +215,5 @@ namespace hmLib{
 			Itr.advance(2);
 			Assert::AreEqual(14, std::distance(Con.begin(), Itr.ref()), L"Position Error");
 		}
-	}; 
+*/	}; 
 }

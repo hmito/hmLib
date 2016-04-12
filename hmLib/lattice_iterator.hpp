@@ -117,8 +117,7 @@ namespace hmLib{
 			lattice_difference_type pos()const{ return Pos; }
 			lattice_difference_type size()const{ return Size; }
 			lattice_difference_type gap()const{ return Gap; }
-			lattice_difference_type step()const{ return gap() + step_size(); }
-			lattice_difference_type step_size()const{ return 1; }
+			lattice_difference_type step()const{ return gap() + 1; }
 			lattice_difference_type lattice_size()const{ return size(); }
 			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
