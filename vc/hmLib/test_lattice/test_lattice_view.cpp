@@ -117,6 +117,41 @@ public:
 		Assert::AreEqual(6, Lattice.size<2>(), L"Size Error");
 		Assert::AreEqual(0, Lattice.gap<2>(), L"Size Error");
 	}
+	TEST_METHOD(at_point){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 2> Lat(Con.begin(), Con.end(), std::make_pair(5, 3), std::make_pair(6, 4));
+
+		Assert::AreEqual(0, Lat.at(lattices::make_point(0, 0)), L"Access Error");
+		Assert::AreEqual(5, Lat.at(lattices::make_point(0, 1)), L"Access Error");
+		Assert::AreEqual(10, Lat.at(lattices::make_point(0, 2)), L"Access Error");
+		Assert::AreEqual(33, Lat.at(lattices::make_point(1, 0)), L"Access Error");
+		Assert::AreEqual(43, Lat.at(lattices::make_point(1, 2)), L"Access Error");
+		Assert::AreEqual(114, Lat.at(lattices::make_point(3, 3)), L"Access Error");
+	}
+	TEST_METHOD(operator_access){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 2> Lat(Con.begin(), Con.end(), std::make_pair(5, 3), std::make_pair(6, 4));
+
+		Assert::AreEqual(0, Lat[lattices::make_point(0, 0)], L"Access Error");
+		Assert::AreEqual(0, Lat[{0, 0}], L"Access Error");
+		Assert::AreEqual(5, Lat[lattices::make_point(0, 1)], L"Access Error");
+		Assert::AreEqual(10, Lat[lattices::make_point(0, 2)], L"Access Error");
+		Assert::AreEqual(33, Lat[lattices::make_point(1, 0)], L"Access Error");
+		Assert::AreEqual(43, Lat[lattices::make_point(1, 2)], L"Access Error");
+		Assert::AreEqual(114, Lat[lattices::make_point(3, 3)], L"Access Error");
+	}
 	/*
 	TEST_METHOD(point){
 		using container = std::vector<int>;

@@ -65,7 +65,13 @@ namespace hmLib{
 		template<typename... others>
 		reference at(difference_type Pos_, others... Others_){
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			return Lower.direct_at(Pos_*lattice_step(), Others_...);
+			return Lower.at_template(Pos_*lattice_step(), Others_...);
+		}
+		reference at(const point_type& Point_){
+			return Lower.at_iterator(Point_[0] * lattice_step(), Point_.begin() + 1, Point_.end());
+		}
+		reference operator[](const point_type& Point_){
+			return Lower.at_iterator(Point_[0] * lattice_step(), Point_.begin() + 1, Point_.end());
 		}
 	public:
 		template<unsigned int req_dim_>
@@ -81,11 +87,16 @@ namespace hmLib{
 		difference_type lattice_size()const{ return Size*Lower.lattice_size(); }
 		difference_type lattice_step()const{ return Gap+Lower.lattice_size()*Lower.lattice_step(); }
 	private:
-		reference direct_at(difference_type DirectPos_) = delete;	//===ERROR===: Too few arguments for access at.
+		reference at_template(difference_type RawPos_) = delete;	//===ERROR===: Too few arguments for access at.
 		template<typename... others>
-		reference direct_at(difference_type DirectPos_, difference_type Pos_, others... Others_){
+		reference at_template(difference_type RawPos_, difference_type Pos_, others... Others_){
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			return Lower.direct_at(DirectPos_+Pos_*lattice_step(), Others_...);
+			return Lower.at_template(RawPos_+Pos_*lattice_step(), Others_...);
+		}
+		template<typename iterator>
+		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){
+			RawPos_ += (*Begin_)*lattice_step();
+			return Lower.at_iterator(RawPos_, ++Begin_, End_);
 		}
 	private:
 		template<unsigned int req_dim_, typename T = void>
@@ -132,9 +143,11 @@ namespace hmLib{
 		difference_type lattice_size()const{ return 1; }
 		difference_type lattice_step()const{ return 1; }
 	private:
-		reference direct_at(difference_type DirectPos_){return *std::next(Begin, DirectPos_);}
+		reference at_template(difference_type RawPos_){return *std::next(Begin, RawPos_);}
 		template<typename... others>
-		reference direct_at(others... Others_)=delete;//===ERROR===: Too much arguments for access position.
+		reference at_template(others... Others_)=delete;//===ERROR===: Too much arguments for access position.
+		template<typename iterator>
+		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }
 	};
 
 	template<typename iterator, typename... others>
