@@ -18,6 +18,124 @@ namespace hmLib{
 		auto make_point(others... Others)->point<sizeof...(others)>{
 			return point<sizeof...(others)>{Others...};
 		}
+
+		namespace iterators{
+			template<typename this_type, typename iterator_category_ = this_type::iterator_category, bool is_const_ = std::is_const<this_type::value_type>::value, typename reference = this_type::reference, typename pointer = this_type::pointer, typename difference_type = this_type::difference_type>
+			struct lattice_iterator_mixin{};
+			template<typename this_type, bool is_const_, typename reference, typename pointer, typename difference_type>
+			struct lattice_iterator_mixin<this_type, std::output_iterator_tag, is_const_, reference, pointer, difference_type>{
+				this_type& operator++(){
+					static_cast<this_type*>(this)->advance(1);
+					return *static_cast<this_type*>(this);
+				}
+				this_type operator++(int){
+					this_type Prev = *this;
+					++(*this);
+					return Prev;
+				}
+				reference operator*(){
+					return static_cast<this_type*>(this)->ref().operator*();
+				}
+				const reference operator*()const{
+					return static_cast<const this_type*>(this)->ref().operator*();
+				}
+				pointer operator->(){
+					return static_cast<this_type*>(this)->ref().operator->();
+				}
+				const pointer operator->()const{
+					return static_cast<const this_type*>(this)->ref().operator->();
+				}
+			};
+			template<typename this_type, bool is_const_, typename reference, typename pointer, typename difference_type>
+			struct lattice_iterator_mixin<this_type, std::input_iterator_tag, is_const_, reference, pointer, difference_type>{
+				this_type& operator++(){
+					static_cast<this_type*>(this)->advance(1);
+					return *static_cast<this_type*>(this);
+				}
+				this_type operator++(int){
+					this_type Prev = *this;
+					++(*this);
+					return Prev;
+				}
+				const reference operator*()const{
+					return static_cast<const this_type*>(this)->ref().operator*();
+				}
+				const pointer operator->()const{
+					return static_cast<const this_type*>(this)->ref().operator->();
+				}
+				friend bool operator==(const this_type& val1, const this_type& val2){
+					return val1.is_equal(val2);
+				}
+				friend bool operator!=(const this_type& val1, const this_type& val2){
+					return !val1.is_equal(val2);
+				}
+			};
+			template<typename this_type, typename reference, typename pointer, typename difference_type>
+			struct lattice_iterator_mixin<this_type, std::forward_iterator_tag, false, reference, pointer, difference_type>
+				: public lattice_iterator_mixin<this_type, std::output_iterator_tag, false, reference, pointer, difference_type>{
+				friend bool operator==(const this_type& val1, const this_type& val2){
+					return val1.is_equal(val2);
+				}
+				friend bool operator!=(const this_type& val1, const this_type& val2){
+					return !val1.is_equal(val2);
+				}
+			};
+			template<typename this_type, typename reference, typename pointer, typename difference_type>
+			struct lattice_iterator_mixin<this_type, std::forward_iterator_tag, true, reference, pointer, difference_type>
+				: public lattice_iterator_mixin<this_type, std::input_iterator_tag, true, reference, pointer, difference_type>{};
+			template<typename this_type, bool is_const_, typename reference, typename pointer, typename difference_type>
+			struct lattice_iterator_mixin<this_type, std::bidirectional_iterator_tag, is_const_, reference, pointer, difference_type>
+				: public lattice_iterator_mixin<this_type, std::forward_iterator_tag, is_const_, reference, pointer, difference_type>{
+				this_type& operator--(){
+					static_cast<this_type*>(this)->advance(-1);
+					return *static_cast<this_type*>(this);
+				}
+				this_type operator--(int){
+					this_type Prev = *this;
+					--(*this);
+					return Prev;
+				}
+			};
+			template<typename this_type, typename reference, typename pointer, typename difference_type>
+			struct lattice_iterator_mixin<this_type, std::random_access_iterator_tag, true, reference, pointer, difference_type>
+				: public lattice_iterator_mixin<this_type, std::bidirectional_iterator_tag, true, reference, pointer, difference_type>{
+				const reference operator[](difference_type pos)const{
+					this_type other = *static_cast<const this_type*>(this);
+					other += pos;
+					return *other;
+				}
+				this_type& operator+=(difference_type pos){
+					static_cast<this_type*>(this)->advance(pos);
+					return static_cast<this_type*>(this);
+
+				}
+				friend this_type operator+(const this_type& val, difference_type pos){
+					this_type other = val;
+					other += pos;
+					return other;
+				}
+				friend this_type operator+(difference_type pos, const this_type& val){
+					this_type other = val;
+					other += pos;
+					return other;
+				}
+				friend difference_type operator-(const this_type& val1, const this_type& val2){
+					return val1.distance(val2);
+				}
+				friend bool operator<(const this_type& val1, const this_type& val2){
+					return val1.is_less(val2);
+				}
+				friend bool operator>(const this_type& val1, const this_type& val2){
+					return val2.is_less(val1);
+				}
+				friend bool operator<=(const this_type& val1, const this_type& val2){
+					return val1.is_equal(val2) || val1.is_less(val2);;
+				}
+				friend bool operator>=(const this_type& val1, const this_type& val2){
+					return val1.is_equal(val2) || val2.is_less(val1);;
+				}
+			};
+		}
 	}
 	template<typename iterator_, unsigned int dim_>
 	struct lattice_view{
@@ -36,8 +154,6 @@ namespace hmLib{
 		lower_type Lower;
 	public:
 		lattice_view() = default;
-		template<typename... others>
-		lattice_view(iterator_ Begin_, iterator_ End_) = delete;//===ERROR=== Too few arguments for construct.
 		template<typename... others>
 		lattice_view(iterator_ Begin_, iterator_ End_, difference_type Size_, others... Others_)
 			:Size(Size_)
@@ -136,16 +252,10 @@ namespace hmLib{
 	public:
 		difference_type raw_position(difference_type Ini_){return Ini_;}
 	public:
-		template<unsigned int dim>
-		difference_type size()const = delete;//===ERROR===: Too higher dim is requested.
-		template<unsigned int dim>
-		difference_type gap()const = delete;//===ERROR===: Too higher dim is requested.
 		difference_type lattice_size()const{ return 1; }
 		difference_type lattice_step()const{ return 1; }
 	private:
 		reference at_template(difference_type RawPos_){return *std::next(Begin, RawPos_);}
-		template<typename... others>
-		reference at_template(others... Others_)=delete;//===ERROR===: Too much arguments for access position.
 		template<typename iterator>
 		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }
 	};

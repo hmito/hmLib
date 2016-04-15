@@ -31,14 +31,14 @@ namespace hmLib{
 				lattice_difference_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep += (NewPos - Pos) * step();
+				RawStep += (NewPos - Pos) * lattice_step();
 
 				if(RequestedStep > 0 && NewPos < Pos){
-					RequestedStep = (RequestedStep / lattice_size()) + 1;
+					RequestedStep = (RequestedStep / size()) + 1;
 				} else if(RequestedStep < 0 && NewPos > Pos){
-					RequestedStep = (RequestedStep / lattice_size()) - 1;
+					RequestedStep = (RequestedStep / size()) - 1;
 				} else{
-					RequestedStep = (RequestedStep / lattice_size());
+					RequestedStep = (RequestedStep / size());
 				}
 
 				Pos = NewPos;
@@ -52,7 +52,7 @@ namespace hmLib{
 			lattice_difference_type pos()const{ return Pos; }
 			lattice_difference_type size()const{ return Size; }
 			lattice_difference_type gap()const{ return Gap; }
-			lattice_difference_type step()const{ return gap() + Itr.lattice_size(); }
+			lattice_difference_type lattice_step()const{ return gap() + Itr.lattice_size()*Itr.lattice_step(); }
 			lattice_difference_type lattice_size()const{ return Itr.lattice_size()*size(); }
 			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
@@ -96,14 +96,14 @@ namespace hmLib{
 				lattice_difference_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep = (NewPos - Pos) * step();
+				RawStep = (NewPos - Pos) * lattice_step();
 
 				if(RequestedStep > 0 && NewPos < Pos){
-					RequestedStep = (RequestedStep / lattice_size()) + 1;
+					RequestedStep = (RequestedStep / size()) + 1;
 				} else if(RequestedStep < 0 && NewPos > Pos){
-					RequestedStep = (RequestedStep / lattice_size()) - 1;
+					RequestedStep = (RequestedStep / size()) - 1;
 				} else{
-					RequestedStep = (RequestedStep / lattice_size());
+					RequestedStep = (RequestedStep / size());
 				}
 
 				Pos = NewPos;
@@ -117,7 +117,7 @@ namespace hmLib{
 			lattice_difference_type pos()const{ return Pos; }
 			lattice_difference_type size()const{ return Size; }
 			lattice_difference_type gap()const{ return Gap; }
-			lattice_difference_type step()const{ return gap() + 1; }
+			lattice_difference_type lattice_step()const{ return gap() + 1; }
 			lattice_difference_type lattice_size()const{ return size(); }
 			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
@@ -307,16 +307,16 @@ namespace hmLib{
 		using this_type = lattice_iterator<iterator_, dim_, iterator_category_, is_const_>;
 	public:
 		lattice_iterator() = default;
-		template<typename iterator_pos, typename iterator_size, typename iterator_step>
-		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
-			: basic_lattice_iterator<iterator_, dim_>(lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_size + 1, end_size, begin_step + 1, end_step), *begin_pos, *begin_size, *begin_step){
+		template<typename iterator_pos, typename iterator_size, typename iterator_lattice_step>
+		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_lattice_step begin_lattice_step, iterator_lattice_step end_lattice_step)
+			: basic_lattice_iterator<iterator_, dim_>(lattice_iterator<iterator_, dim_-1>(itr, begin_pos+1, end_pos, begin_size + 1, end_size, begin_lattice_step + 1, end_lattice_step), *begin_pos, *begin_size, *begin_lattice_step){
 		}
-//		template<typename container_pos, typename container_size, typename container_step>
-//		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_step& set_step)
-//			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
+//		template<typename container_pos, typename container_size, typename container_lattice_step>
+//		lattice_iterator(iterator_ itr, const container_pos& set_pos, const container_size& set_size, const container_lattice_step& set_lattice_step)
+//			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_lattice_step), std::end(set_lattice_step)){
 //		}
-		lattice_iterator(iterator_ itr, std::initializer_list<difference_type> set_pos, std::initializer_list<difference_type> set_size, std::initializer_list<difference_type> set_step)
-			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
+		lattice_iterator(iterator_ itr, std::initializer_list<difference_type> set_pos, std::initializer_list<difference_type> set_size, std::initializer_list<difference_type> set_lattice_step)
+			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_lattice_step), std::end(set_lattice_step)){
 		}
 	};
 	template<typename iterator_, typename iterator_category_, bool is_const_>
@@ -329,12 +329,12 @@ namespace hmLib{
 		using this_type = lattice_iterator<iterator_, 1, iterator_category_, is_const_>;
 	public:
 		lattice_iterator() = default;
-		template<typename iterator_pos, typename iterator_size, typename iterator_step>
-		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_step begin_step, iterator_step end_step)
-			: basic_lattice_iterator<iterator_, 1>(itr, *begin_pos, *begin_size, *begin_step){
+		template<typename iterator_pos, typename iterator_size, typename iterator_lattice_step>
+		lattice_iterator(iterator_ itr, iterator_pos begin_pos, iterator_pos end_pos, iterator_size begin_size, iterator_size end_size, iterator_lattice_step begin_lattice_step, iterator_lattice_step end_lattice_step)
+			: basic_lattice_iterator<iterator_, 1>(itr, *begin_pos, *begin_size, *begin_lattice_step){
 		}
-		lattice_iterator(iterator_ itr, std::initializer_list<difference_type> set_pos, std::initializer_list<difference_type> set_size, std::initializer_list<difference_type> set_step)
-			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_step), std::end(set_step)){
+		lattice_iterator(iterator_ itr, std::initializer_list<difference_type> set_pos, std::initializer_list<difference_type> set_size, std::initializer_list<difference_type> set_lattice_step)
+			: lattice_iterator(itr, std::begin(set_pos), std::end(set_pos), std::begin(set_size), std::end(set_size), std::begin(set_lattice_step), std::end(set_lattice_step)){
 		}
 		lattice_iterator(iterator_ itr, difference_type Pos_, difference_type Size_, difference_type Gap_)
 			: basic_lattice_iterator<iterator_, 1>(itr, Pos_, Size_, Gap_){
