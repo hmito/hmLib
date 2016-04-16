@@ -5,22 +5,9 @@
 #include<utility>
 #include<iterator>
 #include<hmLib/exceptions.hpp>
+#include"exceptions.hpp"
+#include"point.hpp"
 namespace hmLib{
-	namespace lattices{
-		struct exception_tag{};
-		using exception = hmLib::exceptions::exception_pattern<exception_tag>;
-		using out_of_range_access = hmLib::exceptions::access::out_of_range_access<exception>;
-
-		template<typename T,typename U,unsigned int dim_>
-		T dim_value(){return }
-
-		template<unsigned int dim_>
-		using point = std::array<int, dim_>;
-		template<typename ...others>
-		auto make_point(others... Others)->point<sizeof...(others)>{
-			return point<sizeof...(others)>{Others...};
-		}
-	}
 	template<typename iterator_, unsigned int dim_>
 	struct lattice_view{
 		friend struct lattice_view<iterator_, dim_ + 1>;

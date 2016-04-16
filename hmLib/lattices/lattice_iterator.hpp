@@ -2,6 +2,8 @@
 #define HMLIB_LATTICEITERATOR_INC 100
 #
 #include<iterator>
+#include"exceptions.hpp"
+#include"point.hpp"
 namespace hmLib{
 	namespace{
 		template<typename iterator_, unsigned int dim_>
