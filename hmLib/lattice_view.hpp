@@ -174,20 +174,23 @@ namespace hmLib{
 		}
 	public:
 		template<typename... others>
-		difference_type raw_position(difference_type Ini_, difference_type Pos_, others... Others_){
-			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			return Lower.raw_position(Ini_ + Pos_*lattice_step(), Others_...);
+		difference_type raw_position(difference_type Pos_, others... Others_)const{
+			static_assert(dim_ == 1 + sizeof...(others), "the number of arguments is different from that of dim.");
+			return raw_position_template(0, Pos_, Others_...);
+		}
+		difference_type raw_position(const point_type& Point_)const{
+			return raw_position_iterator(0, Point_.begin(), Point_.end());
 		}
 		template<typename... others>
 		reference at(difference_type Pos_, others... Others_){
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			return Lower.at_template(Pos_*lattice_step(), Others_...);
+			return at_template(0, Pos_, Others_...);
 		}
 		reference at(const point_type& Point_){
-			return Lower.at_iterator(Point_[0] * lattice_step(), Point_.begin() + 1, Point_.end());
+			return at_iterator(0, Point_.begin(), Point_.end());
 		}
 		reference operator[](const point_type& Point_){
-			return Lower.at_iterator(Point_[0] * lattice_step(), Point_.begin() + 1, Point_.end());
+			return at_iterator(0, Point_.begin(), Point_.end());
 		}
 	public:
 		template<unsigned int req_dim_>
@@ -202,11 +205,21 @@ namespace hmLib{
 		}
 		difference_type lattice_size()const{ return Size*Lower.lattice_size(); }
 		difference_type lattice_step()const{ return Gap+Lower.lattice_size()*Lower.lattice_step(); }
+	public:
+		iterator_ raw_begin(){ return Lower.raw_begin(); }
+		iterator_ raw_end(){ return Lower.raw_end(); }
 	private:
-		reference at_template(difference_type RawPos_) = delete;	//===ERROR===: Too few arguments for access at.
+		template<typename... others>
+		difference_type raw_position_template(difference_type RawPos_, difference_type Pos_, others... Others_)const{
+			return Lower.raw_position_template(RawPos_ + Pos_*lattice_step(), Others_...);
+		}
+		template<typename iterator>
+		difference_type raw_position_iterator(difference_type RawPos_, iterator Begin_, iterator End_)const{
+			RawPos_ += (*Begin_)*lattice_step();
+			return Lower.raw_position_iterator(RawPos_, ++Begin_, End_);
+		}
 		template<typename... others>
 		reference at_template(difference_type RawPos_, difference_type Pos_, others... Others_){
-			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
 			return Lower.at_template(RawPos_+Pos_*lattice_step(), Others_...);
 		}
 		template<typename iterator>
@@ -245,16 +258,16 @@ namespace hmLib{
 	public:
 		lattice_view() = default;
 		lattice_view(iterator_ Begin_, iterator_ End_):Begin(Begin_),End(End_){}
-		template<typename... args>
-		lattice_view(iterator_ Begin_, iterator_ End_, difference_type Size_, args... Others_) = delete;//===ERROR===: Too many argument for lattice constructor.
-		template<typename... args>
-		lattice_view(iterator_ Begin_, iterator_ End_, std::pair<difference_type, difference_type> SizeGap, args... Others_) = delete;//===ERROR===: Too many argument for lattice constructor.
-	public:
-		difference_type raw_position(difference_type Ini_){return Ini_;}
 	public:
 		difference_type lattice_size()const{ return 1; }
 		difference_type lattice_step()const{ return 1; }
+	public:
+		iterator_ raw_begin(){ return Begin; }
+		iterator_ raw_end(){ return End; }
 	private:
+		difference_type raw_position_template(difference_type RawPos_)const{ return RawPos_; }
+		template<typename iterator>
+		difference_type raw_position_iterator(difference_type RawPos_, iterator Begin_, iterator End_)const{ return RawPos_; }
 		reference at_template(difference_type RawPos_){return *std::next(Begin, RawPos_);}
 		template<typename iterator>
 		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }

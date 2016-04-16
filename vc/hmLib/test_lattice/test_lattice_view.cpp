@@ -42,12 +42,12 @@ public:
 
 		lattice_view<iterator, 2> Lat(Con.begin(), Con.end(), 5, 6);
 
-		Assert::AreEqual(0, Lat.raw_position(0, 0, 0), L"Access Error");
-		Assert::AreEqual(1, Lat.raw_position(0, 0, 1), L"Access Error");
-		Assert::AreEqual(2, Lat.raw_position(0, 0, 2), L"Access Error");
-		Assert::AreEqual(6, Lat.raw_position(0, 1, 0), L"Access Error");
-		Assert::AreEqual(8, Lat.raw_position(0, 1, 2), L"Access Error");
-		Assert::AreEqual(21, Lat.raw_position(0, 3, 3), L"Access Error");
+		Assert::AreEqual(0, Lat.raw_position(0, 0), L"Access Error");
+		Assert::AreEqual(1, Lat.raw_position(0, 1), L"Access Error");
+		Assert::AreEqual(2, Lat.raw_position(0, 2), L"Access Error");
+		Assert::AreEqual(6, Lat.raw_position(1, 0), L"Access Error");
+		Assert::AreEqual(8, Lat.raw_position(1, 2), L"Access Error");
+		Assert::AreEqual(21, Lat.raw_position(3, 3), L"Access Error");
 	}
 	TEST_METHOD(at){
 		using container = std::vector<int>;
