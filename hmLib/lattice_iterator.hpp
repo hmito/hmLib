@@ -34,11 +34,11 @@ namespace hmLib{
 				RawStep += (NewPos - Pos) * lattice_step();
 
 				if(RequestedStep > 0 && NewPos < Pos){
-					RequestedStep = (RequestedStep / size()) + 1;
+					RequestedStep = (RequestedStep / Size) + 1;
 				} else if(RequestedStep < 0 && NewPos > Pos){
-					RequestedStep = (RequestedStep / size()) - 1;
+					RequestedStep = (RequestedStep / Size) - 1;
 				} else{
-					RequestedStep = (RequestedStep / size());
+					RequestedStep = (RequestedStep / Size);
 				}
 
 				Pos = NewPos;
@@ -49,11 +49,15 @@ namespace hmLib{
 		public:
 			iterator_& ref(){ return Itr.ref(); }
 			const iterator_& ref()const{ return Itr.ref(); }
-			lattice_difference_type pos()const{ return Pos; }
-			lattice_difference_type size()const{ return Size; }
-			lattice_difference_type gap()const{ return Gap; }
-			lattice_difference_type lattice_step()const{ return gap() + Itr.lattice_size()*Itr.lattice_step(); }
-			lattice_difference_type lattice_size()const{ return Itr.lattice_size()*size(); }
+			template<unsigned int req_dim_>
+			lattice_difference_type pos()const{ return pos_getter<req_dim_>()(); }
+			template<unsigned int req_dim_>
+			lattice_difference_type size()const{ return size_getter<req_dim_>()(); }
+			template<unsigned int req_dim_>
+			lattice_difference_type gap()const{ return gap_getter<req_dim_>()(); }
+			lattice_difference_type lattice_step()const{ return Gap + Itr.lattice_size()*Itr.lattice_step(); }
+			lattice_difference_type lattice_size()const{ return Itr.lattice_size()*Size; }
+		public:
 			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep);
@@ -69,72 +73,61 @@ namespace hmLib{
 			lattice_difference_type distance(const this_type& Other)const{
 				return (Pos - Other.Pos) * Size + Itr.distance(Other.Itr);
 			}
+		private:
+			template<unsigned int req_dim_, typename T = void>
+			struct pos_getter{
+				lattice_difference_type operator()(const this_type& This){ return This.Lower.pos<req_dim_ - 1>(); }
+			};
+			template<typename T>
+			struct pos_getter<0, T>{
+				lattice_difference_type operator()(const this_type& This){ return This.Pos; }
+			};
+			template<unsigned int req_dim_, typename T = void>
+			struct size_getter{
+				lattice_difference_type operator()(const this_type& This){ return This.Lower.size<req_dim_ - 1>(); }
+			};
+			template<typename T>
+			struct size_getter<0, T>{
+				lattice_difference_type operator()(const this_type& This){ return This.Size; }
+			};
+			template<unsigned int req_dim_, typename T = void>
+			struct gap_getter{
+				lattice_difference_type operator()(const this_type& This){ return This.Lower.gap<req_dim_ - 1>(); }
+			};
+			template<typename T>
+			struct gap_getter<0, T>{
+				lattice_difference_type operator()(const this_type& This){ return This.Gap; }
+			};
 		};
 		template<typename iterator_>
-		struct basic_lattice_iterator<iterator_, 1>{
-			friend struct basic_lattice_iterator<iterator_, 2>;
+		struct basic_lattice_iterator<iterator_, 0>{
+			friend struct basic_lattice_iterator<iterator_, 1>;
 			using lattice_difference_type = typename iterator_::difference_type;
-			using this_type = basic_lattice_iterator<iterator_, 1>;
+			using this_type = basic_lattice_iterator<iterator_, 0>;
 			using iterator_type = iterator_;
-			constexpr static unsigned int dim(){ return 1; }
+			constexpr static unsigned int dim(){ return 0; }
 		private:
 			iterator_type Itr;
-			lattice_difference_type Pos;
-			lattice_difference_type Size;
-			lattice_difference_type Gap;
 		public:
 			basic_lattice_iterator() = default;
-			basic_lattice_iterator(iterator_type Itr_, lattice_difference_type Pos_, lattice_difference_type Size_, lattice_difference_type Gap_)
-				: Itr(Itr_)
-				, Pos(Pos_)
-				, Size(Size_)
-				, Gap(Gap_){}
+			basic_lattice_iterator(iterator_type Itr_): Itr(Itr_){}
 		private:
-			lattice_difference_type advance_pos(lattice_difference_type& RequestedStep){
-				lattice_difference_type RawStep = 0;
-
-				lattice_difference_type NewPos = (Pos + RequestedStep) % Size;
-				if(NewPos < 0) NewPos += Size;
-
-				RawStep = (NewPos - Pos) * lattice_step();
-
-				if(RequestedStep > 0 && NewPos < Pos){
-					RequestedStep = (RequestedStep / size()) + 1;
-				} else if(RequestedStep < 0 && NewPos > Pos){
-					RequestedStep = (RequestedStep / size()) - 1;
-				} else{
-					RequestedStep = (RequestedStep / size());
-				}
-
-				Pos = NewPos;
-
-				return RawStep;
-			}
+			lattice_difference_type advance_pos(lattice_difference_type& RequestedStep){return 0;}
 			void advance_itr(lattice_difference_type RawStep){ std::advance(Itr, RawStep); }
 		public:
 			iterator_& ref(){ return Itr; }
 			const iterator_& ref()const{ return Itr; }
-			lattice_difference_type pos()const{ return Pos; }
-			lattice_difference_type size()const{ return Size; }
-			lattice_difference_type gap()const{ return Gap; }
-			lattice_difference_type lattice_step()const{ return gap() + 1; }
-			lattice_difference_type lattice_size()const{ return size(); }
+		public:
+			lattice_difference_type lattice_step()const{ return 1; }
+			lattice_difference_type lattice_size()const{ return 1; }
 			void advance(lattice_difference_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep);
 			}
-			bool is_equal(const this_type& Other)const{
-				return Pos == Other.Pos;
-			}
-			bool is_less(const this_type& Other)const{
-				return Pos < Other.Pos;
-			}
-			lattice_difference_type distance(const this_type& Other)const{
-				return (Pos - Other.Pos) * Size;
-			}
+			bool is_equal(const this_type& Other)const{return true;}
+			bool is_less(const this_type& Other)const{ return true; }
+			lattice_difference_type distance(const this_type& Other)const{ return 0; }
 		};
-		template<typename iterator_>
-		struct basic_lattice_iterator<iterator_, 0>{};
 
 		template<typename this_type, typename iterator_category_ = this_type::iterator_category, bool is_const_ = std::is_const<this_type::value_type>::value, typename reference = this_type::reference, typename pointer = this_type::pointer, typename difference_type = this_type::difference_type>
 		struct lattice_iterator_mixin{};
