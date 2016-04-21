@@ -8,6 +8,18 @@
 #include"exceptions.hpp"
 #include"point.hpp"
 namespace hmLib{
+	namespace lattice_views{
+		template<typename base_type, unsigned int dim_>
+		struct iterator_pattern{};
+		template<typename base_type>
+		struct iterator_pattern<base_type, 0>{
+		private:
+			base_type Base;
+		public:
+
+		};
+	}
+
 	template<typename iterator_, unsigned int dim_>
 	struct lattice_view{
 		friend struct lattice_view<iterator_, dim_ + 1>;
