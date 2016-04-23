@@ -27,8 +27,8 @@ namespace hmLib{
 		struct iterator_base
 			: public std::iterator<typename iterator_::iterator_category, typename iterator_::value_type, typename iterator_::difference_type, typename iterator_::pointer, typename iterator_::reference>{
 			friend struct iterator_base<iterator_, base_, dim_ + 1>;
-			using this_type = iterator_pattern<iterator_, base_, dim_>;
-			using lower_type = iterator_pattern<iterator_, base_, dim_ - 1>;
+			using this_type = iterator_base<iterator_, base_, dim_>;
+			using lower_type = iterator_base<iterator_, base_, dim_ - 1>;
 			using raw_iterator = iterator_;
 			using base_type = base_;
 		public:
@@ -86,7 +86,7 @@ namespace hmLib{
 				other += pos;
 				return *other;
 			}
-			this_tyoe& operator++(){
+			this_type& operator++(){
 				advance(1);
 				return *this;
 			}
@@ -95,7 +95,7 @@ namespace hmLib{
 				advance(1);
 				return pre;
 			}
-			this_tyoe& operator--(){
+			this_type& operator--(){
 				advance(-1);
 				return *this;
 			}
@@ -145,7 +145,7 @@ namespace hmLib{
 			friend bool operator<=(const this_type& val1, const this_type& val2){
 				return val1.sup() < val2.sup() || (val1.sup() == val2.sup() && val1.is_lower_or_equal(val2));
 			}
-			friend bool operator<=(const this_type& val1, const this_type& val2){
+			friend bool operator>=(const this_type& val1, const this_type& val2){
 				return val1.sup() > val2.sup() || (val1.sup() == val2.sup() && val2.is_lower_or_equal(val1));
 			}
 		private:
@@ -171,7 +171,7 @@ namespace hmLib{
 				point_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep += (NewPos - Pos) * lattice_step();
+				RawStep += (NewPos - Pos) * lattice_step<0>();
 
 				if(RequestedStep > 0 && NewPos < Pos){
 					RequestedStep = (RequestedStep / Size) + 1;
@@ -236,7 +236,7 @@ namespace hmLib{
 				point_type NewPos = (Pos + RequestedStep) % Size;
 				if(NewPos < 0) NewPos += Size;
 
-				RawStep += (NewPos - Pos) * lattice_step();
+				RawStep += (NewPos - Pos) * lattice_step<0>();
 
 				if(RequestedStep > 0 && NewPos < Pos){
 					RequestedStep = (RequestedStep / Size) + 1;
@@ -282,7 +282,7 @@ namespace hmLib{
 			, Gap(0)
 			, Lower(Begin_, End_, Others_...){
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			hmLib_assert(std::distance(Begin_, End_) >= lattice_step(), lattices::exception, "Too small range for lattice_view.");
+			hmLib_assert(std::distance(Begin_, End_) >= lattice_step<0>(), lattices::exception, "Too small range for lattice_view.");
 		}
 		template<typename... others>
 		lattice_view(iterator_ Begin_, iterator_ End_, std::pair<difference_type, difference_type> SizeGap, others... Others_)
@@ -292,7 +292,7 @@ namespace hmLib{
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
 			Size = SizeGap.first;
 			Gap = SizeGap.second;
-			hmLib_assert(std::distance(Begin_, End_) >= lattice_step(), lattices::exception, "Too small range for lattice_view.");
+			hmLib_assert(std::distance(Begin_, End_) >= lattice_step<0>(), lattices::exception, "Too small range for lattice_view.");
 		}
 	public:
 		template<typename... others>
@@ -348,7 +348,7 @@ namespace hmLib{
 		template<typename... others>
 		difference_type raw_position_template(difference_type RawPos_, difference_type Pos_, others... Others_)const{
 			hmLib_assert(Pos_ < Size, lattices::out_of_range_access, "The requested position is out of range.");
-			return Lower.raw_position_template(RawPos_ + Pos_*lattice_step(), Others_...);
+			return Lower.raw_position_template(RawPos_ + Pos_*lattice_step<0>(), Others_...);
 		}
 		template<typename iterator>
 		difference_type raw_position_iterator(difference_type RawPos_, iterator Begin_, iterator End_)const{
@@ -359,12 +359,12 @@ namespace hmLib{
 		template<typename... others>
 		reference at_template(difference_type RawPos_, difference_type Pos_, others... Others_){
 			hmLib_assert(Pos_<  Size, lattices::out_of_range_access, "The requested position is out of range.");
-			return Lower.at_template(RawPos_ + Pos_*lattice_step(), Others_...);
+			return Lower.at_template(RawPos_ + Pos_*lattice_step<0>(), Others_...);
 		}
 		template<typename iterator>
 		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){
 			hmLib_assert(*Begin_<  Size, lattices::out_of_range_access, "The requested position is out of range.");
-			RawPos_ += (*Begin_)*lattice_step();
+			RawPos_ += (*Begin_)*lattice_step<0>();
 			return Lower.at_iterator(RawPos_, ++Begin_, End_);
 		}
 	private:
@@ -390,7 +390,7 @@ namespace hmLib{
 		};
 		template<typename T>
 		struct lattice_size_getter<0, T>{
-			difference_type operator()(const this_type& This){ return This.Size*This.Lower.lattice_size(); }
+			difference_type operator()(const this_type& This){ return This.Size*This.Lower.lattice_size<0>(); }
 		};
 		template<unsigned int req_dim_, typename T = void>
 		struct lattice_step_getter{
@@ -405,9 +405,12 @@ namespace hmLib{
 	struct lattice_view<iterator_, 0>{
 		friend struct lattice_view<iterator_, 1>;
 		using this_type = lattice_view<iterator_, 0>;
-		using difference_type = int;
+		using point_type = lattices::point_type;
+		using difference_type = lattices::difference_type;
 		using value_type = typename iterator_::value_type;
 		using reference = typename iterator_::reference;
+		using point = lattices::point<0>;
+		using iterator = lattices::iterator_base<iterator_, this_type, 0>;
 		using raw_iterator = iterator_;
 	public:
 		lattice_view() = default;
@@ -420,6 +423,8 @@ namespace hmLib{
 	public:
 		raw_iterator raw_begin(){ return Begin; }
 		raw_iterator raw_end(){ return End; }
+		iterator begin(){ return iterator(Begin,*this,0); }
+		iterator end(){ return iterator(End, *this, 1); }
 	private:
 		raw_iterator Begin;
 		raw_iterator End;

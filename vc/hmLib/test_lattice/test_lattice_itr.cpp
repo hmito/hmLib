@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 #include<vector>
 #include<algorithm>
-#include <hmLib/lattice_iterator.hpp>
+#include <hmLib/lattice_view.hpp>
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
