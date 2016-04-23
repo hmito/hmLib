@@ -6,8 +6,9 @@
 #include<iterator>
 #include<hmLib/exceptions.hpp>
 namespace hmLib{
-	namespace lattice_views{
+	namespace lattices{
 		using point_type = int;
+		using difference_type = int;
 
 		struct exception_tag{};
 		struct out_of_dim_exception_tag{};
@@ -32,6 +33,7 @@ namespace hmLib{
 			using base_type = base_;
 		public:
 			iterator_base() = default;
+			iterator_base(lower_type Lower_, point_type Pos_):Lower(Lower_),Pos(Pos_){}
 			template<typename... others>
 			iterator_base(raw_iterator Itr, base_type& Ref_, point_type Pos_, others... Others)
 				: Pos(Pos_)
@@ -178,18 +180,20 @@ namespace hmLib{
 			difference_type distance_from(const this_type& Other)const{
 				return (Pos - Other.Pos) * size<0>() + Itr.distance_from(Other.Itr);
 			}
-
 		};
 		template<typename iterator_, typename base_>
-		struct iterator_pattern<iterator_, base_, 0>{
-			friend struct iterator_pattern<iterator_, base_, 1>;
-			using this_type = iterator_pattern<iterator_, base_, 0>;
+		struct iterator_base<iterator_, base_, 0>{
+			friend struct iterator_base<iterator_, base_, 1>;
+			using this_type = iterator_base<iterator_, base_, 0>;
 			using raw_iterator = iterator_;
 			using base_type = base_;
-		private:
-			raw_iterator Itr;
-			base_type* Ptr;
-			point_type Sup;
+		public:
+			iterator_base():Itr(), Ptr(nullptr), Sup(0){}
+			iterator_base(raw_iterator Itr_, base_type& Ref_, point_type Sup_ = 0)
+				: Itr(Itr_)
+				, Ptr(&Ref_)
+				, Sup(Sup_){
+			}
 		public:
 			point_type sup()const{ return Sup; }
 			raw_iterator& ref(){ return Itr; }
@@ -221,6 +225,10 @@ namespace hmLib{
 			bool is_equal(const this_type& Other)const{ return true; }
 			bool is_less(const this_type& Other)const{ return false; }
 			bool is_less_or_equal(const this_type& Other)const{ return true; }
+		private:
+			raw_iterator Itr;
+			base_type* Ptr;
+			point_type Sup;
 		};
 	}
 
@@ -229,11 +237,12 @@ namespace hmLib{
 		friend struct lattice_view<iterator_, dim_ + 1>;
 		using this_type = lattice_view<iterator_, dim_>;
 		using lower_type = lattice_view<iterator_, dim_ - 1>;
-		using difference_type = int;
+		using point_type = lattices::point_type;
+		using difference_type = lattices::difference_type;
 		using value_type = typename iterator_::value_type;
 		using reference = typename iterator_::reference;
-		using point_type = lattices::point<dim_>;
-//		using iterator = 
+		using point = lattices::point<dim_>;
+		using iterator = lattices::iterator_base<iterator_, this_type, dim_>;
 		using raw_iterator = iterator_;
 	public:
 		static constexpr unsigned int dim(){ return dim_; }
@@ -267,7 +276,7 @@ namespace hmLib{
 			static_assert(dim_ == 1 + sizeof...(others), "the number of arguments is different from that of dim.");
 			return raw_position_template(0, Pos_, Others_...);
 		}
-		difference_type raw_position(const point_type& Point_)const{
+		difference_type raw_position(const point& Point_)const{
 			return raw_position_iterator(0, Point_.begin(), Point_.end());
 		}
 		template<typename... others>
@@ -275,10 +284,10 @@ namespace hmLib{
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
 			return at_template(0, Pos_, Others_...);
 		}
-		reference at(const point_type& Point_){
+		reference at(const point& Point_){
 			return at_iterator(0, Point_.begin(), Point_.end());
 		}
-		reference operator[](const point_type& Point_){
+		reference operator[](const point& Point_){
 			return at_iterator(0, Point_.begin(), Point_.end());
 		}
 	public:
@@ -292,8 +301,16 @@ namespace hmLib{
 			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 			return gap_getter<req_dim_>()(*this);
 		}
-		difference_type lattice_size()const{ return Size*Lower.lattice_size(); }
-		difference_type lattice_step()const{ return Gap + Lower.lattice_size()*Lower.lattice_step(); }
+		template<unsigned int req_dim_>
+		difference_type lattice_size()const{
+			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+			return lattice_size_getter<req_dim_>()(*this);
+		}
+		template<unsigned int req_dim_>
+		difference_type lattice_step()const{
+			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+			return lattice_step_getter<req_dim_>()(*this);
+		}
 	public:
 		raw_iterator raw_begin(){ return Lower.raw_begin(); }
 		raw_iterator raw_end(){ return Lower.raw_end(); }
@@ -337,6 +354,22 @@ namespace hmLib{
 		struct gap_getter<0, T>{
 			difference_type operator()(const this_type& This){ return This.Gap; }
 		};
+		template<unsigned int req_dim_, typename T = void>
+		struct lattice_size_getter{
+			difference_type operator()(const this_type& This){ return This.Lower.lattice_size<req_dim_ - 1>();}
+		};
+		template<typename T>
+		struct lattice_size_getter<0, T>{
+			difference_type operator()(const this_type& This){ return This.Size*This.Lower.lattice_size(); }
+		};
+		template<unsigned int req_dim_, typename T = void>
+		struct lattice_step_getter{
+			difference_type operator()(const this_type& This){ return This.Lower.lattice_step<req_dim_ - 1>(); }
+		};
+		template<typename T>
+		struct lattice_step_getter<0, T>{
+			difference_type operator()(const this_type& This){ return This.Gap + This.Lower.lattice_size<0>()*This.Lower.lattice_step<0>(); }
+		};
 	};
 	template<typename iterator_>
 	struct lattice_view<iterator_, 0>{
@@ -353,7 +386,9 @@ namespace hmLib{
 		lattice_view() = default;
 		lattice_view(raw_iterator Begin_, raw_iterator End_) :Begin(Begin_), End(End_){}
 	public:
+		template<unsigned int req_dim_>
 		difference_type lattice_size()const{ return 1; }
+		template<unsigned int req_dim_>
 		difference_type lattice_step()const{ return 1; }
 	public:
 		raw_iterator raw_begin(){ return Begin; }
