@@ -32,6 +32,8 @@ namespace hmLib{
 			using raw_iterator = iterator_;
 			using base_type = base_;
 		public:
+			static constexpr unsigned int dim(){ return dim_; }
+		public:
 			iterator_base() = default;
 			iterator_base(lower_type Lower_, point_type Pos_):Lower(Lower_),Pos(Pos_){}
 			template<typename... others>
@@ -49,18 +51,28 @@ namespace hmLib{
 			raw_iterator& ref(){ return Lower.ref(); }
 			template<unsigned int req_dim_>
 			point_type pos()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than the dim");
-				return pos_getter<req_dim_>()(); 
+				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+				return pos_getter<req_dim_>()();
 			}
 			template<unsigned int req_dim_>
 			point_type size()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than the dim");
-				return Lower.size<req_dim_>(); 
+				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+				return Lower.size<req_dim_>();
 			}
 			template<unsigned int req_dim_>
 			point_type gap()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than the dim");
-				return Lower.size<req_dim_>();
+				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+				return Lower.gap<req_dim_>();
+			}
+			template<unsigned int req_dim_>
+			difference_type lattice_size()const{
+				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+				return Lower.lattice_size<req_dim_>();
+			}
+			template<unsigned int req_dim_>
+			difference_type lattice_step()const{
+				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+				return Lower.lattice_step<req_dim_>();
 			}
 		public:
 			reference operator*(){
@@ -197,6 +209,26 @@ namespace hmLib{
 		public:
 			point_type sup()const{ return Sup; }
 			raw_iterator& ref(){ return Itr; }
+			template<unsigned int req_dim_>
+			point_type size()const{
+				return Ptr->size<req_dim_>();
+			}
+			template<unsigned int req_dim_>
+			point_type gap()const{
+				return Ptr->gap<req_dim_>();
+			}
+			template<unsigned int req_dim_>
+			difference_type lattice_size()const{
+				return Ptr->lattice_size<req_dim_>();
+			}
+			template<unsigned int req_dim_>
+			difference_type lattice_step()const{
+				return Ptr->lattice_step<req_dim_>();
+			}
+		private:
+			raw_iterator Itr;
+			base_type* Ptr;
+			point_type Sup;
 		private:
 			point_type advance_pos(point_type& RequestedStep){
 				point_type RawStep = 0;
@@ -225,10 +257,6 @@ namespace hmLib{
 			bool is_equal(const this_type& Other)const{ return true; }
 			bool is_less(const this_type& Other)const{ return false; }
 			bool is_less_or_equal(const this_type& Other)const{ return true; }
-		private:
-			raw_iterator Itr;
-			base_type* Ptr;
-			point_type Sup;
 		};
 	}
 
@@ -246,10 +274,6 @@ namespace hmLib{
 		using raw_iterator = iterator_;
 	public:
 		static constexpr unsigned int dim(){ return dim_; }
-	private:
-		difference_type Size;
-		difference_type Gap;
-		lower_type Lower;
 	public:
 		lattice_view() = default;
 		template<typename... others>
@@ -314,6 +338,12 @@ namespace hmLib{
 	public:
 		raw_iterator raw_begin(){ return Lower.raw_begin(); }
 		raw_iterator raw_end(){ return Lower.raw_end(); }
+		iterator begin(){ return iterator(0, Lower.begin()); }
+		iterator end(){ return iterator(0, Lower.end()); }
+	private:
+		difference_type Size;
+		difference_type Gap;
+		lower_type Lower;
 	private:
 		template<typename... others>
 		difference_type raw_position_template(difference_type RawPos_, difference_type Pos_, others... Others_)const{
@@ -379,9 +409,6 @@ namespace hmLib{
 		using value_type = typename iterator_::value_type;
 		using reference = typename iterator_::reference;
 		using raw_iterator = iterator_;
-	private:
-		raw_iterator Begin;
-		raw_iterator End;
 	public:
 		lattice_view() = default;
 		lattice_view(raw_iterator Begin_, raw_iterator End_) :Begin(Begin_), End(End_){}
@@ -393,6 +420,9 @@ namespace hmLib{
 	public:
 		raw_iterator raw_begin(){ return Begin; }
 		raw_iterator raw_end(){ return End; }
+	private:
+		raw_iterator Begin;
+		raw_iterator End;
 	private:
 		difference_type raw_position_template(difference_type RawPos_)const{ return RawPos_; }
 		template<typename iterator>
