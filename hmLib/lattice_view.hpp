@@ -424,7 +424,7 @@ namespace hmLib{
 		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }
 		template<typename base_type>
 		lattices::iterator_base<raw_iterator, base_type, 0> make_iterator(base_type& Ref_, point_type Sup_){
-			return lattices::iterator_base<raw_iterator, base_type, 0>(std::next(Begin,Ref_.lattice_step<0>()*Sup_), Ref_, Sup_);
+			return lattices::iterator_base<raw_iterator, base_type, 0>(std::next(Begin,(Ref_.gap<0>()+Ref_.size<0>()*Ref_.lattice_step<0>())*Sup_), Ref_, Sup_);
 		}
 	};
 
