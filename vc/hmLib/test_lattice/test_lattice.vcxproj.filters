@@ -26,9 +26,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="test_lattice_itr.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="test_lattice_view.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>

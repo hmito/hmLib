@@ -33,6 +33,7 @@ namespace hmLib{
 			using base_type = base_;
 		public:
 			static constexpr unsigned int dim(){ return dim_; }
+			static constexpr unsigned int this_dim(){ return base_::dim() - dim_; }
 		public:
 			iterator_base() = default;
 			iterator_base(lower_type Lower_, point_type Pos_):Lower(Lower_),Pos(Pos_){}
@@ -56,22 +57,18 @@ namespace hmLib{
 			}
 			template<unsigned int req_dim_>
 			point_type size()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return Lower.size<req_dim_>();
 			}
 			template<unsigned int req_dim_>
 			point_type gap()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return Lower.gap<req_dim_>();
 			}
 			template<unsigned int req_dim_>
 			difference_type lattice_size()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return Lower.lattice_size<req_dim_>();
 			}
 			template<unsigned int req_dim_>
 			difference_type lattice_step()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return Lower.lattice_step<req_dim_>();
 			}
 		public:
@@ -137,16 +134,16 @@ namespace hmLib{
 				return !(val1.sup() == val2.sup() && val1.is_equal(val2));
 			}
 			friend bool operator<(const this_type& val1, const this_type& val2){
-				return val1.sup() < val2.sup() || (val1.sup() == val2.sup() && val1.is_lower(val2));
+				return val1.sup() < val2.sup() || (val1.sup() == val2.sup() && val1.is_less(val2));
 			}
 			friend bool operator>(const this_type& val1, const this_type& val2){
-				return val1.sup() > val2.sup() || (val1.sup() == val2.sup() && val2.is_lower(val1));
+				return val1.sup() > val2.sup() || (val1.sup() == val2.sup() && val2.is_less(val1));
 			}
 			friend bool operator<=(const this_type& val1, const this_type& val2){
-				return val1.sup() < val2.sup() || (val1.sup() == val2.sup() && val1.is_lower_or_equal(val2));
+				return val1.sup() < val2.sup() || (val1.sup() == val2.sup() && val1.is_less_or_equal(val2));
 			}
 			friend bool operator>=(const this_type& val1, const this_type& val2){
-				return val1.sup() > val2.sup() || (val1.sup() == val2.sup() && val2.is_lower_or_equal(val1));
+				return val1.sup() > val2.sup() || (val1.sup() == val2.sup() && val2.is_less_or_equal(val1));
 			}
 		private:
 			point_type Pos;
@@ -163,34 +160,34 @@ namespace hmLib{
 		private:
 			void advance(point_type Diff){
 				auto RawStep = advance_pos(Diff);
-				advance_itr(RawStep, Diff);
+				advance_itr(RawStep + Diff*(gap<0>()+size<0>()*lattice_step<0>()), Diff);
 			}
 			point_type advance_pos(point_type& RequestedStep){
-				point_type RawStep = Itr.advance_pos(RequestedStep);
+				point_type RawStep = Lower.advance_pos(RequestedStep);
 
-				point_type NewPos = (Pos + RequestedStep) % Size;
-				if(NewPos < 0) NewPos += Size;
+				point_type NewPos = (Pos + RequestedStep) % size<this_dim()>();
+				if(NewPos < 0) NewPos += size<this_dim()>();
 
-				RawStep += (NewPos - Pos) * lattice_step<0>();
+				RawStep += (NewPos - Pos) * lattice_step<this_dim()>();
 
 				if(RequestedStep > 0 && NewPos < Pos){
-					RequestedStep = (RequestedStep / Size) + 1;
+					RequestedStep = (RequestedStep / size<this_dim()>()) + 1;
 				} else if(RequestedStep < 0 && NewPos > Pos){
-					RequestedStep = (RequestedStep / Size) - 1;
+					RequestedStep = (RequestedStep / size<this_dim()>()) - 1;
 				} else{
-					RequestedStep = (RequestedStep / Size);
+					RequestedStep = (RequestedStep / size<this_dim()>());
 				}
 
 				Pos = NewPos;
 
 				return RawStep;
 			}
-			void advance_itr(point_type RawStep, point_type ReaminStep){ Lower.advance_itr(Itr.ref(), RawStep); }
-			bool is_equal(const this_type& Other)const{ return Pos == Other.Pos && Lowrer.is_equal(Other.Lower); }
-			bool is_less(const this_type& Other)const{ return Pos == Other.Pos && Lowrer.is_equal(Other.Lower); }
-			bool is_less_or_equal(const this_type& Other)const{ return Pos == Other.Pos && Lowrer.is_equal(Other.Lower); }
+			void advance_itr(point_type RawStep, point_type ReaminStep){ Lower.advance_itr(RawStep, ReaminStep); }
+			bool is_equal(const this_type& Other)const{ return Pos == Other.Pos && Lower.is_equal(Other.Lower); }
+			bool is_less(const this_type& Other)const{ return Pos < Other.Pos || (Pos == Other.Pos && Lower.is_less(Other.Lower)); }
+			bool is_less_or_equal(const this_type& Other)const{ return Pos < Other.Pos || (Pos == Other.Pos && Lower.is_less_or_equal(Other.Lower)); }
 			difference_type distance_from(const this_type& Other)const{
-				return (Pos - Other.Pos) * size<0>() + Itr.distance_from(Other.Itr);
+				return (Pos - Other.Pos) * lattice_size<this_dim()+1>() + Lower.distance_from(Other.Lower);
 			}
 		};
 		template<typename iterator_, typename base_>
@@ -231,32 +228,18 @@ namespace hmLib{
 			point_type Sup;
 		private:
 			point_type advance_pos(point_type& RequestedStep){
-				point_type RawStep = 0;
-
-				point_type NewPos = (Pos + RequestedStep) % Size;
-				if(NewPos < 0) NewPos += Size;
-
-				RawStep += (NewPos - Pos) * lattice_step<0>();
-
-				if(RequestedStep > 0 && NewPos < Pos){
-					RequestedStep = (RequestedStep / Size) + 1;
-				} else if(RequestedStep < 0 && NewPos > Pos){
-					RequestedStep = (RequestedStep / Size) - 1;
-				} else{
-					RequestedStep = (RequestedStep / Size);
-				}
-
-				Pos = NewPos;
-
-				return RawStep;
+				return 0;
 			}
-			void advance_itr(point_type RawStep, point_type ReaminStep){ 
-				std::advance(Itr.ref(), RawStep);
+			void advance_itr(point_type RawStep, point_type RemainStep){ 
+				std::advance(Itr, RawStep);
 				Sup += RemainStep;
 			}
 			bool is_equal(const this_type& Other)const{ return true; }
 			bool is_less(const this_type& Other)const{ return false; }
 			bool is_less_or_equal(const this_type& Other)const{ return true; }
+			difference_type distance_from(const this_type& Other)const{
+				return (Sup - Other.Sup) * Ptr->lattice_size<0>();
+			}
 		};
 	}
 
@@ -327,19 +310,19 @@ namespace hmLib{
 		}
 		template<unsigned int req_dim_>
 		difference_type lattice_size()const{
-			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+			static_assert(req_dim_ <= dim_, "requested dim is larger than lattice's dim.");
 			return lattice_size_getter<req_dim_>()(*this);
 		}
 		template<unsigned int req_dim_>
 		difference_type lattice_step()const{
-			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+			static_assert(req_dim_ <= dim_, "requested dim is larger than lattice's dim.");
 			return lattice_step_getter<req_dim_>()(*this);
 		}
 	public:
 		raw_iterator raw_begin(){ return Lower.raw_begin(); }
 		raw_iterator raw_end(){ return Lower.raw_end(); }
-		iterator begin(){ return iterator(0, Lower.begin()); }
-		iterator end(){ return iterator(0, Lower.end()); }
+		iterator begin(){ return make_iterator(*this, 0); }
+		iterator end(){ return make_iterator(*this, 1); }
 	private:
 		difference_type Size;
 		difference_type Gap;
@@ -398,8 +381,12 @@ namespace hmLib{
 		};
 		template<typename T>
 		struct lattice_step_getter<0, T>{
-			difference_type operator()(const this_type& This){ return This.Gap + This.Lower.lattice_size<0>()*This.Lower.lattice_step<0>(); }
+			difference_type operator()(const this_type& This){ return This.Gap + This.Lower.size<0>()*This.Lower.lattice_step<0>(); }
 		};
+		template<typename base_type>
+		lattices::iterator_base<raw_iterator, base_type, dim_> make_iterator(base_type& Ref_, point_type Sup_){
+			return lattices::iterator_base<raw_iterator, base_type, dim_>(Lower.make_iterator(Ref_, Sup_), 0);
+		}
 	};
 	template<typename iterator_>
 	struct lattice_view<iterator_, 0>{
@@ -417,14 +404,14 @@ namespace hmLib{
 		lattice_view(raw_iterator Begin_, raw_iterator End_) :Begin(Begin_), End(End_){}
 	public:
 		template<unsigned int req_dim_>
+		difference_type size()const{ return 1; }
+		template<unsigned int req_dim_>
 		difference_type lattice_size()const{ return 1; }
 		template<unsigned int req_dim_>
 		difference_type lattice_step()const{ return 1; }
 	public:
 		raw_iterator raw_begin(){ return Begin; }
 		raw_iterator raw_end(){ return End; }
-		iterator begin(){ return iterator(Begin,*this,0); }
-		iterator end(){ return iterator(End, *this, 1); }
 	private:
 		raw_iterator Begin;
 		raw_iterator End;
@@ -435,6 +422,10 @@ namespace hmLib{
 		reference at_template(difference_type RawPos_){ return *std::next(Begin, RawPos_); }
 		template<typename iterator>
 		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }
+		template<typename base_type>
+		lattices::iterator_base<raw_iterator, base_type, 0> make_iterator(base_type& Ref_, point_type Sup_){
+			return lattices::iterator_base<raw_iterator, base_type, 0>(std::next(Begin,Ref_.lattice_step<0>()*Sup_), Ref_, Sup_);
+		}
 	};
 
 	template<typename iterator, typename... others>

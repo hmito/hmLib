@@ -152,8 +152,7 @@ public:
 		Assert::AreEqual(43, Lat[lattices::make_point(1, 2)], L"Access Error");
 		Assert::AreEqual(114, Lat[lattices::make_point(3, 3)], L"Access Error");
 	}
-	/*
-	TEST_METHOD(point){
+	TEST_METHOD(access_2d){
 		using container = std::vector<int>;
 		using iterator = container::iterator;
 
@@ -162,11 +161,220 @@ public:
 		std::generate(Con.begin(), Con.end(), [&](){return val++; });
 
 		lattice_view<iterator, 2> Lat(Con.begin(), Con.end(), 5, 6);
-		
-		auto Pos = Lat.point(4, 5);
-		Assert::AreEqual(2, Pos.dim(), L"Point Error");
-		Assert::AreEqual(4, Pos.get<0>, L"Point Error");
-		Assert::AreEqual(5, Pos.get<1>, L"Point Error");
-	}*/
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				Assert::AreEqual(x * 6 + y, Lat[lattices::make_point(x, y)], L"Access Error");
+			}
+		}
+	}
+	TEST_METHOD(iterator_2d){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 2> Lat(Con.begin(), Con.end(), 5, 6);
+
+		auto Begin = Lat.begin();
+		auto Itr = Begin;
+		int Cnt = 0;
+		auto End = Lat.end();
+
+		Assert::AreEqual(Lat.lattice_size<0>(), End - Begin, L"Distance Error");
+		Assert::AreEqual(-Lat.lattice_size<0>(), Begin - End, L"Distance Error");
+
+		Assert::IsFalse(Begin == End, L"Iterator Compare Error");
+		Assert::IsFalse(Begin >= End, L"Iterator Compare Error");
+		Assert::IsFalse(Begin > End, L"Iterator Compare Error");
+		Assert::IsTrue(Begin <= End, L"Iterator Compare Error");
+		Assert::IsTrue(Begin < End, L"Iterator Compare Error");
+
+		Assert::IsTrue(Itr == Begin, L"Iterator Compare Error");
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				Assert::AreEqual(x*6+y, *Itr, L"Access Error");
+				Assert::AreEqual(Cnt, Itr - Begin, L"Distance Error");
+				Assert::AreEqual(Lat.lattice_size<0>() - Cnt, End - Itr, L"Distance Error");
+				Assert::AreEqual(-Cnt, Begin - Itr, L"Distance Error");
+				Assert::AreEqual(-Lat.lattice_size<0>() + Cnt, Itr - End, L"Distance Error");
+				Assert::IsFalse(Itr == End, L"Iterator Compare Error");
+				Assert::IsFalse(Itr >= End, L"Iterator Compare Error");
+				Assert::IsFalse(Itr > End, L"Iterator Compare Error");
+				Assert::IsTrue(Itr <= End, L"Iterator Compare Error");
+				Assert::IsTrue(Itr < End, L"Iterator Compare Error");
+				++Itr;
+				++Cnt;
+			}
+		}
+		Assert::IsTrue(Itr == End, L"Iterator Compare Error");
+	}
+	TEST_METHOD(access_3d){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 3> Lat(Con.begin(), Con.end(), 5, 6, 7);
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				for(int z = 0; z < 7; ++z){
+					Assert::AreEqual(x * 6 * 7 + y * 7 + z, Lat[lattices::make_point(x,y,z)], L"Access Error");
+				}
+			}
+		}
+	}
+	TEST_METHOD(iterator_3d){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 3> Lat(Con.begin(), Con.end(), 5, 6, 7);
+
+		auto Begin = Lat.begin();
+		auto Itr = Begin;
+		int Cnt = 0;
+		auto End = Lat.end();
+
+		Assert::AreEqual(Lat.lattice_size<0>(), End - Begin, L"Distance Error");
+		Assert::AreEqual(-Lat.lattice_size<0>(), Begin - End, L"Distance Error");
+
+		Assert::IsFalse(Begin == End, L"Iterator Compare Error");
+		Assert::IsFalse(Begin >= End, L"Iterator Compare Error");
+		Assert::IsFalse(Begin > End, L"Iterator Compare Error");
+		Assert::IsTrue(Begin <= End, L"Iterator Compare Error");
+		Assert::IsTrue(Begin < End, L"Iterator Compare Error");
+
+		Assert::IsTrue(Itr == Begin, L"Iterator Compare Error");
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				for(int z = 0; z < 7; ++z){
+					Assert::AreEqual(x * 6 * 7 + y * 7 + z, *Itr, L"Access Error");
+					Assert::AreEqual(Cnt, Itr - Begin, L"Distance Error");
+					Assert::AreEqual(Lat.lattice_size<0>() - Cnt, End - Itr, L"Distance Error");
+					Assert::AreEqual(-Cnt, Begin - Itr, L"Distance Error");
+					Assert::AreEqual(-Lat.lattice_size<0>() + Cnt, Itr - End, L"Distance Error");
+					Assert::IsFalse(Itr == End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr >= End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr > End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr <= End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr < End, L"Iterator Compare Error");
+					++Itr;
+					++Cnt;
+				}
+			}
+		}
+		Assert::IsTrue(Itr == End, L"Iterator Compare Error");
+	}
+	TEST_METHOD(access_gap_3d){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 3> Lat(Con.begin(), Con.end(), std::make_pair(5,1), std::make_pair(6, 2), std::make_pair(7, 3));
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				for(int z = 0; z < 7; ++z){
+					Assert::AreEqual(x * 181 + y * 30 + z*4, Lat[lattices::make_point(x, y, z)], L"Access Error");
+				}
+			}
+		}
+	}
+	TEST_METHOD(iterator_gap_3d){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 3> Lat(Con.begin(), Con.end(), std::make_pair(5, 1), std::make_pair(6, 2), std::make_pair(7, 3));
+
+		auto Begin = Lat.begin();
+		auto Itr = Begin;
+		int Cnt = 0;
+		auto End = Lat.end();
+
+		Assert::AreEqual(Lat.lattice_size<0>(), End - Begin, L"Distance Error");
+		Assert::AreEqual(-Lat.lattice_size<0>(), Begin - End, L"Distance Error");
+
+		Assert::IsFalse(Begin == End, L"Iterator Compare Error");
+		Assert::IsFalse(Begin >= End, L"Iterator Compare Error");
+		Assert::IsFalse(Begin > End, L"Iterator Compare Error");
+		Assert::IsTrue(Begin <= End, L"Iterator Compare Error");
+		Assert::IsTrue(Begin < End, L"Iterator Compare Error");
+
+		Assert::IsTrue(Itr == Begin, L"Iterator Compare Error");
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				for(int z = 0; z < 7; ++z){
+					Assert::AreEqual(x * 181 + y * 30 + z * 4, *Itr, L"Access Error");
+					Assert::AreEqual(Cnt, Itr - Begin, L"Distance Error");
+					Assert::AreEqual(Lat.lattice_size<0>() - Cnt, End - Itr, L"Distance Error");
+					Assert::AreEqual(-Cnt, Begin - Itr, L"Distance Error");
+					Assert::AreEqual(-Lat.lattice_size<0>() + Cnt, Itr - End, L"Distance Error");
+					Assert::IsFalse(Itr == End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr >= End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr > End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr <= End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr < End, L"Iterator Compare Error");
+					++Itr;
+					++Cnt;
+				}
+			}
+		}
+		Assert::IsTrue(Itr == End, L"Iterator Compare Error");
+	}
+	TEST_METHOD(iterator_gap_3d_rev){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 3> Lat(Con.begin(), Con.end(), std::make_pair(5, 1), std::make_pair(6, 2), std::make_pair(7, 3));
+
+		auto Begin = Lat.begin();
+		auto End = Lat.end();
+		auto Itr = End;
+		int Cnt = 210;
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				for(int z = 0; z < 7; ++z){
+					--Itr;
+					--Cnt;
+					Assert::AreEqual((5-x) * 181 + (6-y) * 30 + (7-z) * 4, *Itr, L"Access Error");
+					Assert::AreEqual(Cnt, Itr - Begin, L"Distance Error");
+					Assert::AreEqual(Lat.lattice_size<0>() - Cnt, End - Itr, L"Distance Error");
+					Assert::AreEqual(-Cnt, Begin - Itr, L"Distance Error");
+					Assert::AreEqual(-Lat.lattice_size<0>() + Cnt, Itr - End, L"Distance Error");
+					Assert::IsFalse(Itr == End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr >= End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr > End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr <= End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr < End, L"Iterator Compare Error");
+
+				}
+			}
+		}
+		Assert::IsTrue(Itr == Begin, L"Iterator Compare Error");
+	}
 };
 }
