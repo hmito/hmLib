@@ -197,15 +197,20 @@ namespace hmLib{
 			using raw_iterator = iterator_;
 			using base_type = base_;
 		public:
-			iterator_base():Itr(), Ptr(nullptr), Sup(0){}
-			iterator_base(raw_iterator Itr_, base_type& Ref_, point_type Sup_ = 0)
+			iterator_base():Itr(), Ptr(nullptr), Sup(0), Raw(0){}
+			iterator_base(raw_iterator Itr_, base_type& Ref_, point_type Sup_, point_type Raw_)
 				: Itr(Itr_)
 				, Ptr(&Ref_)
-				, Sup(Sup_){
+				, Sup(Sup_)
+				, Raw(Raw_){
 			}
 		public:
 			point_type sup()const{ return Sup; }
-			raw_iterator& ref(){ return Itr; }
+			raw_iterator& ref(){
+				std::advance(Itr, Raw);
+				Raw = 0;
+				return Itr;
+			}
 			template<unsigned int req_dim_>
 			point_type size()const{
 				return Ptr->size<req_dim_>();
@@ -226,12 +231,13 @@ namespace hmLib{
 			raw_iterator Itr;
 			base_type* Ptr;
 			point_type Sup;
+			point_type Raw;
 		private:
 			point_type advance_pos(point_type& RequestedStep){
 				return 0;
 			}
-			void advance_itr(point_type RawStep, point_type RemainStep){ 
-				std::advance(Itr, RawStep);
+			void advance_itr(point_type RawStep, point_type RemainStep){
+				Raw += RawStep;
 				Sup += RemainStep;
 			}
 			bool is_equal(const this_type& Other)const{ return true; }
@@ -424,7 +430,7 @@ namespace hmLib{
 		reference at_iterator(difference_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }
 		template<typename base_type>
 		lattices::iterator_base<raw_iterator, base_type, 0> make_iterator(base_type& Ref_, point_type Sup_){
-			return lattices::iterator_base<raw_iterator, base_type, 0>(std::next(Begin,(Ref_.gap<0>()+Ref_.size<0>()*Ref_.lattice_step<0>())*Sup_), Ref_, Sup_);
+			return lattices::iterator_base<raw_iterator, base_type, 0>(Begin, Ref_, Sup_, (Ref_.gap<0>() + Ref_.size<0>()*Ref_.lattice_step<0>())*Sup_);
 		}
 	};
 
