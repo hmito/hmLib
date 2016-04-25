@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include<vector>
 #include<algorithm>
+#include<list>
 #include <hmLib/lattice_view.hpp>
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -378,6 +379,42 @@ public:
 	}
 	TEST_METHOD(iterator_gap_3d_revend){
 		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(900);
+		int val = 0;
+		std::generate(Con.begin(), Con.end(), [&](){return val++; });
+
+		lattice_view<iterator, 3> Lat(Con.begin(), Con.end(), std::make_pair(5, 1), std::make_pair(6, 2), std::make_pair(7, 3));
+
+		auto Begin = Lat.begin();
+		auto End = Lat.end();
+		auto Itr = End;
+		int Cnt = 210;
+
+		for(int x = 0; x < 5; ++x){
+			for(int y = 0; y < 6; ++y){
+				for(int z = 0; z < 7; ++z){
+					--Itr;
+					--Cnt;
+					Assert::AreEqual((4 - x) * 181 + (5 - y) * 30 + (6 - z) * 4, *Itr, L"Access Error");
+					Assert::AreEqual(Cnt, Itr - Begin, L"Distance Error");
+					Assert::AreEqual(Lat.lattice_size<0>() - Cnt, End - Itr, L"Distance Error");
+					Assert::AreEqual(-Cnt, Begin - Itr, L"Distance Error");
+					Assert::AreEqual(-Lat.lattice_size<0>() + Cnt, Itr - End, L"Distance Error");
+					Assert::IsFalse(Itr == End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr >= End, L"Iterator Compare Error");
+					Assert::IsFalse(Itr > End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr <= End, L"Iterator Compare Error");
+					Assert::IsTrue(Itr < End, L"Iterator Compare Error");
+
+				}
+			}
+		}
+		Assert::IsTrue(Itr == Begin, L"Iterator Compare Error");
+	}
+	TEST_METHOD(list_iterator_gap_3d_revend){
+		using container = std::list<int>;
 		using iterator = container::iterator;
 
 		container Con(900);
