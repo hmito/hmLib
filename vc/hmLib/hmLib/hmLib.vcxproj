@@ -93,7 +93,7 @@
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
-    <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp" />
+    <ClInclude Include="..\..\..\hmLib\random\random_bits.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />
     <ClInclude Include="..\..\..\hmLib\signals.hpp" />
@@ -110,7 +110,6 @@
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
-    <ClCompile Include="..\..\..\hmLib\random.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

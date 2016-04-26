@@ -62,13 +62,13 @@ namespace hmLib{
 	
 	namespace random{
 		struct default_engine_tag{};
-		using defaul_engine = singleton_random_engine<default_engine_tag>;
+		using default_engine = singleton_random_engine<default_engine_tag>;
 		template<typename value_type>
-		value_type uniform_int(value_type Min,value_type Max){return std::uniform_int_distribution<value_type>(Min,Max)(defaul_engine());}
+		value_type uniform_int(value_type Min,value_type Max){return std::uniform_int_distribution<value_type>(Min,Max)(default_engine());}
 		template<typename value_type>
-		value_type uniform_real(value_type Min, value_type Max){return std::uniform_real_distribution<value_type>(Min,Max)(defaul_engine());}
+		value_type uniform_real(value_type Min, value_type Max){return std::uniform_real_distribution<value_type>(Min,Max)(default_engine());}
 		template<typename value_type>
-		value_type normal(value_type meen, value_type sigma){return std::normal_distribution<value_type>(meen,sigma)(defaul_engine());}
+		value_type normal(value_type meen, value_type sigma){return std::normal_distribution<value_type>(meen,sigma)(default_engine());}
 	}
 }
 #

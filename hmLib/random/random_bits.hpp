@@ -117,10 +117,10 @@ namespace hmLib{
 	random_bits_engine<singleton_random_engine<tag, random_engine_type>> singleton_random_bits_engine<tag, random_engine_type>::Engine(std::move(singleton_random_engine<tag, random_engine_type>()));
 
 	namespace random{
-		using defaul_bits_engine = singleton_random_bits_engine<default_engine_tag>;
-		inline bool uniform_bool(){return defaul_bits_engine()();}
+		using default_bits_engine = singleton_random_bits_engine<default_engine_tag>;
+		inline bool uniform_bool(){return default_bits_engine()();}
 		template<unsigned int bit_size>
-		inline std::bitset<bit_size> uniform_bits(){ return defaul_bits_engine().bits<bit_size>(); }
+		inline std::bitset<bit_size> uniform_bits(){ return default_bits_engine().bits<bit_size>(); }
 	}
 }
 #

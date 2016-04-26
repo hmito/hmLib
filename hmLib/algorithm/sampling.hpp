@@ -38,7 +38,7 @@ namespace hmLib{
 		//ランダム選択 OutputIteratorの範囲を埋めるまで
 		template<typename InputIterator, typename OutputIterator, typename RandEngine>
 		void random_sample(InputIterator Begin,InputIterator End,OutputIterator OutBegin,OutputIterator OutEnd, RandEngine&& Engine){
-			if(Begin == End)return End;
+			if(Begin == End)return;
 
 			std::uniform_int<int> Dist(0, std::distance(Begin, End) - 1);
 			while(OutBegin!=OutEnd){
@@ -48,7 +48,7 @@ namespace hmLib{
 		//ランダム選択 n個分
 		template<typename InputIterator, typename OutputIterator, typename RandEngine>
 		OutputIterator random_sample(InputIterator Begin,InputIterator End, OutputIterator Out, unsigned int n, RandEngine&& Engine){
-			if(Begin == End)return End;
+			if(Begin == End)return Out;
 
 			std::uniform_int<int> Dist(0, std::distance(Begin, End) - 1);
 			for(unsigned int i = 0; i < n; ++i){
@@ -74,7 +74,7 @@ namespace hmLib{
 			void sync(InputIterator Begin_,InputIterator End_){
 				Begin=Begin_;
 
-				dist_type::param_type prm(0, std::distance(Begin_, End_));
+				dist_type::param_type prm(0, std::distance(Begin_, End_)-1);
 				Dist.param(prm);
 			}
 		};
@@ -101,7 +101,7 @@ namespace hmLib{
 		//ルーレット選択 OutputIteratorの範囲を埋めるまで
 		template<typename InputIterator, typename OutputIterator, typename fnAssess, typename RandEngine>
 		void roulette_sample(InputIterator Begin,InputIterator End, fnAssess&& FnAssess,OutputIterator OutBegin,OutputIterator OutEnd, RandEngine&& Engine){
-			if(Begin == End)return End;
+			if(Begin == End)return;
 
 			double TotalFitness = 0;
 			std::for_each(Begin, End, [&](decltype(*Begin)& Val){TotalFitness += FnAssess(Val); });
@@ -110,7 +110,8 @@ namespace hmLib{
 
 			while(OutBegin != OutEnd){
 				double SelectFitness = Dist(Engine);
-				for(auto Itr = Begin; Itr != End; ++Itr){
+				auto Itr = Begin;
+				for(; Itr != End; ++Itr){
 					SelectFitness -= FnAssess(*Itr);
 					if(SelectFitness <= 0.)break;
 				}
@@ -120,7 +121,7 @@ namespace hmLib{
 		//ルーレット選択 n個分
 		template<typename InputIterator, typename OutputIterator, typename fnAssess, typename RandEngine>
 		OutputIterator roulette_sample(InputIterator Begin,InputIterator End, fnAssess&& FnAssess, OutputIterator Out, unsigned int n, RandEngine&& Engine){
-			if(Begin == End)return End;
+			if(Begin == End)return Out;
 
 			double TotalFitness = 0;
 			std::for_each(Begin, End, [&](decltype(*Begin)& Val){TotalFitness += FnAssess(Val); });
@@ -129,7 +130,8 @@ namespace hmLib{
 
 			for(unsigned int i = 0; i < n; ++i){
 				double SelectFitness = Dist(Engine);
-				for(auto Itr = Begin; Itr != End; ++Itr){
+				auto Itr = Begin;
+				for(; Itr != End; ++Itr){
 					SelectFitness -= FnAssess(*Itr);
 					if(SelectFitness <= 0.)break;
 				}
@@ -154,7 +156,7 @@ namespace hmLib{
 		public:
 			roulette_sampler(){}
 			template<typename fnAssess>
-			roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess&& FnAssess_){sync(Begin_,End_, std::forward(FnAssess_));}
+			roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess&& FnAssess_){sync(Begin_,End_, std::forward<fnAssess>(FnAssess_));}
 		public:
 			template<typename RandEngine>
 			InputIterator operator()(RandEngine Engine){
@@ -186,7 +188,7 @@ namespace hmLib{
 		//ルーレット選択クラスのビルダー
 		template<typename InputIterator,typename fnAssess>
 		roulette_sampler<InputIterator> make_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess&& FnAssess_){
-			return roulette_sampler<InputIterator>(Begin_,End_,std::forward(FnAssess_));
+			return roulette_sampler<InputIterator>(Begin_,End_,std::forward<fnAssess>(FnAssess_));
 		}
 		//シャッフル選択クラス
 		template<typename InputIterator>
@@ -198,7 +200,8 @@ namespace hmLib{
 			InputIterator End;
 		public:
 			shuffle_sampler() {}
-			shuffle_sampler(InputIterator Begin_, InputIterator End_) { sync(Begin_, End_); }
+			template<typename RandEngine>
+			shuffle_sampler(InputIterator Begin_, InputIterator End_, RandEngine&& Engine) { sync(Begin_, End_, std::forward<RandEngine>(Engine)); }
 		public:
 			InputIterator operator()() {
 				if(Now==Vec.end())return End;
@@ -217,22 +220,23 @@ namespace hmLib{
 				std::shuffle(Vec.begin(), Vec.end(), Engine);
 				Now=Vec.begin();
 			}
-			void sync(InputIterator Begin_, InputIterator End_) {
+			template<typename RandEngine>
+			void sync(InputIterator Begin_, InputIterator End_, RandEngine&& Engine) {
 				End=End_;
 				Vec.clear();
 				for(; Begin_!=End_; ++Begin_) {
 					Vec.push_back(Begin_);
 				}
-				shuffle();
+				shuffle(std::forward<RandEngine>(Engine));
 			}
 			unsigned int size()const{return Vec.size();}
 			void clear(){Vec.clear();}
 			void add(InputIterator Itr_){Vec.push_back(Itr_);}
 		};
 		//シャッフル選択クラスのビルダー
-		template<typename InputIterator>
-		shuffle_sampler<InputIterator> make_shuffle_sampler(InputIterator Begin_, InputIterator End_) {
-			return shuffle_sampler<InputIterator>(Begin_, End_);
+		template<typename InputIterator, typename RandEngine>
+		shuffle_sampler<InputIterator> make_shuffle_sampler(InputIterator Begin_, InputIterator End_, RandEngine&& Engine) {
+			return shuffle_sampler<InputIterator>(Begin_, End_, std::forward<RandEngine>(Engine));
 		}
 	}
 }
