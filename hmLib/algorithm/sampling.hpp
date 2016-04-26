@@ -97,7 +97,7 @@ namespace hmLib{
 		};
 		//ランダム選択クラスのビルダー
 		template<typename InputIterator>
-		random_sampler<InputIterator> build_random_sampler(InputIterator Begin_,InputIterator End_){
+		random_sampler<InputIterator> make_random_sampler(InputIterator Begin_,InputIterator End_){
 			return random_sampler<InputIterator>(Begin_,End_);
 		}
 		//ルーレット選択
@@ -206,7 +206,7 @@ namespace hmLib{
 		};
 		//ルーレット選択クラスのビルダー
 		template<typename InputIterator,typename fnAssess>
-		roulette_sampler<InputIterator> build_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess FnAssess_){
+		roulette_sampler<InputIterator> make_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess FnAssess_){
 			return roulette_sampler<InputIterator>(Begin_,End_,FnAssess_);
 		}
 		//シャッフル選択クラス
@@ -252,9 +252,9 @@ namespace hmLib{
 				if(!SuppressShuffle_)shuffle();
 			}
 		};
-		//ルーレット選択クラスのビルダー
+		//シャッフル選択クラスのビルダー
 		template<typename InputIterator>
-		shuffle_sampler<InputIterator> build_shuffle_sampler(InputIterator Begin_, InputIterator End_) {
+		shuffle_sampler<InputIterator> make_shuffle_sampler(InputIterator Begin_, InputIterator End_) {
 			return shuffle_sampler<InputIterator>(Begin_, End_);
 		}
 
