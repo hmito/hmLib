@@ -73,15 +73,10 @@
     <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\cdeque.h" />
-    <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\config_vc.h" />
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
-    <ClInclude Include="..\..\..\hmLib\cqueue.h" />
-    <ClInclude Include="..\..\..\hmLib\cstack.h" />
-    <ClInclude Include="..\..\..\hmLib\cstring.h" />
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
@@ -89,12 +84,16 @@
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
     <ClInclude Include="..\..\..\hmLib\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
-    <ClInclude Include="..\..\..\hmLib\iocsv.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\point.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
-    <ClInclude Include="..\..\..\hmLib\random\random_bit.hpp" />
-    <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp" />
+    <ClInclude Include="..\..\..\hmLib\random\random_bits.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />
     <ClInclude Include="..\..\..\hmLib\signals.hpp" />
@@ -108,18 +107,10 @@
     <ClInclude Include="csv.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\hmLib\cdeque.c" />
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
-    <ClCompile Include="..\..\..\hmLib\cqueue.c" />
-    <ClCompile Include="..\..\..\hmLib\cstack.c" />
-    <ClCompile Include="..\..\..\hmLib\cstring.c" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
-    <ClCompile Include="..\..\..\hmLib\random.cpp" />
-    <ClCompile Include="run_csv.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="test1.csv" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

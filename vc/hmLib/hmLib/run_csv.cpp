@@ -4,23 +4,15 @@
 #include<vector>
 #include<limits>
 #include<hmLib/random/random_engine.hpp>
+#include<hmLib/random/random_bits.hpp>
 #include<hmLib/algorithm/nonrepeat_random_integrals.hpp>
-
-
 
 int main(){
 	try{
-		auto Ans = hmLib::algorithm::nonrepeat_random_integrals(10, 0, 1000,hmLib::random::Engine);
-		for(auto val : Ans)std::cout << val << "\t";
-
-		Ans = hmLib::algorithm::nonrepeat_random_integrals(10, 0, 20, hmLib::random::Engine);
-		for(auto val : Ans)std::cout << val << "\t";
-
-		Ans = hmLib::algorithm::nonrepeat_random_integrals(10, 0, 10, hmLib::random::Engine);
-		for(auto val : Ans)std::cout << val << "\t";
-
-		Ans = hmLib::algorithm::nonrepeat_random_integrals(10, 0, 5, hmLib::random::Engine);
-		for(auto val : Ans)std::cout << val << "\t";
+		std::cout << hmLib::random::defaul_bits_engine::interval()<<","<<hmLib::random::defaul_bits_engine::max_interval_bits() << std::endl;
+		std::cout << hmLib::random::uniform_bool() << std::endl;
+		std::cout << hmLib::random::uniform_bits<5>() << std::endl;
+		std::cout << hmLib::random::uniform_bits<37>() << std::endl;
 	}
 	catch(std::exception& Excp){
 		std::cout << Excp.what();
