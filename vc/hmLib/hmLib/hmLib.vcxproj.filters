@@ -99,12 +99,6 @@
     <ClInclude Include="..\..\..\hmLib\gps.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice_iterator.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -114,8 +108,14 @@
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattice_view.hpp">
-      <Filter>hmLib</Filter>
+    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp">
+      <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -83,10 +83,10 @@
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice_iterator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\point.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattice_view.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />

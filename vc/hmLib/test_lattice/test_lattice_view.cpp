@@ -3,7 +3,7 @@
 #include<vector>
 #include<algorithm>
 #include<list>
-#include <hmLib/lattice_view.hpp>
+#include <hmLib/lattices.hpp>
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -87,7 +87,7 @@ public:
 	TEST_METHOD(lattices_point){
 		lattices::point<4> Pos{4, 5, 6, 7};
 
-		Assert::AreEqual(4u, Pos.size(), L"Point Access Error");
+		Assert::AreEqual(4u, Pos.dim(), L"Point Access Error");
 		Assert::AreEqual(4, Pos[0],L"Point Access Error");
 		Assert::AreEqual(5, Pos[1], L"Point Access Error");
 		Assert::AreEqual(6, Pos[2], L"Point Access Error");
@@ -96,7 +96,7 @@ public:
 	TEST_METHOD(use_make_point){
 		auto Pos = lattices::make_point(4, 5, 6, 7);
 
-		Assert::AreEqual(4u, Pos.size(), L"Point Access Error");
+		Assert::AreEqual(4u, Pos.dim(), L"Point Access Error");
 		Assert::AreEqual(4, Pos[0], L"Point Access Error");
 		Assert::AreEqual(5, Pos[1], L"Point Access Error");
 		Assert::AreEqual(6, Pos[2], L"Point Access Error");

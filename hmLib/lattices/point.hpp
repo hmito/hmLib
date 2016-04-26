@@ -1,7 +1,10 @@
-﻿namespace hmLib{
+﻿#ifndef HMLIB_LATTICES_POINT_INC
+#define HMLIB_LATTICES_POINT_INC 100
+#
+namespace hmLib{
 	namespace lattices{
-//		template<unsigned int dim_>
-//		using point = std::array<int, dim_>;
+		using point_type = int;
+		using difference_type = int;
 
 		template<unsigned int dim_>
 		struct point{
@@ -20,7 +23,8 @@
 			this_type& operator=(const this_type&) = default;
 			point(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
-			point(std::initializer_list<int> Init_):Array(Init_){}
+			template<typename... others>
+			point(int val, others... Others) :Array{val, Others...}{}
 		public:
 			this_type& operator+=(const this_type& Other){
 				for(unsigned int i = 0; i < dim_; ++i){
@@ -111,3 +115,5 @@
 		}
 	}
 }
+#
+#endif
