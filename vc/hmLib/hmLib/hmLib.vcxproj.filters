@@ -16,6 +16,9 @@
     <Filter Include="hmLib">
       <UniqueIdentifier>{5c40190c-7a39-4404-8867-626d545f0ebb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\lattices">
+      <UniqueIdentifier>{bb0bf879-de82-4865-a369-edbb5e3616b2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="hmLib\random">
       <UniqueIdentifier>{dfcd2d27-54f0-40d5-9bba-6ffbc5af820b}</UniqueIdentifier>
     </Filter>
@@ -36,9 +39,6 @@
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cdeque.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\color.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -49,15 +49,6 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cqueue.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cstack.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cstring.h">
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\date.hpp">
@@ -114,6 +105,24 @@
     <ClInclude Include="..\..\..\hmLib\gps.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\point.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
     <ClInclude Include="csv.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -143,28 +152,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\hmLib\cdeque.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\cqueue.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\cstack.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\cstring.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
     <ClCompile Include="run_csv.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
