@@ -7,6 +7,16 @@
 //ライブラリファイルを使わずにソースファイルをコンパイルしてリンクする場合は、以下を有効にする
 #define HMLIB_NOLIB
 
+//byte数の指定
+#define HMLIB_TYPE_SIZE_CHAR 1
+#define HMLIB_TYPE_SIZE_SHORT 2
+#define HMLIB_TYPE_SIZE_INT 4
+#define HMLIB_TYPE_SIZE_LONG 4
+#define HMLIB_TYPE_SIZE_LONG_LONG 8
+#define HMLIB_TYPE_SIZE_FLOAT 4
+#define HMLIB_TYPE_SIZE_DOUBLE 8
+#define HMLIB_TYPE_SIZE_LONG_DOUBLE 8
+
 //#define HMLIB_TYPE_NOPREFIX
 
 #endif
