@@ -91,6 +91,9 @@
     <ClInclude Include="..\..\..\hmLib\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
     <ClInclude Include="..\..\..\hmLib\iocsv.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lab\enumerators\container_enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lab\enumerators\enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lab\enumerators\enumerator_interface.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />

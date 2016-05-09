@@ -1,7 +1,8 @@
 ﻿#ifndef HMLIB_ENUMERATOR_INC
 #define HMLIB_ENUMERATOR_INC 100
 #
-#include<functional>
+#include<iterator>
+#include<memory>
 /*
 ターゲット
 ・iteratorクラスを非template関数で使いたい
@@ -26,6 +27,29 @@ protected:
 */
 namespace hmLib{
 	namespace enumerators{
+		template<typename iterator_>
+		class range{
+			using this_type = range<iterator_>;
+			using iterator = iterator_;
+			using value_type = typename iterator::value_type;
+			using pointer = typename iterator::pointer;
+			using reference = typename iterator::reference;
+			using difference_type = typename iterator::difference_type;
+		public: // construction, assignment
+			range(){}
+			range(iterator Begin_, iterator End_) :Begin(Begin_), End(End_){}
+			range(const this_type& Other) = default;
+			range& operator=(const this_type& Other) = default;
+		public:
+			iterator begin() const{return Begin;}
+			iterator end() const{ return End; }
+		public:
+			operator bool() const{return Begin != End;}
+			void advance_begin(difference_type n){std::advance(Begin, n);}
+			void advance_end(difference_type n){ std::advance(End, n); }
+			bool empty() const{ return Begin == End; }
+		};
+
 		enum class return_target{ begin, end, current };
 		template<typename iterator>
 		struct iterator_holder{
@@ -41,18 +65,17 @@ namespace hmLib{
 			}
 		};
 
-		template<class... concepts>
+		template<typename... concepts>
 		struct concept_pack{};
-		template<class concept, class... concepts>
-		struct concept_pack<concept, concepts...> :public concept, public concept_pack<concepts...>{
-			struct mixin_interface : public concept::mixin_interface, public concept_pack<concepts...>::mixin_interface{};
-			struct mixin : public concept::mixin, public concept_pack<concepts...>::mixin{};
+		template<class concept, typename... others>
+		struct concept_pack<concept, others...> :public concept, public concept_pack<others...>{
+			struct mixin_interface : public concept::mixin_interface, public concept_pack<others...>::mixin_interface{};
+			struct mixin : public concept::mixin, public concept_pack<others...>::mixin{};
 		};
-
-		struct default_concept{
-		};
+		template<typename T>
+		struct default_concept{};
+		template<typename T>
 		struct foward_iterator_concept{
-			template<typename T>
 			struct concept_interface{
 			public:
 				virtual const T& operator()(void) const = 0;
@@ -61,8 +84,8 @@ namespace hmLib{
 				virtual void operator++() = 0;
 				virtual void reset() = 0;
 			};
-			template<typename iterator_holder>
-			struct concept :public concept_interface<iterator_holder::type>{
+			template<typename iterator_>
+			struct concept :public concept_interface<iterator_>{
 				using type = iterator_holder::type;
 			public:
 				const T& operator()(void) const override{ const auto& ref = static_cast<const iterator_holder&>(*this); return *(ref.itr); }
@@ -107,17 +130,21 @@ namespace hmLib{
 			}
 		};
 	}
-	template<typename T, typename Concept>
-	struct enumerator : public Concept::mixin<enumerator<T, Concept>>{
-		using mixin = Concept::mixin;
-
-		template<typename iterator>
-		static iterator_holder
-			: public enumerators::iterator_holder<iterator>
-			, public Concept::concept<iterator_holder<iterator>>{
+	template<typename T, typename concept>
+	struct enumerator : public concept::mixin<enumerator<T, concept>>{
+		using mixin = concept::mixin;
+	private:
+		struct basic_enumerator_adaptor{};
+		template<typename iterator_>
+		struct enumerator_adaptor 
+			: public basic_enumerator_adaptor
+			, public concept{
+			using iterator = iterator_;
+		public:
+			iterator Begin;
+			iterator End;
+			iterator Current;
 		};
-
-
 	};
 
 	template<typename T, typename Concept = enumerators::default_concept<T>>
@@ -160,6 +187,87 @@ namespace hmLib{
 		void operator++(){ ++ref; }
 		void reset(){ ref.reset(); }
 	};
+
+	//enumerator
+	template<typename T, typename concept = enumerators::default_concept<T> >
+	struct enumerator : public concept{
+		using this_type = enumerator<T, concept>;
+	private:
+		struct basic_enumeratable{
+		public:
+			virtual basic_enumeratable* clone()const = 0;
+			virtual void destroy() = 0;
+			virtual bool equal(const basic_enumeratable& itr)const = 0;
+			virtual void increment() = 0;
+			virtual const value_type& dereference()const = 0;
+		public:
+			template<typename enumerator_>
+			static basic_enumeratable* construct(enumerator_ itr);
+		};
+		template<typename iterator>
+		struct enumeratable :public basic_enumeratable{
+			typedef enumeratable<iterator> adaptor;
+		private:
+			iterator Begin;
+			iterator End;
+			iterator Current;
+		public:
+			basic_enumeratable* clone()const override{ return adaptor::construct(itr); }
+			void destroy() override{ adaptor::destruct(this); }
+			bool equal(const basic_enumeratable& itr_)const override{
+				const adaptor* adp = static_cast<const adaptor*>(&itr_);
+				if(adp == nullptr)return false;
+				return itr == adp->itr;
+			}
+			void increment() override{ ++itr; }
+			const value_type& dereference()const override{ return *itr; }
+		public:
+			enumerator_adaptor(enumerator_ itr_) :itr(itr_){}
+		private:
+			static boost::fast_pool_allocator<adaptor> allocator;
+		public:
+			static void destruct(adaptor* Ptr){
+				allocator.destroy(Ptr);
+				allocator.deallocate(Ptr);
+			}
+			static basic_enumeratable* construct(enumerator_ titr_){
+				adaptor* ans = allocator.allocate();
+				allocator.construct(ans, adaptor(titr_));
+				return ans;
+			}
+		};
+	private:
+		std::unique_ptr<basic_enumeratable, typename basic_enumeratable::deleter> Ptr;
+	public:
+		//return true if the object can be accessed to.
+		virtual operator bool()const{ return (*Ptr; }
+		//access to object.
+		virtual T& operator*(){ return Ptr->operator*(); }
+		//move to next object.
+		virtual void operator++(){ return Ptr->operator ++; }
+		//restart from the initial object.
+		virtual void reset() = 0;
+	public://for conctructor
+		enumerator() :Ptr(nullptr){}
+		enumerator(const my_type& My_) :Ptr(nullptr){ if(My_.Ptr)Ptr.reset(My_.Ptr->clone()); }
+		const my_type& operator=(const my_type& My_){
+			if(this != &My_)Ptr.reset(My_.Ptr->clone());
+			return *this;
+		}
+		enumerator(my_type&& My_) :Ptr(std::move(My_.Ptr)){}
+		const my_type& operator=(my_type&& My_){
+			if(this != &My_)Ptr = std::move(My_.Ptr);
+			return *this;
+		}
+		template<typename enumerator_>
+		enumerator(enumerator_ itr_) : Ptr(basic_enumerator_adaptor::construct(itr_)){}
+		template<typename enumerator_>
+		const my_type& operator=(enumerator_ itr_){
+			Ptr.reset(basic_enumerator_adaptor::construct(itr));
+			return *this;
+		}
+	};
+
 }
 #
 #endif
