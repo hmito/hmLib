@@ -3,7 +3,7 @@
 #
 namespace hmLib{
 	namespace lattices{
-		using point_type = int;
+		using index_type = int;
 		using difference_type = int;
 
 		template<unsigned int dim_>

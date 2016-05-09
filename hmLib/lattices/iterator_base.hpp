@@ -19,9 +19,9 @@ namespace hmLib{
 			static constexpr unsigned int this_dim(){ return base_::dim() - dim_; }
 		public:
 			iterator_base() = default;
-			iterator_base(lower_type Lower_, point_type Pos_) :Lower(Lower_), Pos(Pos_){}
+			iterator_base(lower_type Lower_, index_type Pos_) :Lower(Lower_), Pos(Pos_){}
 			template<typename... others>
-			iterator_base(raw_iterator Itr, base_type& Ref_, point_type Pos_, others... Others)
+			iterator_base(raw_iterator Itr, base_type& Ref_, index_type Pos_, others... Others)
 				: Pos(Pos_)
 				, Lower(Itr, Ref_, Others...){}
 			template<typename point_iterator>
@@ -29,19 +29,19 @@ namespace hmLib{
 				: Pos()
 				, Lower(Itr, Ref_, Others...){}
 		public:
-			point_type sup()const{ return Lower.sup(); }
+			index_type sup()const{ return Lower.sup(); }
 			raw_iterator& ref(){ return Lower.ref(); }
 			template<unsigned int req_dim_>
-			point_type pos()const{
+			index_type pos()const{
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return pos_getter<req_dim_>()();
 			}
 			template<unsigned int req_dim_>
-			point_type size()const{
+			index_type size()const{
 				return Lower.size<req_dim_>();
 			}
 			template<unsigned int req_dim_>
-			point_type gap()const{
+			index_type gap()const{
 				return Lower.gap<req_dim_>();
 			}
 			template<unsigned int req_dim_>
@@ -127,7 +127,7 @@ namespace hmLib{
 				return val1.sup() > val2.sup() || (val1.sup() == val2.sup() && val2.is_less_or_equal(val1));
 			}
 		private:
-			point_type Pos;
+			index_type Pos;
 			lower_type Lower;
 		private:
 			template<unsigned int req_dim_, typename T = void>
@@ -139,14 +139,14 @@ namespace hmLib{
 				difference_type operator()(const this_type& This){ return This.Pos; }
 			};
 		private:
-			void advance(point_type Diff){
+			void advance(index_type Diff){
 				auto RawStep = advance_pos(Diff);
 				advance_itr(RawStep + Diff*(gap<0>() + size<0>()*lattice_step<0>()), Diff);
 			}
-			point_type advance_pos(point_type& RequestedStep){
-				point_type RawStep = Lower.advance_pos(RequestedStep);
+			index_type advance_pos(index_type& RequestedStep){
+				index_type RawStep = Lower.advance_pos(RequestedStep);
 
-				point_type NewPos = (Pos + RequestedStep) % size<this_dim()>();
+				index_type NewPos = (Pos + RequestedStep) % size<this_dim()>();
 				if(NewPos < 0) NewPos += size<this_dim()>();
 
 				RawStep += (NewPos - Pos) * lattice_step<this_dim()>();
@@ -163,7 +163,7 @@ namespace hmLib{
 
 				return RawStep;
 			}
-			void advance_itr(point_type RawStep, point_type ReaminStep){ Lower.advance_itr(RawStep, ReaminStep); }
+			void advance_itr(index_type RawStep, index_type ReaminStep){ Lower.advance_itr(RawStep, ReaminStep); }
 			bool is_equal(const this_type& Other)const{ return Pos == Other.Pos && Lower.is_equal(Other.Lower); }
 			bool is_less(const this_type& Other)const{ return Pos < Other.Pos || (Pos == Other.Pos && Lower.is_less(Other.Lower)); }
 			bool is_less_or_equal(const this_type& Other)const{ return Pos < Other.Pos || (Pos == Other.Pos && Lower.is_less_or_equal(Other.Lower)); }
@@ -179,24 +179,24 @@ namespace hmLib{
 			using base_type = base_;
 		public:
 			iterator_base() :Itr(), Ptr(nullptr), Sup(0), Raw(0){}
-			iterator_base(raw_iterator Itr_, base_type& Ref_, point_type Sup_, point_type Raw_)
+			iterator_base(raw_iterator Itr_, base_type& Ref_, index_type Sup_, index_type Raw_)
 				: Itr(Itr_)
 				, Ptr(&Ref_)
 				, Sup(Sup_)
 				, Raw(Raw_){}
 		public:
-			point_type sup()const{ return Sup; }
+			index_type sup()const{ return Sup; }
 			raw_iterator& ref(){
 				std::advance(Itr, Raw);
 				Raw = 0;
 				return Itr;
 			}
 			template<unsigned int req_dim_>
-			point_type size()const{
+			index_type size()const{
 				return Ptr->size<req_dim_>();
 			}
 			template<unsigned int req_dim_>
-			point_type gap()const{
+			index_type gap()const{
 				return Ptr->gap<req_dim_>();
 			}
 			template<unsigned int req_dim_>
@@ -210,13 +210,13 @@ namespace hmLib{
 		private:
 			raw_iterator Itr;
 			base_type* Ptr;
-			point_type Sup;
-			point_type Raw;
+			index_type Sup;
+			index_type Raw;
 		private:
-			point_type advance_pos(point_type& RequestedStep){
+			index_type advance_pos(index_type& RequestedStep){
 				return 0;
 			}
-			void advance_itr(point_type RawStep, point_type RemainStep){
+			void advance_itr(index_type RawStep, index_type RemainStep){
 				Raw += RawStep;
 				Sup += RemainStep;
 			}
