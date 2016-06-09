@@ -3,6 +3,8 @@
 #
 #include<iterator>
 #include<memory>
+#include<functional>
+
 /*
 ターゲット
 ・iteratorクラスを非template関数で使いたい
@@ -27,6 +29,97 @@ protected:
 */
 namespace hmLib{
 	namespace enumerators{
+		struct current_tag{}constexpr current;
+		struct end_tag{}constexpr end;
+		struct begin_tag{}constexpr begin;
+		struct initial_begin_tag{}constexpr initial_begin;
+		struct initial_end_tag{}constexpr initial_end;
+		
+		struct basic_enumeratable{};
+		template<typename iterator_>
+		struct referable_enumeratable:public basic_enumeratable{
+		protected:
+			iterator_ Itr;
+		public:
+			iterator& ref(current_tag){return Itr;}
+			const iterator& ref(current_tag)const{return Itr;}
+		};
+		template<typename iterator_>
+		struct end_checked_enumerator :public referable_enumeratable<iterator_>{
+		protected:
+			iterator_ End;
+		public:
+			iterator& ref(end_tag){return End;}
+			const iterator& ref(end_tag)const{return End;}
+			operator bool()const{return is_end();}
+			bool is_end()const{return Itr!=End;}
+		};
+		template<typename iterator_>
+		struct range_enumerator :public end_checked_enumerator <iterator_>{
+		protected:
+			iterator_ Begin;
+		public:
+			void reset(){
+				Itr=Begin;
+			}
+		};
+		template<typename iterator_>
+		struct mutable_range_enumerator: public range_enumerator<iterator_>{
+		protected:
+			iterator_ IniBegin;
+			iterator_ IniEnd;
+		public:
+			void reset_range(){
+				Begin = IniBegin;
+				End = IniEnd;
+			}
+		};
+
+		template<typename T>
+		struct foward_traversal_concept{
+			struct concept_interface{
+			public:
+				virtual const T& operator()(void) const = 0;
+				virtual T& operator()(void) = 0;
+				virtual operator bool()const = 0;
+				virtual void operator++() = 0;
+				virtual void reset() = 0;
+			};
+			template<typename enumerator_traits>
+			struct concept :public concept_interface{
+			public:
+				const T& operator()(void) const override{ const auto& This = static_cast<const enumerator_traits&>(*this); return *(This.Itr); }
+				T& operator()(void) override{ auto& ref = static_cast<iterator_holder&>(*this); return *(ref.itr); }
+				operator bool()const override{ const auto& ref = static_cast<const iterator_holder&>(*this); return ref.itr != ref.end; }
+				void operator++() override{ auto& ref = static_cast<iterator_holder&>(*this); ++(ref.itr); }
+				void reset() override{ auto& ref = static_cast<iterator_holder&>(*this);  ref.begin = ref.itr; }
+			};
+			template<typename enumerator>
+			struct mixin : public enumerator{
+				using type = enumerator::type;
+			public:
+				const type& operator()(void) const{ const auto& ref = static_cast<const concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); return ref(); }
+				type& operator()(void){ auto& ref = static_cast<concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); return ref(); }
+				operator bool()const{ const auto& ref = static_cast<const concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); return static_cast<bool>(ref()); }
+				void operator++(){ auto& ref = static_cast<concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); ++ref; }
+				void reset(){ auto& ref = static_cast<concept_interface<T>&>(static_cast<enumerator*>(this)->Holder); ref.reset(); }
+			};
+		};
+	}
+	template<typename T,typename enumerator_traits>
+	struct enumerator : public enumerator_traits::enumerator_interface{
+	private:
+		using this_type = enumerator<T, enumerate_traits>;
+	private:
+		std::unique_ptr<enumerate_traits> Ptr;
+	public:
+		enumerator()=default;
+		enumerator(const this_type& This)=delete;
+		this_type& operator=(const this_type& This)=delete;
+		enumerator(this_type&& This)=default;
+		this_type& operator=(this_type&& This)=default;
+	};
+	namespace{
 		template<typename iterator_>
 		class range{
 			using this_type = range<iterator_>;
@@ -129,6 +222,7 @@ namespace hmLib{
 				static_cast<enumerator_*>(this)->Concept.find_if(std::move(Pred), Target);
 			}
 		};
+		struct 
 	}
 	template<typename T, typename concept>
 	struct enumerator : public concept::mixin<enumerator<T, concept>>{
