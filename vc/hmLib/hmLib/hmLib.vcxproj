@@ -79,6 +79,7 @@
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
+    <ClInclude Include="..\..\..\hmLib\euclidean.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
