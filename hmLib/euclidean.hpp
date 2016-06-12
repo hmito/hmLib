@@ -24,8 +24,9 @@ namespace hmLib{
 			this_type& operator=(const this_type&) = default;
 			element(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
-			template<typename... others>
-			element(int val, others... Others) :Array{val, Others...}{}
+			template<typename T,typename...others>
+			element(T Value, others... Others) :Array{Value,Others...}{}
+			explicit element(T val) :Array(){ Array.fill(val); }
 		public:
 			this_type& operator+=(const this_type& Other){
 				for(unsigned int i = 0; i < dim_; ++i){
@@ -109,23 +110,23 @@ namespace hmLib{
 				return Ans /= Val;
 			}
 		public:
-			int& operator[](int pos){ return Array[pos]; }
-			const int& operator[](int pos)const{ return Array[pos]; }
-			int& at(int pos){ return Array.at(pos); }
-			const int& at(int pos)const{ return Array.at(pos); }
+			T& operator[](int pos){ return Array[pos]; }
+			const T& operator[](int pos)const{ return Array[pos]; }
+			T& at(int pos){ return Array.at(pos); }
+			const T& at(int pos)const{ return Array.at(pos); }
 			iterator begin(){ return Array.begin(); }
 			iterator end(){ return Array.end(); }
 			const_iterator begin()const{ return Array.begin(); }
 			const_iterator end()const{ return Array.end(); }
 			const_iterator cbegin()const{ return Array.begin(); }
 			const_iterator cend()const{ return Array.end(); }
-			void fill(int val){ Array.fill(val); }
+			void fill(T val){ Array.fill(val); }
 			void swap(this_type& Other){ Array.swap(Other.Array); }
 		};
 
-		template<typename ...others>
-		auto make_element(others... Others)->element<sizeof...(others)>{
-			return element<sizeof...(others)>{Others...};
+		template<typename T, typename ...others>
+		auto make_element(T Value, others... Others)->element<T,1+sizeof...(others)>{
+			return element<T,1+sizeof...(others)>{Value, Others...};
 		}
 	}
 }
