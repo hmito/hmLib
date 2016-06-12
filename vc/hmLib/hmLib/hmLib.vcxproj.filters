@@ -144,6 +144,9 @@
     <ClInclude Include="..\..\..\hmLib\random\random_bits.hpp">
       <Filter>hmLib\random</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\math.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">

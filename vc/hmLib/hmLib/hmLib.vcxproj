@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\point.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp" />
+    <ClInclude Include="..\..\..\hmLib\math.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
