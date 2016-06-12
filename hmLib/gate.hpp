@@ -30,10 +30,10 @@ v1_02/130324 hmIto
 */
 #include<iostream>
 #ifndef HMLIB_STREAMBUINTERFACE_INC
-#	include <hmLib/streambuf_interface.hpp>
+#	include "streambuf_interface.hpp"
 #endif
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include <hmLib/exceptions.hpp>
+#	include "exceptions.hpp"
 #endif
 namespace hmLib{
 	struct gate_exception_identifier {};

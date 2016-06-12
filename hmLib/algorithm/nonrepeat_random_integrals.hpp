@@ -9,7 +9,7 @@
 #include <functional>
 #include <limits>
 #include <type_traits>
-#include <hmLib/exceptions.hpp>
+#include "../exceptions.hpp"
 
 namespace hmLib{
 	namespace algorithm{

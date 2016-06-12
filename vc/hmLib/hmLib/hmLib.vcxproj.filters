@@ -25,6 +25,24 @@
     <Filter Include="hmLib\algorithm">
       <UniqueIdentifier>{f0c8bbe1-a33e-4d10-8d2d-cd72b377d857}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\exceptions">
+      <UniqueIdentifier>{0b870c9d-00b7-45e0-881d-e6604188b9fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\inquiries">
+      <UniqueIdentifier>{68dde468-3175-4ca0-bdaa-f6e1e6569f97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\signals">
+      <UniqueIdentifier>{30d51514-a608-44e0-916a-6c80834ffc69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\typemanage">
+      <UniqueIdentifier>{64d43e4e-ad02-4945-99ee-237b34e794d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\comgate">
+      <UniqueIdentifier>{026770c0-b1bd-4f0b-ae18-65669b4ef99b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\comgate\winRS">
+      <UniqueIdentifier>{9a365d6a-3e36-41e6-92f9-7aeee47ec84b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm.hpp">
@@ -147,6 +165,75 @@
     <ClInclude Include="..\..\..\hmLib\math.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\exceptions\memory_exceptions.hpp">
+      <Filter>hmLib\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\exceptions\numeric_exceptions.hpp">
+      <Filter>hmLib\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\exceptions\access_exceptions.hpp">
+      <Filter>hmLib\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\exceptions\application_exceptions.hpp">
+      <Filter>hmLib\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\exceptions\exception.hpp">
+      <Filter>hmLib\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\exceptions\io_exceptions.hpp">
+      <Filter>hmLib\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\inquiries\signaled_contact.hpp">
+      <Filter>hmLib\inquiries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\inquiries\unique_connections.hpp">
+      <Filter>hmLib\inquiries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\inquiries\inquiry.hpp">
+      <Filter>hmLib\inquiries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\inquiries\inquiry_abstruct.hpp">
+      <Filter>hmLib\inquiries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\inquiries\range_inquiry.hpp">
+      <Filter>hmLib\inquiries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\inquiries\signal_inquiry.hpp">
+      <Filter>hmLib\inquiries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\signals\unique_connections.hpp">
+      <Filter>hmLib\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\signals\connect.hpp">
+      <Filter>hmLib\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\string_build.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\type_manage.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\type_name.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\listup_name.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\listup_parameter.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\listup_string_build.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\typemanage\parameter.hpp">
+      <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\comgate\winRS\winrs.h">
+      <Filter>hmLib\comgate\winRS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h">
+      <Filter>hmLib\comgate\winRS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
@@ -160,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\hmLib\comgate\winRS\winrs.cpp">
+      <Filter>hmLib\comgate\winRS</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

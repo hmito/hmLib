@@ -7,7 +7,7 @@
 #include<limits>
 #include<boost/lexical_cast.hpp>
 #include<boost/iterator_adaptors.hpp>
-#include<hmLib/exceptions.hpp>
+#include"exceptions.hpp"
 namespace hmLib{
 	namespace{
 		struct basic_table_identifier{};

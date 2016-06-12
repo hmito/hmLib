@@ -20,7 +20,7 @@ debugstream v1_01/130328 hmIto
 #include <windows.h>
 #include <iostream>
 #ifndef HMLIB_STREAMBUFINTERFACE_INC
-#	include <hmLib/streambuf_interface.hpp>
+#	include "streambuf_interface.hpp"
 #endif
 
 

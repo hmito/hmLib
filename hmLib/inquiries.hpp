@@ -55,10 +55,10 @@ inquiry:v0_01/130224 hmIto
 	inquiryについては提供開始
 	range_inquiryは、iterator_proxy待ち
 */
-#include <hmLib/inquiries/inquiry.hpp>
-#include <hmLib/inquiries/range_inquiry.hpp>
-#include <hmLib/inquiries/signal_inquiry.hpp>
-#include <hmLib/inquiries/unique_connections.hpp>
-#include <hmLib/inquiries/signaled_contact.hpp>
+#include "inquiries/inquiry.hpp"
+#include "inquiries/range_inquiry.hpp"
+#include "inquiries/signal_inquiry.hpp"
+#include "inquiries/unique_connections.hpp"
+#include "inquiries/signaled_contact.hpp"
 #
 #endif
