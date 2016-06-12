@@ -128,6 +128,19 @@ namespace hmLib{
 		auto make_element(T Value, others... Others)->element<T,1+sizeof...(others)>{
 			return element<T,1+sizeof...(others)>{Value, Others...};
 		}
+
+		template<typename T, unsigned int dim>
+		T length2(const element<T, dim>& Elem){
+			T value = Elem[0] * Elem[0];
+			for(unsigned int pos = 1; pos < dim; ++pos){
+				value += Elem[pos] * Elem[pos];
+			}
+			return value;
+		}
+		template<typename T, unsigned int dim>
+		T length(const element<T, dim>& Elem){
+			return std::sqrt(length2(Elem));
+		}
 	}
 }
 #
