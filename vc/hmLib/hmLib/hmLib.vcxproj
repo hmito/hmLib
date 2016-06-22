@@ -129,6 +129,7 @@
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\version.h" />
     <ClInclude Include="csv.hpp" />
+    <ClInclude Include="either.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
