@@ -126,9 +126,6 @@
     <ClInclude Include="..\..\..\hmLib\lattices.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\point.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
@@ -240,11 +237,14 @@
     <ClInclude Include="..\..\..\hmLib\lattices\lattice.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_indexer.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\euclidean.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\utility.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\gaplattice_indexer.hpp">
+      <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

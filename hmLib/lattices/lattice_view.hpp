@@ -4,7 +4,7 @@
 #include<array>
 #include<utility>
 #include<iterator>
-#include"point.hpp"
+#include"utility.hpp"
 #include"exceptions.hpp"
 #include"iterator_base.hpp"
 namespace hmLib{
