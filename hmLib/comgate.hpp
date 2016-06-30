@@ -36,9 +36,9 @@ comgate v1_05/130310 hmIto
 #	endif
 #endif
 #ifndef HMLIB_GATE_INC
-#	include <hmLib/gate.hpp>
+#	include "gate.hpp"
 #endif
-#include "hmLib/comgate/winRS/winrs.h"
+#include "comgate/winRS/winrs.h"
 
 namespace hmLib{
 	class comgate:public virtual gate{

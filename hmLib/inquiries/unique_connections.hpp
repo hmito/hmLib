@@ -11,7 +11,7 @@ inquiries::unique_connections v1_00/130328 hmIto
 */
 #include<vector>
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib/exceptions.hpp>
+#	include"../exceptions.hpp"
 #endif
 #ifndef HMLIB_INQUIRIES_INQUIRYABSTRUCT_INC
 #	include"inquiry_abstruct.hpp"

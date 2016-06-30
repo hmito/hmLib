@@ -7,11 +7,11 @@ hmLibの例外クラスの基底クラス群を提供する
 v2_00/131115 hmIto
 	例外機構再定義
 */
-#include<hmLib/exceptions/exception.hpp>
-#include<hmLib/exceptions/memory_exceptions.hpp>
-#include<hmLib/exceptions/numeric_exceptions.hpp>
-#include<hmLib/exceptions/access_exceptions.hpp>
-#include<hmLib/exceptions/application_exceptions.hpp>
-#include<hmLib/exceptions/io_exceptions.hpp>
+#include"exceptions/exception.hpp"
+#include"exceptions/memory_exceptions.hpp"
+#include"exceptions/numeric_exceptions.hpp"
+#include"exceptions/access_exceptions.hpp"
+#include"exceptions/application_exceptions.hpp"
+#include"exceptions/io_exceptions.hpp"
 #
 #endif

@@ -1,7 +1,7 @@
 ﻿#ifndef HMLIB_LATTICES_EXCEPTIONS_INC
 #define HMLIB_LATTICES_EXCEPTIONS_INC 100
 #
-#include<hmLib/exceptions.hpp>
+#include"../exceptions.hpp"
 namespace hmLib{
 	namespace lattices{
 		struct exception_tag{};

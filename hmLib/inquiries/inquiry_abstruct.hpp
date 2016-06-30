@@ -18,10 +18,10 @@ v1_00/130328 hmIto
 	inquiryから分離
 */
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib/exceptions.hpp>
+#	include"../exceptions.hpp"
 #endif
 #ifndef HMLIB_MEMORY_CLONECOUNTER_INC
-#	include<hmLib/lab/memory/clone_counter.hpp>
+#	include"../lab/memory/clone_counter.hpp"
 #endif
 namespace hmLib{
 	namespace inquiries{
