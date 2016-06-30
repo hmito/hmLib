@@ -6,11 +6,11 @@
 namespace hmLib{
 	namespace euclidean{
 		template<typename T, unsigned int dim_>
-		struct element{
+		struct point{
 		private:
-			using this_type = element<T, dim_>;
+			using this_type = point<T, dim_>;
 			template<typename U>
-			using other_type = element<U, dim_>;
+			using other_type = point<U, dim_>;
 			using container = std::array<T, dim_>;
 		public:
 			using iterator = typename container::iterator;
@@ -19,14 +19,24 @@ namespace hmLib{
 		private:
 			container Array;
 		public:
-			element() = default;
-			element(const this_type&) = default;
+			point() = default;
+			point(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
-			element(this_type&&) = default;
+			point(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
+			template<typename U>
+			point(const other_type<U>& Other)
+				: Array(Otehr.begin(), Other.end()){}
+			template<typename U>
+			this_type& operator=(const other_type<U>& Other){
+				for(unsigned int i = 0; i < Array.size(); ++i){
+					Array[i] = Other[i];
+				}
+				return *this;
+			}
 			template<typename T,typename...others>
-			element(T Value, others... Others) :Array{Value,Others...}{}
-			explicit element(T val) :Array(){ Array.fill(val); }
+			point(T Value, others... Others) :Array{Value,Others...}{}
+			explicit point(T val) :Array(){ Array.fill(val); }
 		public:
 			this_type& operator+=(const this_type& Other){
 				for(unsigned int i = 0; i < dim_; ++i){
@@ -125,12 +135,12 @@ namespace hmLib{
 		};
 
 		template<typename T, typename ...others>
-		auto make_element(T Value, others... Others)->element<T,1+sizeof...(others)>{
-			return element<T,1+sizeof...(others)>{Value, Others...};
+		auto make_point(T Value, others... Others)->point<T,1+sizeof...(others)>{
+			return point<T,1+sizeof...(others)>{Value, Others...};
 		}
 
 		template<typename T, unsigned int dim>
-		T length2(const element<T, dim>& Elem){
+		T length2(const point<T, dim>& Elem){
 			T value = Elem[0] * Elem[0];
 			for(unsigned int pos = 1; pos < dim; ++pos){
 				value += Elem[pos] * Elem[pos];
@@ -138,7 +148,7 @@ namespace hmLib{
 			return value;
 		}
 		template<typename T, unsigned int dim>
-		T length(const element<T, dim>& Elem){
+		T length(const point<T, dim>& Elem){
 			return std::sqrt(length2(Elem));
 		}
 	}
