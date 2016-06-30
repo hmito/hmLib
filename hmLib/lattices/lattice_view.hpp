@@ -4,7 +4,6 @@
 #include<array>
 #include<utility>
 #include<iterator>
-#include"../exceptions.hpp"
 #include"point.hpp"
 #include"exceptions.hpp"
 #include"iterator_base.hpp"
