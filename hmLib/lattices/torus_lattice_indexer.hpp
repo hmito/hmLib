@@ -1,0 +1,116 @@
+#ifndef HMLIB_LATTICES_TORUSLATTICEINDEXER_INC
+#define HMLIB_LATTICES_TORUSLATTICEINDEXER_INC 100
+#
+#include "exceptions.hpp"
+#include "utility.hpp"
+#include "../algorithm/compare.hpp"
+namespace hmLib{
+	namespace lattices{
+		namespace lattices{
+			template<unsigned int dim_>
+			struct torus_lattice_indexer{
+				friend struct torus_lattice_indexer<dim_ + 1>;
+				using this_type = torus_lattice_indexer<dim_>;
+				using lower_type = torus_lattice_indexer<dim_ - 1>;
+			public:
+				static constexpr unsigned int dim(){ return dim_; }
+			private:
+				size_type Size;
+				diff_type Gap;
+				lower_type Lower;
+			public:
+				torus_lattice_indexer() : Size(0), Lower(){}
+				template<typename... others>
+				torus_lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Lower(Others...){
+					static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+				}
+				template<typename... others>
+				index_type index(index_type Pos_, others... Others)const{
+					static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+					return index_step(0, 1 + Gap, Pos_, Others...);
+				}
+				template<typename... others>
+				index_type operator()(index_type Pos_, others... Others)const{
+					static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+					return index_calc(0, 1 + Gap, Pos_, Others...);
+				}
+				std::pair<index_type, index_type> lattice_range()const{ return lattice_pos_size_calc(0, 0, 1 + Gap); }
+				index_type lattice_size()const{ auto Pair = lattice_pos_size_calc(0, 0, 1 + Gap); return Pair.second - Pair.first; }
+				size_type size()const{ return Size*Lower.size(); }
+				template<typename req_dim_>
+				size_type dim_size()const{
+					static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+					return dim_size_getter<req_dim_>(*this);
+				}
+				template<typename req_dim_>
+				diff_type dim_gap()const{
+					static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
+					return dim_gap_getter<req_dim_>(*this);
+				}
+			private:
+				std::pair<index_type, index_type> lattice_range_calc(index_type Min_, index_type Max_, diff_type Step_){
+					if(Step_ < 0)Min_ = std::min(Min_, Step_ * Size);
+					else Max_ = std::max(Max_, Step_ * Size);
+
+					return Lower.lattice_range_calc(Min_, Max_, Step_ * Size + Lower.dim_gap<0>());
+				}
+				template<typename... others>
+				index_type index_calc(index_type Sum_, diff_type Step_, index_type Pos_, others... Others)const{
+					Pos_ = algorithm::positive_mod(Pos_, Size);
+					return Lower.index_calc(Sum_ + Pos_ * Step_, Step_*Size + Lower.gap<0>(), Others...);
+				}
+				template<unsigned int req_dim_, typename T = void>
+				struct dim_size_getter{
+					size_type operator()(const this_type& This){ return This.Lower.dim_size<req_dim_ - 1>(); }
+				};
+				template<typename T>
+				struct dim_size_getter<0, T>{
+					size_type operator()(const this_type& This){ return This.Size; }
+				};
+				template<unsigned int req_dim_, typename T = void>
+				struct dim_gap_getter{
+					diff_type operator()(const this_type& This){ return This.Lower.dim_gap<req_dim_ - 1>(); }
+				};
+				template<typename T>
+				struct dim_gap_getter<0, T>{
+					diff_type operator()(const this_type& This){ return This.Gap; }
+				};
+			};
+			template<>
+			struct torus_lattice_indexer<0>{
+				friend struct torus_lattice_indexer<1>;
+				using this_type = torus_lattice_indexer<0>;
+			public:
+				torus_lattice_indexer() = default;
+				template<typename... others>
+				torus_lattice_indexer(others... Others){
+					static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::lattice_indexer is not enough");
+				}
+				template<typename... others>
+				index_type index(index_type Pos_, others... Others)const{
+					return 0;
+				}
+				template<typename... others>
+				index_type operator()(index_type Pos_, others... Others)const{ return 0; }
+				size_type size()const{ return 1; }
+				template<typename req_dim_>
+				size_type dim_size()const{
+					return 1;
+				}
+				template<typename req_dim_>
+				diff_type dim_gap()const{
+					return 0;
+				}
+			private:
+				std::pair<index_type, index_type> lattice_range_calc(index_type Min_, index_type Max_, diff_type Step_){
+					return std::pair<index_type, size_type>(Min_, Max_);
+				}
+				index_type index_calc(index_type Sum_, diff_type Step_, index_type Pos_)const{
+					return Sum_;
+				}
+			};
+		}
+	}
+}
+#
+#endif

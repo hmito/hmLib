@@ -19,13 +19,17 @@ namespace hmLib{
 		public:
 			gap_lattice_indexer() : Size(0), Lower(){}
 			template<typename... others>
-			gap_lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Lower(Others...){}
+			gap_lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Lower(Others...){
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+			}
 			template<typename... others>
 			index_type index(index_type Pos_, others... Others)const{
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				return index_step(0, 1 + Gap, Pos_, Others...);
 			}
 			template<typename... others>
 			index_type operator()(index_type Pos_, others... Others)const{
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				return operator_index_calc(0, 1 + Gap, Pos_, Others...);
 			}
 			std::pair<index_type, index_type> lattice_range()const{ return lattice_pos_size_calc(0, 0, 1 + Gap); }

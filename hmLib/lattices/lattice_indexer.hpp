@@ -17,14 +17,18 @@ namespace hmLib{
 		public:
 			lattice_indexer() : Size(0), Lower(){}
 			template<typename... others>
-			lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Lower(Others...){}
+			lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Lower(Others...){
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+			}
 			template<typename... others>
 			index_type index(index_type Pos_, others... Others)const{
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				hmLib_assert(Pos_ < Size, lattices::out_of_range_access, "Pos is larger than Size.");
 				return Pos_ + Lower.index(Others...)*Lower.size<0>();
 			}
 			template<typename... others>
 			index_type operator()(index_type Pos_, others... Others)const{
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				return Pos_ + Lower(Others...)*Lower.size<0>();
 			}
 			std::pair<index_type, index_type> lattice_range()const{ return std::pair<index_type,index_type>(0, size()); }
