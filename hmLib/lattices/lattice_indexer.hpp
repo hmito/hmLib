@@ -21,38 +21,27 @@ namespace hmLib{
 			template<typename... others>
 			index_type index(index_type Pos_, others... Others)const{
 				hmLib_assert(Pos_ < Size, lattices::out_of_range_access, "Pos is larger than Size.");
-				return operator()(Pos_, Others...);
+				return Pos_ + Lower.index(Others...)*Lower.size<0>();
 			}
 			template<typename... others>
 			index_type operator()(index_type Pos_, others... Others)const{
-				return Pos_ + Lower.at(Others...)*Lower.size<0>();
+				return Pos_ + Lower(Others...)*Lower.size<0>();
 			}
-			size_type lattice_size()const{ return Size*Lower.lattice_size();}
+			std::pair<index_type, index_type> lattice_range()const{ return std::pair<index_type,index_type>(0, size()); }
+			index_type lattice_size()const{ return size(); }
+			size_type size()const{ return Size*Lower.size();}
 			template<typename req_dim_>
-			diff_type step()const{
+			size_type dim_size()const{
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
-				return step_getter<req_dim_>(*this);
-			}
-			template<typename req_dim_>
-			size_type size()const{
-				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
-				return size_getter<req_dim_>(*this);
+				return dim_size_getter<req_dim_>(*this);
 			}
 		private:
 			template<unsigned int req_dim_, typename T = void>
-			struct step_getter{
-				diff_type operator()(const this_type& This){ return This.Lower.step<req_dim_ - 1>(); }
+			struct dim_size_getter{
+				size_type operator()(const this_type& This){ return This.Lower.dim_size<req_dim_ - 1>(); }
 			};
 			template<typename T>
-			struct step_getter<0, T>{
-				diff_type operator()(const this_type& This){ return This.Lower.size()*This.Lower.step(); }
-			};
-			template<unsigned int req_dim_, typename T = void>
-			struct size_getter{
-				size_type operator()(const this_type& This){ return This.Lower.size<req_dim_ - 1>(); }
-			};
-			template<typename T>
-			struct size_getter<0, T>{
+			struct dim_size_getter<0, T>{
 				size_type operator()(const this_type& This){ return This.Size; }
 			};
 		};
@@ -65,18 +54,13 @@ namespace hmLib{
 			lattice_indexer(others... Others){
 				static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::lattice_indexer is not enough");
 			}
-			template<typename... others>
-			index_type index(index_type Pos_, others... Others)const{
-				static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::index is not enough");
-				return operator()(Pos_, Others...);
+			index_type index()const{
+				return 0;
 			}
-			template<typename... others>
-			index_type operator()(index_type Pos_, others... Others)const{
+			index_type operator()(void)const{
 				return 0;
 			}
 			size_type lattice_size()const{ return 1; }
-			template<typename req_dim_>
-			diff_type step()const{ return 1;}
 			template<typename req_dim_>
 			size_type size()const{ return 1; }
 		};

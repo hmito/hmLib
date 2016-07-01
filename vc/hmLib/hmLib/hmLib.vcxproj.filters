@@ -243,7 +243,10 @@
     <ClInclude Include="..\..\..\hmLib\lattices\utility.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\gaplattice_indexer.hpp">
+    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_indexer.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\gap_lattice_indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
