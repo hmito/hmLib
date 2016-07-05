@@ -11,7 +11,7 @@ random:v2_07/130709 hmIto
 random:v2_06/121128 hmIto
 	拡張子をhからhppに変更。
 */
-#include<hmLib/random/random_engine.hpp>
-#include<hmLib/random/random_bits.hpp>
+#include"random/random_engine.hpp"
+#include"random/random_bits.hpp"
 #
 #endif

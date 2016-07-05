@@ -438,8 +438,8 @@ namespace hmLib{
 	}
 }
 namespace std{
-	double abs(const hmLib::coordinates3D::position& pos){return pos.abs();}
-	double abs(const hmLib::coordinates3D::polar& pol){return pol.abs();}
+	inline double abs(const hmLib::coordinates3D::position& pos){return pos.abs();}
+	inline double abs(const hmLib::coordinates3D::polar& pol){return pol.abs();}
 }
 #
 #endif
