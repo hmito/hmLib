@@ -36,6 +36,8 @@ namespace hmLib{
 			}
 			template<typename T,typename...others>
 			point(T Value, others... Others) :Array{Value,Others...}{}
+			template<typename input_iterator>
+			point(input_iterator Begin_, input_iterator End_) : Array(Begin_,End_){}
 			explicit point(T val) :Array(){ Array.fill(val); }
 		public:
 			this_type& operator+=(const this_type& Other){
@@ -151,6 +153,20 @@ namespace hmLib{
 		T length(const point<T, dim>& Elem){
 			return std::sqrt(length2(Elem));
 		}
+
+		template<typename T>
+		using point1d = point<T, 1>;
+		template<typename T>
+		using point2d = point<T, 2>;
+		template<typename T>
+		using point3d = point<T, 3>;
+
+		using p1int = point<int, 1>;
+		using p2int = point<int, 2>;
+		using p3int = point<int, 3>;
+		using p1double = point<double, 1>;
+		using p2double = point<double, 2>;
+		using p3double = point<double, 3>;
 	}
 }
 #

@@ -25,7 +25,7 @@ namespace hmLib{
 		lattice_view() = default;
 		template<typename... others>
 		lattice_view(iterator_ Begin_, iterator_ End_, index_type Size_, others... Others_)
-			:Size(Size_)
+			: Size(Size_)
 			, Gap(0)
 			, Lower(Begin_, End_, Others_...){
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");

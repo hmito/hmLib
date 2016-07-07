@@ -9,6 +9,7 @@ namespace hmLib{
 		using indexer = lattices::lattice_indexer<dim_>;
 		using size_type = typename indexer::size_type;
 		using index_type = typename indexer::index_type;
+		using point_type = lattices::point<dim_>;
 	private:
 		indexer Idx;
 		std::vector<T> Vec;
@@ -26,6 +27,9 @@ namespace hmLib{
 		template<typename... others>
 		const T& at(index_type Pos, others... Others)const{
 			return Vec[idx(Pos, Others...)];
+		}
+		T& at(point_type Point){
+			point_type()
 		}
 	};
 }

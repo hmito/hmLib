@@ -1,14 +1,29 @@
 #ifndef HMLIB_LATTICES_LATTICEINDEXER_INC
 #define HMLIB_LATTICES_LATTICEINDEXER_INC 100
 #
+/*
+=== lattice ===
+(0,0,0)->(1,0,0)->(2,0,0)...(0,1,0)...
+
+axis_size: length of data on the requested axis
+axis_gap: 
+axis_step
+
+size: total length of data
+
+
+*/
+#include "../euclidean.hpp"
 #include "exceptions.hpp"
 #include "utility.hpp"
 namespace hmLib{
 	namespace lattices{
 		template<unsigned int dim_>
 		struct lattice_indexer{
+			friend struct lattice_indexer<dim_ + 1>;
 			using this_type = lattice_indexer<dim_>;
 			using lower_type = lattice_indexer<dim_ - 1>;
+			using point_type = lattices::point<dim_>;
 		public:
 			static constexpr unsigned int dim(){ return dim_; }
 		private:
@@ -31,21 +46,36 @@ namespace hmLib{
 				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				return Pos_ + Lower(Others...)*Lower.size<0>();
 			}
+			index_type index(point_type Point_)const{
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+				hmLib_assert(Point_[0] < Size, lattices::out_of_range_access, "Pos is larger than Size.");
+				return Point_[0] + Lower.index(Others...)*Lower.axis_size<0>();
+			}
+			template<typename... others>
+			index_type operator()(index_type Pos_, others... Others)const{
+				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
+				return Pos_ + Lower(Others...)*Lower.size<0>();
+			}
 			std::pair<index_type, index_type> lattice_range()const{ return std::pair<index_type,index_type>(0, size()); }
 			index_type lattice_size()const{ return size(); }
 			size_type size()const{ return Size*Lower.size();}
 			template<typename req_dim_>
-			size_type dim_size()const{
+			size_type axis_size()const{
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
-				return dim_size_getter<req_dim_>(*this);
+				return axis_size_getter<req_dim_>(*this);
 			}
 		private:
+			template<unsigned int point_dim_>
+			index_type checked_index(const point<point_dim_>& Point_)const{
+				hmLib_assert(Point_[point_dim_ - dim] < Size, lattices::out_of_range_access, "Pos is larger than Size.");
+				return Point_[point_dim_ - dim] + Lower.cheked_index(Point_)*Lower.axis_size<0>();
+			}
 			template<unsigned int req_dim_, typename T = void>
-			struct dim_size_getter{
-				size_type operator()(const this_type& This){ return This.Lower.dim_size<req_dim_ - 1>(); }
+			struct axis_size_getter{
+				size_type operator()(const this_type& This){ return This.Lower.axis_size<req_dim_ - 1>(); }
 			};
 			template<typename T>
-			struct dim_size_getter<0, T>{
+			struct axis_size_getter<0, T>{
 				size_type operator()(const this_type& This){ return This.Size; }
 			};
 		};
