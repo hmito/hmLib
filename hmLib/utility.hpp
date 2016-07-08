@@ -24,7 +24,7 @@ namespace hmLib{
 	//クローン関数
 	template<typename T>
 	T clone(const T& t_){return T(t_);}
-	template<typename T,template Fn>
+	template<typename T, typename Fn>
 	T clone(const T& t_,Fn Func){return Func(t_);}
 	//値入れ替え関数
 	template<typename T, typename U>
