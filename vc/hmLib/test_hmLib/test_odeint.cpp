@@ -7,6 +7,9 @@
 #include <hmLib/odeint/container_observer.hpp>
 #include <hmLib/odeint/stream_observer.hpp>
 #include <hmLib/odeint/iterator_observer.hpp>
+#include <hmLib/odeint/break_observer.hpp>
+#include <hmLib/odeint/eqstate_break_observer.hpp>
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -68,6 +71,16 @@ namespace hmLib{
 			auto Observer = odeint::make_pair_iterator_observer(std::back_inserter(Log));
 
 			bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
+		}
+		TEST_METHOD(break_observer){
+			bodeint::euler<test_system::state> Stepper;
+			test_system System;
+			test_system::state State{0.0,1.0};
+
+			std::vector<std::pair<double, test_system::state> > Log;
+			auto Observer = odeint::make_break_observer([](const test_system::state& State)->bool{return State[0] > 1.0; });
+
+			bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, Observer);
 		}
 	};
 }

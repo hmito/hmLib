@@ -1,7 +1,6 @@
 #ifndef HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC
 #define HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC 100
 #
-#include"odeint_tags.hpp"
 #include<boost/numeric/odeint.hpp>
 namespace hmLib{
 	namespace odeint{
@@ -11,13 +10,13 @@ namespace hmLib{
 			*/
 			template< class Stepper, class System, class State, class Time, class BreakableObserver >
 			size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
-				Time start_time, Time end_time, Time dt, BreakableObserver observer, stepper_tag
+				Time start_time, Time end_time, Time dt, BreakableObserver observer, boost::numeric::odeint::stepper_tag
 			){
 				using namespace boost::numeric::odeint;
 				using namespace boost::numeric::odeint::detail;
 
-				unwrap_reference< interrupt_observer >::type &obs = Observer;
-				unwrap_reference< stepper >::type &st = Stepper;
+				unwrap_reference< BreakableObserver >::type &obs = observer;
+				unwrap_reference< Stepper >::type &st = stepper;
 
 				Time time = start_time;
 				int step = 0;
@@ -43,7 +42,7 @@ namespace hmLib{
 			*/
 			template< class Stepper, class System, class State, class Time, class BreakableObserver >
 			size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
-				Time &start_time, Time end_time, Time &dt, BreakableObserver observer, controlled_stepper_tag
+				Time &start_time, Time end_time, Time &dt, BreakableObserver observer, boost::numeric::odeint::controlled_stepper_tag
 			){
 				using namespace boost::numeric::odeint;
 				using namespace boost::numeric::odeint::detail;
@@ -79,10 +78,9 @@ namespace hmLib{
 			* step size control is used if the stepper supports it
 			*/
 			template< class Stepper, class System, class State, class Time, class BreakableObserver >
-			size_t breakable_integrate_adaptive(
-				Stepper stepper, System system, State &start_state,
-				Time start_time, Time end_time, Time dt,
-				BreakableObserver observer, dense_output_stepper_tag){
+			size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
+				Time start_time, Time end_time, Time dt, BreakableObserver observer, boost::numeric::odeint::dense_output_stepper_tag
+			){
 				using namespace boost::numeric::odeint;
 				using namespace boost::numeric::odeint::detail;
 
@@ -108,23 +106,18 @@ namespace hmLib{
 					st.initialize(st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()));
 				}
 				obs(st.current_state(), st.current_time());
+
 				// overwrite start_state with the final point
 				boost::numeric::odeint::copy(st.current_state(), start_state);
+
 				return count;
 			}
 		}
 
 		template< class Stepper, class System, class State, class Time, class BreakableObserver >
-		size_t breakable_integrate_adaptive(
-			Stepper stepper, System system, State &start_state,
-			Time start_time, Time end_time, Time dt,
-			BreakableObserver observer
-		){
+		size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,Time start_time, Time end_time, Time dt,BreakableObserver observer){
 			using stepper_category = typename boost::numeric::odeint::unwrap_reference<Stepper>::type::stepper_category;
-
-			return detail::breakable_integrate_adaptive(stepper,	system, start_state,
-				start_time, end_time, dt,observer,stepper_category()
-			);
+			return detail::breakable_integrate_adaptive(stepper,system, start_state,start_time, end_time, dt,observer,stepper_category());
 		}
 	}
 }

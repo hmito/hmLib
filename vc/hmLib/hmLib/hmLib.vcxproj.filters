@@ -246,9 +246,6 @@
     <ClInclude Include="..\..\..\hmLib\odeint\breakable_integrate.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\odeint\odeint_tags.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\odeint\iterator_observer.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
@@ -256,6 +253,15 @@
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\odeint\stream_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\break_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\eqstate_break_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\utility.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>
