@@ -169,6 +169,7 @@
     </ClCompile>
     <ClCompile Include="test_algorithm.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
+    <ClCompile Include="test_odeint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test1.csv" />

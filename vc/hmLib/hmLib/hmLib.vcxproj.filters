@@ -234,6 +234,12 @@
     <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h">
       <Filter>hmLib\comgate\winRS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\sequence.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
