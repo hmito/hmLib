@@ -43,6 +43,9 @@
     <Filter Include="hmLib\comgate\winRS">
       <UniqueIdentifier>{9a365d6a-3e36-41e6-92f9-7aeee47ec84b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\odeint">
+      <UniqueIdentifier>{b0d7a183-270c-4bd8-b22b-03e97578322b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm.hpp">
@@ -240,6 +243,21 @@
     <ClInclude Include="..\..\..\hmLib\odeint.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\breakable_integrate.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\odeint_tags.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\iterator_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\container_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\stream_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
@@ -253,9 +271,6 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\comgate\winRS\winrs.cpp">
-      <Filter>hmLib\comgate\winRS</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

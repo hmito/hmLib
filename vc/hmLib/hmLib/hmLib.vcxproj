@@ -39,7 +39,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\labuser\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\labuser\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,6 +110,11 @@
     <ClInclude Include="..\..\..\hmLib\math.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\odeint.hpp" />
+    <ClInclude Include="..\..\..\hmLib\odeint\breakable_integrate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\odeint\iterator_observer.hpp" />
+    <ClInclude Include="..\..\..\hmLib\odeint\odeint_tags.hpp" />
+    <ClInclude Include="..\..\..\hmLib\odeint\container_observer.hpp" />
+    <ClInclude Include="..\..\..\hmLib\odeint\stream_observer.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_bits.hpp" />
@@ -134,7 +142,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
-    <ClCompile Include="..\..\..\hmLib\comgate\winRS\winrs.cpp" />
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
     <ClCompile Include="main.cpp" />
