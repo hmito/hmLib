@@ -104,7 +104,8 @@ int main(){
 
 		odeint::eqstate_break_observer<test_system::state> Observer(0.001,1);
 
-		odeint::breakable_integrate_adaptive(Stepper, System, State, 0.0, 100.0, 0.01, std::ref(Observer));
+		//odeint::breakable_integrate_adaptive(Stepper, System, State, 0.0, 100.0, 0.1, std::ref(Observer));
+		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 100.0, 0.1, std::ref(Observer));
 
 		std::ofstream fout("result2.csv");
 		for(auto val : Observer){
