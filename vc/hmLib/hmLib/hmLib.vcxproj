@@ -110,6 +110,7 @@
     <ClInclude Include="..\..\..\hmLib\math.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\hmLib\odeint.hpp" />
+    <ClInclude Include="..\..\..\hmLib\odeint\range_stepper.hpp" />
     <ClInclude Include="..\..\..\hmLib\odeint\breakable_integrate.hpp" />
     <ClInclude Include="..\..\..\hmLib\odeint\break_observer.hpp" />
     <ClInclude Include="..\..\..\hmLib\odeint\eqstate_break_observer.hpp" />

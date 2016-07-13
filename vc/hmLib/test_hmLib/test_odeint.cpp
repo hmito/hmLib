@@ -9,6 +9,7 @@
 #include <hmLib/odeint/iterator_observer.hpp>
 #include <hmLib/odeint/break_observer.hpp>
 #include <hmLib/odeint/eqstate_break_observer.hpp>
+#include <hmLib/odeint/range_stepper.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -21,6 +22,7 @@ namespace hmLib{
 				dxdt[0] = std::sin(x[0]);
 				dxdt[1] = std::cos(x[1]);
 			}
+			unsigned region(const state&,double){ return 1; }
 		};
 	public:
 		TEST_METHOD(container_observer){
@@ -81,6 +83,15 @@ namespace hmLib{
 			auto Observer = odeint::make_break_observer([](const test_system::state& State)->bool{return State[0] > 1.0; });
 
 			bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, Observer);
+		}
+		TEST_METHOD(range_stepper){
+			auto Stepper = bodeint::make_dense_output(1.0e-10, 1.0e-6, bodeint::runge_kutta_dopri5<test_system::state>());
+			test_system System;
+			test_system::state State{0.0,1.0};
+
+			odeint::region_abridged_stepper<decltype(Stepper)> RStepper(0.001, std::move(Stepper));
+
+			RStepper.do_step(System);
 		}
 	};
 }

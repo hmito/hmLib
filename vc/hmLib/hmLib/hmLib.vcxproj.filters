@@ -264,6 +264,9 @@
     <ClInclude Include="..\..\..\hmLib\odeint\utility.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\range_stepper.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
