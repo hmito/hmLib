@@ -21,6 +21,24 @@ namespace hmLib{
 			using stepper_category = boost::numeric::odeint::dense_output_stepper_tag;
 			using region_type = region_type_;
 		private:
+			template<typename region_system>
+			struct region_fix_system{
+				region_system& Ref;
+				region_type Region;
+				region_fix_system(region_system& Ref_, region_type Region_)
+					: Ref(Ref_)
+					, Region(Region_){
+				}
+				void operator()(const state_type& x, deriv_type& dxdt, time_type t){
+					Ref(x, dxdt, t, Region);
+				}
+				region_type region(const state_type& x, time_type t){
+					return Ref.region(x, t);
+				}
+				region_type current_region(){ return Region; }
+				void update_current_region(region_type Region_){ Region = Region_; }
+			};
+		private:
 			double RegionError;
 			stepper_type Stepper;
 			boost::optional<region_type> CurrentRegion;
@@ -42,7 +60,7 @@ namespace hmLib{
 				Stepper.initialize(CurrentState,CurrentTime,dt);
 			}
 			template<typename region_system_>
-			std::pair<time_type, time_type> do_step(region_system_& System){
+			std::pair<time_type, time_type> do_step(region_system_& System_){
 				if(CurrentTime != Stepper.current_time()){
 					time_type dt = Stepper.current_time_step();
 					Stepper.initialize(CurrentState, CurrentTime,dt);
@@ -50,9 +68,11 @@ namespace hmLib{
 				}
 				
 				if(!CurrentRegion){
-					CurrentRegion = System.region(CurrentState, CurrentTime);
+					CurrentRegion = System_.region(CurrentState, CurrentTime);
 				}
 				
+				region_fix_system<region_system_> System(System_, *CurrentRegion);
+
 				auto TimePair = Stepper.do_step(System);
 				auto NewRegion = System.region(Stepper.current_state(), Stepper.current_time());
 
@@ -61,8 +81,8 @@ namespace hmLib{
 					auto NewTime = Stepper.current_time();
 					
 					state_type State;
-					while(detail::abs_distance(CurrentState,NewState) < RegionError){
-						auto Time = CurrentTime+NewTime;
+					while(detail::abs_distance(CurrentState,NewState) > RegionError){
+						auto Time = (CurrentTime+NewTime)/2.;
 						Stepper.calc_state(Time,State);
 						NewRegion = System.region(State,Time);
 						if(NewRegion == *CurrentRegion){

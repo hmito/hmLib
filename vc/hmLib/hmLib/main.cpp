@@ -18,14 +18,17 @@ namespace hmLib{
 		static constexpr double region_error(){ return 0.00001; }
 		using state = std::array<double, 2>;
 		void operator()(const state& x, state& dxdt, double t){
+			operator()(x, dxdt, t, region(x,t));
+		}
+		void operator()(const state& x, state& dxdt, double t, unsigned int r){
 			double base = std::sqrt(x[0] * x[0] + x[1] * x[1]);
 			dxdt[0] = -x[1];
 			dxdt[1] = x[0];
 
-			if(x[0] > 0.5 - region_error() && dxdt[0] > 0)dxdt[0] = 0.0;
+			if(r==2 && dxdt[0] > 0)dxdt[0] = 0.0;
 		}
 		unsigned int region(const state& x, double t){
-			if(x[0] > 0.5)return 0;
+			if(x[0] >= 0.5 - region_error() )return 2;
 			return 1;
 		}
 	};
@@ -125,7 +128,7 @@ int main(){
 		test_system System;
 		test_system::state State{0.0,1.0};
 
-		odeint::region_abridged_stepper<decltype(BaseStepper)> Stepper(0.001, std::move(BaseStepper));
+		odeint::region_abridged_stepper<decltype(BaseStepper)> Stepper(System.region_error(), std::move(BaseStepper));
 
 //		odeint::container_observer<test_system::state> Observer;
 
@@ -144,7 +147,7 @@ int main(){
 		test_system System;
 		test_system::state State{0.0,1.0};
 
-		odeint::region_abridged_stepper<decltype(BaseStepper)> Stepper(0.001, std::move(BaseStepper));
+		odeint::region_abridged_stepper<decltype(BaseStepper)> Stepper(System.region_error(), std::move(BaseStepper));
 		Stepper.initialize(State, 0.0, 0.001);
 
 		//odeint::eqstate_break_observer<test_system::state> Observer(0.001, 1);
