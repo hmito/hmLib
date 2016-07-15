@@ -25,10 +25,20 @@ namespace hmLib{
 			dxdt[0] = -x[1];
 			dxdt[1] = x[0];
 
-			if(r==2 && dxdt[0] > 0)dxdt[0] = 0.0;
+			if(r == 2 && dxdt[0] > 0)dxdt[0] = 0.0;
+			else if(r == 3 && dxdt[1] < 0)dxdt[1] = 0.0;
+			else if(r == 4){
+				if(dxdt[0] > 0)dxdt[0] = 0.0;
+				if(dxdt[1] < 0)dxdt[1] = 0.0;
+			}
 		}
 		unsigned int region(const state& x, double t){
-			if(x[0] >= 0.5 - region_error() )return 2;
+			if(x[0] >= 0.5 - region_error()){
+				if(x[1] <= -0.75 - region_error())return 4;
+				return 2;
+			}
+			if(x[1] <= -0.75 - region_error())return 3;
+
 			return 1;
 		}
 	};

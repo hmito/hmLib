@@ -3,19 +3,23 @@
 #
 #include<utility>
 #include<boost/optional.hpp>
-#include<boost/numeric/odeint/stepper/dense_output_runge_kutta.hpp>
+#include<boost/numeric/odeint.hpp>
 #include"utility.hpp"
 namespace hmLib{
 	namespace odeint{
-		template<typename dense_output_stepper_, typename region_type_=unsigned int>
+		template<typename stepper_, typename region_type_ = unsigned int, typename stepper_category = typename boost::numeric::odeint::unwrap_reference<stepper_>::type::stepper_category>
 		struct region_abridged_stepper{
+			static_assert(true,"region_abridged_stepper can use only dense_output_stepper as the basic stepper.");
+		};
+		template<typename stepper_, typename region_type_>
+		struct region_abridged_stepper<stepper_, region_type_, boost::numeric::odeint::dense_output_stepper_tag>{
 		public:
-			using stepper_type = dense_output_stepper_;
+			using stepper_type = stepper_;
 			using state_type = typename stepper_type::state_type;
 			using value_type = typename stepper_type::value_type;
 			using deriv_type = typename stepper_type::deriv_type;
 			using time_type = typename stepper_type::time_type;
-			using algebra_type =  typename stepper_type::algebra_type;
+			using algebra_type = typename stepper_type::algebra_type;
 			using operations_type = typename stepper_type::operations_type;
 			using resizer_type = typename stepper_type::resizer_type;
 			using stepper_category = boost::numeric::odeint::dense_output_stepper_tag;
@@ -27,8 +31,7 @@ namespace hmLib{
 				region_type Region;
 				region_fix_system(region_system& Ref_, region_type Region_)
 					: Ref(Ref_)
-					, Region(Region_){
-				}
+					, Region(Region_){}
 				void operator()(const state_type& x, deriv_type& dxdt, time_type t){
 					Ref(x, dxdt, t, Region);
 				}
@@ -47,8 +50,7 @@ namespace hmLib{
 		public:
 			region_abridged_stepper(double RegionError_, const stepper_type& Stepper_)
 				: RegionError(RegionError_)
-				, Stepper(Stepper_){
-			}
+				, Stepper(Stepper_){}
 			region_abridged_stepper(double RegionError_, stepper_type&& Stepper_)noexcept
 				: RegionError(RegionError_)
 				, Stepper(std::move(Stepper_)){}
@@ -57,20 +59,20 @@ namespace hmLib{
 				CurrentState = State;
 				CurrentTime = Time;
 				CurrentRegion = boost::none;
-				Stepper.initialize(CurrentState,CurrentTime,dt);
+				Stepper.initialize(CurrentState, CurrentTime, dt);
 			}
 			template<typename region_system_>
 			std::pair<time_type, time_type> do_step(region_system_& System_){
 				if(CurrentTime != Stepper.current_time()){
 					time_type dt = Stepper.current_time_step();
-					Stepper.initialize(CurrentState, CurrentTime,dt);
+					Stepper.initialize(CurrentState, CurrentTime, dt);
 					CurrentRegion = boost::none;
 				}
-				
+
 				if(!CurrentRegion){
 					CurrentRegion = System_.region(CurrentState, CurrentTime);
 				}
-				
+
 				region_fix_system<region_system_> System(System_, *CurrentRegion);
 
 				auto TimePair = Stepper.do_step(System);
@@ -79,37 +81,37 @@ namespace hmLib{
 				if(NewRegion != *CurrentRegion){
 					auto NewState = Stepper.current_state();
 					auto NewTime = Stepper.current_time();
-					
+
 					state_type State;
-					while(detail::abs_distance(CurrentState,NewState) > RegionError){
-						auto Time = (CurrentTime+NewTime)/2.;
-						Stepper.calc_state(Time,State);
-						NewRegion = System.region(State,Time);
+					while(detail::abs_distance(CurrentState, NewState) > RegionError){
+						auto Time = (CurrentTime + NewTime) / 2.;
+						Stepper.calc_state(Time, State);
+						NewRegion = System.region(State, Time);
 						if(NewRegion == *CurrentRegion){
-							std::swap(State,CurrentState);
+							std::swap(State, CurrentState);
 							CurrentTime = Time;
-						}else{
-							std::swap(State,NewState);
+						} else{
+							std::swap(State, NewState);
 							NewTime = Time;
 						}
 					}
 					if(NewRegion){
-						std::swap(CurrentState,NewState);
+						std::swap(CurrentState, NewState);
 						CurrentTime = NewTime;
 						CurrentRegion = NewRegion;
 					}
-				}else{
+				} else{
 					CurrentState = Stepper.current_state();
 					CurrentTime = Stepper.current_time();
-					CurrentRegion = NewRegion;					
+					CurrentRegion = NewRegion;
 				}
-				
+
 				TimePair.second = CurrentTime;
-				
+
 				return TimePair;
 			}
 			void calc_state(time_type t, state_type& x){
-				Stepper.calc_state(t,x);
+				Stepper.calc_state(t, x);
 			}
 			const time_type& current_time()const{
 				return CurrentTime;
