@@ -9,7 +9,7 @@ namespace hmLib{
 	namespace odeint{
 		template<typename dense_output_stepper_, typename region_type_=unsigned int>
 		struct region_abridged_stepper{
-		private:
+		public:
 			using stepper_type = dense_output_stepper_;
 			using state_type = typename stepper_type::state_type;
 			using value_type = typename stepper_type::value_type;
@@ -37,9 +37,9 @@ namespace hmLib{
 		public:
 			void initialize(const state_type& State, time_type Time, time_type dt){
 				CurrentState = State;
-				CurrenTime = Time;
+				CurrentTime = Time;
 				CurrentRegion = boost::none;
-				Stepper.initialize(CurrentState,CurrenTime,dt);
+				Stepper.initialize(CurrentState,CurrentTime,dt);
 			}
 			template<typename region_system_>
 			std::pair<time_type, time_type> do_step(region_system_& System){
@@ -92,16 +92,17 @@ namespace hmLib{
 				Stepper.calc_state(t,x);
 			}
 			const time_type& current_time()const{
-				return CurrenTime;
+				return CurrentTime;
 			}
 			const state_type& current_state()const{
-				return CurrenState;
+				return CurrentState;
 			}
 			time_type current_time_step()const{
-				return 2*Stepper.current_time() - CurrenTime - Stepper.current_time_step();
+				return Stepper.current_time_step();
 			}
 			region_type current_region()const{
-				return CurrentRegion;
+				if(!CurrentRegion)return 0;
+				return *CurrentRegion;
 			}
 		};
 	}
