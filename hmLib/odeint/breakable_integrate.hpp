@@ -1,6 +1,7 @@
 #ifndef HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC
 #define HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC 100
 #
+#include<utility>
 #include<boost/numeric/odeint.hpp>
 namespace hmLib{
 	namespace odeint{
@@ -9,7 +10,7 @@ namespace hmLib{
 			* integrate_adaptive for simple stepper is basically an integrate_const + some last step
 			*/
 			template< class Stepper, class System, class State, class Time, class BreakableObserver >
-			size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
+			std::pair<Time, size_t> breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
 				Time start_time, Time end_time, Time dt, BreakableObserver observer, boost::numeric::odeint::stepper_tag
 			){
 				using namespace boost::numeric::odeint;
@@ -23,7 +24,7 @@ namespace hmLib{
 				// cast time+dt explicitely in case of expression templates (e.g. multiprecision)
 				while(less_eq_with_sign(static_cast<Time>(time + dt), end_time, dt)){
 					if(obs(start_state, time)){
-						return step;
+						return std::make_pair(time, step);
 					}
 					st.do_step(system, start_state, time, dt);
 					// direct computation of the time avoids error propagation happening when using time += dt
@@ -33,7 +34,7 @@ namespace hmLib{
 				}
 				obs(start_state, time);
 
-				return step;
+				return std::make_pair(time,step);
 			}
 
 
@@ -41,7 +42,7 @@ namespace hmLib{
 			* integrate adaptive for controlled stepper
 			*/
 			template< class Stepper, class System, class State, class Time, class BreakableObserver >
-			size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
+			std::pair<Time,size_t> breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
 				Time &start_time, Time end_time, Time &dt, BreakableObserver observer, boost::numeric::odeint::controlled_stepper_tag
 			){
 				using namespace boost::numeric::odeint;
@@ -53,7 +54,7 @@ namespace hmLib{
 				failed_step_checker fail_checker;  // to throw a runtime_error if step size adjustment fails
 				size_t count = 0;
 				while(less_with_sign(start_time, end_time, dt)){
-					if(obs(start_state, start_time))return count;
+					if(obs(start_state, start_time))return std::make_pair(start_time,count);
 					if(less_with_sign(end_time, static_cast<Time>(start_time + dt), dt)){
 						dt = end_time - start_time;
 					}
@@ -68,7 +69,8 @@ namespace hmLib{
 					++count;
 				}
 				obs(start_state, start_time);
-				return count;
+
+				return std::make_pair(start_time, count)
 			}
 
 
@@ -78,7 +80,7 @@ namespace hmLib{
 			* step size control is used if the stepper supports it
 			*/
 			template< class Stepper, class System, class State, class Time, class BreakableObserver >
-			size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
+			std::pair<Time, size_t> breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,
 				Time start_time, Time end_time, Time dt, BreakableObserver observer, boost::numeric::odeint::dense_output_stepper_tag
 			){
 				using namespace boost::numeric::odeint;
@@ -97,7 +99,7 @@ namespace hmLib{
 						if(obs(st.current_state(), st.current_time())){
 							// overwrite start_state with the final point
 							boost::numeric::odeint::copy(st.current_state(), start_state);
-							return count;
+							return std::make_pair(st.current_time(), count);
 						}
 						st.do_step(system);
 						++count;
@@ -110,7 +112,7 @@ namespace hmLib{
 				// overwrite start_state with the final point
 				boost::numeric::odeint::copy(st.current_state(), start_state);
 
-				return count;
+				return std::make_pair(st.current_time(), count);
 			}
 		}
 

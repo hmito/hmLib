@@ -20,7 +20,7 @@ namespace hmLib{
 		void operator()(const state& x, state& dxdt, double t){
 			operator()(x, dxdt, t, region(x,t));
 		}
-		void operator()(const state& x, state& dxdt, double t, unsigned int r){
+		void operator()(const state& x, state& dxdt, double t, int r){
 			double base = std::sqrt(x[0] * x[0] + x[1] * x[1]);
 			dxdt[0] = -x[1];
 			dxdt[1] = x[0];
@@ -32,7 +32,7 @@ namespace hmLib{
 				if(dxdt[1] < 0)dxdt[1] = 0.0;
 			}
 		}
-		unsigned int region(const state& x, double t){
+		int region(const state& x, double t){
 			if(x[0] >= 0.5 - region_error()){
 				if(x[1] <= -0.75 - region_error())return 4;
 				return 2;
