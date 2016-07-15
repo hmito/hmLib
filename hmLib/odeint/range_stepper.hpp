@@ -7,7 +7,7 @@
 #include"utility.hpp"
 namespace hmLib{
 	namespace odeint{
-		template<typename stepper_, typename region_type_ = unsigned int, typename stepper_category = typename boost::numeric::odeint::unwrap_reference<stepper_>::type::stepper_category>
+		template<typename stepper_, typename region_type_ = int, typename stepper_category = typename boost::numeric::odeint::unwrap_reference<stepper_>::type::stepper_category>
 		struct region_abridged_stepper{
 			static_assert(true,"region_abridged_stepper can use only dense_output_stepper as the basic stepper.");
 		};
@@ -95,7 +95,7 @@ namespace hmLib{
 							NewTime = Time;
 						}
 					}
-					if(NewRegion){
+					if(*NewRegion < 0){
 						std::swap(CurrentState, NewState);
 						CurrentTime = NewTime;
 						CurrentRegion = NewRegion;
