@@ -1,4 +1,4 @@
-#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
+﻿#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
 #define HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC 100
 #
 #include <array>
@@ -10,13 +10,17 @@ namespace hmLib{
 		namespace detail{
 			template<typename state_, typename time_>
 			struct eqstate_breaker{
+			public:
+				using state = state_;
+				using time = time_;
+			private:
 				unsigned int Cnt;
 				unsigned int Interval;
 				unsigned int IgnoreNum;
 				double Error;
 			public:
 				eqstate_breaker(unsigned int Interval_,unsigned int IgnoreNum_, double Error_) :Cnt(0), Interval(Interval_), IgnoreNum(IgnoreNum_), Error(Error_){}
-				bool operator()(const state_& x, time_ t, container_observer<state_,time_>& Observer){
+				bool operator()(const state& x, time t, container_observer<state,time>& Observer){
 					if(++Cnt < Interval)return false;
 					Cnt = 0;
 
@@ -38,6 +42,7 @@ namespace hmLib{
 			template<typename time_>
 			struct eqstate_breaker < std::array<double, 2> , time_>{
 				using state = std::array<double, 2>;
+				using time = time_;
 			private:
 				unsigned int Cnt;
 				unsigned int Interval;
@@ -52,7 +57,7 @@ namespace hmLib{
 				};
 			public:
 				eqstate_breaker(unsigned int Interval_):Cnt(0),Interval(Interval_){}
-				bool operator()(const state_& x, time_ t, container_observer<state_, time_>& Observer){
+				bool operator()(const state& x, time t, container_observer<state, time>& Observer){
 					if(++Cnt < Interval)return false;
 					Cnt = 0;
 

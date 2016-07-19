@@ -24,7 +24,7 @@ namespace hmLib{
 			pair& operator[](size_t Pos){ return Log[Pos]; }
 			const pair& operator[](size_t Pos)const{ return Log[Pos]; }
 			bool empty()const{ return Log.empty(); }
-			void size()const{ return Log.size(); }
+			unsigned int size()const{ return Log.size(); }
 			void reserve(size_t Size){ Log.reserve(Size); }
 		public:
 			const container& get()const{ return Log; }
