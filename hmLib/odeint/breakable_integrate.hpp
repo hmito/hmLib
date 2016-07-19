@@ -16,8 +16,8 @@ namespace hmLib{
 				using namespace boost::numeric::odeint;
 				using namespace boost::numeric::odeint::detail;
 
-				unwrap_reference< BreakableObserver >::type &obs = observer;
-				unwrap_reference< Stepper >::type &st = stepper;
+				boost::numeric::odeint::unwrap_reference< BreakableObserver >::type &obs = observer;
+				boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
 
 				Time time = start_time;
 				int step = 0;
