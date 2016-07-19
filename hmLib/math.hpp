@@ -1,4 +1,4 @@
-#ifndef HMLIB_MATH_INC
+﻿#ifndef HMLIB_MATH_INC
 #define HMLIB_MATH_INC 100
 #
 namespace hmLib{
