@@ -1,4 +1,4 @@
-#ifndef HMLIB_ODEINT_UTILITY_INC
+﻿#ifndef HMLIB_ODEINT_UTILITY_INC
 #define HMLIB_ODEINT_UTILITY_INC 100
 #
 #include<boost/numeric/odeint/algebra/vector_space_algebra.hpp>
