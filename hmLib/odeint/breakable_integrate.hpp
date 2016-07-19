@@ -117,7 +117,7 @@ namespace hmLib{
 		}
 
 		template< class Stepper, class System, class State, class Time, class BreakableObserver >
-		size_t breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,Time start_time, Time end_time, Time dt,BreakableObserver observer){
+		std::pair<Time, size_t> breakable_integrate_adaptive(Stepper stepper, System system, State &start_state,Time start_time, Time end_time, Time dt,BreakableObserver observer){
 			using stepper_category = typename boost::numeric::odeint::unwrap_reference<Stepper>::type::stepper_category;
 			return detail::breakable_integrate_adaptive(stepper,system, start_state,start_time, end_time, dt,observer,stepper_category());
 		}

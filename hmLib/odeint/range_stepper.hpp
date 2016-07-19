@@ -95,7 +95,7 @@ namespace hmLib{
 							NewTime = Time;
 						}
 					}
-					if(*NewRegion < 0){
+					if(NewRegion < 0){
 						std::swap(CurrentState, NewState);
 						CurrentTime = NewTime;
 						CurrentRegion = NewRegion;
