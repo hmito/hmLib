@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC
+#ifndef HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC
 #define HMLIB_ODEINT_BREAKABLE_INTEGRATE_INC 100
 #
 #include<utility>
@@ -16,8 +16,8 @@ namespace hmLib{
 				using namespace boost::numeric::odeint;
 				using namespace boost::numeric::odeint::detail;
 
-				boost::numeric::odeint::unwrap_reference< BreakableObserver >::type &obs = observer;
-				boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
+				typename boost::numeric::odeint::unwrap_reference< BreakableObserver >::type &obs = observer;
+				typename boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
 
 				Time time = start_time;
 				int step = 0;
@@ -70,7 +70,7 @@ namespace hmLib{
 				}
 				obs(start_state, start_time);
 
-				return std::make_pair(start_time, count)
+				return std::make_pair(start_time, count);
 			}
 
 

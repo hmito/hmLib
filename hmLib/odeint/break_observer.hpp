@@ -19,6 +19,7 @@ namespace hmLib{
 				observer::operator()(State, Time);
 				return IsBrake;
 			}
+			breaker& get_breaker(){ return Breaker; }
 		};
 		template<typename observer, typename breaker>
 		break_observer<observer, breaker> make_break_observer(breaker Breakerition, observer Observer){
