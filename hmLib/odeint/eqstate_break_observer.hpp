@@ -51,21 +51,23 @@ namespace hmLib{
 				bool is_cross_segment(std::array<double, 2> a1, std::array<double, 2> a2, std::array<double, 2> b1, std::array<double, 2> b2){
 					//x座標によるチェック
 					if(a1[0] >= a2[0]){
-						if((a1[0] < b1[0] && a1[0] < b2[0]) ||(a2[0] > b1[0] && a2[0] > b2[0])){
+						if((a1[0] < b1[0] && a1[0] < b2[0]) || (a2[0] > b1[0] && a2[0] > b2[0])){
 							return false;
-						} else
-							if((a2[0] < b1[0] && a2[0] < b2[0]) ||(a1[0] > b1[0] && a1[0] > b2[0])){
-								return false;
-							}
+						}
+					} else{
+						if((a2[0] < b1[0] && a2[0] < b2[0]) || (a1[0] > b1[0] && a1[0] > b2[0])){
+							return false;
+						}
 					}
 					//y座標によるチェック
 					if(a1[1] >= a2[1]){
-						if((a1[1] < b1[1] && a1[1] < b2[1]) ||(a2[1] > b1[1] && a2[1] > b2[1])){
+						if((a1[1] < b1[1] && a1[1] < b2[1]) || (a2[1] > b1[1] && a2[1] > b2[1])){
 							return false;
-						} else
-							if((a2[1] < b1[1] && a2[1] < b2[1]) ||(a1[1] > b1[1] && a1[1] > b2[1])){
-								return false;
-							}
+						}
+					} else{
+						if((a2[1] < b1[1] && a2[1] < b2[1]) || (a1[1] > b1[1] && a1[1] > b2[1])){
+							return false;
+						}
 					}
 
 					if(((a1[0] - a2[0]) * (b1[1] - a1[1]) + (a1[1] - a2[1]) * (a1[0] - b1[0])) *
