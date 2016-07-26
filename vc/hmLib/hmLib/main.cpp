@@ -105,7 +105,7 @@ int main(){
 		test_system System;
 		test_system::state State{0.0,1.0};
 
-		auto Observer = odeint::make_break_observer([](const test_system::state& State)->bool{return State[0] > 1.0; });
+		auto Observer = odeint::make_break_observer([](const test_system::state& State,double t)->bool{return State[0] > 1.0; });
 
 		odeint::breakable_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, Observer);
 	}
@@ -114,7 +114,7 @@ int main(){
 		test_system System;
 		test_system::state State{0.0,1.0};
 
-		auto Observer = odeint::make_break_observer([](const test_system::state& State)->bool{return State[0] > 1.0; }, odeint::container_observer<test_system::state>());
+		auto Observer = odeint::make_break_observer([](const test_system::state& State, double t)->bool{return State[0] > 1.0; }, odeint::container_observer<test_system::state>());
 
 		odeint::breakable_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, std::ref(Observer));
 	}
@@ -123,7 +123,7 @@ int main(){
 		test_system System;
 		test_system::state State{0.0,1.0};
 
-		odeint::eqstate_break_observer<test_system::state> Observer(0.001,1);
+		odeint::eqstate_break_observer<test_system::state> Observer(odeint::detail::eqstate_breaker<test_system::state,double>(1));
 
 		//odeint::breakable_integrate_adaptive(Stepper, System, State, 0.0, 100.0, 0.1, std::ref(Observer));
 		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 100.0, 0.1, std::ref(Observer));

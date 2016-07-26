@@ -15,11 +15,27 @@ namespace hmLib{
 				: observer(Others...), Breaker(Breaker_){}
 			template<typename state, typename time>
 			bool operator()(const state& State, time Time){
-				bool IsBrake = Breaker(State, Time, static_cast<observer&>(*this));
+				bool IsBrake = Breaker(State, Time);
 				observer::operator()(State, Time);
 				return IsBrake;
 			}
 			breaker& get_breaker(){ return Breaker; }
+		};
+		template<typename observer, typename observer_based_breaker>
+		struct observer_based_break_observer : public observer{
+		private:
+			observer_based_breaker Breaker;
+		public:
+			template<typename... others>
+			observer_based_break_observer(observer_based_breaker Breaker_, others... Others)
+				: observer(Others...), Breaker(Breaker_){}
+			template<typename state, typename time>
+			bool operator()(const state& State, time Time){
+				bool IsBrake = Breaker(State, Time, static_cast<observer&>(*this));
+				observer::operator()(State, Time);
+				return IsBrake;
+			}
+			observer_based_breaker& get_breaker(){ return Breaker; }
 		};
 		template<typename observer, typename breaker>
 		break_observer<observer, breaker> make_break_observer(breaker Breakerition, observer Observer){

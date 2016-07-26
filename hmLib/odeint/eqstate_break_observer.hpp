@@ -100,7 +100,7 @@ namespace hmLib{
 			};
 		}
 		template<typename state_, typename time_=double>
-		using eqstate_break_observer = break_observer<container_observer<state_, time_>, detail::eqstate_breaker<state_,time_> >;
+		using eqstate_break_observer = observer_based_break_observer<container_observer<state_, time_>, detail::eqstate_breaker<state_,time_> >;
 	}
 }
 #
