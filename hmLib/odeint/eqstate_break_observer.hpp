@@ -2,6 +2,7 @@
 #define HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC 100
 #
 #include <array>
+#include <boost/geometry.hpp>
 #include "container_observer.hpp"
 #include "break_observer.hpp"
 #include "utility.hpp"
@@ -47,14 +48,36 @@ namespace hmLib{
 				unsigned int Cnt;
 				unsigned int Interval;
 			private:
-				bool cross_segment(std::array<double, 2> a1, std::array<double, 2> a2, std::array<double, 2> b1, std::array<double, 2> b2){
-					double ta = (b1[0] - b2[0]) * (a1[1] - b1[1]) + (b1[1] - b2[1]) * (b1[0] - a1[0]);
-					double tb = (b1[0] - b2[0]) * (a2[1] - b1[1]) + (b1[1] - b2[1]) * (b1[0] - a2[0]);
-					double tc = (a1[0] - a2[0]) * (b1[1] - a1[1]) + (a1[1] - a2[1]) * (a1[0] - b1[0]);
-					double td = (a1[0] - a2[0]) * (b2[1] - a1[1]) + (a1[1] - a2[1]) * (a1[0] - b2[0]);
+				bool is_cross_segment(std::array<double, 2> a1, std::array<double, 2> a2, std::array<double, 2> b1, std::array<double, 2> b2){
+					//x座標によるチェック
+					if(a1[0] >= a2[0]){
+						if((a1[0] < b1[0] && a1[0] < b2[0]) ||(a2[0] > b1[0] && a2[0] > b2[0])){
+							return false;
+						} else
+							if((a2[0] < b1[0] && a2[0] < b2[0]) ||(a1[0] > b1[0] && a1[0] > b2[0])){
+								return false;
+							}
+					}
+					//y座標によるチェック
+					if(a1[1] >= a2[1]){
+						if((a1[1] < b1[1] && a1[1] < b2[1]) ||(a2[1] > b1[1] && a2[1] > b2[1])){
+							return false;
+						} else
+							if((a2[1] < b1[1] && a2[1] < b2[1]) ||(a1[1] > b1[1] && a1[1] > b2[1])){
+								return false;
+							}
+					}
 
-					return tc * td < 0 && ta * tb < 0;
-				};
+					if(((a1[0] - a2[0]) * (b1[1] - a1[1]) + (a1[1] - a2[1]) * (a1[0] - b1[0])) *
+						((a1[0] - a2[0]) * (b2[1] - a1[1]) + (a1[1] - a2[1]) * (a1[0] - b2[0])) > 0){
+						return false;
+					}
+					if(((b1[0] - b2[0]) * (a1[1] - b1[1]) + (b1[1] - b2[1]) * (b1[0] - a1[0])) *
+						((b1[0] - b2[0]) * (a2[1] - b1[1]) + (b1[1] - b2[1]) * (b1[0] - a2[0])) > 0){
+						return false;
+					}
+					return true;
+				}
 			public:
 				eqstate_breaker(unsigned int Interval_):Cnt(0),Interval(Interval_){}
 				bool operator()(const state& x, time t, container_observer<state, time>& Observer){
@@ -69,7 +92,7 @@ namespace hmLib{
 					++Beg;
 
 					for(; Beg != End; ++Beg){
-						if(cross_segment(x, y, p, Beg->second))return true;
+						if(is_cross_segment(x, y, p, Beg->second))return true;
 						p = Beg->second;
 					}
 					return false;
