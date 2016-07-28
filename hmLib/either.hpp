@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_EITHER_INC
+#ifndef HMLIB_EITHER_INC
 #define HMLIB_EITHER_INC 100
 #
 #include<utility>
