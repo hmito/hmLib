@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_OPERATORINTERFACE_INC
+#ifndef HMLIB_OPERATORINTERFACE_INC
 #define HMLIB_OPERATORINTERFACE_INC 1
 #
 /*===operator_interface===

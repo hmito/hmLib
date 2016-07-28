@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_DIRECTX_DXLIB_INC
+#ifndef HMLIB_DIRECTX_DXLIB_INC
 #define HMLIB_DIRECTX_DXLIB_INC 100
 #
 namespace hmLib {

@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_SHAREDPTR_INC
+#ifndef HMLIB_SHAREDPTR_INC
 #define HMLIB_SHAREDPTR_INC 101
 #
 /*

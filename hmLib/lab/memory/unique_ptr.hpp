@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_MEMORY_UNIQUEPTR_INC
+#ifndef HMLIB_MEMORY_UNIQUEPTR_INC
 #define HMLIB_MEMORY_UNIQUEPTR_INC 100
 #
 #include<hmLib/lab/rvalue_reference.hpp>

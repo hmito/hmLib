@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_FUNCTIONAL_INC
+#ifndef HMLIB_FUNCTIONAL_INC
 #define HMLIB_FUNCTIONAL_INC 100
 #
 namespace hmLib{

@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_STREAMBUFINTERFACE_INC
+#ifndef HMLIB_STREAMBUFINTERFACE_INC
 #define HMLIB_STREAMBUFINTERFACE_INC 102
 /*===streambuf_interface===
 streambuf作成支援用のクラスです。

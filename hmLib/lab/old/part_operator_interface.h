@@ -1,4 +1,4 @@
-﻿		// %Name% %Sign%
+		// %Name% %Sign%
 		template<typename my_type,typename sub_type,typename ans_type>
 		struct operator_forward_%Name%_interface{
 			private:

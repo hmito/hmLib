@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_DEBUGSTREAM_INC
+#ifndef HMLIB_DEBUGSTREAM_INC
 #define HMLIB_DEBUGSTREAM_INC 101
 #
 /*===debugstream===

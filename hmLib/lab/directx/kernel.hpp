@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_DXLIB_KERNEL_INC
+#ifndef HMLIB_DXLIB_KERNEL_INC
 #define HMLIB_DXLIB_KERNEL_INC 100
 #
 namespace hmLib{

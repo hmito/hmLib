@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ANYITERATOR_INC
+#ifndef HMLIB_ANYITERATOR_INC
 #define HMLIB_ANYITERATOR_INC 101
 #
 /*===any_iterator.hpp===

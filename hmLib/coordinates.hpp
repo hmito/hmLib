@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_COORDINATES_INC
+#ifndef HMLIB_COORDINATES_INC
 #define HMLIB_COORDINATES_INC 103
 #
 /*===coordinate.hpp ===

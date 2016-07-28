@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_SOFTIMAGE_INC
+#ifndef HMLIB_SOFTIMAGE_INC
 #define HMLIB_SOFTIMAGE_INC 100
 #
 namespace hmLib{

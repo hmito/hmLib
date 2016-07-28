@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_FIXEDDEQUE_INC
+#ifndef HMLIB_FIXEDDEQUE_INC
 #define HMLIB_FIXEDDEQUE_INC 100
 /*=== fixed_deque ===
 固定長の簡易配列

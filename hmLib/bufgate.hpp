@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_BUFGATE_INC
+#ifndef HMLIB_BUFGATE_INC
 #define HMLIB_BUFGATE_INC 200
 #
 /*===bufgate===

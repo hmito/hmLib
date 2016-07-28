@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_MEMORY_INC
+#ifndef HMLIB_MEMORY_INC
 #define HMLIB_MEMORY_INC
 #
 #include"memory/unique_ptr.hpp"

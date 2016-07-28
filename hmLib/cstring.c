@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_CSTRING_C_INC
+#ifndef HMLIB_CSTRING_C_INC
 #define HMLIB_CSTRING_C_INC 201
 #ifndef HMLIB_CSTRING_INC
 #	include <hmLib/cstring.h>

@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_TABLE_INC
+#ifndef HMLIB_TABLE_INC
 #define HMLIB_TABLE_INC 100
 #
 #include<string>

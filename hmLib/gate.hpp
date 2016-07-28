@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_GATE_INC
+#ifndef HMLIB_GATE_INC
 #define HMLIB_GATE_INC 201
 #
 /*===gate===

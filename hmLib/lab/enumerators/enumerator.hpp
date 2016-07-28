@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ENUMERATORS_ENUMERATOR_INC
+#ifndef HMLIB_ENUMERATORS_ENUMERATOR_INC
 #define HMLIB_ENUMERATORS_ENUMERATOR_INC 100
 #
 #include<boost/pool/pool_alloc.hpp>

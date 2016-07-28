@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_UTILITY_INC
+#ifndef HMLIB_UTILITY_INC
 #define HMLIB_UTILITY_INC 100
 #
 /*===utility===

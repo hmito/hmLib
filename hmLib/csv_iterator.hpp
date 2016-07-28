@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_CSVITERATOR_INC
+#ifndef HMLIB_CSVITERATOR_INC
 #define HMLIB_CSVITERATOR_INC 100
 #
 #include<iterator>

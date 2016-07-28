@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_COMGATE_INC
+#ifndef HMLIB_COMGATE_INC
 #define HMLIB_COMGATE_INC 201
 #
 /*===comgate===

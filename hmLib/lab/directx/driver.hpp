@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_DXLIB_DRIBER_INC
+#ifndef HMLIB_DXLIB_DRIBER_INC
 #define HMLIB_DXLIB_DRIBER_INC 100
 #
 #include<memory>

@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_GPS_INC
+#ifndef HMLIB_GPS_INC
 #define HMLIB_GPS_INC 100
 #
 #include<utility>

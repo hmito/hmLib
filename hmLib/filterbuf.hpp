@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_FILTERBUF_INC
+#ifndef HMLIB_FILTERBUF_INC
 #define HMLIB_FILTERBUF_INC 102
 #
 /*===filterbuf===

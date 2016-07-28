@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_OBJECTINTERFACE_INC
+#ifndef HMLIB_OBJECTINTERFACE_INC
 #define HMLIB_OBJECTINTERFACE_INC 1
 #
 /*===object_interface===

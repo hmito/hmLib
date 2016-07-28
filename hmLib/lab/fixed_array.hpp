@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_FIXEDARRAY_INC
+#ifndef HMLIB_FIXEDARRAY_INC
 #define HMLIB_FIXEDARRAY_INC 100
 /*=== fixed_array ===
 固定長の簡易配列

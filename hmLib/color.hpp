@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_COLOR_INC
+#ifndef HMLIB_COLOR_INC
 #define HMLIB_COLOR_INC 100
 #ifndef HMLIB_BYTEBASETYPE_INC
 #	include "bytebase_type.hpp"

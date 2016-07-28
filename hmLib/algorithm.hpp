@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ALGORITHM_INC
+#ifndef HMLIB_ALGORITHM_INC
 #define HMLIB_ALGORITHM_INC 111
 /*===algorithm===
 C++ algorthmを補助するアルゴリズムを提供する

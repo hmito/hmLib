@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_FIXEDSTACK_INC
+#ifndef HMLIB_FIXEDSTACK_INC
 #define HMLIB_FIXEDSTACK_INC 100
 /*=== fixed_stack ===
 固定長の簡易配列

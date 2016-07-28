@@ -1,1 +1,1 @@
-﻿#include"lattices/lattice_view.hpp"
+#include"lattices/lattice_view.hpp"

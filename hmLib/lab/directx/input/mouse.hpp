@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_DIRECTX_MOUSE_INC
+#ifndef HMLIB_DIRECTX_MOUSE_INC
 #define HMLIB_DIRECTX_MOUSE_INC 100
 #
 #include<memory>

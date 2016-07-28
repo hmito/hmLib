@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_RECTANGLE_INC
+#ifndef HMLIB_RECTANGLE_INC
 #define HMLIB_RECTANGLE_INC 100
 #ifndef HMLIB_POSITION_INC
 #	include "position.hpp"

@@ -1,4 +1,4 @@
-﻿#ifndef WINRS_WINRS_H
+#ifndef WINRS_WINRS_H
 #define WINRS_WINRS_H
 
 #include <windows.h>

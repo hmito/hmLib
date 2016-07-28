@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_FIXEDVECTOR_INC
+#ifndef HMLIB_FIXEDVECTOR_INC
 #define HMLIB_FIXEDVECTOR_INC 100
 /*=== fixed_vector ===
 固定長の簡易配列

@@ -1,4 +1,4 @@
-﻿template<typename T>
+template<typename T>
 struct inquiry {};
 template<typename T>
 struct property{};

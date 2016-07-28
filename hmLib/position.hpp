@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_POSITION_INC
+#ifndef HMLIB_POSITION_INC
 #define HMLIB_POSITION_INC 100
 #include <cmath>
 #include <iostream>

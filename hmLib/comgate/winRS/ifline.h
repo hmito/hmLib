@@ -1,4 +1,4 @@
-﻿// ifLine .. line 単位のコミニュケーションを行う通信回線を定義する
+// ifLine .. line 単位のコミニュケーションを行う通信回線を定義する
 // address, type, delimter を基本的な定義とする
 
 #if !defined(_BCL_IfLineHeadder)

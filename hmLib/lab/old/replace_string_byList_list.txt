@@ -1,4 +1,4 @@
-﻿%Name%	add	%AbleName%	addable	%Sign%	+
+%Name%	add	%AbleName%	addable	%Sign%	+
 %Name%	sub	%AbleName%	subable	%Sign%	-
 %Name%	multiplicate	%AbleName%	multiplicatable	%Sign%	*
 %Name%	divide	%AbleName%	dividable	%Sign%	/

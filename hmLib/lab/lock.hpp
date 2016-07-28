@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_LOCK_INC
+#ifndef HMLIB_LOCK_INC
 #define HMLIB_LOCK_INC 100
 #
 namespace hmLib {
