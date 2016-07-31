@@ -1,4 +1,4 @@
-#ifndef HMLIB_LATTICES_EXCEPTIONS_INC
+﻿#ifndef HMLIB_LATTICES_EXCEPTIONS_INC
 #define HMLIB_LATTICES_EXCEPTIONS_INC 100
 #
 #include"../exceptions.hpp"

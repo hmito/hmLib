@@ -1,4 +1,4 @@
-#ifndef HMLIB_DXLIB_DISPLAY_INC
+﻿#ifndef HMLIB_DXLIB_DISPLAY_INC
 #define HMLIB_DXLIB_DISPLAY_INC 100
 #
 #include<string>

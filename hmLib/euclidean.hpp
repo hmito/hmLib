@@ -1,4 +1,4 @@
-#ifndef HMLIB_EUCLIDEAN_INC 
+﻿#ifndef HMLIB_EUCLIDEAN_INC 
 #define HMLIB_EUCLIDEAN_INC 100
 #
 #include<array>

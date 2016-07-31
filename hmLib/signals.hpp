@@ -1,4 +1,4 @@
-#ifndef HMLIB_SIGNALS_INC
+﻿#ifndef HMLIB_SIGNALS_INC
 #define HMLIB_SIGNALS_INC 100
 #
 /*===signals===

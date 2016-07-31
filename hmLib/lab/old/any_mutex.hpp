@@ -1,4 +1,4 @@
-#ifndef HMLIB_ANYMUTEX_INC
+﻿#ifndef HMLIB_ANYMUTEX_INC
 #define HMLIB_ANTMUTEX_INC 100
 #
 /*===any_mutex===

@@ -1,4 +1,4 @@
-#ifndef HMLIB_ALGORITHM_COMPARE_INC
+﻿#ifndef HMLIB_ALGORITHM_COMPARE_INC
 #define HMLIB_ALGORITHM_COMPARE_INC 200
 #
 /*===algorithm::compare===

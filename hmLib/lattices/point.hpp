@@ -1,4 +1,4 @@
-#ifndef HMLIB_LATTICES_POINT_INC
+﻿#ifndef HMLIB_LATTICES_POINT_INC
 #define HMLIB_LATTICES_POINT_INC 100
 #
 namespace hmLib{

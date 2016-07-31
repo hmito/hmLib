@@ -1,4 +1,4 @@
-#ifndef HMLIB_CSTACK_INC
+﻿#ifndef HMLIB_CSTACK_INC
 #define HMLIB_CSTACK_INC 200
 #
 /*

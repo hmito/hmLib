@@ -1,4 +1,4 @@
-#ifndef HMLIB_CONFIGVC_INC
+﻿#ifndef HMLIB_CONFIGVC_INC
 #define HMLIB_CONFIGVC_INC 101
 #
 /*===config_vc===

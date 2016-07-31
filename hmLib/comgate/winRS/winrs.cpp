@@ -1,4 +1,4 @@
-#ifndef WINRS_WINRS_CPP
+﻿#ifndef WINRS_WINRS_CPP
 #define WINRS_WINRS_CPP
 #
 #ifndef HMLIB_CONFIG_INC

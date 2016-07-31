@@ -1,4 +1,4 @@
-#ifndef HMLIB_ANYPREDICATE_INC
+﻿#ifndef HMLIB_ANYPREDICATE_INC
 #define HMLIB_ANYPREDICATE_INC
 #
 /*===any_predicate===

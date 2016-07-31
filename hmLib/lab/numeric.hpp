@@ -1,4 +1,4 @@
-#ifndef HMLIB_NUMERIC_INC
+﻿#ifndef HMLIB_NUMERIC_INC
 #define HMLIB_NUMERIC_INC 102
 #
 /*===hmLib::numeric===

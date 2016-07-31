@@ -1,4 +1,4 @@
-#ifndef HMLIB_RANDOM_INC
+﻿#ifndef HMLIB_RANDOM_INC
 #define HMLIB_RANDOM_INC 208
 #
 /*

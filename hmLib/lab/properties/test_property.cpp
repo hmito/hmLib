@@ -1,4 +1,4 @@
-#include<iostream>
+﻿#include<iostream>
 #include<hmLib/lab/properties/property.hpp>
 
 class cTest {

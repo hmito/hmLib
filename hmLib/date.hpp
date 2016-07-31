@@ -1,4 +1,4 @@
-#ifndef HMLIB_DATE_INC
+﻿#ifndef HMLIB_DATE_INC
 #define HMLIB_DATE_INC 100
 #
 /*===date===

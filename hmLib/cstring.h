@@ -1,4 +1,4 @@
-#ifndef HMLIB_CSTRING_INC
+﻿#ifndef HMLIB_CSTRING_INC
 #define HMLIB_CSTRING_INC 201
 /*
 ===cstring===

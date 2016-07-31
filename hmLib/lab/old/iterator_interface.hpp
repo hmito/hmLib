@@ -1,4 +1,4 @@
-#ifndef HMLIB_ITERATORINTERFACE_INC
+﻿#ifndef HMLIB_ITERATORINTERFACE_INC
 #define HMLIB_ITERATORINTERFACE_INC 1
 #
 /*===iterator_interface===

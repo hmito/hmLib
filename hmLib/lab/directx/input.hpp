@@ -1,4 +1,4 @@
-#ifndef HMLIB_DIRECTX_INPUT_INC
+﻿#ifndef HMLIB_DIRECTX_INPUT_INC
 #define HMLIB_DIRECTX_INPUT_INC 100
 #
 #include"input/button.hpp"

@@ -73,6 +73,7 @@
     <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\circular.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h" />
@@ -135,7 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
-    <ClCompile Include="..\..\..\hmLib\comgate\winRS\winrs.cpp" />
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
     <ClCompile Include="main.cpp" />

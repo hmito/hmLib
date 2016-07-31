@@ -1,4 +1,4 @@
-#ifndef HMLIB_MUTEXPROXY_INC
+﻿#ifndef HMLIB_MUTEXPROXY_INC
 #define HMLIB_MUTEXPROXY_INC 102
 #
 /*===mutex_proxy===

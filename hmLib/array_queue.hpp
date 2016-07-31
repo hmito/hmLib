@@ -1,4 +1,4 @@
-#ifndef HMLIB_ARRAYQUEUE_INC
+﻿#ifndef HMLIB_ARRAYQUEUE_INC
 #define HMLIB_ARRAYQUEUE_INC 100
 #
 namespace hmLib {
