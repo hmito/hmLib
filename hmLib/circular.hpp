@@ -457,7 +457,7 @@ namespace hmLib{
 		template<typename input_iterator>
 		iterator insert(const_iterator Itr, input_iterator Begin_, input_iterator End_){
 			int N = std::distance(Begin_, End_);
-			if(remain() < N || N == 0)return End;
+			if(static_cast<int>(remain() )< N || N == 0)return End;
 
 			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
 				//insert_front
@@ -480,11 +480,12 @@ namespace hmLib{
 				To = From;
 				for(; Begin_ != End_; ++Begin_){
 					if(n > 0){
-						::new(To.base()) value_type(*Begin);
+						::new(To.base()) value_type(*Begin_);
 						--n;
 					} else{
-						*(To++) = *Begin_;
+						*To = *Begin_;
 					}
+					++To;
 				}
 
 				Beg -= N;
@@ -493,21 +494,20 @@ namespace hmLib{
 				return From;
 			} else{
 				//insert_back
-				iterator From = End - 1;
+				iterator From = End;
 				iterator To = From + N;
 
 				int n = N;
-				while(true){
+				while(From != Itr){
+					--From;
+					--To;
+
 					if(n > 0){
 						::new(To.base()) value_type(*From);
 						--n;
 					} else{
 						*To = *From;
 					}
-					if(From == Itr)break;
-
-					--From;
-					--To;
 				}
 
 				n = N - n;
@@ -519,6 +519,7 @@ namespace hmLib{
 					} else{
 						::new(To.base()) value_type(*Begin_);
 					}
+					++To;
 				}
 
 				End += N;
@@ -566,10 +567,12 @@ namespace hmLib{
 			}
 		}
 		iterator erase(const_iterator Begin_, const_iterator End_){
+			int N = std::distance(Begin_, End_);
+
 			if(std::distance<const_iterator>(Beg, Begin_) <= std::distance<const_iterator>(End_, End)){
 				//erase_front
-				iterator From(Begin_);
-				iterator To(End_);
+				iterator From(Begin_.base(),*this);
+				iterator To(End_.base(),*this);
 
 				--From;
 				--To;
@@ -590,15 +593,14 @@ namespace hmLib{
 					--To;
 				}
 
-				int N = std::distance(Begin_, End_);
 				Beg += N;
 				Size -= N;
 
 				return iterator(End_.base(), *this) + 1;
 			} else{
 				//erase_back
-				iterator From(End_);
-				iterator To(Begin_);
+				iterator From(End_.base(),*this);
+				iterator To(Begin_.base(), *this);
 
 				bool IsDestruct = (From == End);
 				while(true){
@@ -615,7 +617,6 @@ namespace hmLib{
 					if(From == End) IsDestruct = true;
 				}
 
-				int N = std::distance(Begin_, End_);
 				End -= N;
 				Size -= N;
 
