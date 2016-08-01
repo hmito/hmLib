@@ -18,6 +18,10 @@ namespace hmLib{
 			aligned_array()
 				: Begin(Array + ((sizeof(T) - static_cast<unsigned int>(reinterpret_cast<unsigned long long>(Array) % sizeof(T))) % sizeof(T)))
 				, End(Begin + sizeof(T)*Size_){}
+		private:
+			aligned_array(const aligned_array<T, Size_>&);
+			aligned_array<T, Size_>& operator=(const aligned_array<T, Size_>&);
+		public:
 			unsigned int size(){ return Size_; }
 			reference operator[](int pos){ return begin()[pos]; }
 			reference at(int pos){ return begin()[pos]; }
@@ -138,7 +142,7 @@ namespace hmLib{
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
 					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first())+1;
-				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
+				} else if(Itr2.Cur <= Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
 					//2<=E<1
 					return - (Itr1.Ptr->buffer_last() - Itr1.Cur) - (Itr2.Cur - Itr2.Ptr->buffer_first())-1;
 				}
@@ -153,10 +157,10 @@ namespace hmLib{
 			friend bool operator<(this_type Itr1, this_type Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
-					return true;
+					return false;
 				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
 					//2<=E<1
-					return false;
+					return true;
 				}
 				return Itr1.Cur < Itr2.Cur;
 			}
@@ -257,10 +261,10 @@ namespace hmLib{
 			friend difference_type operator-(this_type Itr1, this_type Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
-					return -(Itr2.Ptr->buffer_last() - Itr2.Cur) - (Itr1.Cur - Itr1.Ptr->buffer_first());
+					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first()) + 1;
 				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
 					//2<=E<1
-					return (Itr1.Ptr->buffer_last() - Itr1.Cur) + (Itr2.Cur - Itr2.Ptr->buffer_first());
+					return -(Itr1.Ptr->buffer_last() - Itr1.Cur) - (Itr2.Cur - Itr2.Ptr->buffer_first()) - 1;
 				}
 				return Itr1.Cur - Itr2.Cur;
 			}
@@ -273,10 +277,10 @@ namespace hmLib{
 			friend bool operator<(this_type Itr1, this_type Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
-					return true;
+					return false;
 				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
 					//2<=E<1
-					return false;
+					return true;
 				}
 				return Itr1.Cur < Itr2.Cur;
 			}
@@ -323,6 +327,26 @@ namespace hmLib{
 			: Beg(Array.begin(), *this)
 			, End(Array.begin(), *this)
 			, Size(0){
+		}
+		circular(const this_type& Other)
+			: Beg(Array.begin(), *this)
+			, End(Array.begin(), *this)
+			, Size(0){
+			insert(begin(), Other.cbegin(), Other.cend());
+		}
+		this_type& operator=(const this_type& Other){
+			if(&Other != this){
+				clear();
+				insert(begin(), Other.cbegin(), Other.cend());
+			}
+			return *this;
+		}
+		template<typename input_iterator>
+		circular(input_iterator Begin_, input_iterator End_)
+			: Beg(Array.begin(), *this)
+			, End(Array.begin(), *this)
+			, Size(0){
+			insert(begin(), Begin_, End_);
 		}
 		~circular(){
 			clear();
@@ -376,24 +400,28 @@ namespace hmLib{
 		iterator insert(const_iterator Itr, const_reference Value){
 			if(full())return End;
 
-			if(std::distance(Beg, Itr) < size() / 2){
+			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
 				//insert_front
 				iterator From = Beg;
 				iterator To = Beg - 1;
 
-				To->value_type(*From);
-
-				++From;
-				++To;
-
-				while(To != Itr){
-					*To = *From;
+				if(Beg == Itr){
+					::new(To.base()) value_type(Value);
+				} else{
+					::new(To.base()) value_type(*From);
 
 					++From;
 					++To;
-				}
 
-				*To = Value;
+					while(To != Itr){
+						*To = *From;
+
+						++From;
+						++To;
+					}
+
+					*To = Value;
+				}
 
 				--Beg;
 				++Size;
@@ -403,19 +431,23 @@ namespace hmLib{
 				iterator From = End - 1;
 				iterator To = End;
 
-				To->value_type(*From);
-
-				--From;
-				--To;
-
-				while(To != Itr){
-					*To = *From;
+				if(Itr == End){
+					::new(To.base()) value_type(Value);
+				} else{
+					::new(To.base()) value_type(*From);
 
 					--From;
 					--To;
-				}
 
-				*To = Value;
+					while(To != Itr){
+						*To = *From;
+
+						--From;
+						--To;
+					}
+
+					*To = Value;
+				}
 
 				++End;
 				++Size;
@@ -427,7 +459,7 @@ namespace hmLib{
 			int N = std::distance(Begin_, End_);
 			if(remain() < N || N == 0)return End;
 
-			if(std::distance(Beg, Itr) < size() / 2){
+			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
 				//insert_front
 				iterator From = Beg;
 				iterator To = Beg - N;
@@ -435,7 +467,7 @@ namespace hmLib{
 				int n = N;
 				while(To != Itr){
 					if(n > 0){
-						To->value_type(*From);
+						::new(To.base()) value_type(*From);
 						--n;
 					} else{
 						*To = *From;
@@ -447,7 +479,12 @@ namespace hmLib{
 
 				To = From;
 				for(; Begin_ != End_; ++Begin_){
-					*(To++) = *Begin_;
+					if(n > 0){
+						::new(To.base()) value_type(*Begin);
+						--n;
+					} else{
+						*(To++) = *Begin_;
+					}
 				}
 
 				Beg -= N;
@@ -462,7 +499,7 @@ namespace hmLib{
 				int n = N;
 				while(true){
 					if(n > 0){
-						To->value_type(*From);
+						::new(To.base()) value_type(*From);
 						--n;
 					} else{
 						*To = *From;
@@ -473,9 +510,15 @@ namespace hmLib{
 					--To;
 				}
 
+				n = N - n;
 				To = From;
 				for(; Begin_ != End_; ++Begin_){
-					*(To++) = *Begin_;
+					if(n > 0){
+						*To = *Begin_;
+						--n;
+					} else{
+						::new(To.base()) value_type(*Begin_);
+					}
 				}
 
 				End += N;
@@ -486,8 +529,9 @@ namespace hmLib{
 		}
 		iterator erase(const_iterator Itr){
 			if(empty())return End;
+			if(Itr == cend())return End;
 
-			if(std::distance(Beg, Itr) < size() / 2){
+			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
 				//erase_front
 				iterator To(Itr.base(), *this);
 				iterator From = To - 1;
@@ -515,14 +559,14 @@ namespace hmLib{
 					++To;
 				}
 
-				End->~value_type();
+				To->~value_type();
 				--End;
-				++Size;
+				--Size;
 				return iterator(Itr.base(), *this);
 			}
 		}
 		iterator erase(const_iterator Begin_, const_iterator End_){
-			if(std::distance(Beg, Begin_) <= std::distance(End_, End)){
+			if(std::distance<const_iterator>(Beg, Begin_) <= std::distance<const_iterator>(End_, End)){
 				//erase_front
 				iterator From(Begin_);
 				iterator To(End_);

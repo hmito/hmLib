@@ -64,6 +64,31 @@ public:
 			Assert::AreEqual<int>(i, Cir.at(i), L"push_back value error");
 		}
 	}
+	TEST_METHOD(clear){
+		circular<value_t, 10> Cir;
+		Assert::AreEqual(0u, Cir.size(), L"push back error");
+		Assert::AreEqual(0u, value_t::cnt(), L"construct number error");
+
+		for(unsigned int i=0;i<7;++i){
+			Cir.push_back(0);
+		}
+		Assert::AreEqual(7u, Cir.size(), L"push back error");
+		Assert::AreEqual(7u, value_t::cnt(), L"construct number error");
+
+		Cir.clear();
+		Assert::AreEqual(0u, Cir.size(), L"push back error");
+		Assert::AreEqual(0u, value_t::cnt(), L"construct number error");
+
+		for(unsigned int i = 0; i<7; ++i){
+			Cir.push_back(0);
+		}
+		Assert::AreEqual(7u, Cir.size(), L"push back error");
+		Assert::AreEqual(7u, value_t::cnt(), L"construct number error");
+
+		Cir.clear();
+		Assert::AreEqual(0u, Cir.size(), L"push back error");
+		Assert::AreEqual(0u, value_t::cnt(), L"construct number error");
+	}
 	TEST_METHOD(pop_back){
 		circular<value_t, 10> Cir;
 
@@ -460,7 +485,202 @@ public:
 		Assert::AreEqual(0, Cir.end() - Cir.begin(), L"iterator diff error");
 		Assert::IsTrue(Cir.begin() == Cir.end(), L"empty error");
 	}
+	TEST_METHOD(iterator_3){
+		circular<value_t, 7> Cir;
+
+		Cir.push_back(0);
+		Cir.pop_front();
+		Cir.push_back(0);
+		Cir.pop_front();
+		Cir.push_back(0);
+		Cir.pop_front();
+
+		Assert::AreEqual(0u, value_t::cnt(), L"construct number error");
+
+		for(unsigned int i=0;i<6;++i){
+			Cir.push_back(i);
+		}
+
+		auto Itr = Cir.begin();
+		Assert::AreEqual(0, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(-6, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(0, *Itr, L"iterator access error");
+
+		Itr += 2;
+		Assert::AreEqual(2, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(-4, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(2, *Itr, L"iterator access error");
+
+		Itr += 2;
+		Assert::AreEqual(4, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(-2, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(4, *Itr, L"iterator access error");
+
+		Itr += 2;
+		Assert::AreEqual(6, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(0, Itr - Cir.end(), L"iterator diff error");
+
+		Itr -= 2;
+		Assert::AreEqual(4, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(-2, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(4, *Itr, L"iterator access error");
+
+		Itr -= 2;
+		Assert::AreEqual(2, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(-4, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(2, *Itr, L"iterator access error");
+
+		Itr -= 2;
+		Assert::AreEqual(0, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual(-6, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(0, *Itr, L"iterator access error");
+	}
+	TEST_METHOD(iterator_4){
+		circular<value_t, 7> Cir;
+
+		Cir.push_back(0);
+		Cir.pop_front();
+		Cir.push_back(0);
+		Cir.pop_front();
+		Cir.push_back(0);
+		Cir.pop_front();
+
+		Assert::AreEqual(0u, value_t::cnt(), L"construct number error");
+
+		for(unsigned int i = 0; i<6; ++i){
+			Cir.push_back(i);
+		}
+
+		auto Itr = Cir.begin();
+		for(int i = 0; i < 6; ++i){
+			Assert::AreEqual<int>(i, Itr[i], L"iterator access error");
+		}
+
+		Itr += 2;
+		for(int i = 0; i < 6; ++i){
+			Assert::AreEqual<int>(i, Itr[i-2], L"iterator access error");
+		}
+
+		Itr += 2;
+		for(int i = 0; i < 6; ++i){
+			Assert::AreEqual<int>(i, Itr[i - 4], L"iterator access error");
+		}
+
+		Itr += 2;
+		for(int i = 0; i < 6; ++i){
+			Assert::AreEqual<int>(i, Itr[i - 6], L"iterator access error");
+		}
+	}
+	TEST_METHOD(insert_single){
+		circular<value_t, 7> Cir;
+
+		Cir.insert(Cir.begin(), 0);		//0
+		Cir.insert(Cir.begin(), 1);		//10
+		Cir.insert(Cir.end(), 2);		//102
+		Cir.insert(Cir.begin()+1, 3);	//1302
+		Cir.insert(Cir.end() - 1, 4);	//13042
+
+		Assert::AreEqual(5u, Cir.size());
+		Assert::AreEqual<int>(1, Cir.at(0));
+		Assert::AreEqual<int>(3, Cir.at(1));
+		Assert::AreEqual<int>(0, Cir.at(2));
+		Assert::AreEqual<int>(4, Cir.at(3));
+		Assert::AreEqual<int>(2, Cir.at(4));
+		Assert::AreEqual(5u, value_t::cnt());
+
+		Cir.clear();
+		Assert::AreEqual(0u, value_t::cnt());
+
+		Cir.insert(Cir.begin(), 0);		//0
+		Cir.insert(Cir.begin(), 1);		//10
+		Cir.insert(Cir.end(), 2);		//102
+		Cir.insert(Cir.begin() + 1, 3);	//1302
+		Cir.insert(Cir.end() - 1, 4);	//13042
+
+		Assert::AreEqual(5u, Cir.size());
+		Assert::AreEqual<int>(1, Cir.at(0));
+		Assert::AreEqual<int>(3, Cir.at(1));
+		Assert::AreEqual<int>(0, Cir.at(2));
+		Assert::AreEqual<int>(4, Cir.at(3));
+		Assert::AreEqual<int>(2, Cir.at(4));
+		Assert::AreEqual(5u, value_t::cnt());
+	}
+	TEST_METHOD(erase_single){
+		circular<value_t, 7> Cir;
+
+		for(unsigned int i = 0; i < 5; ++i){
+			Cir.push_back(i);
+		}
+		//12345
+
+		Cir.erase(Cir.begin());		//1234
+		Cir.erase(Cir.end() - 1);	//123
+		Cir.erase(Cir.begin() + 1);	//13
+		Assert::AreEqual(2u, Cir.size());
+		Assert::AreEqual<int>(1, Cir.at(0));
+		Assert::AreEqual<int>(3, Cir.at(1));
+		Assert::AreEqual(2u, value_t::cnt());
+
+		for(unsigned int i = 5; i < 10; ++i){
+			Cir.push_back(i);
+		}
+		//1356789
+
+		Assert::AreEqual(7u, Cir.size());
+		Assert::AreEqual(7u, value_t::cnt());
+
+		Cir.erase(Cir.begin());		//356789
+		Cir.erase(Cir.end() - 1);	//35678
+		Cir.erase(Cir.begin() + 1);	//3678
+		Assert::AreEqual(4u, Cir.size());
+		Assert::AreEqual<int>(3, Cir.at(0));
+		Assert::AreEqual<int>(6, Cir.at(1));
+		Assert::AreEqual<int>(7, Cir.at(2));
+		Assert::AreEqual<int>(8, Cir.at(3));
+		Assert::AreEqual(4u, value_t::cnt());
+	}
+	TEST_METHOD(insert_multi){
+		std::vector<int> Vec = {0,1,2,3,4,5,6};
+
+		circular<value_t, 9> Cir;
+
+		Cir.insert(Cir.begin(), Vec.begin(), Vec.end());
+		Assert::AreEqual(7u, Cir.size());
+		Assert::AreEqual(7u, value_t::cnt());
+		for(int i = 0; i < 7; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i));
+		}
+
+		for(unsigned int i = 0; i < 4; ++i)Cir.pop_back();
+
+		std::vector<int> Vec2 = {7,8,9,10};
+		Cir.insert(Cir.end(), Vec2.begin(), Vec2.end());
+		Assert::AreEqual(7u, Cir.size());
+		Assert::AreEqual(7u, value_t::cnt());
+		for(int i = 0; i < 3; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i));
+		}
+		for(int i = 7; i < 11; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i-4));
+		}
+
+		for(unsigned int i = 0; i < 4; ++i)Cir.pop_back();
+		//0123
+
+		std::vector<int> Vec3 = {11,12,13,14};
+		Cir.insert(Cir.begin()+1, Vec3.begin(), Vec3.end());
+		Assert::AreEqual(7u, Cir.size());
+		Assert::AreEqual(7u, value_t::cnt());
+		for(int i = 0; i < 4; ++i){
+			Assert::AreEqual<int>(i+11, Cir.at(i));
+		}
+		for(int i = 4; i < 7; ++i){
+			Assert::AreEqual<int>(i-4, Cir.at(i));
+		}
+	}
+	TEST_METHOD(erase_multi){
+
+	}
 	};
 	unsigned int test_circular::value_t::Cnt = 0;
-
 }
