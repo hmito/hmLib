@@ -8,8 +8,8 @@ namespace hmLib{
 		struct aligned_array{
 			typedef T& reference;
 			typedef T* pointer;
-			typedef pointer iterator;
-			typedef const pointer const_iterator;
+			typedef T* iterator;
+			typedef const T* const_iterator;
 		private:
 			unsigned char Array[sizeof(T)*(Size_ + 1)];
 			unsigned char* Begin;
@@ -25,12 +25,12 @@ namespace hmLib{
 			unsigned int size(){ return Size_; }
 			reference operator[](int pos){ return begin()[pos]; }
 			reference at(int pos){ return begin()[pos]; }
-			iterator begin(){ return reinterpret_cast<pointer>(Begin); }
-			iterator end(){ return reinterpret_cast<pointer>(End); }
+			iterator begin(){ return reinterpret_cast<iterator>(Begin); }
+			iterator end(){ return reinterpret_cast<iterator>(End); }
 			const reference operator[](int pos)const{ return begin()[pos]; }
 			const reference at(int pos)const{ return begin()[pos]; }
-			const_iterator begin()const{ return reinterpret_cast<const pointer>(Begin); }
-			const_iterator end()const{ return reinterpret_cast<const pointer>(End); }
+			const_iterator begin()const{ return reinterpret_cast<const_iterator>(Begin); }
+			const_iterator end()const{ return reinterpret_cast<const_iterator>(End); }
 		};
 		template<typename this_circular>
 		struct circular_const_iterator;
@@ -40,6 +40,7 @@ namespace hmLib{
 			friend struct circular_const_iterator<this_circular>;
 			typedef circular_iterator<this_circular> this_type;
 			typedef typename this_circular::base_iterator base_iterator;
+			typedef typename this_circular::base_const_iterator base_const_iterator;
 			typedef const reference const_reference;
 			typedef const pointer const_pointer;
 		private:
@@ -52,10 +53,13 @@ namespace hmLib{
 			circular_iterator(base_iterator Cur_, const this_circular& Ref_)
 				: Cur(Cur_)
 				, Ptr(&Ref_){}
+			circular_iterator(base_const_iterator Cur_, const this_circular& Ref_)
+				: Cur(const_cast<base_iterator>(Cur_))
+				, Ptr(&Ref_){}
 		public:
 			base_iterator base()const{ return Cur; }
 			this_type& operator++(){
-				if(Cur == Ptr->buffer_last())Cur = Ptr->buffer_first();
+				if(Cur == Ptr->buffer_last())Cur = const_cast<base_iterator>(Ptr->buffer_first());
 				else ++Cur;
 				return *this;
 			}
@@ -65,7 +69,7 @@ namespace hmLib{
 				return Prev;
 			}
 			this_type& operator--(){
-				if(Cur == Ptr->buffer_first())Cur = Ptr->buffer_last();
+				if(Cur == Ptr->buffer_first())Cur = const_cast<base_iterator>(Ptr->buffer_last());
 				else --Cur;
 				return *this;
 			}
@@ -76,14 +80,14 @@ namespace hmLib{
 			}
 			this_type& operator+=(difference_type dif){
 				if(dif < 0){
-					if(std::distance(Ptr->buffer_first(), Cur) < -dif){
-						Cur = Ptr->buffer_last() - (-dif - std::distance(Ptr->buffer_first(), Cur) - 1);
+					if(std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) < -dif){
+						Cur = const_cast<base_iterator>(Ptr->buffer_last()) - (-dif - std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) - 1);
 					} else{
 						Cur += dif;
 					}
 				} else{
-					if(std::distance(Cur, Ptr->buffer_last()) < dif){
-						Cur = Ptr->buffer_first() + (dif - std::distance(Cur, Ptr->buffer_last()) - 1);
+					if(std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) < dif){
+						Cur = const_cast<base_iterator>(Ptr->buffer_first()) + (dif - std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) - 1);
 					} else{
 						Cur += dif;
 					}
@@ -99,14 +103,14 @@ namespace hmLib{
 			const_pointer operator->()const{ return Cur; }
 			reference operator[](difference_type dif){
 				if(dif < 0){
-					if(std::distance(Ptr->buffer_first(), Cur) < -dif){
-						return Ptr->buffer_last() [- (-dif - std::distance(Ptr->buffer_first(), Cur) - 1)];
+					if(std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) < -dif){
+						return const_cast<base_iterator>(Ptr->buffer_last()) [- (-dif - std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) - 1)];
 					} else{
 						return Cur[dif];
 					}
 				} else{
-					if(std::distance(Cur, Ptr->buffer_last()) < dif){
-						return Ptr->buffer_first()[ + (dif - std::distance(Cur, Ptr->buffer_last()) - 1)];
+					if(std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) < dif){
+						return const_cast<base_iterator>(Ptr->buffer_first())[ + (dif - std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) - 1)];
 					} else{
 						return Cur[dif];
 					}
@@ -175,8 +179,9 @@ namespace hmLib{
 			}
 		};
 		template<typename this_circular>
-		struct circular_const_iterator : public std::iterator<std::random_access_iterator_tag, typename this_circular::value_type, typename this_circular::difference_type, typename this_circular::pointer, typename this_circular::reference>{
+		struct circular_const_iterator : public std::iterator<std::random_access_iterator_tag, typename this_circular::value_type, typename this_circular::difference_type, typename this_circular::const_pointer, typename this_circular::const_reference>{
 			typedef circular_const_iterator<this_circular> this_type;
+			typedef typename this_circular::base_iterator base_iterator;
 			typedef typename this_circular::base_const_iterator base_const_iterator;
 		private:
 			base_const_iterator Cur;
@@ -187,7 +192,8 @@ namespace hmLib{
 				, Ptr(nullptr){}
 			circular_const_iterator(base_const_iterator Cur_, const this_circular& Ref_)
 				: Cur(Cur_)
-				, Ptr(&Ref_){}
+				, Ptr(&Ref_){
+			}
 			circular_const_iterator(circular_iterator<this_circular> Itr_)
 				: Cur(Itr_.Cur)
 				, Ptr(Itr_.Ptr){}
@@ -196,6 +202,7 @@ namespace hmLib{
 			this_type& operator++(){
 				if(Cur == Ptr->buffer_last())Cur = Ptr->buffer_first();
 				else ++Cur;
+				return *this;
 			}
 			this_type operator++(int){
 				auto Prev = *this;
@@ -230,8 +237,8 @@ namespace hmLib{
 			this_type& operator-=(difference_type dif){
 				return operator+=(-dif);
 			}
-			reference operator*()const{ return Cur.operator*(); }
-			pointer operator->()const{ return Cur.operator->(); }
+			reference operator*()const{ return *Cur; }
+			pointer operator->()const{ return Cur; }
 			reference operator[](difference_type dif)const{
 				if(dif < 0){
 					if(std::distance(Ptr->buffer_first(), Cur) < -dif){
@@ -308,10 +315,10 @@ namespace hmLib{
 	public:
 		static size_type max_size(){ return Size_; }
 	private:
-		using base_array = aligned_array<T, Size_ + 1>;
+		typedef aligned_array<T, Size_ + 1> base_array;
 	public:
-		using base_iterator = typename base_array::iterator;
-		using base_const_iterator = typename base_array::const_iterator;
+		typedef typename base_array::iterator base_iterator;
+		typedef typename base_array::const_iterator base_const_iterator;
 		typedef circular_iterator<this_type> iterator;
 		typedef circular_const_iterator<this_type> const_iterator;
 	private:

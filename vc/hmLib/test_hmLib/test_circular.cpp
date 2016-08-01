@@ -732,6 +732,73 @@ public:
 		}
 		Vec.clear();
 	}
+	TEST_METHOD(erase_multi_back){
+		std::vector<int> Vec = {0,1,2,3,4,5,6};
+
+		circular<value_t, 9> Cir;
+		Cir.insert(Cir.begin(), Vec.begin(), Vec.end());
+
+		Cir.erase(Cir.end()-3, Cir.end());
+		Assert::AreEqual(4u, Cir.size());
+		Assert::AreEqual(4u, value_t::cnt());
+
+		for(int i = 0; i < 4; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i));
+		}
+		Cir.clear();
+
+		Cir.insert(Cir.begin(), Vec.begin(), Vec.end());
+
+		Cir.erase(Cir.end() - 3, Cir.end());
+		Assert::AreEqual(4u, Cir.size());
+		Assert::AreEqual(4u, value_t::cnt());
+
+		for(int i = 0; i < 4; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i));
+		}
+		Cir.clear();
+	}
+	TEST_METHOD(erase_multi_back_sub){
+		std::vector<int> Vec = {0,1,2,3,4,5,6};
+
+		circular<value_t, 9> Cir;
+		Cir.insert(Cir.begin(), Vec.begin(), Vec.end());
+
+		Cir.erase(Cir.end() - 4, Cir.end()-1);
+		Assert::AreEqual(4u, Cir.size());
+		Assert::AreEqual(4u, value_t::cnt());
+
+		for(int i = 0; i < 3; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i));
+		}
+		Assert::AreEqual<int>(6, Cir.at(3));
+
+		Cir.clear();
+
+		Cir.insert(Cir.begin(), Vec.begin(), Vec.end());
+
+		Cir.erase(Cir.end() - 4, Cir.end() - 1);
+		Assert::AreEqual(4u, Cir.size());
+		Assert::AreEqual(4u, value_t::cnt());
+
+		for(int i = 0; i < 3; ++i){
+			Assert::AreEqual<int>(i, Cir.at(i));
+		}
+		Assert::AreEqual<int>(6, Cir.at(3));
+		Cir.clear();
+	}
+	TEST_METHOD(copy_construct){
+		std::vector<int> Vec = {0,1,2,3,4,5,6};
+
+		circular<value_t, 9> Cir(Vec.begin(), Vec.end());
+
+		circular<value_t, 9> Cir2 = Cir;
+		Cir.clear();
+
+		for(unsigned int i = 0; i < Cir.size(); ++i){
+			Assert::AreEqual<int>(i, Cir2[i]);
+		}
+	}
 	};
 	unsigned int test_circular::value_t::Cnt = 0;
 }
