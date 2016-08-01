@@ -137,10 +137,10 @@ namespace hmLib{
 			friend difference_type operator-(this_type Itr1, this_type Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
-					return -(Itr2.Ptr->buffer_last() - Itr2.Cur) - (Itr1.Cur - Itr1.Ptr->buffer_first());
+					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first())+1;
 				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
 					//2<=E<1
-					return (Itr1.Ptr->buffer_last() - Itr1.Cur) + (Itr2.Cur - Itr2.Ptr->buffer_first());
+					return - (Itr1.Ptr->buffer_last() - Itr1.Cur) - (Itr2.Cur - Itr2.Ptr->buffer_first())-1;
 				}
 				return Itr1.Cur - Itr2.Cur;
 			}
@@ -314,13 +314,19 @@ namespace hmLib{
 		base_array Array;
 		iterator Beg;
 		iterator End;
+		unsigned int Size;
 	public:
 		base_const_iterator buffer_first()const{ return Array.begin(); }
 		base_const_iterator buffer_last()const{ return Array.end() - 1; }
 	public:
 		circular()
 			: Beg(Array.begin(), *this)
-			, End(Array.begin(), *this){}
+			, End(Array.begin(), *this)
+			, Size(0){
+		}
+		~circular(){
+			clear();
+		}
 	public:
 		reference at(difference_type pos){ return Beg[pos]; }
 		const_reference at(difference_type pos)const{ return Beg[pos]; }
@@ -333,35 +339,39 @@ namespace hmLib{
 	public:
 		bool push_back(const_reference Value){
 			if(full())return true;
-			std::allocator<value_type>().construct(End.operator->(), Value);
+			::new(End.base()) value_type(Value);
 			++End;
+			++Size;
 			return false;
 		}
 		void pop_back(){
 			if(empty())return;
 			End[-1].~value_type();
 			--End;
+			--Size;
 		}
 		bool push_front(const_reference Value){
 			if(full())return true;
-			pointer Ptr = &(Beg[-1]);
-			Ptr->value_type(Value);
+			::new((Beg - 1).base()) value_type(Value);
 			--Beg;
+			++Size;
 			return false;
 		}
 		void pop_front(){
 			if(empty())return;
-			Beg->~value_type();
+			(*End).~value_type();
 			++Beg;
+			--Size;
 		}
 		void clear(){
 			iterator Itr = Beg;
-			Beg = End;
 			while(Itr != End){
 				pointer Ptr = &(*Itr);
 				Ptr->~value_type();
 				++Itr;
 			}
+			Beg = End;
+			Size = 0;
 		}
 		iterator insert(const_iterator Itr, const_reference Value){
 			if(full())return End;
@@ -386,6 +396,7 @@ namespace hmLib{
 				*To = Value;
 
 				--Beg;
+				++Size;
 				return To;
 			} else{
 				//insert_back
@@ -407,6 +418,7 @@ namespace hmLib{
 				*To = Value;
 
 				++End;
+				++Size;
 				return To;
 			}
 		}
@@ -439,6 +451,7 @@ namespace hmLib{
 				}
 
 				Beg -= N;
+				Size += N;
 
 				return From;
 			} else{
@@ -466,6 +479,7 @@ namespace hmLib{
 				}
 
 				End += N;
+				Size += N;
 
 				return From;
 			}
@@ -487,6 +501,7 @@ namespace hmLib{
 
 				Beg->~value_type();
 				++Beg;
+				--Size;
 				return iterator(Itr.base(), *this) + 1;
 			} else{
 				//erase_back
@@ -502,6 +517,7 @@ namespace hmLib{
 
 				End->~value_type();
 				--End;
+				++Size;
 				return iterator(Itr.base(), *this);
 			}
 		}
@@ -530,7 +546,9 @@ namespace hmLib{
 					--To;
 				}
 
-				Beg += std::distance(Begin_, End_);
+				int N = std::distance(Begin_, End_);
+				Beg += N;
+				Size -= N;
 
 				return iterator(End_.base(), *this) + 1;
 			} else{
@@ -553,7 +571,9 @@ namespace hmLib{
 					if(From == End) IsDestruct = true;
 				}
 
-				End -= std::distance(Begin_, End_);
+				int N = std::distance(Begin_, End_);
+				End -= N;
+				Size -= N;
 
 				return iterator(Begin_.base(), *this) + 1;
 			}
@@ -567,9 +587,9 @@ namespace hmLib{
 		const_iterator cbegin()const{ return Beg; }
 		const_iterator cend()const{ return End; }
 	public:
-		bool empty()const{ return Beg == End; }
-		bool full()const{ return Beg == End + 1; }
-		size_type size()const{ return End - Beg; }
+		bool empty()const{ return Size == 0; }
+		bool full()const{ return Size == max_size(); }
+		size_type size()const{ return Size; }
 		size_type remain()const{ return max_size() - size(); }
 	};
 }
