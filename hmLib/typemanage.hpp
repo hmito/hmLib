@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPEMANAGE_INC
+﻿#ifndef HMLIB_TYPEMANAGE_INC
 #define HMLIB_TYPEMANAGE_INC 1
 #
 /*===type_manage===

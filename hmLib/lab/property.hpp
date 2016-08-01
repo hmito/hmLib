@@ -1,4 +1,4 @@
-#ifndef HMLIB_PROPERTY_INC
+﻿#ifndef HMLIB_PROPERTY_INC
 #define HMLIB_PROPERTY_INC 101
 #
 /*=== property ===

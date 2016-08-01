@@ -1,4 +1,4 @@
-#ifndef HMLIB_CDEQUE_INC
+﻿#ifndef HMLIB_CDEQUE_INC
 #define HMLIB_CDEQUE_INC 200
 #
 /*

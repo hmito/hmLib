@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPEMANAGE_LISTUPNAME_INC
+﻿#ifndef HMLIB_TYPEMANAGE_LISTUPNAME_INC
 #define HMLIB_TYPEMANAGE_LISTUPNAME_INC 100
 #
 /*===typemanage::listup_name===

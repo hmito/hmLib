@@ -1,4 +1,4 @@
-#ifndef HMLIB_INQUIRIES_INC
+﻿#ifndef HMLIB_INQUIRIES_INC
 #define HMLIB_INQUIRIES_INC 101
 #
 /*===inquiries::inquiry===

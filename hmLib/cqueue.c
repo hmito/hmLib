@@ -1,4 +1,4 @@
-#ifndef HMLIB_CQUEUE_C_INC
+﻿#ifndef HMLIB_CQUEUE_C_INC
 #define HMLIB_CQUEUE_C_INC 200
 #
 #ifndef HMLIB_CQUEUE_INC

@@ -1,4 +1,4 @@
-#ifndef HMLIB_VCOM_INC
+﻿#ifndef HMLIB_VCOM_INC
 #define HMLIB_VCOM_INC 100
 #
 /*===vcom===

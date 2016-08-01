@@ -1,4 +1,4 @@
-#ifndef HMLIB_SIGNALS_CONNECT_INC
+﻿#ifndef HMLIB_SIGNALS_CONNECT_INC
 #define HMLIB_SIGNALS_CONNECT_INC 101
 #
 /*===signal::connect===
