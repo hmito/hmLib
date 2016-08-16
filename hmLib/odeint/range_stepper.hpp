@@ -88,11 +88,34 @@ namespace hmLib{
 						Stepper.calc_state(Time, State);
 						NewRegion = System.region(State, Time);
 						if(NewRegion == *CurrentRegion){
-							std::swap(State, CurrentState);
+							CurrentState = State;
 							CurrentTime = Time;
 						} else{
-							std::swap(State, NewState);
+							NewState = State;
 							NewTime = Time;
+						}
+
+						//If time cannot have enough difference, next step is direct linear position fitting
+						if(Time == NewTime){
+							double Prob_Low = 0.0;
+							double Prob_Hig = 1.0;
+
+							while(detail::abs_distance(CurrentState, NewState) > RegionError){
+								double Prob = (Prob_Low + Prob_Hig) / 2.0;
+
+								//linear assumed "calc_state" part. time is constant.
+								algebra_type().for_each3(State, CurrentState, NewState, typename operations_type::scale_sum2<double>(1.0 - Prob, Prob));
+
+								NewRegion = System.region(State, Time);
+								if(NewRegion == *CurrentRegion){
+									CurrentState = State;
+									Prob_Low = Prob;
+								} else{
+									NewState = State;
+									Prob_Hig = Prob;
+								}
+							}
+							break;
 						}
 					}
 					if(NewRegion >= 0){
