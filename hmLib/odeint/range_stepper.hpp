@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ODEINT_BOUNEDSTEPPER_INC
+#ifndef HMLIB_ODEINT_BOUNEDSTEPPER_INC
 #define HMLIB_ODEINT_BOUNEDSTEPPER_INC 100
 #
 #include<utility>
@@ -104,7 +104,9 @@ namespace hmLib{
 								double Prob = (Prob_Low + Prob_Hig) / 2.0;
 
 								//linear assumed "calc_state" part. time is constant.
-								algebra_type().for_each3(State, CurrentState, NewState, typename operations_type::scale_sum2<double>(1.0 - Prob, Prob));
+								algebra_type Algebra;
+//								typename operations_type::scale_sum2<double> Operation(1.0 - Prob, Prob);
+								Algebra.for_each3(State, CurrentState, NewState, [=](double& out, double in1, double in2){out=(1-Prob)*in1+Prob*in2; });
 
 								NewRegion = System.region(State, Time);
 								if(NewRegion == *CurrentRegion){
