@@ -81,25 +81,17 @@ namespace hmLib{
 				if(NewRegion != *CurrentRegion){
 					auto NewState = Stepper.current_state();
 					auto NewTime = Stepper.current_time();
+					auto Time = CurrentTime;
 
 					state_type State;
 					while(detail::abs_distance(CurrentState, NewState) > RegionError){
-						auto Time = (CurrentTime + NewTime) / 2.;
-						Stepper.calc_state(Time, State);
-						NewRegion = System.region(State, Time);
-						if(NewRegion == *CurrentRegion){
-							CurrentState = State;
-							CurrentTime = Time;
-						} else{
-							NewState = State;
-							NewTime = Time;
-						}
+						auto HalfTime = (CurrentTime + NewTime) / 2.;
 
-						//If time cannot have enough difference, next step is direct linear position fitting
-						if(Time == NewTime){
+						if(Time == HalfTime){
+							//If time cannot have enough difference, next step is direct linear position fitting
 							while(detail::abs_distance(CurrentState, NewState) > RegionError){
 								algebra_type Algebra;
-								Algebra.for_each3(State, CurrentState, NewState, [=](double& out, double in1, double in2){out = in1/2 + in2/2; });
+								Algebra.for_each3(State, CurrentState, NewState, [=](double& out, double in1, double in2){out = in1 / 2 + in2 / 2; });
 
 								NewRegion = System.region(State, Time);
 								if(NewRegion == *CurrentRegion){
@@ -109,6 +101,18 @@ namespace hmLib{
 								}
 							}
 							break;
+						}
+
+						Time = HalfTime;
+
+						Stepper.calc_state(Time, State);
+						NewRegion = System.region(State, Time);
+						if(NewRegion == *CurrentRegion){
+							CurrentState = State;
+							CurrentTime = Time;
+						} else{
+							NewState = State;
+							NewTime = Time;
 						}
 					}
 					if(NewRegion >= 0){
