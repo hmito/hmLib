@@ -97,31 +97,22 @@ namespace hmLib{
 
 						//If time cannot have enough difference, next step is direct linear position fitting
 						if(Time == NewTime){
-							double Prob_Low = 0.0;
-							double Prob_Hig = 1.0;
-
 							while(detail::abs_distance(CurrentState, NewState) > RegionError){
-								double Prob = (Prob_Low + Prob_Hig) / 2.0;
-
-								//linear assumed "calc_state" part. time is constant.
 								algebra_type Algebra;
-//								typename operations_type::scale_sum2<double> Operation(1.0 - Prob, Prob);
-								Algebra.for_each3(State, CurrentState, NewState, [=](double& out, double in1, double in2){out=(1-Prob)*in1+Prob*in2; });
+								Algebra.for_each3(State, CurrentState, NewState, [=](double& out, double in1, double in2){out = in1/2 + in2/2; });
 
 								NewRegion = System.region(State, Time);
 								if(NewRegion == *CurrentRegion){
 									CurrentState = State;
-									Prob_Low = Prob;
 								} else{
 									NewState = State;
-									Prob_Hig = Prob;
 								}
 							}
 							break;
 						}
 					}
 					if(NewRegion >= 0){
-						std::swap(CurrentState, NewState);
+						CurrentState = NewState;
 						CurrentTime = NewTime;
 						CurrentRegion = NewRegion;
 					}
