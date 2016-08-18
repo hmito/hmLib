@@ -43,6 +43,9 @@
     <Filter Include="hmLib\comgate\winRS">
       <UniqueIdentifier>{9a365d6a-3e36-41e6-92f9-7aeee47ec84b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\odeint">
+      <UniqueIdentifier>{b0d7a183-270c-4bd8-b22b-03e97578322b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm.hpp">
@@ -234,17 +237,35 @@
     <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h">
       <Filter>hmLib\comgate\winRS</Filter>
     </ClInclude>
-    <ClInclude Include="either.hpp">
+    <ClInclude Include="..\..\..\hmLib\sequence.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\euclidean.hpp">
+    <ClInclude Include="..\..\..\hmLib\odeint.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\either.hpp">
-      <Filter>hmLib</Filter>
+    <ClInclude Include="..\..\..\hmLib\odeint\breakable_integrate.hpp">
+      <Filter>hmLib\odeint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\circular.hpp">
-      <Filter>hmLib</Filter>
+    <ClInclude Include="..\..\..\hmLib\odeint\iterator_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\container_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\stream_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\break_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\eqstate_break_observer.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\utility.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\odeint\range_stepper.hpp">
+      <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
