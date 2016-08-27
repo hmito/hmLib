@@ -222,8 +222,6 @@ namespace hmLib{
 				static_cast<enumerator_*>(this)->Concept.find_if(std::move(Pred), Target);
 			}
 		};
-		struct 
-	}
 	template<typename T, typename concept>
 	struct enumerator : public concept::mixin<enumerator<T, concept>>{
 		using mixin = concept::mixin;
@@ -361,6 +359,7 @@ namespace hmLib{
 			return *this;
 		}
 	};
+	}
 
 }
 #
