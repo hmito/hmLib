@@ -13,7 +13,7 @@ signal_unique_connections v1_00/130328 hmIto
 */
 #include<boost/signals2/connection.hpp>
 #ifndef HMLIB_EXCEPTIONS_INC
-#	include<hmLib/exceptions.hpp>
+#	include"../exceptions.hpp"
 #endif
 namespace hmLib{
 	namespace signals{

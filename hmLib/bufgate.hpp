@@ -13,7 +13,7 @@ bufgate v1_01/130328 hmIto
 	work関数をoperator()(unsigned int GetMaxNum,unsigned int PutMaxNum)に変更しました。
 */
 #ifndef HMLIB_GATE_INC
-#	include <hmLib/gate.hpp>
+#	include "gate.hpp"
 #endif
 #include <deque>
 #include <vector>
