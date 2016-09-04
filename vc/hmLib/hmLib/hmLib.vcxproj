@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>
     <RootNamespace>hmLib</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -107,6 +108,7 @@
     <ClInclude Include="..\..\..\hmLib\table.hpp" />
     <ClInclude Include="..\..\..\hmLib\type.h" />
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
+    <ClInclude Include="..\..\..\hmLib\type_traits.hpp" />
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\version.h" />
   </ItemGroup>

@@ -159,6 +159,9 @@
     <ClInclude Include="..\..\..\hmLib\lab\enumerators\enumerator_interface.hpp">
       <Filter>hmLib\lab\enumerators</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\type_traits.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c">
