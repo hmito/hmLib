@@ -182,9 +182,6 @@
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\random.cpp">
-      <Filter>hmLib</Filter>
-    </ClCompile>
     <ClCompile Include="lab_enumerator.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
