@@ -86,6 +86,9 @@
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumbase.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_traits.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />

@@ -28,6 +28,9 @@
     <Filter Include="hmLib\lab\enumerators">
       <UniqueIdentifier>{0129c774-c2f7-4f91-aa6c-a2818e27636a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\enumerators">
+      <UniqueIdentifier>{4d042a27-c97e-48e8-bb08-bab3ea15fb6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm.hpp">
@@ -161,6 +164,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\type_traits.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_traits.hpp">
+      <Filter>hmLib\enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumbase.hpp">
+      <Filter>hmLib\enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp">
+      <Filter>hmLib\enumerators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
