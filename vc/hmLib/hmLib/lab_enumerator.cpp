@@ -88,7 +88,7 @@ public:
 	}
 };
 
-//enumerator tag
+//basic_enumerator tag
 struct referable_enumeratable_tag{};
 struct sentinel_enumeratable_tag :public referable_enumeratable_tag{};
 struct range_enumeratable_tag :public sentinel_enumeratable_tag{};
@@ -124,7 +124,7 @@ struct sort_trait{
 		void sort(void)override{ auto& ref = static_cast<enumeratable&>(*this); std::sort(ref.Begin, ref.End); }
 	};
 	template<typename type, typename base>
-	struct enumerator_mixin{
+	struct trait_enumerator{
 	public:
 		void sort(void){ auto& ref = static_cast<base*>(this)->get_enumeratable(); ref.sort(); }
 	};
@@ -150,13 +150,13 @@ struct incrementable_traversal_traits{
 		void operator++() override{ ++(Ref.Cur); }
 	};
 	template<typename type, typename base>
-	struct enumerator_mixin{
+	struct trait_enumerator{
 		decltype(static_cast<base*>(this)->get_enumeratable()) Ref;
 	private:
 		auto& ref()->{ return  static_cast<base*>(this)->get_enumeratable(); }
 		const auto& ref()const->decltype(static_cast<base*>(this)->get_enumeratable()){ return  static_cast<base*>(this)->get_enumeratable(); }
 	public:
-		enumerator_mixin() :Ref(static_cast<enumeratable&>(*this)){}
+		trait_enumerator() :Ref(static_cast<enumeratable&>(*this)){}
 	public:
 		type& operator*(void){ return *ref(); }
 		const type& operator*(void) const{ return *ref(); }
@@ -188,7 +188,7 @@ struct forward_traversal_traits{
 		void reset() override{ auto& Ref = ref(); ref.Cur = ref.Beg; }
 	};
 	template<typename type, typename base>
-	struct enumerator_mixin{
+	struct trait_enumerator{
 	private:
 		auto& ref()->decltype(static_cast<base*>(this)->get_enumeratable()){ return  static_cast<base*>(this)->get_enumeratable(); }
 		const auto& ref()const->decltype(static_cast<base*>(this)->get_enumeratable()){ return  static_cast<base*>(this)->get_enumeratable(); }
@@ -203,99 +203,50 @@ struct forward_traversal_traits{
 //*/
 //enumeratable
 namespace enumerators{
-	//enumerator tag
+	//basic_enumerator tag
 	struct referable_enumerator_tag{};
 	struct sentinel_enumerator_tag :public referable_enumerator_tag{};
 	struct range_enumerator_tag :public sentinel_enumerator_tag{};
 	struct mutable_range_enumerator_tag :public range_enumerator_tag{};
 
-	//enumeratable
-	struct referable_enumeratable{
-		template<typename extention_interface_>
-		struct enumeratable_interface{};
-		template<typename iterator_, typename extention_interface_>
-		struct enumeratable : public enumeratable_interface, public extention_interface_{
-			iterator_ Cur;
-		};
+	//enumbase
+	template<typename iterator_, typename interface_>
+	struct referable_enumbase: public interface_{
+		using iterator = iterator_;
+		iterator_ Cur;
 	};
-	struct sentinel_enumeratable{
-		template<typename extention_interface_>
-		struct enumeratable_interface : public referable_enumeratable::enumeratable_interface< extention_interface_>{
-			virtual operator bool()const = 0;
-		};
-		template<typename iterator_, typename extention_interface_>
-		struct enumeratable :public enumeratable_interface, public extention_interface_{
-			iterator_ Cur;
-			iterator_ End;
-		public:
-			operator bool()const override{
-				return Cur != End;
-			}
-		};
+	template<typename iterator_, typename interface_>
+	struct sentinel_enumbase : public referable_enumbase<iterator_, interface_>{
+		iterator_ End;
 	};
-	struct range_enumeratable{
-		template<typename extention_interface_>
-		struct enumeratable_interface : public sentinel_enumeratable::enumeratable_interface< extention_interface_>{
-			virtual void reset() = 0;
-		};
-		template<typename iterator_, typename extention_interface_>
-		struct enumeratable :public enumeratable_interface, public extention_interface_{
-			iterator_ Cur;
-			iterator_ Beg;
-			iterator_ End;
-		public:
-			operator bool()const override{
-				return Cur != End;
-			}
-			void reset()override{
-				Cur = Beg;
-			}
-		};
+	template<typename iterator_, typename interface_>
+	struct range_enumbase : public sentinel_enumbase<iterator_, interface_>{
+		iterator_ Beg;
 	};
-	struct mutable_range_enumeratable{
-		template<typename extention_interface_>
-		struct enumeratable_interface : public range_enumeratable::enumeratable_interface< extention_interface_>{
-			virtual void reset_range() = 0;
-		};
-		template<typename iterator_, typename extention_interface_>
-		struct enumeratable :public enumeratable_interface, public extention_interface_{
-			iterator_ Cur;
-			iterator_ Beg;
-			iterator_ End;
-			iterator_ IniBeg;
-			iterator_ IniEnd;
-		public:
-			operator bool()const override{
-				return Cur != End;
-			}
-			void reset()override{
-				Cur = Beg;
-			}
-			void reset_range()override{
-				Beg = IniBeg;
-				End = IniEnd;
-			}
-		};
+	template<typename iterator_, typename interface_>
+	struct mutable_range_enumbase : public range_enumbase<iterator_, interface_>{
+		iterator_ IniBeg;
+		iterator_ IniEnd;
 	};
 
-	//enumeratable selecter
-	template<typename enumerator_tag>
-	struct select_enumeratable{};
-	template<>
-	struct select_enumeratable<referable_enumerator_tag>{
-		using type = referable_enumeratable;
+	//enumbase selecter
+	template<typename enumerator_tag, typename iterator_, typename interface_>
+	struct make_enumbase{};
+	template<typename iterator_, typename interface_>
+	struct make_enumbase<referable_enumerator_tag, typename iterator_, typename interface_>{
+		using type = referable_enumbase<iterator_, interface_>;
 	};
-	template<>
-	struct select_enumeratable<sentinel_enumerator_tag>{
-		using type = sentinel_enumeratable;
+	template<typename iterator_, typename interface_>
+	struct make_enumbase<sentinel_enumerator_tag, typename iterator_, typename interface_>{
+		using type = sentinel_enumbase<iterator_, interface_>;
 	};
-	template<>
-	struct select_enumeratable<range_enumerator_tag>{
-		using type = range_enumeratable;
+	template<typename iterator_, typename interface_>
+	struct make_enumbase<range_enumerator_tag, typename iterator_, typename interface_>{
+		using type = range_enumbase<iterator_, interface_>;
 	};
-	template<>
-	struct select_enumeratable<mutable_range_enumerator_tag>{
-		using type = mutable_range_enumeratable;
+	template<typename iterator_, typename interface_>
+	struct make_enumbase<mutable_range_enumerator_tag, typename iterator_, typename interface_>{
+		using type = mutable_range_enumbase<iterator_, interface_>;
 	};
 }
 //trait pack
@@ -303,93 +254,110 @@ namespace enumerators{
 	template<typename... traits>
 	struct traits_pack{
 	private:
-		template<typename enumerator, typename... others>
-		struct extention_interface_pack{};
-		template<typename enumerator, typename trait, typename... others>
-		struct extention_interface_pack<enumerator, trait, others...>
-			: public trait::template extention_interface<enumerator>
-			, public extention_interface_pack<enumerator, others...>{
+		template<typename basic_enumerator, typename... others>
+		struct enumeratable_interface_pack{};
+		template<typename basic_enumerator, typename trait, typename... others>
+		struct enumeratable_interface_pack<basic_enumerator, trait, others...>
+			: public trait::template trait_interface<basic_enumerator>
+			, public enumeratable_interface_pack<basic_enumerator, others...>{
 		};
-		template<typename enumeratable, typename base, typename... others>
-		struct extention_pack{};
-		template<typename enumeratable, typename base, typename trait, typename... others>
-		struct extention_pack<enumeratable, base, trait, others...>
-			: public extention_pack<enumeratable, trait::template extention<enumeratable, base>, others...>{};
-		template<typename enumerator, typename base, typename... others>
-		struct enumerator_extention_pack{};
-		template<typename enumerator, typename base, typename trait, typename... others>
-		struct enumerator_extention_pack<enumerator, base, trait, others...>
-			: public enumerator_extention_pack<enumerator, trait::template enumerator_extention<enumerator, base>, others...>{};
+
+		template<typename basic_enumerator, typename enumbase, typename base, typename... others>
+		struct enumeratable_pack: public base{};
+		template<typename basic_enumerator, typename enumbase, typename base, typename trait, typename... others>
+		struct enumeratable_pack<basic_enumerator, enumbase, base, trait, others...>
+			: public enumeratable_pack<basic_enumerator, enumbase, typename trait::template trait_enumeratable<basic_enumerator, enumbase, base>, others...>{};
+
+		template<typename basic_enumerator, typename base, typename... others>
+		struct enumerator_pack : public base{};
+		template<typename basic_enumerator, typename base, typename trait, typename... others>
+		struct enumerator_pack<basic_enumerator, base, trait, others...>
+			: public enumerator_pack<basic_enumerator, typename trait::template trait_enumerator<basic_enumerator, base>, others...>{};
 	public:
-		template<typename enumerator>
-		using extention_interface = extention_interface_pack<enumerator, traits...>;
-		template<typename enumeratable, typename base>
-		using extention = extention_pack<enumeratable, base, traits...>;
-		template<typename enumerator, typename base>
-		using enumerator_extention = enumerator_extention_pack<enumerator, base, traits...>;
+		template<typename basic_enumerator>
+		using enumeratable_interface = enumeratable_interface_pack<basic_enumerator, traits...>;
+		template<typename basic_enumerator,typename enumbase>
+		using enumeratable = enumeratable_pack<basic_enumerator, enumbase, enumbase, traits...>;
+		template<typename basic_enumerator>
+		using enumerator = enumerator_pack<basic_enumerator, basic_enumerator, traits...>;
+	};
+
+	template<typename enumerator_tag_, typename value_type_, typename difference_type_, typename reference_, typename pointer_, typename... traits>
+	struct basic_enumerator{
+	public:
+		using this_type = basic_enumerator<enumerator_tag_, value_type_, difference_type_, reference_, pointer_, traits...>;
+		using enumerator_tag = enumerator_tag_;
+		using value_type = value_type_;
+		using difference_type = difference_type_;
+		using reference = reference_;
+		using pointer = pointer_;
+	private:
+		using this_trais_pack = enumerators::traits_pack<traits...>;
+	public:
+		using enumeratable_interface = typename this_trais_pack::template enumeratable_interface<this_type>;
+	private:
+		template<typename iterator_>
+		using enumbase = typename enumerators::make_enumbase<enumerator_tag, iterator_, enumeratable_interface>::type;
+	public:
+		template<typename iterator_>
+		using enumeratable = typename this_trais_pack::template enumeratable<this_type, enumbase<iterator_> >;
+	private:
+		std::unique_ptr<enumeratable_interface> Ptr;
+	protected:
+		enumeratable_interface& ref(){ return *Ptr; }
+		const enumeratable_interface& ref()const{ return *Ptr; }
+		const enumeratable_interface& cref()const{ return *Ptr; }
 	};
 }
 struct trait1{
-	template<typename enumerator>
-	struct extention_interface{
-		virtual enumerator::value_type func1() = 0;
+	template<typename basic_enumerator>
+	struct trait_interface{
+		virtual typename basic_enumerator::value_type func1() = 0;
 	};
-	template<typename enumeratable, typename base>
-	struct extention : public base{
-		enumeratable::value_type func1()override{
-			return *enrable::Cur;
+	template<typename basic_enumerator, typename enumbase, typename base>
+	struct trait_enumeratable : public base{
+	public:
+		typename basic_enumerator::value_type func1()override{
+			return *enumbase::Cur;
 		}
 	};
-	template<typename enumerator, typename base>
-	struct enumerator_extention : public base{
-		enumerator::value_type  func1(){
-			enr_t::ref().func1();
+	template<typename basic_enumerator, typename base>
+	struct trait_enumerator : public base{
+	public:
+		typename basic_enumerator::value_type func1(){
+			return basic_enumerator::ref().func1();
 		}
 	};
 };
 struct trait2{
-	template<typename enumerator>
-	struct extention_interface{
-		virtual enumerator::value_type func2() = 0;
+	template<typename basic_enumerator>
+	struct trait_interface{
+		virtual typename basic_enumerator::value_type func2() = 0;
 	};
-	template<typename enumeratable, typename base>
-	struct extention : public base{
-		enumeratable::value_type func2()override{
-			return *enumeratable::Beg;
+	template<typename basic_enumerator, typename enumbase, typename base>
+	struct trait_enumeratable : public base{
+	public:
+		typename basic_enumerator::value_type func2()override{
+			return *enumbase::Beg;
 		}
 	};
-	template<typename enumerator, typename base>
-	struct enumerator_extention : public base{
-		enumerator::value_type func2(){
-			return enumerator::ref().func2();
+	template<typename basic_enumerator, typename base>
+	struct trait_enumerator:public base{
+	public:
+		typename basic_enumerator::value_type func2(){
+			return ref().func2();
 		}
 	};
 };
 
-
-template<typename enumerator_tag_, typename traversal_tag_, typename value_type_, typename difference_type_, typename reference_, typename pointer_, typename... traits>
-struct basic_enumerator{
-public:
-	using enumerator_tag = enumerator_tag_;
-	using traversal_tag = traversal_tag_;
-	using value_type = value_type_;
-	using difference_type = difference_type_;
-	using reference = reference_;
-	using pointer = pointer_;
-private:
-	using this_trais_pack = enumerators::traits_pack<traits...>;
-	using this_enumeratable = typename enumerators::select_enumeratable<enumerator_tag>::type;
-public:
-	using enumeratable_interface = typename this_enumeratable::template enumeratable_interface<typename this_trais_pack::extention_interface>;
-	template<typename iterator_>
-	using enumeratable = typename this_trais_pack::extention<enumeratable_, enumeratable_>;
-private:
-	std::unique_ptr<enumeratable_interface> Ptr;
-public:
-	template<typename iterator_>
-	static enumeratable<iterator_> make_enumeratable(iterator_ Begin, iterator_ End){
-	}
+template<typename enumerator_tag_, typename value_type_, typename difference_type_, typename reference_, typename pointer_, typename... traits>
+struct enumerator : public enumerators::traits_pack<traits...>::template enumerator< enumerators::basic_enumerator<enumerator_tag_, value_type_, difference_type_, reference_, pointer_, traits...> >{
 };
+
 int main(void){
+	using this_enumerator = enumerator<enumerators::range_enumerator_tag, int, int, int&, int*, trait1, trait2>;
+	this_enumerator Enum;
+	Enum.func2();
+	Enum.func1();
 	return 0;
 }
