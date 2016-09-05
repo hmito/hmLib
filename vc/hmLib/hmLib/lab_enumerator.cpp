@@ -10,20 +10,20 @@
 /*
 namespace enumerators{
 	template<typename type, typename base, typename... others>
-	struct traits_mixin{};
-	template<typename type, typename base, typename trait, typename... others>
-	struct traits_mixin <type, base, trait, others...> : public trait::template mixin<type, base>, public traits_mixin<type, base, others...>{};
+	struct abilities_mixin{};
+	template<typename type, typename base, typename ability, typename... others>
+	struct abilities_mixin <type, base, ability, others...> : public ability::template mixin<type, base>, public abilities_mixin<type, base, others...>{};
 	template<typename type, typename... others>
-	struct traits_interface{};
-	template<typename type, typename trait, typename... others>
-	struct traits_interface <type, trait, others...> : public trait::template interface<type>, public traits_interface<type, others...>{};
+	struct abilities_interface{};
+	template<typename type, typename ability, typename... others>
+	struct abilities_interface <type, ability, others...> : public ability::template interface<type>, public abilities_interface<type, others...>{};
 	template<typename type, typename enumeratable, typename base, typename... others>
-	struct traits_impl : public base{};
-	template<typename type, typename enumeratable, typename base, typename trait, typename... others>
-	struct traits_impl <type, enumeratable, base, trait, others...> : public trait::template impl<type, enumeratable, traits_impl<type, enumeratable, base, others...>>{};
+	struct abilities_impl : public base{};
+	template<typename type, typename enumeratable, typename base, typename ability, typename... others>
+	struct abilities_impl <type, enumeratable, base, ability, others...> : public ability::template impl<type, enumeratable, abilities_impl<type, enumeratable, base, others...>>{};
 }
 namespace enumerators{
-	struct forward_traversal_traits{
+	struct forward_traversal_abilities{
 		template<typename type>
 		struct interface{
 		public:
@@ -52,7 +52,7 @@ namespace enumerators{
 			void reset(){ auto& ref = static_cast<base*>(this)->get_enumeratable(); ref.reset(); }
 		};
 	};
-	struct sort_traits{
+	struct sort_abilities{
 		template<typename type>
 		struct interface{
 		public:
@@ -71,11 +71,11 @@ namespace enumerators{
 	};
 }
 
-template<typename T, typename enumeratable_, typename... traits>
-struct basic_enumerator :public enumerators::traits_mixin<T, basic_enumerator<T, enumeratable_, traits...>, traits...>{
-	using interface = enumerators::traits_interface<T, enumeratable_, traits...>;
+template<typename T, typename enumeratable_, typename... abilities>
+struct basic_enumerator :public enumerators::abilities_mixin<T, basic_enumerator<T, enumeratable_, abilities...>, abilities...>{
+	using interface = enumerators::abilities_interface<T, enumeratable_, abilities...>;
 	template<typename iterator_>
-	using enumeratable = enumerators::traits_impl<T, enumeratable_::impl<iterator_>, interface, traits...>;
+	using enumeratable = enumerators::abilities_impl<T, enumeratable_::impl<iterator_>, interface, abilities...>;
 private:
 	std::unique_ptr<interface> Ptr;
 public:
@@ -96,7 +96,7 @@ struct mutable_range_enumeratable_tag :public range_enumeratable_tag{};
 
 
 
-struct find_trait{
+struct find_ability{
 	template<
 		typename enumeratable_, 
 		typename enumeratable_type = hmLib::sieve_base_of<enumeratable_, sentinel_enumeratable_tag, mutable_range_enumeratable_tag>::type
@@ -112,7 +112,7 @@ struct find_trait{
 	};
 };
 
-struct sort_trait{
+struct sort_ability{
 	template<typename type>
 	struct enumeratable_interface{
 	public:
@@ -124,13 +124,13 @@ struct sort_trait{
 		void sort(void)override{ auto& ref = static_cast<enumeratable&>(*this); std::sort(ref.Begin, ref.End); }
 	};
 	template<typename type, typename base>
-	struct trait_enumerator{
+	struct ability_enumerator{
 	public:
 		void sort(void){ auto& ref = static_cast<base*>(this)->get_enumeratable(); ref.sort(); }
 	};
 };
 
-struct incrementable_traversal_traits{
+struct incrementable_traversal_abilities{
 	template<typename type>
 	struct enumeratable_interface{
 	public:
@@ -150,13 +150,13 @@ struct incrementable_traversal_traits{
 		void operator++() override{ ++(Ref.Cur); }
 	};
 	template<typename type, typename base>
-	struct trait_enumerator{
+	struct ability_enumerator{
 		decltype(static_cast<base*>(this)->get_enumeratable()) Ref;
 	private:
 		auto& ref()->{ return  static_cast<base*>(this)->get_enumeratable(); }
 		const auto& ref()const->decltype(static_cast<base*>(this)->get_enumeratable()){ return  static_cast<base*>(this)->get_enumeratable(); }
 	public:
-		trait_enumerator() :Ref(static_cast<enumeratable&>(*this)){}
+		ability_enumerator() :Ref(static_cast<enumeratable&>(*this)){}
 	public:
 		type& operator*(void){ return *ref(); }
 		const type& operator*(void) const{ return *ref(); }
@@ -165,7 +165,7 @@ struct incrementable_traversal_traits{
 		void reset(){ ref().reset(); }
 	};
 };
-struct forward_traversal_traits{
+struct forward_traversal_abilities{
 	template<typename type>
 	struct enumeratable_interface{
 	public:
@@ -188,7 +188,7 @@ struct forward_traversal_traits{
 		void reset() override{ auto& Ref = ref(); ref.Cur = ref.Beg; }
 	};
 	template<typename type, typename base>
-	struct trait_enumerator{
+	struct ability_enumerator{
 	private:
 		auto& ref()->decltype(static_cast<base*>(this)->get_enumeratable()){ return  static_cast<base*>(this)->get_enumeratable(); }
 		const auto& ref()const->decltype(static_cast<base*>(this)->get_enumeratable()){ return  static_cast<base*>(this)->get_enumeratable(); }
@@ -201,14 +201,15 @@ struct forward_traversal_traits{
 	};
 };
 //*/
+
+//basic_enumerator tag
+struct referable_enumerator_tag{};
+struct sentinel_enumerator_tag :public referable_enumerator_tag{};
+struct range_enumerator_tag :public sentinel_enumerator_tag{};
+struct mutable_range_enumerator_tag :public range_enumerator_tag{};
+
 //enumeratable
 namespace enumerators{
-	//basic_enumerator tag
-	struct referable_enumerator_tag{};
-	struct sentinel_enumerator_tag :public referable_enumerator_tag{};
-	struct range_enumerator_tag :public sentinel_enumerator_tag{};
-	struct mutable_range_enumerator_tag :public range_enumerator_tag{};
-
 	//enumbase
 	template<typename iterator_, typename interface_>
 	struct referable_enumbase: public interface_{
@@ -249,50 +250,51 @@ namespace enumerators{
 		using type = mutable_range_enumbase<iterator_, interface_>;
 	};
 }
-//trait pack
+//ability pack
 namespace enumerators{
-	template<typename... traits>
-	struct traits_pack{
+	template<typename... abilities>
+	struct ability_pack{
 	private:
 		template<typename basic_enumerator, typename... others>
 		struct enumeratable_interface_pack{};
-		template<typename basic_enumerator, typename trait, typename... others>
-		struct enumeratable_interface_pack<basic_enumerator, trait, others...>
-			: public trait::template trait_interface<basic_enumerator>
+		template<typename basic_enumerator, typename ability, typename... others>
+		struct enumeratable_interface_pack<basic_enumerator, ability, others...>
+			: public ability::template ability_interface<basic_enumerator>
 			, public enumeratable_interface_pack<basic_enumerator, others...>{
 		};
 
 		template<typename basic_enumerator, typename enumbase, typename base, typename... others>
 		struct enumeratable_pack: public base{};
-		template<typename basic_enumerator, typename enumbase, typename base, typename trait, typename... others>
-		struct enumeratable_pack<basic_enumerator, enumbase, base, trait, others...>
-			: public enumeratable_pack<basic_enumerator, enumbase, typename trait::template trait_enumeratable<basic_enumerator, enumbase, base>, others...>{};
+		template<typename basic_enumerator, typename enumbase, typename base, typename ability, typename... others>
+		struct enumeratable_pack<basic_enumerator, enumbase, base, ability, others...>
+			: public enumeratable_pack<basic_enumerator, enumbase, typename ability::template ability_enumeratable<basic_enumerator, enumbase, base>, others...>{};
 
 		template<typename basic_enumerator, typename base, typename... others>
 		struct enumerator_pack : public base{};
-		template<typename basic_enumerator, typename base, typename trait, typename... others>
-		struct enumerator_pack<basic_enumerator, base, trait, others...>
-			: public enumerator_pack<basic_enumerator, typename trait::template trait_enumerator<basic_enumerator, base>, others...>{};
+		template<typename basic_enumerator, typename base, typename ability, typename... others>
+		struct enumerator_pack<basic_enumerator, base, ability, others...>
+			: public enumerator_pack<basic_enumerator, typename ability::template ability_enumerator<basic_enumerator, base>, others...>{};
 	public:
 		template<typename basic_enumerator>
-		using enumeratable_interface = enumeratable_interface_pack<basic_enumerator, traits...>;
+		using enumeratable_interface = enumeratable_interface_pack<basic_enumerator, abilities...>;
 		template<typename basic_enumerator,typename enumbase>
-		using enumeratable = enumeratable_pack<basic_enumerator, enumbase, enumbase, traits...>;
+		using enumeratable = enumeratable_pack<basic_enumerator, enumbase, enumbase, abilities...>;
 		template<typename basic_enumerator>
-		using enumerator = enumerator_pack<basic_enumerator, basic_enumerator, traits...>;
+		using enumerator = enumerator_pack<basic_enumerator, basic_enumerator, abilities...>;
 	};
 
-	template<typename enumerator_tag_, typename value_type_, typename difference_type_, typename reference_, typename pointer_, typename... traits>
+	template<typename enumerator_traits_, typename... abilities>
 	struct basic_enumerator{
 	public:
-		using this_type = basic_enumerator<enumerator_tag_, value_type_, difference_type_, reference_, pointer_, traits...>;
-		using enumerator_tag = enumerator_tag_;
-		using value_type = value_type_;
-		using difference_type = difference_type_;
-		using reference = reference_;
-		using pointer = pointer_;
+		using this_type = basic_enumerator<enumerator_traits_, abilities...>;
+		using enumerator_traits = enumerator_traits_;
+		using enumerator_tag = typename enumerator_traits::enumerator_tag;
+		using value_type = typename enumerator_traits::value_type;
+		using difference_type = typename enumerator_traits::difference_type;
+		using reference = typename enumerator_traits::reference;
+		using pointer = typename enumerator_traits::pointer;
 	private:
-		using this_trais_pack = enumerators::traits_pack<traits...>;
+		using this_trais_pack = enumerators::ability_pack<abilities...>;
 	public:
 		using enumeratable_interface = typename this_trais_pack::template enumeratable_interface<this_type>;
 	private:
@@ -309,40 +311,40 @@ namespace enumerators{
 		const enumeratable_interface& cref()const{ return *Ptr; }
 	};
 }
-struct trait1{
+struct ability1{
 	template<typename basic_enumerator>
-	struct trait_interface{
+	struct ability_interface{
 		virtual typename basic_enumerator::value_type func1() = 0;
 	};
 	template<typename basic_enumerator, typename enumbase, typename base>
-	struct trait_enumeratable : public base{
+	struct ability_enumeratable : public base{
 	public:
 		typename basic_enumerator::value_type func1()override{
 			return *enumbase::Cur;
 		}
 	};
 	template<typename basic_enumerator, typename base>
-	struct trait_enumerator : public base{
+	struct ability_enumerator : public base{
 	public:
 		typename basic_enumerator::value_type func1(){
 			return basic_enumerator::ref().func1();
 		}
 	};
 };
-struct trait2{
+struct ability2{
 	template<typename basic_enumerator>
-	struct trait_interface{
+	struct ability_interface{
 		virtual typename basic_enumerator::value_type func2() = 0;
 	};
 	template<typename basic_enumerator, typename enumbase, typename base>
-	struct trait_enumeratable : public base{
+	struct ability_enumeratable : public base{
 	public:
 		typename basic_enumerator::value_type func2()override{
 			return *enumbase::Beg;
 		}
 	};
 	template<typename basic_enumerator, typename base>
-	struct trait_enumerator:public base{
+	struct ability_enumerator:public base{
 	public:
 		typename basic_enumerator::value_type func2(){
 			return ref().func2();
@@ -350,12 +352,21 @@ struct trait2{
 	};
 };
 
-template<typename enumerator_tag_, typename value_type_, typename difference_type_, typename reference_, typename pointer_, typename... traits>
-struct enumerator : public enumerators::traits_pack<traits...>::template enumerator< enumerators::basic_enumerator<enumerator_tag_, value_type_, difference_type_, reference_, pointer_, traits...> >{
+template<typename enumerator_tag_, typename value_type_, typename difference_type_ = int, typename reference_ = value_type_&, typename pointer_ = const value_type_&>
+struct enumerator_traits{
+public:
+	using enumerator_tag = enumerator_tag_;
+	using value_type = value_type_;
+	using difference_type = difference_type_;
+	using reference = reference_;
+	using pointer = pointer_;
+};
+template<typename enumerator_traits_, typename... abilities>
+struct enumerator : public enumerators::ability_pack<abilities...>::template enumerator< enumerators::basic_enumerator<enumerator_traits_, abilities...> >{
 };
 
 int main(void){
-	using this_enumerator = enumerator<enumerators::range_enumerator_tag, int, int, int&, int*, trait1, trait2>;
+	using this_enumerator = enumerator<enumerator_traits<range_enumerator_tag, int>, ability1, ability2>;
 	this_enumerator Enum;
 	Enum.func2();
 	Enum.func1();
