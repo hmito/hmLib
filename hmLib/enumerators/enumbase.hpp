@@ -11,13 +11,25 @@ namespace hmLib{
 	//enumbase
 	namespace enumerators{
 		//enumbase
+		struct referable_enumbase_interface{};
 		template<typename iterator_, typename interface_>
 		struct referable_enumbase : public interface_{
+		public:
 			using iterator = iterator_;
+		public:
+			using enumerator_tag = typename interface_::enumerator_tag;
+			using value_type = typename interface_::value_type;
+			using difference_type = typename interface_::difference_type;
+			using reference = typename interface_::reference;
+			using pointer = typename interface_::pointer;
+		public:
 			iterator_ Cur;
 			void set(iterator_ Cur_){
 				Cur = Cur_;
 			}
+		};
+		struct sentinel_enumbase_interface{
+			virtual operator bool()const = 0;
 		};
 		template<typename iterator_, typename interface_>
 		struct sentinel_enumbase : public referable_enumbase<iterator_, interface_>{
@@ -29,6 +41,12 @@ namespace hmLib{
 				End = End_;
 				base_type::set(Beg_);
 			}
+		public:
+			operator bool()const override{ return Cur != End; }
+		};
+		struct range_enumbase_interface{
+		public:
+			virtual void reset() = 0;
 		};
 		template<typename iterator_, typename interface_>
 		struct range_enumbase : public sentinel_enumbase<iterator_, interface_>{
@@ -40,6 +58,8 @@ namespace hmLib{
 				Beg = Beg_;
 				base_type::set(Beg_, End_);
 			}
+		public:
+			operator bool()const override{ return Cur != End; }
 		};
 		template<typename iterator_, typename interface_>
 		struct mutable_range_enumbase : public range_enumbase<iterator_, interface_>{
