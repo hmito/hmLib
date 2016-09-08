@@ -19,7 +19,7 @@ namespace hmLib{
 			public:
 				void operator++(int){ operator++(); }
 			};
-			template<typename enumbase, typename base>
+			template<typename enumerator_traits, typename enumbase, typename base>
 			struct ability_impl : public base{
 			private:
 				using reference = typename enumerator_traits::reference;
