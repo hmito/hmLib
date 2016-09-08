@@ -150,9 +150,6 @@
     <ClInclude Include="..\..\..\hmLib\algorithm\nonrepeat_random_integrals.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\enumerator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lab\enumerators\container_enumerator.hpp">
       <Filter>hmLib\lab\enumerators</Filter>
     </ClInclude>
@@ -172,6 +169,12 @@
       <Filter>hmLib\enumerators</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp">
+      <Filter>hmLib\enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators\traversal_ability.hpp">
       <Filter>hmLib\enumerators</Filter>
     </ClInclude>
   </ItemGroup>
