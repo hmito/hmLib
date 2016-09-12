@@ -3,5 +3,6 @@
 #
 #include"enumerators/enumerator.hpp"
 #include"enumerators/traversal_ability.hpp"
+#include"enumerators/algorithm_ability.hpp"
 #
 #endif

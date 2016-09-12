@@ -13,11 +13,11 @@ namespace hmLib{
 			: public ability::template ability_interface<enumerator_traits>
 			, public enumerator_pack<enumerator_traits, others...>{
 		};
-		template<typename enumerator_traits, typename enumbase, typename base, typename... others>
+		template<typename enumerator_traits, typename base, typename... others>
 		struct enumerator_impl_pack : public base{};
-		template<typename enumerator_traits, typename enumbase, typename base, typename ability, typename... others>
-		struct enumerator_impl_pack<enumerator_traits, enumbase, base, ability, others...>
-			: public enumerator_impl_pack<enumerator_traits, enumbase, typename ability::template ability_impl<enumerator_traits, enumbase, base>, others...>{
+		template<typename enumerator_traits, typename base, typename ability, typename... others>
+		struct enumerator_impl_pack<enumerator_traits, base, ability, others...>
+			: public enumerator_impl_pack<enumerator_traits, typename ability::template ability_impl<enumerator_traits, base>, others...>{
 		};
 	}
 	template<typename enumerator_traits, typename enumerator_tag_, typename... abilities>
@@ -37,19 +37,15 @@ namespace hmLib{
 		//にもかかわらず、enumbaseを使ってimplを作るので、コンパイルエラーになるっぽい
 	public:
 		template<typename iterator_>
-		struct impl;
+		struct impl : public enumerators::enumerator_impl_pack<enumerator_traits, enumbase<iterator_>, abilities...>{};
 	public:
-/*		template<typename iterator_>
+		template<typename iterator_>
 		static impl<iterator_> make_enumerator(iterator_ Beg_, iterator_ End_){
 			impl<iterator_> Impl;
 			Impl.initialize(Beg_, End_);
 			return Impl;
 		}
-*/	};
-	template<typename enumerator_traits, typename enumerator_tag_, typename... abilities>
-	template<typename iterator_>
-	struct basic_enumerator<enumerator_traits, enumerator_tag_, abilities...>::impl : public enumerators::enumerator_impl_pack<enumerator_traits, enumbase<iterator_>, enumbase<iterator_>, abilities...>{};
-
+	};
 
 	template<typename enumerator_traits, typename... abilities>
 	struct basic_enumerator<enumerator_traits, referable_enumerator_tag, abilities...> :public enumerators::enumerator_pack<enumerator_traits, abilities...>{

@@ -86,6 +86,7 @@
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumbase.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_traits.hpp" />
