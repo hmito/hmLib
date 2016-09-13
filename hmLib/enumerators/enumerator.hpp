@@ -71,8 +71,8 @@ namespace hmLib{
 			return Impl;
 		}
 	};
-	template<typename enumerator_traits, typename... abilities>
-	using enumerator = basic_enumerator<enumerator_traits, typename enumerator_traits::enumerator_tag, abilities...>;
+	template<typename value_type, typename enumerator_tag, typename... abilities>
+	using enumerator = basic_enumerator<enumerator_traits<enumerator_tag,value_type>, enumerator_tag, abilities...>;
 }
 #
 #endif

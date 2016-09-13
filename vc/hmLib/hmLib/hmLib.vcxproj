@@ -89,6 +89,7 @@
     <ClInclude Include="..\..\..\hmLib\enumerators\algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumbase.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_defines.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_traits.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\traversal_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
