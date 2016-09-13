@@ -29,6 +29,8 @@ namespace hmLib{
 			virtual operator bool()const = 0;
 			virtual void advance(enumerators::cur_t, typename enumerator_traits_::difference_type Dif) = 0;
 			virtual void advance(enumerators::end_t, typename enumerator_traits_::difference_type Dif) = 0;
+			virtual void set_cur(enumerators::end_t) = 0;
+			virtual void set_end(enumerators::cur_t) = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::end_t)const = 0;
 			typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::cur_t)const{ return -std::distance(cur, end); }
 		};
@@ -38,11 +40,17 @@ namespace hmLib{
 			virtual void advance(enumerators::beg_t, typename enumerator_traits_::difference_type Dif) = 0;
 			virtual void advance(enumerators::cur_t, typename enumerator_traits_::difference_type Dif) = 0;
 			virtual void advance(enumerators::end_t, typename enumerator_traits_::difference_type Dif) = 0;
-			virtual void reset_cur() = 0;
-			virtual void reset()= 0;
+			virtual void set_cur(enumerators::beg_t) = 0;
+			virtual void set_cur(enumerators::end_t) = 0;
+			virtual void set_begin(enumerators::cur_t) = 0;
+			virtual void set_begin(enumerators::end_t) = 0;
+			virtual void set_end(enumerators::beg_t) = 0;
+			virtual void set_end(enumerators::cur_t) = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::cur_t)const = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::end_t)const = 0;
 			virtual typename enumerator_traits_::difference_type size()const = 0;
+			void reset_cur(){ set_cur(enumerators::beg); }
+			void reset(){ reset_cur(); }
 			typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::cur_t)const{ return -std::distance(cur, end); }
 			typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::beg_t)const{ return -std::distance(cur, beg); }
 			typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::end_t)const{ return size(); }
@@ -54,9 +62,18 @@ namespace hmLib{
 			virtual void advance(enumerators::beg_t, typename enumerator_traits_::difference_type Dif) = 0;
 			virtual void advance(enumerators::cur_t, typename enumerator_traits_::difference_type Dif) = 0;
 			virtual void advance(enumerators::end_t, typename enumerator_traits_::difference_type Dif) = 0;
-			virtual void reset_cur() = 0;
-			virtual void reset() = 0;
-			virtual void reset_range() = 0;
+			virtual void set_cur(enumerators::beg_t) = 0;
+			virtual void set_cur(enumerators::end_t) = 0;
+			virtual void set_cur(enumerators::inibeg_t) = 0;
+			virtual void set_cur(enumerators::iniend_t) = 0;
+			virtual void set_begin(enumerators::cur_t) = 0;
+			virtual void set_begin(enumerators::end_t) = 0;
+			virtual void set_begin(enumerators::inibeg_t) = 0;
+			virtual void set_begin(enumerators::iniend_t) = 0;
+			virtual void set_end(enumerators::beg_t) = 0;
+			virtual void set_end(enumerators::cur_t) = 0;
+			virtual void set_end(enumerators::inibeg_t) = 0;
+			virtual void set_end(enumerators::iniend_t) = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::cur_t)const = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::end_t)const = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::inibeg_t, enumerators::beg_t)const = 0;
@@ -67,6 +84,11 @@ namespace hmLib{
 			virtual typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::iniend_t)const = 0;
 			virtual typename enumerator_traits_::difference_type size()const = 0;
 			virtual typename enumerator_traits_::difference_type initial_size()const = 0;
+			void reset_cur(){ set_cur(enumerators::beg); }
+			void reset_begin(){ set_begin(enumerators::inibeg); }
+			void reset_end(){ set_end(enumerators::iniend); }
+			void reset_range(){ reset_begin(); reset_end(); }
+			void reset(){ reset_range(); reset_cur(); }
 			typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::cur_t)const{ return -std::distance(cur, end); }
 			typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::beg_t)const{ return -std::distance(cur, beg); }
 			typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::end_t)const{ return size(); }
@@ -118,6 +140,8 @@ namespace hmLib{
 				End = End_;
 			}
 			operator bool()const override{ return Cur != End; }
+			void set_cur(enumerators::end_t)override{ Cur = End; }
+			void set_end(enumerators::cur_t)override{ End = Cur; }
 			void advance(enumerators::cur_t, difference_type Dif)override{ std::advance(Cur, Dif); }
 			void advance(enumerators::end_t, difference_type Dif)override{ std::advance(End, Dif); }
 			difference_type distance(enumerators::cur_t, enumerators::end_t)const override{ return std::distance(Cur, End); }
@@ -143,6 +167,12 @@ namespace hmLib{
 				End = End_;
 			}
 			operator bool()const override{ return Cur != End; }
+			void set_cur(enumerators::beg_t) override{ Cur = Beg; }
+			void set_cur(enumerators::end_t) override{ Cur = End; }
+			void set_begin(enumerators::cur_t)  override{ Beg = Cur; }
+			void set_begin(enumerators::end_t)  override{ Beg = End; }
+			void set_end(enumerators::beg_t)  override{ End = Beg; }
+			void set_end(enumerators::cur_t)  override{ End = Cur; }
 			void advance(enumerators::beg_t, difference_type Dif)override{ std::advance(Beg, Dif); }
 			void advance(enumerators::cur_t, difference_type Dif)override{ std::advance(Cur, Dif); }
 			void advance(enumerators::end_t, difference_type Dif)override{ std::advance(End, Dif); }
@@ -177,9 +207,18 @@ namespace hmLib{
 				End = End_;
 			}
 			operator bool()const override{ return Cur != End; }
-			void reset_cur()override{ Cur = Beg; }
-			void reset_range()override{ Beg = IniBeg; End = IniEnd; }
-			void reset()override{ reset_range(); base_type::reset(); }
+			void set_cur(enumerators::beg_t) override{ Cur = Beg; }
+			void set_cur(enumerators::end_t) override{ Cur = End; }
+			void set_cur(enumerators::inibeg_t)  override{ Cur = IniBeg; }
+			void set_cur(enumerators::iniend_t)  override{ Cur = IniEnd; }
+			void set_begin(enumerators::cur_t)  override{ Beg = Cur; }
+			void set_begin(enumerators::end_t)  override{ Beg = End; }
+			void set_begin(enumerators::inibeg_t)  override{ Beg = IniBeg; }
+			void set_begin(enumerators::iniend_t)  override{ Beg = IniEnd; }
+			void set_end(enumerators::beg_t)  override{ End = Beg; }
+			void set_end(enumerators::cur_t)  override{ End = Cur; }
+			void set_end(enumerators::inibeg_t)  override{ End = IniBeg; }
+			void set_end(enumerators::iniend_t)  override{ End = IniEnd; }
 			void advance(enumerators::beg_t, difference_type Dif)override{ std::advance(Beg, Dif); }
 			void advance(enumerators::end_t, difference_type Dif)override{ std::advance(End, Dif); }
 			difference_type distance(enumerators::cur_t, enumerators::end_t)const override{ return std::distance(Cur, End); }
