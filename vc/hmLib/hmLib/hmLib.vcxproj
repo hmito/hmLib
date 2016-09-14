@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>
     <RootNamespace>hmLib</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -39,10 +40,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\labuser\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\labuser\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -76,82 +77,64 @@
     <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\circular.hpp" />
+    <ClInclude Include="..\..\..\hmLib\cdeque.h" />
+    <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h" />
-    <ClInclude Include="..\..\..\hmLib\comgate\winRS\winrs.h" />
     <ClInclude Include="..\..\..\hmLib\config_vc.h" />
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
+    <ClInclude Include="..\..\..\hmLib\cqueue.h" />
+    <ClInclude Include="..\..\..\hmLib\cstack.h" />
+    <ClInclude Include="..\..\..\hmLib\cstring.h" />
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
-    <ClInclude Include="..\..\..\hmLib\either.hpp" />
-    <ClInclude Include="..\..\..\hmLib\euclidean.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\algorithm_ability.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumbase.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_defines.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_traits.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\numeric_ability.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\random_algorithm_ability.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\traversal_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions\access_exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions\application_exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions\exception.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions\io_exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions\memory_exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
     <ClInclude Include="..\..\..\hmLib\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib\inquiries.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries\inquiry.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries\inquiry_abstruct.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries\range_inquiry.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries\signaled_contact.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries\signal_inquiry.hpp" />
-    <ClInclude Include="..\..\..\hmLib\inquiries\unique_connections.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\point.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp" />
-    <ClInclude Include="..\..\..\hmLib\math.hpp" />
+    <ClInclude Include="..\..\..\hmLib\iocsv.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lab\enumerators\container_enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lab\enumerators\enumerator.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lab\enumerators\enumerator_interface.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\range_stepper.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\breakable_integrate.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\break_observer.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\eqstate_break_observer.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\iterator_observer.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\container_observer.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\stream_observer.hpp" />
-    <ClInclude Include="..\..\..\hmLib\odeint\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\position.hpp" />
     <ClInclude Include="..\..\..\hmLib\random.hpp" />
-    <ClInclude Include="..\..\..\hmLib\random\random_bits.hpp" />
+    <ClInclude Include="..\..\..\hmLib\random\random_bit.hpp" />
+    <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />
-    <ClInclude Include="..\..\..\hmLib\sequence.hpp" />
     <ClInclude Include="..\..\..\hmLib\signals.hpp" />
-    <ClInclude Include="..\..\..\hmLib\signals\connect.hpp" />
-    <ClInclude Include="..\..\..\hmLib\signals\unique_connections.hpp" />
     <ClInclude Include="..\..\..\hmLib\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\hmLib\stream_utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\table.hpp" />
     <ClInclude Include="..\..\..\hmLib\type.h" />
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\listup_name.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\listup_parameter.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\listup_string_build.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\parameter.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\string_build.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\type_manage.hpp" />
-    <ClInclude Include="..\..\..\hmLib\typemanage\type_name.hpp" />
+    <ClInclude Include="..\..\..\hmLib\type_traits.hpp" />
     <ClInclude Include="..\..\..\hmLib\utility.hpp" />
     <ClInclude Include="..\..\..\hmLib\version.h" />
-    <ClInclude Include="csv.hpp" />
-    <ClInclude Include="either.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\hmLib\cdeque.c" />
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
+    <ClCompile Include="..\..\..\hmLib\cqueue.c" />
+    <ClCompile Include="..\..\..\hmLib\cstack.c" />
+    <ClCompile Include="..\..\..\hmLib\cstring.c" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="lab_enumerator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test1.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
