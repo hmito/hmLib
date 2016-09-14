@@ -49,8 +49,7 @@ namespace hmLib{
 			virtual typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::cur_t)const = 0;
 			virtual typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::end_t)const = 0;
 			virtual typename enumerator_traits_::difference_type size()const = 0;
-			void reset_cur(){ set_cur(enumerators::beg); }
-			void reset(){ reset_cur(); }
+			void reset(){ set_cur(enumerators::beg); }
 			typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::cur_t)const{ return -std::distance(cur, end); }
 			typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::beg_t)const{ return -std::distance(cur, beg); }
 			typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::end_t)const{ return size(); }
@@ -84,11 +83,10 @@ namespace hmLib{
 			virtual typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::iniend_t)const = 0;
 			virtual typename enumerator_traits_::difference_type size()const = 0;
 			virtual typename enumerator_traits_::difference_type initial_size()const = 0;
-			void reset_cur(){ set_cur(enumerators::beg); }
+			void reset(){ set_cur(enumerators::beg); }
 			void reset_begin(){ set_begin(enumerators::inibeg); }
 			void reset_end(){ set_end(enumerators::iniend); }
 			void reset_range(){ reset_begin(); reset_end(); }
-			void reset(){ reset_range(); reset_cur(); }
 			typename enumerator_traits_::difference_type distance(enumerators::end_t, enumerators::cur_t)const{ return -std::distance(cur, end); }
 			typename enumerator_traits_::difference_type distance(enumerators::cur_t, enumerators::beg_t)const{ return -std::distance(cur, beg); }
 			typename enumerator_traits_::difference_type distance(enumerators::beg_t, enumerators::end_t)const{ return size(); }
@@ -179,8 +177,6 @@ namespace hmLib{
 			difference_type distance(enumerators::cur_t, enumerators::end_t)const override{ return std::distance(Cur, End); }
 			difference_type distance(enumerators::beg_t, enumerators::cur_t)const override{ return std::distance(Beg, Cur); }
 			difference_type size()const override{ return std::distance(Beg, End); }
-			void reset_cur()override{ Cur = Beg; }
-			void reset()override{ reset_cur(); }
 		};
 		template<typename enumerator_traits_, typename iterator_, typename interface_>
 		struct mutable_range_enumbase : public interface_{
