@@ -57,9 +57,9 @@ namespace hmLib{
 				result_type accumulate(result_type IniVal)override{ return std::accumulate(base::Beg, base::End, IniVal); }
 				result_type accumulate_front(result_type IniVal)override{ return std::accumulate(base::Beg, base::Cur, IniVal); }
 				result_type accumulate_back(result_type IniVal)override{ return std::accumulate(base::Cur, base::End, IniVal); }
-				result_type accumulate(result_type IniVal, operation_type Operation)override{ return std::accumulate(base::Beg, base::End, Operation); }
-				result_type accumulate_front(result_type IniVal, operation_type Operation)override{ return std::accumulate(base::Beg, base::Cur, Operation); }
-				result_type accumulate_back(result_type IniVal, operation_type Operation)override{ return  std::accumulate(base::Cur, base::End, Operation); }
+				result_type accumulate(result_type IniVal, operation_type Operation)override{ return std::accumulate(base::Beg, base::End, IniVal, Operation); }
+				result_type accumulate_front(result_type IniVal, operation_type Operation)override{ return std::accumulate(base::Beg, base::Cur, IniVal, Operation); }
+				result_type accumulate_back(result_type IniVal, operation_type Operation)override{ return  std::accumulate(base::Cur, base::End, IniVal, Operation); }
 			};
 		};
 	}
