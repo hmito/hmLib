@@ -11,8 +11,7 @@ namespace hmLib{
 		struct all_of_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "all_of_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -33,7 +32,7 @@ namespace hmLib{
 				using pred_type = std::function<bool(const value_type&) >;
 			public:
 				bool all_of_back(pred_type Pred)override{ return std::all_of(base::Cur, base::End, Pred); }
-				bool anu_of_back(pred_type Pred)override{ return std::any_of(base::Cur, base::End, Pred); }
+				bool any_of_back(pred_type Pred)override{ return std::any_of(base::Cur, base::End, Pred); }
 				bool none_of_back(pred_type Pred)override{ return std::none_of(base::Cur, base::End, Pred); }
 			};
 			template<typename enumerator_traits>
@@ -72,8 +71,7 @@ namespace hmLib{
 		struct find_ability{
 			template<typename enumerator_traits,typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "find_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -125,8 +123,7 @@ namespace hmLib{
 		struct count_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "count_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -182,8 +179,7 @@ namespace hmLib{
 		struct for_each_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "for_each_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -201,7 +197,7 @@ namespace hmLib{
 				using value_type = typename enumerator_traits::value_type;
 				using operation_type = std::function<void(const value_type&) >;
 			public:
-				void for_each_back(operation_type Operator)override{  std::for_each_if(base::Cur, base::End, Operator); }
+				void for_each_back(operation_type Operator)override{  std::for_each(base::Cur, base::End, Operator); }
 			};
 			template<typename enumerator_traits>
 			struct ability_interface<enumerator_traits, range_enumerator_tag>{
@@ -227,8 +223,7 @@ namespace hmLib{
 		struct sort_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "sort ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -262,8 +257,7 @@ namespace hmLib{
 		struct equal_range_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "equal_range_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -321,8 +315,7 @@ namespace hmLib{
 		struct minmax_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "minmax_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -349,14 +342,14 @@ namespace hmLib{
 				using reference = typename enumerator_traits::reference;
 				using compare_type = std::function<bool(const value_type&, const value_type&) >;
 			public:
-				reference min_back()override{ return std::min(base::Cur, base::End); }
-				reference min_back_if(compare_type Compare)override{ return std::min(base::Cur, base::End, Compare); }
-				reference max_back()override{ return std::max(base::Cur, base::End); }
-				reference max_back_if(compare_type Compare)override{ return std::max(base::Cur, base::End, Compare); }
-				void min_element_back()override{ base::Cur = std::min(base::Cur, base::End); }
-				void min_element_back_if(compare_type Compare)override{ base::Cur = std::min(base::Cur, base::End, Compare); }
-				void max_element_back()override{ base::Cur = std::max(base::Cur, base::End); }
-				void max_element_back_if(compare_type Compare)override{ base::Cur = std::max(base::Cur, base::End, Compare); }
+				reference min_back()override{ return *std::min_element(base::Cur, base::End); }
+				reference min_back_if(compare_type Compare)override{ return *std::min_element(base::Cur, base::End, Compare); }
+				reference max_back()override{ return *std::max_element(base::Cur, base::End); }
+				reference max_back_if(compare_type Compare)override{ return *std::max_element(base::Cur, base::End, Compare); }
+				void min_element_back()override{ base::Cur = std::min_element(base::Cur, base::End); }
+				void min_element_back_if(compare_type Compare)override{ base::Cur = std::min_element(base::Cur, base::End, Compare); }
+				void max_element_back()override{ base::Cur = std::max_element(base::Cur, base::End); }
+				void max_element_back_if(compare_type Compare)override{ base::Cur = std::max_element(base::Cur, base::End, Compare); }
 			};
 			template<typename enumerator_traits>
 			struct ability_interface<enumerator_traits, range_enumerator_tag>{
@@ -426,10 +419,9 @@ namespace hmLib{
 		struct remove_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "remove_ability cannot be used in this enumerator_category.");
 			};
-			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, range_enumerator_tag>::type >
+			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
 			template<typename enumerator_traits>
 			struct ability_interface<enumerator_traits, sentinel_enumerator_tag>{
@@ -479,10 +471,9 @@ namespace hmLib{
 		struct unique_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "unique_ability cannot be used in this enumerator_category.");
 			};
-			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, range_enumerator_tag>::type >
+			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
 			template<typename enumerator_traits>
 			struct ability_interface<enumerator_traits, sentinel_enumerator_tag>{
@@ -532,8 +523,7 @@ namespace hmLib{
 		struct fill_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "fill_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};
@@ -573,8 +563,7 @@ namespace hmLib{
 		struct generate_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "generate_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};

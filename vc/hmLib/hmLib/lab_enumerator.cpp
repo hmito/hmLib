@@ -19,13 +19,15 @@ int func_itr(iterator Beg, iterator End){
 	return std::accumulate(Beg, End,0);
 }
 namespace hmenum = hmLib::enumerators;
-using this_enumerator = hmLib::random_access_enumerator<int, 
-	hmenum::all_of_ability, 
-	hmenum::generate_ability, 
-	hmenum::fill_ability, 
+using this_enumerator = hmLib::enumerator<int,
+	hmLib::mutable_range_enumerator_tag,
+	hmenum::forward_traversal_ability, 
+	hmenum::sort_ability,
 	hmenum::shuffle_ability,
-	hmenum::sort_ability, 
-	hmenum::unique_ability, 
+	hmenum::all_of_ability,
+	hmenum::generate_ability,
+	hmenum::fill_ability,
+	hmenum::unique_ability,
 	hmenum::remove_ability,
 	hmenum::count_ability,
 	hmenum::for_each_ability,
@@ -37,11 +39,11 @@ int func_enm(iterator Beg, iterator End){
 	return func_enm(this_enumerator::make_enumerator(Beg, End));
 }
 int func_enm(this_enumerator& Enm){
-	Enm.unique();
-	Enm.remove_if([](int val){return val % 2 != 0; });
-	Enm.sort();
-	Enm.for_each([](int val){val += 3; });
-	return Enm.accumulate(0);
+	Enm.unique_back();
+	Enm.remove_back_if([](int val){return val % 2 != 0; });
+	Enm.sort_back();
+	Enm.for_each_back([](int val){val += 3; });
+	return Enm.accumulate_back(0);
 }
 
 

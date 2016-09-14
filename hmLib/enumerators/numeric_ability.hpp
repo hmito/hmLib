@@ -12,8 +12,7 @@ namespace hmLib{
 		struct accumulate_ability{
 			template<typename enumerator_traits, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_interface{
-			private:
-				ability_interface();
+				static_assert(!std::is_void<enumerator_category>::value, "accumulate_ability cannot be used in this enumerator_category.");
 			};
 			template<typename enumerator_traits, typename base, typename enumerator_category = typename near_base_of<typename enumerator_traits::enumerator_tag, sentinel_enumerator_tag, range_enumerator_tag>::type >
 			struct ability_impl : public base{};

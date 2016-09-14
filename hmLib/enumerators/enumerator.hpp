@@ -33,8 +33,6 @@ namespace hmLib{
 	public:
 		template<typename iterator_>
 		using enumbase = typename enumerators::enumbase_from_tag<enumerator_traits, iterator_, this_type>::type;
-		//ここでエラー　this_typeは不完全型なので、enumbaseも不完全型
-		//にもかかわらず、enumbaseを使ってimplを作るので、コンパイルエラーになるっぽい
 	public:
 		template<typename iterator_>
 		struct impl : public enumerators::enumerator_impl_pack<enumerator_traits, enumbase<iterator_>, abilities...>{};

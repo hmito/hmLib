@@ -216,6 +216,7 @@ namespace hmLib{
 			void set_end(enumerators::inibeg_t)  override{ End = IniBeg; }
 			void set_end(enumerators::iniend_t)  override{ End = IniEnd; }
 			void advance(enumerators::beg_t, difference_type Dif)override{ std::advance(Beg, Dif); }
+			void advance(enumerators::cur_t, difference_type Dif)override{ std::advance(Cur, Dif); }
 			void advance(enumerators::end_t, difference_type Dif)override{ std::advance(End, Dif); }
 			difference_type distance(enumerators::cur_t, enumerators::end_t)const override{ return std::distance(Cur, End); }
 			difference_type distance(enumerators::beg_t, enumerators::cur_t)const override{ return std::distance(Beg, Cur); }
