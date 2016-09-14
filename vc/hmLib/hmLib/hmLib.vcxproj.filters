@@ -183,6 +183,12 @@
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_defines.hpp">
       <Filter>hmLib\enumerators</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators\numeric_ability.hpp">
+      <Filter>hmLib\enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\enumerators\random_algorithm_ability.hpp">
+      <Filter>hmLib\enumerators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c">

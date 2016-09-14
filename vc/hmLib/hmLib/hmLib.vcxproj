@@ -42,6 +42,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -91,6 +94,8 @@
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_defines.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumerator_traits.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\numeric_ability.hpp" />
+    <ClInclude Include="..\..\..\hmLib\enumerators\random_algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\traversal_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
