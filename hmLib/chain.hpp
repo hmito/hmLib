@@ -36,7 +36,6 @@ namespace hmLib{
 		};
 	public:
 		struct iterator:public std::iterator<std::bidirectional_iterator_tag,T>{
-			friend struct const_iterator;
 		private:
 			element* Cur;
 		public:
@@ -78,6 +77,8 @@ namespace hmLib{
 			friend bool operator!=(const iterator& Itr1, const iterator& Itr2){
 				return Itr1.Cur != Itr2.Cur;
 			}
+		public:
+			element* current(){ return Cur; }
 		};
 		struct const_iterator :public std::iterator<std::bidirectional_iterator_tag, const T>{
 		private:
@@ -85,7 +86,7 @@ namespace hmLib{
 		public:
 			const_iterator() :Cur(0){}
 			explicit const_iterator(element* Cur_) :Cur(Cur_){}
-			const_iterator(const iterator& Other) :Cur(Other.Cur){}
+			const_iterator(const iterator& Other) :Cur(Other.current()){}
 			const_iterator(const const_iterator& Other) :Cur(Other.Cur){}
 			const_iterator& operator=(const iterator& Other){
 				if(this != &Other){
@@ -120,6 +121,8 @@ namespace hmLib{
 			friend bool operator!=(const iterator& Itr1, const iterator& Itr2){
 				return Itr1.Cur != Itr2.Cur;
 			}
+		public:
+			element* current(){ return Cur; }
 		};
 	private:
 		element Sentinel;
@@ -139,24 +142,72 @@ namespace hmLib{
 	public:
 		bool empty(){ return Size==0; }
 		size_type size(){ return Size; }
-		T& front();
-		T& back();
-		const T& front()const;
-		const T& back()const;
+		T& front(){ return *(Sentinel.next); }
+		T& back(){ return *(Sentinel.prev); }
+		const T& front()const{ return *(Sentinel.next); }
+		const T& back()const{ return *(Sentinel.prev); }
 		void push_back(element& Elem){
 			element& Prev = *(Sentinel.prev);
 			element::connect(Prev, Elem);
 			element::connect(Elem, Sentinel);
 		}
-		void pop_back();
-		void push_front(element& Elem);
-		void pop_front();
-		iterator insert(const_iterator pos, element& Elem);
-		iterator erase(const_iterator pos);
-		iterator erase(const_iterator pos, const_iterator last);
-		void swap(this_type& other);
-		void clear();
-		void splice(const_iterator pos, this_type& other);
+		void pop_back(){
+			element& Prev = *(Sentinel.prev);
+			element::connect(*(Prev.prev), Sentinel);
+			Prev.next = 0;
+			Prev.prev = 0;
+		}
+		void push_front(element& Elem){
+			element& Next = *(Sentinel.next);
+			element::connect(Sentinel, Elem);
+			element::connect(Elem, Next);
+		}
+		void pop_front(){
+			element& Next = *(Sentinel.next);
+			element::connect(Sentinel, *(Next.next));
+			Next.next = 0;
+			Next.prev = 0;
+		}
+		iterator insert(const_iterator pos, element& Elem){
+			element& Curr = pos.current();
+			element::connect(*(Curr.prev), Elem);
+			element::connect(Elem, Curr);
+		}
+		iterator erase(const_iterator pos){
+			element& Curr = pos.current();
+			element::connect(*(Curr.prev), *(Curr.next));
+			Curr.next = 0;
+			Curr.prev = 0;
+		}
+		iterator erase(const_iterator pos, const_iterator last){
+			element& Prev = *(pos.current().prev);
+
+			for(; pos != last; ++pos){
+				element& Curr = pos.current();
+				Curr.next = 0;
+				Curr.prev = 0;
+			}
+
+			element::connect(Prev, last.current());
+		}
+		void swap(this_type& other){
+			std::swap(Sentinel.prev, other.Sentinel.prev);
+			std::swap(Sentinel.next, other.Sentinel.next);
+		}
+		void clear(){
+			erase(begin(), end());
+		}
+		void splice(const_iterator pos, this_type& other){
+			if(other.empty())return;
+
+			element& Prev = *(pos.current().prev);
+			element& Curr = *(pos.current());
+
+			element::connect(Prev, *(other.Sentinel.next));
+			element::connect(*(other.Sentinel.prev), Curr);
+			other.Sentinel.next = &(other.Sentinel);
+			other.Sentinel.prev = &(other.Sentinel);
+		}
 	};
 	template<typename T, typename Comp = std::less<T>>
 	struct priority_chain{
