@@ -177,6 +177,9 @@
     <ClInclude Include="..\..\..\hmLib\enumerators\random_algorithm_ability.hpp">
       <Filter>hmLib\enumerators</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\chain.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">

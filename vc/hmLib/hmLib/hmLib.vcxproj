@@ -77,6 +77,7 @@
     <ClInclude Include="..\..\..\hmLib\any_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\array_queue.hpp" />
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\chain.hpp" />
     <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
