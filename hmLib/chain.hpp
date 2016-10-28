@@ -142,63 +142,94 @@ namespace hmLib{
 	public:
 		bool empty(){ return Size==0; }
 		size_type size(){ return Size; }
-		T& front(){ return *(Sentinel.next); }
-		T& back(){ return *(Sentinel.prev); }
-		const T& front()const{ return *(Sentinel.next); }
-		const T& back()const{ return *(Sentinel.prev); }
+		T& front(){ return *(*(Sentinel.next)); }
+		T& back(){ return *(*(Sentinel.prev)); }
+		const T& front()const{ return *(*(Sentinel.next)); }
+		const T& back()const{ return *(*(Sentinel.prev)); }
 		void push_back(element& Elem){
 			element& Prev = *(Sentinel.prev);
 			element::connect(Prev, Elem);
 			element::connect(Elem, Sentinel);
+
+			++Size;
 		}
 		void pop_back(){
+			if(empty())return;
+
 			element& Prev = *(Sentinel.prev);
 			element::connect(*(Prev.prev), Sentinel);
 			Prev.next = 0;
 			Prev.prev = 0;
+
+			--Size;
 		}
 		void push_front(element& Elem){
 			element& Next = *(Sentinel.next);
 			element::connect(Sentinel, Elem);
 			element::connect(Elem, Next);
+
+			++Size;
 		}
 		void pop_front(){
+			if(empty())return;
+
 			element& Next = *(Sentinel.next);
 			element::connect(Sentinel, *(Next.next));
 			Next.next = 0;
 			Next.prev = 0;
+
+			--Size;
 		}
 		iterator insert(const_iterator pos, element& Elem){
 			element& Curr = pos.current();
 			element::connect(*(Curr.prev), Elem);
 			element::connect(Elem, Curr);
+
+			++Size;
+
+			return iterator(Curr.prev);
 		}
 		iterator erase(const_iterator pos){
+			if(pos == end())return;
+
 			element& Curr = pos.current();
+			element& Next = *(Curr.next);
 			element::connect(*(Curr.prev), *(Curr.next));
 			Curr.next = 0;
 			Curr.prev = 0;
+
+			--Size;
+
+			return iterator(&Next);
 		}
 		iterator erase(const_iterator pos, const_iterator last){
+			if(pos == end())return;
+
 			element& Prev = *(pos.current().prev);
 
 			for(; pos != last; ++pos){
 				element& Curr = pos.current();
 				Curr.next = 0;
 				Curr.prev = 0;
+
+				--Size;
 			}
 
 			element::connect(Prev, last.current());
+			return iterator(last.current());
 		}
 		void swap(this_type& other){
 			std::swap(Sentinel.prev, other.Sentinel.prev);
 			std::swap(Sentinel.next, other.Sentinel.next);
+			std::swap(Size, other.Size);
 		}
 		void clear(){
 			erase(begin(), end());
+			Size = 0;
 		}
 		void splice(const_iterator pos, this_type& other){
 			if(other.empty())return;
+			auto AddSize = other.size();
 
 			element& Prev = *(pos.current().prev);
 			element& Curr = *(pos.current());
@@ -207,6 +238,8 @@ namespace hmLib{
 			element::connect(*(other.Sentinel.prev), Curr);
 			other.Sentinel.next = &(other.Sentinel);
 			other.Sentinel.prev = &(other.Sentinel);
+
+			Size += AddSize;
 		}
 	};
 	template<typename T, typename Comp = std::less<T>>
