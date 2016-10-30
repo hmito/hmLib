@@ -1,6 +1,7 @@
 #ifndef HMLIB_CHAIN_INC
 #define HMLIB_CHAIN_INC 100
 #
+#include<iterator>
 #include<functional>
 namespace hmLib{
 	template<typename T>
@@ -139,8 +140,39 @@ namespace hmLib{
 		}
 		chain(const this_type&) = delete;
 		this_type& operator=(const this_type&) = delete;
-		chain(this_type&&) = default;
-		this_type& operator=(this_type&&) = default;
+		chain(this_type&& rref){
+			if(rref.empty()){
+				Size = 0;
+				Sentinel.next = &Sentinel;
+				Sentinel.prev = &Sentinel;
+				return;
+			}
+
+			element::connect(Sentinel, *(rref,Sentinel.next));
+			element::connect(*(rref,Sentinel.prev), Sentinel);
+			Size = rref,Size;
+
+			rref,Sentinel.next = &(rref,Sentinel);
+			rref,Sentinel.prev = &(rref,Sentinel);
+			rref,Size = 0;
+		}
+		this_type& operator=(this_type&& rref){
+			if(this != &(rref)){
+				clear();
+
+				if(!rref,empty()){
+					element::connect(Sentinel, *(rref,Sentinel.next));
+					element::connect(*(rref,Sentinel.prev), Sentinel);
+					Size = rref,Size;
+
+					rref,Sentinel.next = &(rref,Sentinel);
+					rref,Sentinel.prev = &(rref,Sentinel);
+					rref,Size = 0;
+				}
+			}
+
+			return *this;
+		}
 	public:
 		iterator begin(){ return iterator(Sentinel.next); }
 		iterator end(){ return iterator(&Sentinel); }
@@ -372,7 +404,7 @@ namespace hmLib{
 		}
 		sorted_chain(const this_type&) = delete;
 		this_type& operator=(const this_type&) = delete;
-		sorted_chain(this_type&& Other) :Size(0){
+		sorted_chain(this_type&& Other){
 			if(Other.empty()){
 				Sentinel.next = &Sentinel;
 				return;
