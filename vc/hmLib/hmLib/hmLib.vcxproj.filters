@@ -45,9 +45,6 @@
     <ClInclude Include="..\..\..\hmLib\bufgate.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cdeque.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\color.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -58,15 +55,6 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cqueue.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cstack.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\cstring.h">
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\date.hpp">
@@ -189,24 +177,15 @@
     <ClInclude Include="..\..\..\hmLib\enumerators\random_algorithm_ability.hpp">
       <Filter>hmLib\enumerators</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\chain.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\hmLib\cdeque.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp">
-      <Filter>hmLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\cqueue.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\cstack.c">
-      <Filter>hmLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\hmLib\cstring.c">
       <Filter>hmLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp">
