@@ -1,3 +1,6 @@
+#ifndef HMLIB_CHAIN_INC
+#define HMLIB_CHAIN_INC 100
+#
 #include<functional>
 namespace hmLib{
 	template<typename T>
@@ -35,6 +38,7 @@ namespace hmLib{
 			}
 		};
 	public:
+		struct const_iterator;
 		struct iterator:public std::iterator<std::bidirectional_iterator_tag,T>{
 		private:
 			element* Cur;
@@ -71,6 +75,7 @@ namespace hmLib{
 			const T& operator*()const{ return Cur->operator*(); }
 			T* operator->(){ return Cur->operator->(); }
 			const T* operator->()const{ return Cur->operator->(); }
+			operator const_iterator();
 			friend bool operator==(const iterator& Itr1, const iterator& Itr2){
 				return Itr1.Cur == Itr2.Cur;
 			}
@@ -78,7 +83,7 @@ namespace hmLib{
 				return Itr1.Cur != Itr2.Cur;
 			}
 		public:
-			element* current(){ return Cur; }
+			element* current()const{ return Cur; }
 		};
 		struct const_iterator :public std::iterator<std::bidirectional_iterator_tag, const T>{
 		private:
@@ -88,7 +93,7 @@ namespace hmLib{
 			explicit const_iterator(element* Cur_) :Cur(Cur_){}
 			const_iterator(const iterator& Other) :Cur(Other.current()){}
 			const_iterator(const const_iterator& Other) :Cur(Other.Cur){}
-			const_iterator& operator=(const iterator& Other){
+			const_iterator& operator=(const const_iterator& Other){
 				if(this != &Other){
 					Cur = Other.Cur;
 				}
@@ -115,10 +120,10 @@ namespace hmLib{
 			}
 			const T& operator*()const{ return Cur->operator*(); }
 			const T* operator->()const{ return Cur->operator->(); }
-			friend bool operator==(const iterator& Itr1, const iterator& Itr2){
+			friend bool operator==(const const_iterator& Itr1, const const_iterator& Itr2){
 				return Itr1.Cur == Itr2.Cur;
 			}
-			friend bool operator!=(const iterator& Itr1, const iterator& Itr2){
+			friend bool operator!=(const const_iterator& Itr1, const const_iterator& Itr2){
 				return Itr1.Cur != Itr2.Cur;
 			}
 		public:
@@ -132,6 +137,10 @@ namespace hmLib{
 			Sentinel.next = &Sentinel;
 			Sentinel.prev= &Sentinel;
 		}
+		chain(const this_type&) = delete;
+		this_type& operator=(const this_type&) = delete;
+		chain(this_type&&) = default;
+		this_type& operator=(this_type&&) = default;
 	public:
 		iterator begin(){ return iterator(Sentinel.next); }
 		iterator end(){ return iterator(&Sentinel); }
@@ -181,7 +190,7 @@ namespace hmLib{
 			--Size;
 		}
 		iterator insert(const_iterator pos, element& Elem){
-			element& Curr = pos.current();
+			element& Curr = *pos.current();
 			element::connect(*(Curr.prev), Elem);
 			element::connect(Elem, Curr);
 
@@ -190,9 +199,9 @@ namespace hmLib{
 			return iterator(Curr.prev);
 		}
 		iterator erase(const_iterator pos){
-			if(pos == end())return;
+			if(pos == end())return end();
 
-			element& Curr = pos.current();
+			element& Curr = *pos.current();
 			element& Next = *(Curr.next);
 			element::connect(*(Curr.prev), *(Curr.next));
 			Curr.next = 0;
@@ -203,19 +212,20 @@ namespace hmLib{
 			return iterator(&Next);
 		}
 		iterator erase(const_iterator pos, const_iterator last){
-			if(pos == end())return;
+			if(pos == end())return end();
 
-			element& Prev = *(pos.current().prev);
+			element& Prev = *(pos.current()->prev);
 
-			for(; pos != last; ++pos){
-				element& Curr = pos.current();
+			while(pos != last){
+				element& Curr = *(pos.current());
+				++pos;
+
 				Curr.next = 0;
 				Curr.prev = 0;
-
 				--Size;
 			}
 
-			element::connect(Prev, last.current());
+			element::connect(Prev, *(last.current()));
 			return iterator(last.current());
 		}
 		void swap(this_type& other){
@@ -225,7 +235,6 @@ namespace hmLib{
 		}
 		void clear(){
 			erase(begin(), end());
-			Size = 0;
 		}
 		void splice(const_iterator pos, this_type& other){
 			if(other.empty())return;
@@ -242,15 +251,20 @@ namespace hmLib{
 			Size += AddSize;
 		}
 	};
+	template<typename T>
+	chain<T>::iterator::operator typename hmLib::chain<T>::const_iterator(){
+		return hmLib::chain<T>::const_iterator(current());
+	}
+	
 	template<typename T, typename compare_ = std::less<T>>
-	struct priority_chain{
+	struct sorted_chain{
 	public:
-		using this_type = chain<T>;
+		using this_type = sorted_chain<T>;
 		using size_type = unsigned int;
 		using compare = compare_;
 	public:
 		struct element{
-			friend struct chain<T>;
+			friend struct sorted_chain<T>;
 		private:
 			T value;
 			element *next;
@@ -276,6 +290,7 @@ namespace hmLib{
 			}
 		};
 	public:
+		struct const_iterator;
 		struct iterator :public std::iterator<std::forward_iterator_tag, T>{
 		private:
 			element* Cur;
@@ -303,6 +318,7 @@ namespace hmLib{
 			const T& operator*()const{ return Cur->operator*(); }
 			T* operator->(){ return Cur->operator->(); }
 			const T* operator->()const{ return Cur->operator->(); }
+			operator const_iterator();
 			friend bool operator==(const iterator& Itr1, const iterator& Itr2){
 				return Itr1.Cur == Itr2.Cur;
 			}
@@ -310,7 +326,7 @@ namespace hmLib{
 				return Itr1.Cur != Itr2.Cur;
 			}
 		public:
-			element* current(){ return Cur; }
+			element* current()const{ return Cur; }
 		};
 		struct const_iterator :public std::iterator<std::forward_iterator_tag, const T>{
 		private:
@@ -320,7 +336,7 @@ namespace hmLib{
 			explicit const_iterator(element* Cur_) :Cur(Cur_){}
 			const_iterator(const iterator& Other) :Cur(Other.current()){}
 			const_iterator(const const_iterator& Other) :Cur(Other.Cur){}
-			const_iterator& operator=(const iterator& Other){
+			const_iterator& operator=(const const_iterator& Other){
 				if(this != &Other){
 					Cur = Other.Cur;
 				}
@@ -338,10 +354,10 @@ namespace hmLib{
 			}
 			const T& operator*()const{ return Cur->operator*(); }
 			const T* operator->()const{ return Cur->operator->(); }
-			friend bool operator==(const iterator& Itr1, const iterator& Itr2){
+			friend bool operator==(const const_iterator& Itr1, const const_iterator& Itr2){
 				return Itr1.Cur == Itr2.Cur;
 			}
-			friend bool operator!=(const iterator& Itr1, const iterator& Itr2){
+			friend bool operator!=(const const_iterator& Itr1, const const_iterator& Itr2){
 				return Itr1.Cur != Itr2.Cur;
 			}
 		public:
@@ -351,6 +367,47 @@ namespace hmLib{
 		element Sentinel;
 		compare Comp;
 	public:
+		sorted_chain(){
+			Sentinel.next = &Sentinel;
+		}
+		sorted_chain(const this_type&) = delete;
+		this_type& operator=(const this_type&) = delete;
+		sorted_chain(this_type&& Other) :Size(0){
+			if(Other.empty()){
+				Sentinel.next = &Sentinel;
+				return;
+			}
+
+			element& Cur = Other.Sentinel;
+			while(Cur.next != Other.Sentinel){
+				Cur = *(Cur.next);
+			}
+
+			Sentinel.next = Other.Sentinel.next;
+			Cur.next = &Sentinel.next;
+
+			Other.Sentinel.next = &(Other.Sentinel);
+		}
+		this_type& operator=(this_type&& Other){
+			if(this != &Other){
+				clear();
+				
+				if(Other.empty())return;
+
+				element& Cur = Other.Sentinel;
+				while(Cur.next != Other.Sentinel){
+					Cur = *(Cur.next);
+				}
+
+				Sentinel.next = Other.Sentinel.next;
+				Cur.next = &Sentinel.next;
+
+				Other.Sentinel.next = &(Other.Sentinel);
+			}
+
+			return *this;
+		}
+	public:
 		iterator begin(){ return iterator(Sentinel.next); }
 		iterator end(){ return iterator(&Sentinel); }
 		const_iterator cbegin()const{ return const_iterator(Sentinel.next); }
@@ -359,9 +416,29 @@ namespace hmLib{
 		const_iterator end()const{ return cend(); }
 	public:
 		bool empty(){ return Sentinel.next == &Sentinel; }
-		T& front(){ return *(*(Sentinel.next)); }
-		const T& front()const{ return *(*(Sentinel.next)); }
-		void push(element& Elem);
+		T& next(){ return *(*(Sentinel.next)); }
+		const T& next()const{ return *(*(Sentinel.next)); }
+		void push(element& Elem){
+			element* p1 = Sentinel.next; 
+			element* p2 = &Sentinel;
+			while(true){
+				//check with p2 < Elem < p1?
+				if(p1 == &Sentinel || Comp(*Elem, *(*p1))){
+					element::connect(*p2, Elem);
+					element::connect(Elem, *p1);
+					return;
+				}
+				p2 = p1->next;
+
+				//check with p1 < Elem < p2?
+				if(p2 == &Sentinel || Comp(*Elem, *(*p2))){
+					element::connect(*p1, Elem);
+					element::connect(Elem, *p2);
+					return;
+				}
+				p1 = p2->next;
+			}
+		}
 		void pop(){
 			element& Next = *(Sentinel.next);
 			element::connect(Sentinel, *(Next.next));
@@ -371,6 +448,32 @@ namespace hmLib{
 			std::swap(Sentinel.next, other.Sentinel.next);
 			std::swap(Size, other.Size);
 		}
-		void clear();
+		void clear(){
+			element* p1 = Sentinel.next;
+			element* p2 = &Sentinel;
+			while(true){
+				//check with p1 == end?
+				if(p1 == &Sentinel){
+					Sentinel.next = &Sentinel;
+					return;
+				}
+				p2 = p1->next;
+				p1->next = 0;
+
+				//check with p2 == end?
+				if(p2 == &Sentinel){
+					Sentinel.next = &Sentinel;
+					return;
+				}
+				p1 = p2->next;
+				p2->next = 0;
+			}
+		}
 	};
+	template<typename T,typename compare_>
+	sorted_chain<T, compare_>::iterator::operator typename hmLib::sorted_chain<T, compare_>::const_iterator(){
+		return hmLib::sorted_chain<T>::const_iterator(current());
+	}
 }
+#
+#endif
