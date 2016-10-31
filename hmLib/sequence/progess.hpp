@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_SEQUENCE_INC
-#define HMLIB_SEQUENCE_INC 100
+﻿#ifndef HMLIB_SEQUENCE_PROGRESS_INC
+#define HMLIB_SEQUENCE_PROGRESS_INC 100
 #
 namespace hmLib{
 	namespace sequence{
