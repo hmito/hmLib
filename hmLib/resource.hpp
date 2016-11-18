@@ -1,46 +1,64 @@
 #ifndef HMLIB_UNIQUERESOURCE_INC
 #define HMLIB_UNIQUERESOURCE_INC 100
+#include<boost/optional.hpp>
 #
 namespace hmLib{
-	template<typename value_type_, value_type_ nullvalue_, typename releaser_>
+	template<typename value_type_, typename releaser_>
 	struct unique_resource{
 	public:
 		using this_type = unique_resource<value_type_, releaser_>;
 		using value_type = value_type_;
+		using optvalue_type = boost::optional<value_type>;
 		using releaser = releaser_;
 	private:
-		value_type Value;
+		optvalue_type OptValue;
 		releaser Releaser;
 	public:
-		unique_resource():Value(nullvalue_){}
+		unique_resource() = default;
 		unique_resource(value_type Value_, releaser Releaser_ = releaser())
-			: Value(std::move(Value_))
-			, Releaser(std::move(Releaser_)){
-		}
+			: OptValue(std::move(Value_))
+			, Releaser(std::move(Releaser_)){}
 		unique_resource(const this_type&) = delete;
-		this_type& opearator=(const this_type&) = delete;
-		unique_resource(this_type&&) = default;
-		this_type& opearator=(this_type&&) = default;
-		~unique_resource(){clear();}
+		this_type& operator = (const this_type&) = delete;
+		unique_resource(this_type&& Other_)noexcept{
+			swap(Other_);
+		}
+		this_type& operator = (this_type&& Other_)noexcept{
+			if(this != &Other_){
+				swap(Other_);
+			}
+
+			return *this;
+		}
+		~unique_resource(){ reset(); }
 	public:
-		operator bool()const{return Value != nullvalue_;}
-		void reset(){if(Value!=nullvalue_)Releaser(Value);}
+		operator bool(){ return static_cast<bool>(OptValue); }
+		void reset(){
+			if(OptValue){
+				Releaser(*OptValue);
+				OptValue.reset();
+			}
+		}
 		void reset(value_type Value_, releaser Releaser_ = releaser()){
-			reset();
-			Value = std::move(Value_);
+			if(OptValue){
+				Releaser(*OptValue);
+			}
+
+			OptValue.emplace(std::move(Value_));
 			Releaser = std::move(Releaser_);
 		}
 		value_type release(){
-			value_type Ans = std::move(Value);
-			Value = nullvalue_;
+			if(!OptValue)return value_type();
+			value_type Ans = std::move(*OptValue);
+			OptValue.reset();
 			return std::move(Ans);
 		}
-		void swap(this_type& Other){
-			std::swap(Value,Other.Value);
-			std::swap(Releaser,Other.Releaser);
+		void swap(this_type& Other_){
+			OptValue.swap(Other_.OptValue);
+			std::swap(Releaser, Other_.Releaser);
 		}
-		value_type get(){return Value;}
-		const value_type& ref()const{return Value;}
+		value_type get(){return *OptValue;}
+		const value_type& ref()const{return *OptValue;}
 	public:
 		friend bool operator==(const this_type& v1, const this_type& v2){
 			return v1.ref() == v2.ref();
@@ -49,55 +67,10 @@ namespace hmLib{
 			return v1.ref() != v2.ref();
 		}
 	};
-	template<typename value_type_, value_type_ nullvalue_, typename releaser_>
-	unique_resource<value_type_,nullvalue_,releaser_> make_resource(value_type Value_, ){}
-	template<typename value_type_, value_type_ nullvalue_, typename releaser_>
-	struct shared_resource{
-	public:
-		using this_type = unique_resource<value_type_, releaser_>;
-		using value_type = value_type_;
-		using releaser = releaser_;
-	private:
-		value_type Value;
-		releaser Releaser;
-	public:
-		unique_resource():Value(nullvalue_){}
-		unique_resource(value_type Value_, releaser Releaser_ = releaser())
-			: Value(std::move(Value_))
-			, Releaser(std::move(Releaser_)){
-		}
-		unique_resource(const this_type&) = delete;
-		this_type& opearator=(const this_type&) = delete;
-		unique_resource(this_type&&) = default;
-		this_type& opearator=(this_type&&) = default;
-		~unique_resource(){clear();}
-	public:
-		operator bool()const{return Value != nullvalue_;}
-		void reset(){if(Value!=nullvalue_)Releaser(Value);}
-		void reset(value_type Value_, releaser Releaser_ = releaser()){
-			reset();
-			Value = std::move(Value_);
-			Releaser = std::move(Releaser_);
-		}
-		value_type release(){
-			value_type Ans = std::move(Value);
-			Value = nullvalue_;
-			return std::move(Ans);
-		}
-		void swap(this_type& Other){
-			std::swap(Value,Other.Value);
-			std::swap(Releaser,Other.Releaser);
-		}
-		value_type get(){return Value;}
-		const value_type& ref()const{return Value;}
-	public:
-		friend bool operator==(const this_type& v1, const this_type& v2){
-			return v1.ref() == v2.ref();
-		}
-		friend bool operator!=(const this_type& v1, const this_type& v2){
-			return v1.ref() != v2.ref();
-		}
-	};
+	template<typename value_type_, typename releaser_>
+	unique_resource<value_type_, releaser_> make_resource(value_type_ Value_, releaser_ Releaser_){
+		return unique_resource<value_type_, releaser_>(std::move(Value_), std::move(Releaser_));
+	}
 }
 #
 #endif

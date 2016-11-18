@@ -85,6 +85,7 @@
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
     <ClInclude Include="..\..\..\hmLib\date.hpp" />
     <ClInclude Include="..\..\..\hmLib\debugstream.hpp" />
+    <ClInclude Include="..\..\..\hmLib\either.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\hmLib\enumerators\enumbase.hpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="..\..\..\hmLib\random\random_bitset.hpp" />
     <ClInclude Include="..\..\..\hmLib\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\hmLib\rectangle.hpp" />
+    <ClInclude Include="..\..\..\hmLib\resource.hpp" />
     <ClInclude Include="..\..\..\hmLib\signals.hpp" />
     <ClInclude Include="..\..\..\hmLib\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\hmLib\stream_utility.hpp" />

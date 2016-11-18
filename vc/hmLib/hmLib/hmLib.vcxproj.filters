@@ -180,6 +180,12 @@
     <ClInclude Include="..\..\..\hmLib\chain.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\resource.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\either.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
