@@ -173,6 +173,7 @@
     <ClCompile Include="test_euclidean.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
     <ClCompile Include="test_odeint.cpp" />
+    <ClCompile Include="test_resource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test1.csv" />
