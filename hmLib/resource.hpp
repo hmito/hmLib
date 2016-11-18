@@ -1,23 +1,30 @@
 #ifndef HMLIB_UNIQUERESOURCE_INC
 #define HMLIB_UNIQUERESOURCE_INC 100
 #include<boost/optional.hpp>
+#include"exceptions.hpp"
 #
 namespace hmLib{
-	template<typename value_type_, typename releaser_>
+	namespace{
+		struct resource_exception_identifier{};
+	}
+	using resrouce_exepction = exceptions::exception_pattern<resource_exception_identifier>;
+	using resource_nullptr_dereference = exceptions::access::nullptr_dereference<resrouce_exepction>;
+
+	template<typename value_type_, typename deleter_>
 	struct unique_resource{
 	public:
-		using this_type = unique_resource<value_type_, releaser_>;
+		using this_type = unique_resource<value_type_, deleter_>;
 		using value_type = value_type_;
 		using optvalue_type = boost::optional<value_type>;
-		using releaser = releaser_;
+		using deleter = deleter_;
 	private:
 		optvalue_type OptValue;
-		releaser Releaser;
+		deleter Deleter;
 	public:
 		unique_resource() = default;
-		unique_resource(value_type Value_, releaser Releaser_ = releaser())
+		unique_resource(value_type Value_, deleter Deleter_ = deleter())
 			: OptValue(std::move(Value_))
-			, Releaser(std::move(Releaser_)){}
+			, Deleter(std::move(Deleter_)){}
 		unique_resource(const this_type&) = delete;
 		this_type& operator = (const this_type&) = delete;
 		unique_resource(this_type&& Other_)noexcept{
@@ -32,20 +39,20 @@ namespace hmLib{
 		}
 		~unique_resource(){ reset(); }
 	public:
-		operator bool(){ return static_cast<bool>(OptValue); }
+		operator bool()noexcept{ return static_cast<bool>(OptValue); }
 		void reset(){
 			if(OptValue){
-				Releaser(*OptValue);
+				Deleter(*OptValue);
 				OptValue.reset();
 			}
 		}
-		void reset(value_type Value_, releaser Releaser_ = releaser()){
+		void reset(value_type Value_, deleter Deleter_ = deleter()){
 			if(OptValue){
-				Releaser(*OptValue);
+				Deleter(*OptValue);
 			}
 
 			OptValue.emplace(std::move(Value_));
-			Releaser = std::move(Releaser_);
+			Deleter = std::move(Deleter_);
 		}
 		value_type release(){
 			if(!OptValue)return value_type();
@@ -55,10 +62,14 @@ namespace hmLib{
 		}
 		void swap(this_type& Other_){
 			OptValue.swap(Other_.OptValue);
-			std::swap(Releaser, Other_.Releaser);
+			std::swap(Deleter, Other_.Deleter);
 		}
-		value_type get(){return *OptValue;}
-		const value_type& ref()const{return *OptValue;}
+		const value_type& get()const{
+			hmLib_assert(OptValue, resource_nullptr_dereference, "Accecced unique_resource hold no resource.");
+			return *OptValue;
+		}
+		const value_type& operator*()const noexcept{ return *OptValue; }
+		const value_type* operator->()const noexcept{ return &(*OptValue); }
 	public:
 		friend bool operator==(const this_type& v1, const this_type& v2){
 			return v1.ref() == v2.ref();
@@ -67,9 +78,9 @@ namespace hmLib{
 			return v1.ref() != v2.ref();
 		}
 	};
-	template<typename value_type_, typename releaser_>
-	unique_resource<value_type_, releaser_> make_resource(value_type_ Value_, releaser_ Releaser_){
-		return unique_resource<value_type_, releaser_>(std::move(Value_), std::move(Releaser_));
+	template<typename value_type_, typename deleter_>
+	unique_resource<value_type_, deleter_> make_resource(value_type_&& Value_, deleter_&& Deleter_){
+		return unique_resource<value_type_, deleter_>(std::forward<value_type_>(Value_), std::forward<deleter_>(Deleter_));
 	}
 }
 #

@@ -65,6 +65,18 @@ namespace hmLib{
 			Assert::IsTrue(static_cast<bool>(Resource));
 			Assert::AreEqual(0u, releaser::Released.size());
 		}
+		TEST_METHOD(use_make_resource){
+			auto Resource = make_resource(40, releaser());
+
+			{
+				unique_resource<int, releaser> MResource(10);
+				Resource = std::move(MResource);
+				Assert::IsTrue(static_cast<bool>(Resource));
+			}
+			Assert::AreEqual(10, Resource.get());
+			Assert::IsTrue(static_cast<bool>(Resource));
+			Assert::AreEqual(1u, releaser::Released.size());
+		}
 	};
 
 	std::vector<int> test_resource::releaser::Released;
