@@ -19,26 +19,26 @@ namespace hmLib{
 			template<typename enumerator_traits>
 			struct ability_interface<enumerator_traits, sentinel_enumerator_tag>{
 			public:
-				virtual void shuffle_back() = 0;
+				virtual void shuffle() = 0;
 			};
 			template<typename enumerator_traits, typename base>
 			struct ability_impl<enumerator_traits, base, sentinel_enumerator_tag> : public base{
 			public:
-				void shuffle_back()override{ std::shuffle(base::Cur, base::End, hmLib::random::default_engine()); }
+				void shuffle()override{ std::shuffle(base::Cur, base::End, hmLib::random::default_engine()); }
 			};
 			template<typename enumerator_traits>
 			struct ability_interface<enumerator_traits, range_enumerator_tag>{
 			public:
-				virtual void shuffle_front() = 0;
-				virtual void shuffle_back() = 0;
+				virtual void shuffle_sofar() = 0;
+				virtual void shuffle_range() = 0;
 				virtual void shuffle() = 0;
 			};
 			template<typename enumerator_traits, typename base>
 			struct ability_impl<enumerator_traits, base, range_enumerator_tag> : public base{
 			public:
-				void shuffle_front()override{ std::shuffle(base::Beg, base::Cur, hmLib::random::default_engine()); }
-				void shuffle_back()override{ std::shuffle(base::Cur, base::End, hmLib::random::default_engine()); }
-				void shuffle()override{ std::shuffle(base::Beg, base::End, hmLib::random::default_engine()); }
+				void shuffle_sofar()override{ std::shuffle(base::Beg, base::Cur, hmLib::random::default_engine()); }
+				void shuffle_range()override{ std::shuffle(base::Beg, base::End, hmLib::random::default_engine()); }
+				void shuffle()override{ std::shuffle(base::Cur, base::End, hmLib::random::default_engine()); }
 			};
 		};
 	}
