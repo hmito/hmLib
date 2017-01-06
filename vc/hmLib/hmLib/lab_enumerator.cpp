@@ -12,21 +12,21 @@
 #include<boost/range/numeric.hpp>
 template<typename iterator>
 int func_itr(iterator Beg, iterator End){
-	//d•¡‚ðœ‚¢‚Ä
+	//é‡è¤‡ã‚’é™¤ã„ã¦
 	End = std::unique(Beg, End);
-	//Šï”‚ðÁ‚µ‚Ä
+	//å¥‡æ•°ã‚’æ¶ˆã—ã¦
 	std::remove_if(Beg, End, [](int val){return val % 2 != 0; });
-	//ƒ\[ƒg‚µ‚Ä
+	//ã‚½ãƒ¼ãƒˆã—ã¦
 	std::sort(Beg, End);
 
-	//æ“ª‚©‚ç‚Ì‡Œv‚ª10‚ð’´‚¦‚éÅ‰‚Ì’l‚ð•Ô‚·
+	//å…ˆé ­ã‹ã‚‰ã®åˆè¨ˆãŒ10ã‚’è¶…ãˆã‚‹æœ€åˆã®å€¤ã‚’è¿”ã™
 	int pos = 0;
 	for(; Beg != End; ++Beg){
 		pos += *Beg;
 		if(pos > 10)return *Beg;
 	}
 
-	//Ž¸”s‚µ‚½‚ç0‚ð•Ô‚·
+	//å¤±æ•—ã—ãŸã‚‰0ã‚’è¿”ã™
 	return 0;
 }
 namespace henum = hmLib::enumerators;
@@ -36,25 +36,25 @@ int func_enm(iterator Beg, iterator End){
 	return func_enm(my_enumerator::make_enumerator(Beg, End));
 }
 int func_enm(my_enumerator& Enm){
-	//d•¡‚ðœ‚¢‚Ä
+	//é‡è¤‡ã‚’é™¤ã„ã¦
 	Enm.unique();
-	//Šï”‚ðÁ‚µ‚Ä
+	//å¥‡æ•°ã‚’æ¶ˆã—ã¦
 	Enm.remove_if([](int val){return val % 2 != 0; });
-	//ƒ\[ƒg‚µ‚Ä
+	//ã‚½ãƒ¼ãƒˆã—ã¦
 	Enm.sort();
 
-	//æ“ª‚©‚ç‚Ì‡Œv‚ª10‚ð’´‚¦‚éÅ‰‚Ì’l‚ð•Ô‚·
+	//å…ˆé ­ã‹ã‚‰ã®åˆè¨ˆãŒ10ã‚’è¶…ãˆã‚‹æœ€åˆã®å€¤ã‚’è¿”ã™
 	int pos = 0;
 	for(; Enm; ++Enm){
 		pos += *Enm;
 		if(pos > 10)return *Enm;
 	}
 
-	//Ž¸”s‚µ‚½‚ç0‚ð•Ô‚·
+	//å¤±æ•—ã—ãŸã‚‰0ã‚’è¿”ã™
 	return 0;
 }
 
-int main(void){
+int main_enumerator(void){
 	std::vector<int> Array{9,2,6,3,5,5,3,3,1,4,6,8,9,2,2};
 
 	system("pause");

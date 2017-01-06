@@ -127,6 +127,7 @@
     <ClCompile Include="..\..\..\hmLib\coordinates.cpp" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
     <ClCompile Include="lab_enumerator.cpp" />
+    <ClCompile Include="lab_random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test1.csv" />
