@@ -14,15 +14,15 @@ namespace hmLib{
 			type e2;
 			type sigma1;
 			type sigma2;
-			type cov;
+			type rho;
 		public:
 			param_type() = default;
-			param_type(type mean1_, type mean2_, type sigma1_, type sigma2_, type cov_)
+			param_type(type mean1_, type mean2_, type sigma1_, type sigma2_, type rho_)
 				: e1(mean1_)
 				, e2(mean2_)
 				, sigma1(sigma1_)
 				, sigma2(sigma2_)
-				, cov(cov){
+				, rho(rho_){
 			}
 		};
 	private:
@@ -32,8 +32,8 @@ namespace hmLib{
 		std::normal_distribution<type> Dist;
 	public:
 		pair_normal_distribution() = delete;
-		pair_normal_distribution(type mean1_ = 0.0, type mean2_ = 0.0, type sigma1_ = 1.0, type sigma2_ = 1.0, type cov_ = 0.0)
-			: Param(mean1_, mean2_, sigma1_, sigma2_, cov_)
+		pair_normal_distribution(type mean1_ = 0.0, type mean2_ = 0.0, type sigma1_ = 1.0, type sigma2_ = 1.0, type rho_ = 0.0)
+			: Param(mean1_, mean2_, sigma1_, sigma2_, rho_)
 			, Dist(0.0, 1.0){
 		}
 		pair_normal_distribution(const this_type&) = default;
@@ -45,9 +45,10 @@ namespace hmLib{
 		result_type operator()(URNG& Urng){ return operator()(Urng, Param); }
 		template<typename URNG>
 		result_type operator()(URNG& Urng, param_type Param_){
+//			hmLib_assert(0.<=Param_.rho && Param_.rho <=1.0, hmLib::exceptions::invalid_initialvalue,"rho is now out of coorect range 0<=rho<=1.");
 			type X = Dist(Urng);
 			type Y = Dist(Urng);
-			type Z = Param_.cov * X + std::sqrt(1 - Param_.cov*Param_.cov)*Y;
+			type Z = Param_.rho * X + std::sqrt(1 - Param_.rho*Param_.rho)*Y;
 
 			return result_type(Param_.e1 + Param_.sigma1*X, Param_.e2 + Param_.sigma2*Z);
 		}
@@ -57,7 +58,7 @@ namespace hmLib{
 		type mean2()const{ return Param.mean2; }
 		type stddev1()const{ return Param.sigma1; }
 		type stddev2()const{ return Param.sigma2; }
-		type cov()const{ return Param.cov; }
+		type rho()const{ return Param.rho; }
 		param_type param()const{ return Param; }
 		void param(const param_type& Param_){ Param = Param_; }
 		result_type min()const{ return std::pair<type, type>(std::numeric_limits<type>::lowest(), std::numeric_limits<type>::lowest()); }

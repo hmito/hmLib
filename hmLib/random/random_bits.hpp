@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_RANDOM_RANDOMBITS_INC
+#ifndef HMLIB_RANDOM_RANDOMBITS_INC
 #define HMLIB_RANDOM_RANDOMBITS_INC 100
 #
 /*===random_bit===
@@ -18,7 +18,7 @@ namespace hmLib{
 		using my_type = random_bits_engine<random_engine>;
 		using bits_result_type = typename random_engine::result_type;
 	public:
-		using bits_type = std::make_unsigned_t<bits_result_type>;
+		using bits_type = typename std::make_unsigned<bits_result_type>::type;
 	public:
 		static std::size_t interval(){
 			std::size_t s = 0;
