@@ -4,6 +4,7 @@
 void test_func_random(){
 	std::random_device RD;
 	hmLib::xorshift128 Engine(RD());
+	Engine.discard(6);
 
 	std::uniform_int_distribution<int> Dist(0, 5);
 	std::array<unsigned int, 6> Cnt;
@@ -16,6 +17,8 @@ void test_func_random(){
 		std::cout << val << std::endl;
 	}
 }
+
+hmLib::pair_normal_distribution<> PairDist(3.0, 3.0, 1.0, 1.0, 0.5);
 
 int main(){
 	test_func_random();

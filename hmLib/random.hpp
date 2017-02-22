@@ -17,5 +17,6 @@ random:v2_06/121128 hmIto
 #include"random/random_engine.hpp"
 #include"random/random_bits.hpp"
 #include"random/xorshift.hpp"
+#include"random/pair_normal_distribution.hpp"
 #
 #endif
