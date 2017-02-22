@@ -1,4 +1,4 @@
-#ifndef HMLIB_ALGORITHMTRAITS_INC
+﻿#ifndef HMLIB_ALGORITHMTRAITS_INC
 #define HMLIB_ALGORITHMTRAITS_INC 100
 #
 #include<algorithm>

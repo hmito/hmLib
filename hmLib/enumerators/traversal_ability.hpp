@@ -1,4 +1,4 @@
-#ifndef HMLIB_TRAVERSALTRAITS_INC
+﻿#ifndef HMLIB_TRAVERSALTRAITS_INC
 #define HMLIB_TRAVERSALTRAITS_INC 100
 #
 #include<type_traits>

@@ -1,4 +1,4 @@
-#ifndef HMLIB_RANDOM_XORSHIFT
+﻿#ifndef HMLIB_RANDOM_XORSHIFT
 #define HMLIB_RANDOM_XORSHIFT 100
 #
 #include<limits>

@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPETRAITS_INC
+﻿#ifndef HMLIB_TYPETRAITS_INC
 #define HMLIB_TYPETRAITS_INC 100
 #
 #include<type_traits>

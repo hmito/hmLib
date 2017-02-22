@@ -1,4 +1,4 @@
-#ifndef HMLIB_CHAIN_INC
+﻿#ifndef HMLIB_CHAIN_INC
 #define HMLIB_CHAIN_INC 100
 #
 #include<iterator>

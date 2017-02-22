@@ -1,4 +1,4 @@
-#ifndef HMLIB_UNIQUERESOURCE_INC
+﻿#ifndef HMLIB_UNIQUERESOURCE_INC
 #define HMLIB_UNIQUERESOURCE_INC 100
 #include<boost/optional.hpp>
 #include"exceptions.hpp"
