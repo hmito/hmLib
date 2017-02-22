@@ -2,6 +2,8 @@
 #define HMLIB_RANDOM_XORSHIFT 100
 #
 #include<limits>
+#include<vector>
+#include<iterator>
 namespace hmLib{
 	/*!
 	@brief Random engine class using algorithm XOrShift.
@@ -26,8 +28,7 @@ namespace hmLib{
 			: x(xval)
 			, y(yval)
 			, z(zval)
-			, w(default_seedval){
-		}
+			, w(default_seedval){}
 		/*!
 		@brief Constructor with set seed value by given value.
 		@param[in] s seed value*/
@@ -35,7 +36,14 @@ namespace hmLib{
 			: x(xval)
 			, y(yval)
 			, z(zval)
-			, w(s){
+			, w(s){}
+		template<class Sseq>
+		xorshift_engine(Sseq&& q)
+			: x(xval)
+			, y(yval)
+			, z(zval)
+			, w(0){
+			seed(q);
 		}
 		//!@brief Copy contstructor.
 		xorshift_engine(const xorshift_engine& e) = default;
@@ -44,19 +52,26 @@ namespace hmLib{
 		/*!
 		@brief Generate random value.
 		@return Generated random value.*/
-		result_type operator()(){		
+		result_type operator()(){
 			result_type t = x ^ (x << 11);
 			x = y;
-			y = z;			
+			y = z;
 			z = w;
-			return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); 
+			return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
 		}
 		/*!
 		@brief Set seed value of the engine.
 		@param[in] s seed value*/
-		void seed(result_type s = default_seedval){w = s;}
+		void seed(result_type s = default_seedval){ w = s; }
+		template<class Sseq>
+		void seed(Sseq&& q){
+			// シード列を取得
+			std::vector<result_type> result;
+			q.param(std::back_inserter(result));
+			w = result.front();
+		}
 		void discard(unsigned long long z){
-			if(z==0)return;
+			if(z == 0)return;
 			while(z-->0){
 				operator()();
 			}
