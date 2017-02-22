@@ -1,17 +1,22 @@
 ﻿#ifndef HMLIB_RANDOM_INC
-#define HMLIB_RANDOM_INC 208
+#define HMLIB_RANDOM_INC 209
 #
 /*
 ===random===
-C++11の乱数ライブラリをラッピングして提供
+Helper random library for c++ standard library <random>
+
+random:v2_09/170105 hmIto
+	Add xorshift.
 random:v2_08/160323 hmIto
-	random_bit/bitsetをrandom_bitsとして統合
+	Remove random_bit and bitset, and Add random_bits.
 random:v2_07/130709 hmIto
-	random_bitsetを追加
+	Add random_bitset.
 random:v2_06/121128 hmIto
-	拡張子をhからhppに変更。
+	Change extention from h to hpp.
 */
 #include"random/random_engine.hpp"
 #include"random/random_bits.hpp"
+#include"random/xorshift.hpp"
+#include"random/pair_normal_distribution.hpp"
 #
 #endif

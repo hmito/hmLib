@@ -168,10 +168,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="test_algorithm.cpp" />
+    <ClCompile Include="test_chain.cpp" />
     <ClCompile Include="test_circular.cpp" />
     <ClCompile Include="test_euclidean.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
     <ClCompile Include="test_odeint.cpp" />
+    <ClCompile Include="test_resource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test1.csv" />

@@ -1,4 +1,4 @@
-#ifndef HMLIB_TYPETRAITS_INC
+﻿#ifndef HMLIB_TYPETRAITS_INC
 #define HMLIB_TYPETRAITS_INC 100
 #
 #include<type_traits>
@@ -20,7 +20,7 @@ namespace hmLib{
 		using type = typename check<void>::ans_type;
 	};
 	template<typename terget, typename... others>
-	struct sieve_base_of{
+	struct near_base_of{
 		template<typename terget_, typename candidate_>
 		struct check{
 			using ans_type = candidate_;
@@ -28,19 +28,19 @@ namespace hmLib{
 		using type = typename check<terget, void>::ans_type;
 	};
 	template<typename terget, typename try_type, typename... others>
-	struct sieve_base_of<terget, try_type, others...>{
+	struct near_base_of<terget, try_type, others...>{
 		template<typename terget_, typename candidate_, bool IsBase = std::is_base_of<try_type, terget>::value>
 		struct check{
-			using ans_type = typename sieve_base_of<terget, others...>::template check<terget_, candidate_>::ans_type;
+			using ans_type = typename near_base_of<terget, others...>::template check<terget_, candidate_>::ans_type;
 		};
 		template<typename terget_, typename candidate_>
 		struct check<terget_, candidate_, true>{
 			using new_candidate = typename select_derived<candidate_, try_type>::type;
-			using ans_type = typename sieve_base_of<terget, others...>::template check<terget_, new_candidate>::ans_type;
+			using ans_type = typename near_base_of<terget, others...>::template check<terget_, new_candidate>::ans_type;
 		};
 		template<typename terget_>
 		struct check<terget_, void, true>{
-			using ans_type = typename sieve_base_of<terget, others...>::template check<terget_, try_type>::ans_type;
+			using ans_type = typename near_base_of<terget, others...>::template check<terget_, try_type>::ans_type;
 		};
 		using type = typename check<terget, void>::ans_type;
 	};
