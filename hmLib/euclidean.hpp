@@ -142,7 +142,7 @@ namespace hmLib{
 		}
 
 		template<typename T, unsigned int dim>
-		T length2(const point<T, dim>& Elem){
+		T sum_of_square(const point<T, dim>& Elem){
 			T value = Elem[0] * Elem[0];
 			for(unsigned int pos = 1; pos < dim; ++pos){
 				value += Elem[pos] * Elem[pos];
@@ -150,8 +150,8 @@ namespace hmLib{
 			return value;
 		}
 		template<typename T, unsigned int dim>
-		T length(const point<T, dim>& Elem){
-			return std::sqrt(length2(Elem));
+		T abs(const point<T, dim>& Elem){
+			return std::sqrt(sum_of_square(Elem));
 		}
 
 		template<typename T>
