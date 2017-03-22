@@ -3,7 +3,6 @@
 #
 #include<iterator>
 #include"exceptions.hpp"
-#include"point.hpp"
 namespace hmLib{
 	namespace lattices{
 		template<typename iterator_, typename base_, unsigned int dim_>
@@ -177,6 +176,7 @@ namespace hmLib{
 			using this_type = iterator_base<iterator_, base_, 0>;
 			using raw_iterator = iterator_;
 			using base_type = base_;
+			using difference_type = int;
 		public:
 			iterator_base() :Itr(), Ptr(nullptr), Sup(0), Raw(0){}
 			iterator_base(raw_iterator Itr_, base_type& Ref_, index_type Sup_, index_type Raw_)

@@ -44,35 +44,39 @@ namespace hmLib{
 			//!Get number of elements included in the lattice
 			size_type lattice_size()const { return Size*Lower.lattice_size(); }
 			//!Get the size of req_dim_ dimmension
-			template<typename req_dim_>
+			template<unsigned int  req_dim_>
 			size_type size()const {
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return dim_solver<req_dim_>().size(*this);
 			}
 			//!Get the gap of req_dim_ dimmension
-			template<typename req_dim_>
+			template<unsigned int  req_dim_>
 			diff_type gap()const {
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				return dim_solver<req_dim_>().gap(*this);
 			}
 			//!Set the size of req_dim_ dimmension
-			template<typename req_dim_>
+			template<unsigned int  req_dim_>
 			void resize(size_type Size_) {
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				dim_solver<req_dim_>().resize(*this, Size_);
 			}
 			//!Set the size of req_dim_ dimmension
-			template<typename req_dim_>
+			template<unsigned int  req_dim_>
 			void resize(size_type Size_, diff_type Gap_) {
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
 				dim_solver<req_dim_>().resize(*this, Size_, Gap_);
 			}
 			//!Set the gap of req_dim_ dimmension
-			template<typename req_dim_>
+			template<unsigned int  req_dim_>
 			void set_gap(diff_type Gap_) {
 				static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
-				dim_solver<req_dim_>().set_gap(*this, Size_, Gap_);
+				dim_solver<req_dim_>().set_gap(*this, Gap_);
 			}
+			//!Get the base index value
+			diff_type base()const { return Lower.base(); }
+			//!Set the base index value
+			void set_base(diff_type Base_) { Lower.set_base(Base_); }
 		public:
 			//Get index value from number list with checking over range.
 			template<typename... others>
@@ -101,21 +105,24 @@ namespace hmLib{
 			diff_type Gap;
 			lower_type Lower;
 		private:
-			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_){
-				if(Step_ < 0)Min_ = std::min(Min_, Step_ * Size);
-				else Max_ = std::max(Max_, Step_ * Size);
+			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_)const{
+				if (Step_ < 0) {
+					Min_ += Step_ * (Size - 1);
+				} else {
+					Max_ += Step_ * (Size - 1);
+				}
 
 				return Lower.index_range_calc(Min_, Max_, Step_ * Size + Lower.gap<0>());
 			}
 			template<typename... others>
 			index_type index_calc(index_type Sum_, diff_type Step_, index_type Pos_, others... Others)const{
-				hmLib_assert(Pos_ < Size, lattices::out_of_range_access, "Pos is larger than Size.");
+				hmLib_assert(0<=Pos_ && static_cast<size_type>(Pos_) < Size, lattices::out_of_range_access, "Pos is larger than Size.");
 				return Lower.index_calc(Sum_ + Pos_ * Step_, Step_*Size + Lower.gap<0>(), Others...);
 			}
 			template<typename point_t>
 			index_type point_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
-				hmLib_assert(Pos_ < Size, lattices::out_of_range_access, "Pos is larger than Size.");
-				return Lower.point_index_calc(Sum_ + Point_[No_]* Step_, Step_*Size + Lower.gap<0>(), No_+1, Point_)
+				hmLib_assert(0 <= Point_[No_] && static_cast<size_type>(Point_[No_]) < Size, lattices::out_of_range_access, "Pos is larger than Size.");
+				return Lower.point_index_calc(Sum_ + Point_[No_] * Step_, Step_*Size + Lower.gap<0>(), No_ + 1, Point_);
 			}
 			template<typename... others>
 			index_type operator_index_calc(index_type Sum_, diff_type Step_, index_type Pos_, others... Others)const{
@@ -123,7 +130,7 @@ namespace hmLib{
 			}
 			template<typename point_t>
 			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
-				return Lower.point_operator_index_calc(Sum_ + Point_[No_] * Step_, Step_*Size + Lower.gap<0>(), No_ + 1, Point_)
+				return Lower.point_operator_index_calc(Sum_ + Point_[No_] * Step_, Step_*Size + Lower.gap<0>(), No_ + 1, Point_);
 			}
 			template<unsigned int req_dim_, typename T = void>
 			struct dim_solver {
@@ -147,11 +154,7 @@ namespace hmLib{
 			friend struct gap_lattice_indexer<1>;
 			using this_type = gap_lattice_indexer<0>;
 		public:
-			gap_lattice_indexer() = default;
-			template<typename... others>
-			gap_lattice_indexer(others... Others){
-				static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::lattice_indexer is not enough");
-			}
+			gap_lattice_indexer() :Base(0) {}
 			template<typename... others>
 			index_type index(index_type Pos_, others... Others)const{
 				static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::index is not enough");
@@ -160,23 +163,35 @@ namespace hmLib{
 			template<typename... others>
 			index_type operator()(index_type Pos_, others... Others)const{return 0;}
 			size_type lattice_size()const{ return 1; }
-			template<typename req_dim_>
+			template<unsigned int req_dim_>
 			size_type size()const{
 				return 1;
 			}
-			template<typename req_dim_>
+			template<unsigned int req_dim_>
 			diff_type gap()const{
 				return 0;
 			}
+			diff_type base()const { return Base; }
+			void set_base(diff_type Base_) { Base = Base_; }
 		private:
-			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_){
-				return std::pair<index_type, size_type>(Min_, Max_);
+			diff_type Base;
+		private:
+			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_)const {
+				return std::pair<index_type, size_type>(Min_ + Base, Max_ + Base);
 			}
-			index_type index_calc(index_type Sum_, diff_type Step_, index_type Pos_)const{
-				return Sum_;
+			index_type index_calc(index_type Sum_, diff_type Step_)const{
+				return Sum_ + Base;
 			}
-			index_type operator_index_calc(index_type Sum_, diff_type Step_, index_type Pos_)const{
-				return Sum_;
+			index_type operator_index_calc(index_type Sum_, diff_type Step_)const{
+				return Sum_ + Base;
+			}
+			template<typename point_t>
+			index_type point_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
+				return Sum_ + Base;
+			}
+			template<typename point_t>
+			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
+				return Sum_ + Base;
 			}
 		};
 	}
