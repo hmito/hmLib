@@ -7,38 +7,32 @@
 #include"utility.hpp"
 #include"exceptions.hpp"
 #include"iterator_base.hpp"
+#include"lattice_indexer.hpp"
 namespace hmLib{
 	template<typename iterator_, unsigned int dim_>
 	struct lattice_view{
 		friend struct lattice_view<iterator_, dim_ + 1>;
 		using this_type = lattice_view<iterator_, dim_>;
-		using lower_type = lattice_view<iterator_, dim_ - 1>;
+		using indexer = lattices::lattice_indexer<dim_>;
+		using size_type = lattices::size_type;
+		using diff_type = lattices::diff_type;
 		using index_type = lattices::index_type;
 		using value_type = typename iterator_::value_type;
 		using reference = typename iterator_::reference;
 		using point = lattices::point<dim_>;
 		using iterator = lattices::iterator_base<iterator_, this_type, dim_>;
 		using raw_iterator = iterator_;
+		struct locator{};
 	public:
 		static constexpr unsigned int dim(){ return dim_; }
 	public:
 		lattice_view() = default;
 		template<typename... others>
-		lattice_view(iterator_ Begin_, iterator_ End_, index_type Size_, others... Others_)
+		lattice_view(iterator_ Begin_, iterator_ End_, size_type Size_, others... Others_)
 			: Size(Size_)
 			, Gap(0)
 			, Lower(Begin_, End_, Others_...){
 			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			hmLib_assert(std::distance(Begin_, End_) >= lattice_step<0>(), lattices::exception, "Too small range for lattice_view.");
-		}
-		template<typename... others>
-		lattice_view(iterator_ Begin_, iterator_ End_, std::pair<index_type, index_type> SizeGap, others... Others_)
-			:Size(0)
-			, Gap(0)
-			, Lower(Begin_, End_, Others_...){
-			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			Size = SizeGap.first;
-			Gap = SizeGap.second;
 			hmLib_assert(std::distance(Begin_, End_) >= lattice_step<0>(), lattices::exception, "Too small range for lattice_view.");
 		}
 	public:
@@ -62,31 +56,11 @@ namespace hmLib{
 			return at_iterator(0, Point_.begin(), Point_.end());
 		}
 	public:
-		template<unsigned int req_dim_>
-		index_type size()const{
-			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
-			return size_getter<req_dim_>()(*this);
-		}
-		template<unsigned int req_dim_>
-		index_type gap()const{
-			static_assert(req_dim_ < dim_, "requested dim is larger than lattice's dim.");
-			return gap_getter<req_dim_>()(*this);
-		}
-		template<unsigned int req_dim_>
-		index_type lattice_size()const{
-			static_assert(req_dim_ <= dim_, "requested dim is larger than lattice's dim.");
-			return lattice_size_getter<req_dim_>()(*this);
-		}
-		template<unsigned int req_dim_>
-		index_type lattice_step()const{
-			static_assert(req_dim_ <= dim_, "requested dim is larger than lattice's dim.");
-			return lattice_step_getter<req_dim_>()(*this);
-		}
-	public:
 		raw_iterator raw_begin(){ return Lower.raw_begin(); }
 		raw_iterator raw_end(){ return Lower.raw_end(); }
 		iterator begin(){ return make_iterator(*this, 0); }
 		iterator end(){ return make_iterator(*this, 1); }
+		locator 
 	private:
 		index_type Size;
 		index_type Gap;
@@ -152,44 +126,9 @@ namespace hmLib{
 			return lattices::iterator_base<raw_iterator, base_type, dim_>(Lower.make_iterator(Ref_, Sup_), 0);
 		}
 	};
-	template<typename iterator_>
-	struct lattice_view<iterator_, 0>{
-		friend struct lattice_view<iterator_, 1>;
-		using this_type = lattice_view<iterator_, 0>;
-		using index_type = lattices::index_type;
-		using value_type = typename iterator_::value_type;
-		using reference = typename iterator_::reference;
-		using point = lattices::point<0>;
-		using iterator = lattices::iterator_base<iterator_, this_type, 0>;
-		using raw_iterator = iterator_;
-	public:
-		lattice_view() = default;
-		lattice_view(raw_iterator Begin_, raw_iterator End_) :Begin(Begin_), End(End_){}
-	public:
-		template<unsigned int req_dim_>
-		index_type size()const{ return 1; }
-		template<unsigned int req_dim_>
-		index_type lattice_size()const{ return 1; }
-		template<unsigned int req_dim_>
-		index_type lattice_step()const{ return 1; }
-	public:
-		raw_iterator raw_begin(){ return Begin; }
-		raw_iterator raw_end(){ return End; }
-	private:
-		raw_iterator Begin;
-		raw_iterator End;
-	private:
-		index_type raw_index_template(index_type RawPos_)const{ return RawPos_; }
-		template<typename iterator>
-		index_type raw_index_iterator(index_type RawPos_, iterator Begin_, iterator End_)const{ return RawPos_; }
-		reference at_template(index_type RawPos_){ return *std::next(Begin, RawPos_); }
-		template<typename iterator>
-		reference at_iterator(index_type RawPos_, iterator Begin_, iterator End_){ return *std::next(Begin, RawPos_); }
-		template<typename base_type>
-		lattices::iterator_base<raw_iterator, base_type, 0> make_iterator(base_type& Ref_, index_type Sup_){
-			return lattices::iterator_base<raw_iterator, base_type, 0>(Begin, Ref_, Sup_, (Ref_.gap<0>() + Ref_.size<0>()*Ref_.lattice_step<0>())*Sup_);
-		}
-	};
+
+	template<typename iterator_, unsigned int dim_>
+	struct sublattice_view{};
 
 	template<typename iterator, typename... others>
 	auto make_lattice(iterator Begin, iterator End, others... Others)->lattice_view<iterator, sizeof...(others)>{
