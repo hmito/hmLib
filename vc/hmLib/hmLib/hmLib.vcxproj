@@ -102,12 +102,10 @@
     <ClInclude Include="..\..\..\hmLib\lattices.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_indexer.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\utility.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\gap_lattice_indexer.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\math.hpp" />
     <ClInclude Include="..\..\..\hmLib\mutex_proxy.hpp" />

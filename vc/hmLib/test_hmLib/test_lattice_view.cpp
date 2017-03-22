@@ -7,6 +7,7 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
+	/*
 TEST_CLASS(test_lattice_view){
 public:
 	TEST_METHOD(construct){
@@ -496,4 +497,5 @@ public:
 		}
 	}
 };
+*/
 }
