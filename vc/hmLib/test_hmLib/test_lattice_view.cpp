@@ -7,7 +7,7 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
-	/*
+
 TEST_CLASS(test_lattice_view){
 public:
 	TEST_METHOD(construct){
@@ -18,9 +18,75 @@ public:
 
 		lattice_view<iterator, 2>  Lattice(Con.begin(),Con.end(), 4, 5);
 
-		Assert::AreEqual(4, Lattice.size<0>(), L"Size Error");
-		Assert::AreEqual(5, Lattice.size<1>(), L"Size Error");
+		Assert::AreEqual(4, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+		auto Size = Lattice.size();
+		Assert::AreEqual(4, Size[0], L"Size Error");
+		Assert::AreEqual(5, Size[1], L"Size Error");
+
+		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
+		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
+		auto Gap = Lattice.gap();
+		Assert::AreEqual(0, Gap[0], L"Gap Error");
+		Assert::AreEqual(0, Gap[1], L"Gap Error");
 	}
+	TEST_METHOD(construct_with_point) {
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(1000);
+
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), { 10,20 }, {2,2});
+
+		Assert::AreEqual(4, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+		auto Size = Lattice.size();
+		Assert::AreEqual(4, Size[0], L"Size Error");
+		Assert::AreEqual(5, Size[1], L"Size Error");
+
+		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
+		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
+		auto Gap = Lattice.gap();
+		Assert::AreEqual(0, Gap[0], L"Gap Error");
+		Assert::AreEqual(0, Gap[1], L"Gap Error");
+	}
+	TEST_METHOD(sublattice_point) {
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+		using namespace hmLib::euclidean;
+
+		container Con(1000);
+
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 20, 10);
+
+		auto SubLattice = Lattice, sublattice(make_point(2, 3), make_point(10, 5));
+
+		Assert::AreEqual(10, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+
+		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
+		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
+	}
+	TEST_METHOD(sublattice_itr) {
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+		using namespace hmLib::euclidean;
+
+		container Con(1000);
+
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 20, 10);
+
+
+		auto Itr = Lattice.begin();
+		auto SubLattice = Lattice, sublattice(Itr+4, make_point(10, 5));
+
+		Assert::AreEqual(4, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+
+		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
+		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
+	}
+	/*
 	TEST_METHOD(construct_with_gap){
 		using container = std::vector<int>;
 		using iterator = container::iterator;
@@ -496,6 +562,6 @@ public:
 			Assert::AreEqual(20, val, L"fill Error");
 		}
 	}
+	*/
 };
-*/
 }

@@ -35,7 +35,15 @@ namespace hmLib{
 		public:
 			lattice_indexer() : Size(0), Gap(0), Lower() {}
 			lattice_indexer(point_type Size_, point_type Gap_= point_type()) : Size(0), Gap(0), Lower() {
-				resize(Size_, Gap_);
+				size_element_set(Size_.begin(), Size_.end());
+				gap_element_set(Gap_.begin(), Gap_.end());
+			}
+			lattice_indexer(const std::initializer_list<index_type>& Size_) : Size(0), Gap(0), Lower() {
+				size_element_set(Size_.begin(), Size_.end());
+			}
+			lattice_indexer(const std::initializer_list<index_type>& Size_, const std::initializer_list<index_type>& Gap_) : Size(0), Gap(0), Lower() {
+				size_element_set(Size_.begin(), Size_.end());
+				gap_element_set(Gap_.begin(), Gap_.end());
 			}
 			template<typename... others>
 			lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Gap(0), Lower(Others...) {
@@ -118,25 +126,25 @@ namespace hmLib{
 			diff_type Gap;
 			lower_type Lower;
 		private:
-			template<typename point_t>
-			point_t size_element_get(index_type Pos_, point_t Point_) {
-				Point_.at(Pos_) = Size;
-				return Lower.size_element_get(Pos_ + 1, Point_);
+			template<typename iterator>
+			void size_element_get(iterator Beg, iterator End) {
+				*Beg = Size;
+				Lower.size_element_get(Beg++, End);
 			}
-			template<typename point_t>
-			point_t gap_element_get(index_type Pos_, point_t Point_) {
-				Point_.at(Pos_) = Gap;
-				return Lower.gap_element_get(Pos_ + 1, Point_);
+			template<typename iterator>
+			void gap_element_get(iterator Beg, iterator End) {
+				*Beg = Gap;
+				Lower.gap_element_get(Beg++, End);
 			}
-			template<typename point_t>
-			void size_element_set(index_type Pos_, point_t Point_) {
-				Size = Point_.at(Pos_);
-				Lower.size_element_set(Pos_ + 1, Point_);
+			template<typename iterator>
+			void size_element_set(iterator Beg, iterator End) {
+				Size = *Beg;
+				Lower.size_element_set(Beg++, End);
 			}
-			template<typename point_t>
-			void gap_element_set(index_type Pos_, point_t Point_) {
-				Gap = Point_.at(Pos_);
-				return Lower.size_element_set(Pos_ + 1, Point_);
+			template<typename iterator>
+			void gap_element_set(iterator Beg, iterator End) {
+				Gap = *Beg;
+				Lower.size_element_set(Beg++, End);
 			}
 			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_)const {
 				if (Step_ < 0) {
@@ -209,18 +217,14 @@ namespace hmLib{
 		private:
 			diff_type Base;
 		private:
-			template<typename point_t>
-			point_t size_element_get(index_type Pos_, point_t Point_) {
-				return Point;
-			}
-			template<typename point_t>
-			point_t gap_element_get(index_type Pos_, point_t Point_) {
-				return Point_;
-			}
-			template<typename point_t>
-			void size_element_set(index_type Pos_, point_t Point_) {}
-			template<typename point_t>
-			void gap_element_set(index_type Pos_, point_t Point_) {}
+			template<typename iterator>
+			void size_element_get(iterator Beg, iterator End) {}
+			template<typename iterator>
+			void gap_element_get(iterator Beg, iterator End) {}
+			template<typename iterator>
+			void size_element_set(iterator Beg, iterator End) {}
+			template<typename iterator>
+			void gap_element_set(iterator Beg, iterator End) {}
 			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_)const {
 				return std::pair<index_type, size_type>(Min_ + Base, Max_ + Base);
 			}

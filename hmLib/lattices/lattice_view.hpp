@@ -53,32 +53,33 @@ namespace hmLib{
 		}
 	public:
 		template<typename... others>
-		index_type raw_index(index_type Pos_, others... Others_)const{
-			static_assert(dim_ == 1 + sizeof...(others), "the number of arguments is different from that of dim.");
-			return raw_index_template(0, Pos_, Others_...);
-		}
-		index_type raw_index(const point& Point_)const{
-			return raw_index_iterator(0, Point_.begin(), Point_.end());
-		}
-		template<typename... others>
 		reference at(index_type Pos_, others... Others_){
-			static_assert(dim_ == 1 + sizeof...(others), "arguments is too few or many for this dim.");
-			return at_template(0, Pos_, Others_...);
+			return Begin[Indexer.index(Pos_, Others_...)];
 		}
-		reference at(const point& Point_){
-			return at_iterator(0, Point_.begin(), Point_.end());
+		reference at(const point_type& Point_){
+			return Begin[Indexer.index(Point_)];
 		}
-		reference operator[](const point& Point_){
-			return at_iterator(0, Point_.begin(), Point_.end());
+		reference operator[](const point_type& Point_){
+			return Begin[Indexer.index(Point_)];
+		}
+		iterator begin() { return make_iterator(*this, 0); }
+		iterator end() { return make_iterator(*this, 1); }
+	public:
+		this_type sublattice(point_type Pos, point_type Size) {
+
 		}
 	public:
+		template<typename... others>
+		index_type raw_index(index_type Pos_, others... Others_)const { return Indexer.index(Pos_, Others_...); }
+		index_type raw_index(const point& Point_)const { Indexer.index(Point_); }
 		raw_iterator raw_begin(){ return Lower.raw_begin(); }
 		raw_iterator raw_end(){ return Lower.raw_end(); }
-		iterator begin(){ return make_iterator(*this, 0); }
-		iterator end(){ return make_iterator(*this, 1); }
 	private:
 		raw_iterator Begin;
 		raw_iterator End;
+		point_type Pos;
+		point_type Size;
+		point_type OriginalSize;
 		indexer Indexer;
 	};
 	template<typename iterator, typename... others>
