@@ -17,6 +17,10 @@ namespace hmLib{
 		auto make_point(others... Others)->point<sizeof...(others)>{
 			return point<sizeof...(others)>{Others...};
 		}
+		template<unsigned int dim_>
+		point<dim_> seqno_to_point(diff_type SecNo, point<dim_> Size) {
+			//for  iterator
+		}
 	}
 }
 #

@@ -50,6 +50,76 @@ public:
 		Assert::AreEqual(0, Gap[0], L"Gap Error");
 		Assert::AreEqual(0, Gap[1], L"Gap Error");
 	}
+	TEST_METHOD(locator) {
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+		using namespace hmLib::euclidean;
+
+		container Con(1000, 0);
+
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 20, 10);
+
+		auto lotr = Lattice.locate(2,4);
+		auto lotr2 = Lattice.locate(3, Lattice.axis_size<1>-1);
+		auto flotr = Lattice.front_locate();	//locate(0,0);
+		auto blotr = Lattice.back_locate();		//locate(axis_size<0>-1, axis_size<1>-1);
+		auto dif = blotr - flotr;				//difference is point type
+		lotr = blotr + dif / 2;					//operator+ pointer is ok.
+		Assert::AreEqual(0,*lotr,L"");
+
+		lotr[0]++;								//change lotr indicating point
+		lotr -= make_point(3, 3);
+
+		//iterator -> locator is OK
+		lotr = Lattice.begin();
+
+		//locator -> iterator is NG
+		//	iterator can be used as the context of the focal lattice.
+		//iterator itr = lotr;
+
+		//locator + lattice -> iterator is maybe OK, but maybe not necessary.
+		auto Itr = Lattice.to_iterator(lotr);
+
+		//two locator pair can make a lattice
+		//	locator belongs to different lattice will throw an exception.
+		auto SubLattice = sublattice(lotr - make_point(2, 3), lotr + make_point(3, 2));
+		lotr.add(3, 4);//same with lotr+=make_point(3,4);
+		lotr.plus(3, 4);//same with lotr+make_point(3,4);
+
+		//locator of lattice and its sublattice can be comparable.
+		auto Distance = lotr - SubLattice.locate(2, 3);
+
+		//locator just behave as an indexer?
+
+		//sublatticeは、どこまでも行けるけど、実際にはlotrで区切られた点に過ぎない
+		//特に指定しなければ、lattice作成時の最初の値が0,0。そのsublatticeはどれもそいつが基準。
+		//locatorが参照しているlatticeごとに変えてやる必要なし。
+		lotr.at(-3, -3);
+
+		for (auto Itr : Lattice) {
+			auto Lotr = to_locator(Itr);
+			
+			*Itr == *Lotr && *Lotr == Lotr.at(0, 0);
+			for (int x = -3; x <= 3; ++x) {
+				for (int y= -3; y <= 3; ++y) {
+					Lotr.at(x, y);
+				}
+			}
+
+			auto SubLattice = Lattice.sublattice(to_locator(Itr,-3,-3), to_locator(Itr, 3, 3));
+			for (auto SItr : SubLattice) {
+				distance(Itr, SItr);
+			}
+		}
+
+		auto SubLattice = Lattice, sublattice(make_point(2, 3), make_point(10, 5));
+
+		Assert::AreEqual(10, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+
+		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
+		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
+	}
 	TEST_METHOD(sublattice_point) {
 		using container = std::vector<int>;
 		using iterator = container::iterator;

@@ -101,7 +101,7 @@ namespace hmLib{
 		public:
 			//Get index value from number list with checking over range.
 			template<typename... others>
-			index_type index(index_type Pos_, others... Others)const {
+			index_type index(diff_type  Pos_, others... Others)const {
 				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				return index_calc(0, 1 + Gap, Pos_, Others...);
 			}
@@ -111,7 +111,7 @@ namespace hmLib{
 			}
 			//Get index value from number list without checking over range.
 			template<typename... others>
-			index_type operator()(index_type Pos_, others... Others)const {
+			index_type operator()(diff_type Pos_, others... Others)const {
 				static_assert(sizeof...(others)+1 == dim_, "The argument number is different from the dim number");
 				return operator_index_calc(0, 1 + Gap, Pos_, Others...);
 			}
@@ -156,21 +156,21 @@ namespace hmLib{
 				return Lower.index_range_calc(Min_, Max_, Step_ * Size + Lower.axis_gap<0>());
 			}
 			template<typename... others>
-			index_type index_calc(index_type Sum_, diff_type Step_, index_type Pos_, others... Others)const {
+			index_type index_calc(index_type Sum_, diff_type Step_, diff_type Pos_, others... Others)const {
 				hmLib_assert(0 <= Pos_ && static_cast<size_type>(Pos_) < Size, lattices::out_of_range_access, "Pos is larger than Size.");
 				return Lower.index_calc(Sum_ + Pos_ * Step_, Step_*Size + Lower.axis_gap<0>(), Others...);
 			}
 			template<typename point_t>
-			index_type point_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
+			index_type point_index_calc(index_type Sum_, diff_type Step_, diff_type No_, const point_t& Point_)const {
 				hmLib_assert(0 <= Point_[No_] && static_cast<size_type>(Point_[No_]) < Size, lattices::out_of_range_access, "Pos is larger than Size.");
 				return Lower.point_index_calc(Sum_ + Point_[No_] * Step_, Step_*Size + Lower.axis_gap<0>(), No_ + 1, Point_);
 			}
 			template<typename... others>
-			index_type operator_index_calc(index_type Sum_, diff_type Step_, index_type Pos_, others... Others)const {
+			index_type operator_index_calc(index_type Sum_, diff_type Step_, diff_type Pos_, others... Others)const {
 				return Lower.operator_index_calc(Sum_ + Pos_ * Step_, Step_*Size + Lower.axis_gap<0>(), Others...);
 			}
 			template<typename point_t>
-			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
+			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, diff_type No_, const point_t& Point_)const {
 				return Lower.point_operator_index_calc(Sum_ + Point_[No_] * Step_, Step_*Size + Lower.axis_gap<0>(), No_ + 1, Point_);
 			}
 			template<unsigned int req_dim_, typename T = void>
@@ -197,12 +197,12 @@ namespace hmLib{
 		public:
 			lattice_indexer() :Base(0) {}
 			template<typename... others>
-			index_type index(index_type Pos_, others... Others)const {
+			index_type index(diff_type Pos_, others... Others)const {
 				static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::index is not enough");
 				return operator()(Pos_, Others...);
 			}
 			template<typename... others>
-			index_type operator()(index_type Pos_, others... Others)const { return 0; }
+			index_type operator()(diff_type Pos_, others... Others)const { return 0; }
 			size_type lattice_size()const { return 1; }
 			template<unsigned int req_dim_>
 			size_type axis_size()const {
@@ -235,11 +235,11 @@ namespace hmLib{
 				return Sum_ + Base;
 			}
 			template<typename point_t>
-			index_type point_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
+			index_type point_index_calc(index_type Sum_, diff_type Step_, diff_type No_, const point_t& Point_)const {
 				return Sum_ + Base;
 			}
 			template<typename point_t>
-			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, index_type No_, const point_t& Point_)const {
+			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, diff_type No_, const point_t& Point_)const {
 				return Sum_ + Base;
 			}
 		};
