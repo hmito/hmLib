@@ -29,6 +29,7 @@ namespace hmLib{
 			this_type& operator=(this_type&&) = default;
 			basic_iterator(lattice& Lattice_, diff_type SeqNo_) :pLattice(&Lattice_), SeqNo(SeqNo_){}
 		public:
+			operator bool()const{ return pLattice != nullptr; }
 			reference operator*(){ return pLattice->at(seqno_to_point(SeqNo, pLattice->size())); }
 			const_reference operator*()const{ return pLattice->at(seqno_to_point(SeqNo, pLattice->size())); }
 			pointer operator->(){ return &(pLattice->at(seqno_to_point(SeqNo, pLattice->size()))); }
@@ -102,6 +103,7 @@ namespace hmLib{
 			basic_const_iterator(const lattice& Lattice_, diff_type SeqNo_) :pLattice(&Lattice_), SeqNo(SeqNo_){}
 			basic_const_iterator(basic_iterator<lattice_> Iterator): pLattice(Iterator.pLattice), SeqNo(Iterator.SeqNo){}
 		public:
+			operator bool()const{ return pLattice != nullptr; }
 			const_reference operator*()const{ return pLattice->at(seqno_to_point(SeqNo, pLattice->size())); }
 			const_pointer operator->()const{ return &(pLattice->at(seqno_to_point(SeqNo, pLattice->size()))); }
 			const_reference operator[](diff_type Dif_)const{ return pLattice->at(seqno_to_point(SeqNo + Dif_, pLattice->size())); }
