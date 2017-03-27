@@ -243,6 +243,12 @@
     <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\locator.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\iterator.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp">
