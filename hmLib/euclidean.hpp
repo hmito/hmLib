@@ -34,8 +34,9 @@ namespace hmLib{
 				}
 				return *this;
 			}
-			template<typename T,typename...others>
-			point(T Value, others... Others) :Array{Value,Others...}{}
+			point(std::initializer_list<T> Values) :Array(){
+				std::copy(Values.begin(), Values.end(), Array.begin());
+			}
 			template<typename input_iterator>
 			point(input_iterator Begin_, input_iterator End_) : Array(){
 				std::copy(Begin_, End_, Array.begin());

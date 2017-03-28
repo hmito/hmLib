@@ -129,23 +129,23 @@ namespace hmLib{
 		private:
 			template<typename iterator>
 			void size_element_get(iterator Beg, iterator End)const {
-				*Beg = Size;
-				Lower.size_element_get(Beg++, End);
+				*Beg++ = Size;
+				Lower.size_element_get(Beg, End);
 			}
 			template<typename iterator>
 			void gap_element_get(iterator Beg, iterator End)const {
-				*Beg = Gap;
-				Lower.gap_element_get(Beg++, End);
+				*Beg++ = Gap;
+				Lower.gap_element_get(Beg, End);
 			}
 			template<typename iterator>
 			void size_element_set(iterator Beg, iterator End) {
-				Size = *Beg;
-				Lower.size_element_set(Beg++, End);
+				Size = *Beg++;
+				Lower.size_element_set(Beg, End);
 			}
 			template<typename iterator>
 			void gap_element_set(iterator Beg, iterator End) {
-				Gap = *Beg;
-				Lower.size_element_set(Beg++, End);
+				Gap = *Beg++;
+				Lower.gap_element_set(Beg, End);
 			}
 			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_)const {
 				if (Step_ < 0) {

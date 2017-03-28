@@ -6,18 +6,20 @@ namespace hmLib{
 	namespace lattices{
 		template<typename lattice_>
 		struct basic_const_iterator;
-
 		template<typename lattice_>
 		struct basic_iterator{
 			friend struct basic_const_iterator<lattice_>;
 		public:
 			using this_type = basic_iterator<lattice_>;
 			using lattice = lattice_;
+			using value_type = typename lattice::value_type;
 			using reference = typename lattice::reference;
 			using const_reference = typename lattice::const_reference;
 			using pointer = typename lattice::pointer;
 			using const_pointer = typename lattice::const_pointer;
 			using point_type = typename lattice::point_type;
+			using difference_type = diff_type;
+			using iterator_category = std::random_access_iterator_tag;
 		private:
 			lattice* pLattice;
 			diff_type SeqNo;
@@ -30,22 +32,24 @@ namespace hmLib{
 			basic_iterator(lattice& Lattice_, diff_type SeqNo_) :pLattice(&Lattice_), SeqNo(SeqNo_){}
 		public:
 			operator bool()const{ return pLattice != nullptr; }
-			reference operator*(){ return pLattice->at(seqno_to_point(SeqNo, pLattice->size())); }
-			const_reference operator*()const{ return pLattice->at(seqno_to_point(SeqNo, pLattice->size())); }
-			pointer operator->(){ return &(pLattice->at(seqno_to_point(SeqNo, pLattice->size()))); }
-			const_pointer operator->()const{ return &(pLattice->at(seqno_to_point(SeqNo, pLattice->size()))); }
-			reference operator[](diff_type Dif_){ return pLattice->at(seqno_to_point(SeqNo + Dif_, pLattice->size())); }
-			const_reference operator[](diff_type Dif_)const{ return pLattice->at(seqno_to_point(SeqNo + Dif_, pLattice->size())); }
+			reference operator*(){ return pLattice->at(index_to_point(SeqNo, pLattice->size())); }
+			const_reference operator*()const{ return pLattice->at(index_to_point(SeqNo, pLattice->size())); }
+			pointer operator->(){ return &(pLattice->at(index_to_point(SeqNo, pLattice->size()))); }
+			const_pointer operator->()const{ return &(pLattice->at(index_to_point(SeqNo, pLattice->size()))); }
+			reference operator[](diff_type Dif_){ return pLattice->at(index_to_point(SeqNo + Dif_, pLattice->size())); }
+			const_reference operator[](diff_type Dif_)const{ return pLattice->at(index_to_point(SeqNo + Dif_, pLattice->size())); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }
 			this_type operator++(int){
 				this_type Other(*this);
-				return ++Other;
+				++(*this);
+				return Other;
 			}
 			this_type& operator--(){ --SeqNo; return *this; }
 			this_type operator--(int){
 				this_type Other(*this);
-				return --Other;
+				--(*this);
+				return Other;
 			}
 			this_type& operator+=(diff_type Dif_){ SeqNo += Dif; return *this; }
 			friend this_type operator+(const this_type& Loc, diff_type Dif){
@@ -92,9 +96,12 @@ namespace hmLib{
 		public:
 			using this_type = basic_const_iterator<lattice_>;
 			using lattice = lattice_;
-			using const_reference = typename lattice::const_reference;
-			using const_pointer = typename lattice::const_pointer;
+			using value_type = typename lattice::value_type;
+			using reference = typename lattice::const_reference;
+			using pointer = typename lattice::const_pointer;
 			using point_type = typename lattice::point_type;
+			using difference_type = diff_type;
+			using iterator_category = std::random_access_iterator_tag;
 		private:
 			const lattice* pLattice;
 			diff_type SeqNo;
@@ -108,9 +115,9 @@ namespace hmLib{
 			basic_const_iterator(basic_iterator<lattice_> Iterator): pLattice(Iterator.pLattice), SeqNo(Iterator.SeqNo){}
 		public:
 			operator bool()const{ return pLattice != nullptr; }
-			const_reference operator*()const{ return pLattice->at(seqno_to_point(SeqNo, pLattice->size())); }
-			const_pointer operator->()const{ return &(pLattice->at(seqno_to_point(SeqNo, pLattice->size()))); }
-			const_reference operator[](diff_type Dif_)const{ return pLattice->at(seqno_to_point(SeqNo + Dif_, pLattice->size())); }
+			reference operator*()const{ return pLattice->at(index_to_point(SeqNo, pLattice->size())); }
+			pointer operator->()const{ return &(pLattice->at(index_to_point(SeqNo, pLattice->size()))); }
+			reference operator[](diff_type Dif_)const{ return pLattice->at(index_to_point(SeqNo + Dif_, pLattice->size())); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }
 			this_type operator++(int){

@@ -33,6 +33,9 @@ public:
 		container Con(1000);
 
 		auto UsedSize = lattices::make_point(4, 5);
+		Assert::AreEqual(4, UsedSize[0], L"Axis Size Error");
+		Assert::AreEqual(5, UsedSize[1], L"Axis Size Error");
+
 		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), UsedSize);
 
 		Assert::AreEqual(4u, Lattice.axis_size<0>(), L"Axis Size Error");
@@ -40,7 +43,52 @@ public:
 		auto Size = Lattice.size();
 		Assert::AreEqual(4, Size[0], L"Size Error");
 		Assert::AreEqual(5, Size[1], L"Size Error");
+	}
+	TEST_METHOD(iterator){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
 
+		container Con(90);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]()->int{return Val++; });
+
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 9, 10);
+
+		auto Begin = Lattice.begin();
+		auto End = Lattice.end();
+		for (int i = 0; i < 90; ++i) {
+			Assert::AreEqual(i, Con[i]);
+			Assert::AreEqual(i, Begin.get_index());
+			Assert::IsTrue(Begin != End);
+			Assert::AreEqual(i, *Begin);
+			Assert::AreEqual<int>(90-i, std::distance(Begin,End));
+			++Begin;
+		}
+		Assert::IsTrue(Begin == End);
+	}
+	TEST_METHOD(const_iterator) {
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(90);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
+
+
+		lattice_view<iterator, 2>  Lattice2(Con.begin(), Con.end(), 9, 10);
+		const lattice_view<iterator, 2>& Lattice = Lattice2;
+
+		auto Begin = Lattice.begin();
+		auto End = Lattice.end();
+		for (int i = 0; i < 90; ++i) {
+			Assert::AreEqual(i, Con[i]);
+			Assert::AreEqual(i, Begin.get_index());
+			Assert::IsTrue(Begin != End);
+			Assert::AreEqual(i, *Begin);
+			Assert::AreEqual<int>(90 - i, std::distance(Begin, End));
+			++Begin;
+		}
+		Assert::IsTrue(Begin == End);
 	}
 /*	TEST_METHOD(locator) {
 		using container = std::vector<int>;
