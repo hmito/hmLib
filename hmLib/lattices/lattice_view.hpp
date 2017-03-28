@@ -56,7 +56,7 @@ namespace hmLib{
 		}
 	private:
 		lattice_view(this_type& Ref, point_type Pos_, point_type Size_, point_type Gap_, diff_type Base_)
-			: Base(Ref)
+			: Base(&Ref)
 			, Begin(Ref.Begin)
 			, Pos(Pos_)
 			, Indexer(Size_, Gap_, Base_) {
@@ -106,9 +106,9 @@ namespace hmLib{
 			return locate(lattices::make_point(Pos_, Others_...));
 		}
 		//!Return locator of (0,0,0...)
-		locator front_locate(){return Pos; }
+		locator front_locate() { return locator(base_lattice(), Pos); }
 		//!Return locator of (size-1)
-		locator back_locate(){return locate(size() + Pos + lattices::make_filled_point(-1)); }
+		locator back_locate(){return locator(base_lattice(), size() + Pos + lattices::make_filled_point<dim_>(-1)); }
 	public:
 		this_type sublattice(point_type Point_, point_type Size_){
 			diff_type Base = 0;
@@ -118,13 +118,13 @@ namespace hmLib{
 			diff_type OStep = 1;
 			for (unsigned int i = 0; i < dim(); ++i) {
 				Gap[i] = OStep - Step;
-				Step = Step*Size[i] + Gap[i];
+				Step = Step*Size_[i] + Gap[i];
 				OStep *= ThisSize[i];
 			}
 			return this_type(*this, Point_+Pos, Size_, Gap, lattices::point_to_index(Point_+Pos, base_lattice().size()));
 		}
 	private:
-		this_type& base_lattice() { return (Base == nullptr ? *this : Base); }
+		this_type& base_lattice() { return (Base == nullptr ? *this : *Base); }
 	private:
 		//!pointer to theoriginal (i.e. first order) lattice
 		this_type* Base;

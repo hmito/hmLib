@@ -30,7 +30,7 @@ namespace hmLib{
 			return Pos;
 		}
 		template<unsigned int dim_>
-		index_type point_tp_index(point<dim_> Point, const point<dim_>& Size) {
+		index_type point_to_index(point<dim_> Point, const point<dim_>& Size) {
 			diff_type Index = Point[0];
 			for (unsigned int no = 1; no < dim_; ++no) {
 				Index += Point[no]*Size[no-1];

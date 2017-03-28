@@ -34,9 +34,13 @@ namespace hmLib{
 			static constexpr unsigned int dim() { return dim_; }
 		public:
 			lattice_indexer() : Size(0), Gap(0), Lower() {}
-			lattice_indexer(point_type Size_, point_type Gap_= point_type()) : Size(0), Gap(0), Lower() {
+			lattice_indexer(point_type Size_) : Size(0), Gap(0), Lower() {
+				size_element_set(Size_.begin(), Size_.end());
+			}
+			lattice_indexer(point_type Size_, point_type Gap_, diff_type Base_) : Size(0), Gap(0), Lower() {
 				size_element_set(Size_.begin(), Size_.end());
 				gap_element_set(Gap_.begin(), Gap_.end());
+				set_base(Base_);
 			}
 			lattice_indexer(const std::initializer_list<index_type>& Size_) : Size(0), Gap(0), Lower() {
 				size_element_set(Size_.begin(), Size_.end());
