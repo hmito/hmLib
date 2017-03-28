@@ -41,9 +41,10 @@ namespace hmLib{
 			lattice_indexer(const std::initializer_list<index_type>& Size_) : Size(0), Gap(0), Lower() {
 				size_element_set(Size_.begin(), Size_.end());
 			}
-			lattice_indexer(const std::initializer_list<index_type>& Size_, const std::initializer_list<index_type>& Gap_) : Size(0), Gap(0), Lower() {
+			lattice_indexer(const std::initializer_list<index_type>& Size_, const std::initializer_list<index_type>& Gap_, diff_type Base_) : Size(0), Gap(0), Lower() {
 				size_element_set(Size_.begin(), Size_.end());
 				gap_element_set(Gap_.begin(), Gap_.end());
+				set_base(Base_);
 			}
 			template<typename... others>
 			lattice_indexer(size_type  Size_, others... Others) : Size(Size_), Gap(0), Lower(Others...) {

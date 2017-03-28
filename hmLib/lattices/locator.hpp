@@ -21,10 +21,8 @@ namespace hmLib{
 		public:
 			basic_locator() :pLattice(nullptr), Pos(){}
 			basic_locator(lattice& Lattice_, point_type Pos_) :pLattice(&Lattice_), Pos(Pos_){}
-//			basic_locator(basic_iterator<lattice_>& Itr) :pLattice(&(Itr.get_lattice())), Pos(Itr.get_point()){}
+			basic_locator(basic_iterator<lattice_>& Itr) :pLattice(&(Itr.get_lattice().base_lattice())), Pos(Itr.get_lattice().index_to_point(Itr.get_index())){}
 		public:
-			point_type& pos(){ return Pos; }
-			const point_type& pos() const{ return Pos; }
 			reference operator*(){ return pLattice->at(Pos); }
 			const_reference operator*()const{ return pLattice->at(Pos); }
 			pointer operator->(){ return &(pLattice->at(Pos)); }
@@ -84,17 +82,19 @@ namespace hmLib{
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Pos == Loc2.Pos; }
 			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return Loc1.Pos != Loc2.Pos; }
 		public:
+			void set(const point_type& Pos_) { Pos = Pos_; }
 			this_type& add(const point_type& Dif){ return operator+=(Dif); }
 			this_type plus(const point_type& Dif){ return *this + (Dif); }
 			template<typename... args>
 			this_type& add(args... Args){ return operator+=(lattices::make_point(Args...)); }
 			template<typename... args>
 			this_type plus(args... Args){ return *this + lattices::make_point(Args...); }
+		public:
+			lattice_view& get_lattice(){ return *pLattice; }
+			const lattice_view& get_lattice()const { return *pLattice; }
+			point_type& get_point(){ return Pos; }
+			const point_type& get_point()const { return Pos; }
 		};
-	}
-	template<typename lattice_t>
-	lattice_t sublattice(lattices::basic_locator<lattice_t> Lat1, lattices::basic_locator<lattice_t> Lat2){
-
 	}
 }
 #

@@ -17,12 +17,12 @@ namespace hmLib{
 			using const_reference = typename lattice::const_reference;
 			using pointer = typename lattice::pointer;
 			using const_pointer = typename lattice::const_pointer;
-			using locator = basic_locator<lattice_>;
+			using point_type = typename lattice::point_type;
 		private:
 			lattice* pLattice;
 			diff_type SeqNo;
 		public:
-			basic_iterator() :pLattice(nullptr), SeqNo(){}
+			basic_iterator() :pLattice(nullptr), SeqNo(0){}
 			basic_iterator(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
 			basic_iterator(this_type&&) = default;
@@ -64,6 +64,10 @@ namespace hmLib{
 				return Loc1.SeqNo - Loc2.SeqNo;
 			}
 		public:
+			lattice_view& get_lattice(){ return *pLattice; }
+			const lattice_view& get_lattice()const { return *pLattice; }
+			diff_type get_index()const { return SeqNo; }
+		public:
 			friend bool operator==(const this_type& val1, const this_type& val2){
 				return val1.SeqNo == val2.SeqNo;
 			}
@@ -90,12 +94,12 @@ namespace hmLib{
 			using lattice = lattice_;
 			using const_reference = typename lattice::const_reference;
 			using const_pointer = typename lattice::const_pointer;
-			using locator = basic_locator<lattice_>;
+			using point_type = typename lattice::point_type;
 		private:
 			const lattice* pLattice;
 			diff_type SeqNo;
 		public:
-			basic_const_iterator() :pLattice(nullptr), SeqNo(){}
+			basic_const_iterator() :pLattice(nullptr), SeqNo(0){}
 			basic_const_iterator(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
 			basic_const_iterator(this_type&&) = default;
@@ -153,6 +157,9 @@ namespace hmLib{
 			friend bool operator>=(const this_type& val1, const this_type& val2){
 				return val1.SeqNo >= val2.SeqNo;
 			}
+		public:
+			const lattice_view& get_lattice()const { return *pLattice; }
+			diff_type get_index()const { return SeqNo; }
 		};
 	}
 }
