@@ -44,12 +44,14 @@ namespace hmLib{
 			, Begin(Begin_)
 			, Pos()
 			, Indexer(Size_, Others_...){
+			hmLib_assert(std::distance(Begin_, End_) <= static_cast<diff_type>(lattice_size()), lattices::invalid_view_range,"The given range is smaller than the lattice size.");
 		}
 		lattice_view(iterator_base Begin_, iterator_base End_, point_type Size_)
 			: Base(nullptr)
 			, Begin(Begin_)
 			, Pos()
 			, Indexer(Size_) {
+			hmLib_assert(std::distance(Begin_, End_) <= static_cast<diff_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
 		}
 	private:
 		lattice_view(this_type& Ref, point_type Pos_, point_type Size_, point_type Gap_, diff_type Base_)
@@ -105,7 +107,7 @@ namespace hmLib{
 		//!Return locator of (0,0,0...)
 		locator front_locate(){return Pos; }
 		//!Return locator of (size-1)
-		locator back_locate(){return locate(size() + Pos + lattices::make_filled_point(-1); }
+		locator back_locate(){return locate(size() + Pos + lattices::make_filled_point(-1)); }
 	public:
 		this_type sublattice(point_type Point_, point_type Size_){
 			diff_type Base = 0;

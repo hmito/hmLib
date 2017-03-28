@@ -58,13 +58,13 @@ namespace hmLib{
 			//!Get number of elements included in the lattice
 			size_type lattice_size()const { return Size*Lower.lattice_size(); }
 			//!Get point_type Size
-			point_type size()const { return size_element_get(0, point_type()); }
+			point_type size()const { point_type Ans;  size_element_get(Ans.begin(), Ans.end()); return Ans; }
 			//!Get point_type Gap
-			point_type gap()const { return gap_element_get(0, point_type()); }
+			point_type gap()const { point_type Ans;  gap_element_get(Ans.begin(), Ans.end()); return Ans; }
 			//!Set point_type Size and Gap
-			void resize(point_type Size_, point_type Gap_ = point_type()) { size_element_set(0, Size_); gap_element_set(0, Gap_); }
+			void resize(point_type Size_, point_type Gap_ = point_type()) { size_element_set(Size_.begin(), Size_.end()); gap_element_set(Gap_.begin(), Gap_.end()); }
 			//!Set point_type Gap
-			void set_gap(point_type Gap_){ gap_element_set(0, Gap_); }
+			void set_gap(point_type Gap_){ gap_element_set(Gap_.begin(), Gap_.end()); }
 			//!Get the size of req_dim_ dimmension
 			template<unsigned int  req_dim_>
 			size_type axis_size()const {
@@ -128,12 +128,12 @@ namespace hmLib{
 			lower_type Lower;
 		private:
 			template<typename iterator>
-			void size_element_get(iterator Beg, iterator End) {
+			void size_element_get(iterator Beg, iterator End)const {
 				*Beg = Size;
 				Lower.size_element_get(Beg++, End);
 			}
 			template<typename iterator>
-			void gap_element_get(iterator Beg, iterator End) {
+			void gap_element_get(iterator Beg, iterator End)const {
 				*Beg = Gap;
 				Lower.gap_element_get(Beg++, End);
 			}
@@ -219,9 +219,9 @@ namespace hmLib{
 			diff_type Base;
 		private:
 			template<typename iterator>
-			void size_element_get(iterator Beg, iterator End) {}
+			void size_element_get(iterator Beg, iterator End)const {}
 			template<typename iterator>
-			void gap_element_get(iterator Beg, iterator End) {}
+			void gap_element_get(iterator Beg, iterator End)const {}
 			template<typename iterator>
 			void size_element_set(iterator Beg, iterator End) {}
 			template<typename iterator>

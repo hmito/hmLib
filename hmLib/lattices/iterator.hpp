@@ -64,8 +64,8 @@ namespace hmLib{
 				return Loc1.SeqNo - Loc2.SeqNo;
 			}
 		public:
-			lattice_view& get_lattice(){ return *pLattice; }
-			const lattice_view& get_lattice()const { return *pLattice; }
+			lattice& get_lattice(){ return *pLattice; }
+			const lattice& get_lattice()const { return *pLattice; }
 			diff_type get_index()const { return SeqNo; }
 		public:
 			friend bool operator==(const this_type& val1, const this_type& val2){
@@ -158,7 +158,7 @@ namespace hmLib{
 				return val1.SeqNo >= val2.SeqNo;
 			}
 		public:
-			const lattice_view& get_lattice()const { return *pLattice; }
+			const lattice& get_lattice()const { return *pLattice; }
 			diff_type get_index()const { return SeqNo; }
 		};
 	}

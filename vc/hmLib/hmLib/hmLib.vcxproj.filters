@@ -129,9 +129,6 @@
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>

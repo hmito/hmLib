@@ -90,8 +90,8 @@ namespace hmLib{
 			template<typename... args>
 			this_type plus(args... Args){ return *this + lattices::make_point(Args...); }
 		public:
-			lattice_view& get_lattice(){ return *pLattice; }
-			const lattice_view& get_lattice()const { return *pLattice; }
+			lattice& get_lattice(){ return *pLattice; }
+			const lattice& get_lattice()const { return *pLattice; }
 			point_type& get_point(){ return Pos; }
 			const point_type& get_point()const { return Pos; }
 		};

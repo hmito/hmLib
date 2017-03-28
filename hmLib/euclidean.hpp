@@ -37,7 +37,9 @@ namespace hmLib{
 			template<typename T,typename...others>
 			point(T Value, others... Others) :Array{Value,Others...}{}
 			template<typename input_iterator>
-			point(input_iterator Begin_, input_iterator End_) : Array(Begin_,End_){}
+			point(input_iterator Begin_, input_iterator End_) : Array(){
+				std::copy(Begin_, End_, Array.begin());
+			}
 			explicit point(T val) :Array(){ Array.fill(val); }
 		public:
 			this_type& operator+=(const this_type& Other){

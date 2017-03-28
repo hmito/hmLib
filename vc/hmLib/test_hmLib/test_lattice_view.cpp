@@ -15,20 +15,16 @@ public:
 		using iterator = container::iterator;
 
 		container Con(1000);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]() {return ++Val; });
 
 		lattice_view<iterator, 2>  Lattice(Con.begin(),Con.end(), 4, 5);
 
-		Assert::AreEqual(4, Lattice.axis_size<0>(), L"Axis Size Error");
-		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+		Assert::AreEqual(4u, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5u, Lattice.axis_size<1>(), L"Axis Size Error");
 		auto Size = Lattice.size();
 		Assert::AreEqual(4, Size[0], L"Size Error");
 		Assert::AreEqual(5, Size[1], L"Size Error");
-
-		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
-		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
-		auto Gap = Lattice.gap();
-		Assert::AreEqual(0, Gap[0], L"Gap Error");
-		Assert::AreEqual(0, Gap[1], L"Gap Error");
 	}
 	TEST_METHOD(construct_with_point) {
 		using container = std::vector<int>;
@@ -36,21 +32,17 @@ public:
 
 		container Con(1000);
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), { 10,20 }, {2,2});
+		auto UsedSize = lattices::make_point(4, 5);
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), UsedSize);
 
-		Assert::AreEqual(4, Lattice.axis_size<0>(), L"Axis Size Error");
-		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
+		Assert::AreEqual(4u, Lattice.axis_size<0>(), L"Axis Size Error");
+		Assert::AreEqual(5u, Lattice.axis_size<1>(), L"Axis Size Error");
 		auto Size = Lattice.size();
 		Assert::AreEqual(4, Size[0], L"Size Error");
 		Assert::AreEqual(5, Size[1], L"Size Error");
 
-		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
-		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
-		auto Gap = Lattice.gap();
-		Assert::AreEqual(0, Gap[0], L"Gap Error");
-		Assert::AreEqual(0, Gap[1], L"Gap Error");
 	}
-	TEST_METHOD(locator) {
+/*	TEST_METHOD(locator) {
 		using container = std::vector<int>;
 		using iterator = container::iterator;
 		using namespace hmLib::euclidean;
@@ -113,12 +105,6 @@ public:
 		}
 
 		auto SubLattice = Lattice, sublattice(make_point(2, 3), make_point(10, 5));
-
-		Assert::AreEqual(10, Lattice.axis_size<0>(), L"Axis Size Error");
-		Assert::AreEqual(5, Lattice.axis_size<1>(), L"Axis Size Error");
-
-		Assert::AreEqual(0, Lattice.axis_gap<0>(), L"Axis Gap Error");
-		Assert::AreEqual(0, Lattice.axis_gap<1>(), L"Axis Gap Error");
 	}
 	TEST_METHOD(sublattice_point) {
 		using container = std::vector<int>;
@@ -631,7 +617,7 @@ public:
 		for(auto val : Pos1){
 			Assert::AreEqual(20, val, L"fill Error");
 		}
-	}
-	*/
+
+	}	*/
 };
 }

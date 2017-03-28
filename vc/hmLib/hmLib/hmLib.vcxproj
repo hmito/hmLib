@@ -102,7 +102,6 @@
     <ClInclude Include="..\..\..\hmLib\lattices.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\iterator.hpp" />
-    <ClInclude Include="..\..\..\hmLib\lattices\iterator_base.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\locator.hpp" />
