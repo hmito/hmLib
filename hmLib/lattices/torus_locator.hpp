@@ -83,22 +83,6 @@ namespace hmLib{
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
 				return Loc1.point() - Loc2.point();
 			}
-			friend point_type distance(const this_type& Loc1, const this_type& Loc2){
-				point_type v1 = Loc1.torus_point();
-				point_type v2 = Loc2.torus_point();
-
-				point_type Ans;
-				for(unsigned int i = 0; i < dim_; ++i){
-					diff_type Dis = v2[i] - v1[i];
-					if(Dis > Indexer.size()[i] / 2){
-						Dis -= Index.size()[i];
-					} else if(Dis < -Indexer.size()[i] / 2){
-						Dis += Index.size()[i];
-					}
-					Ans[i] = Dis;
-				}
-				return Ans;
-			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.torus_point() == Loc2.torus_point(); }
 			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
@@ -116,7 +100,7 @@ namespace hmLib{
 			}
 			point_type& point(){ return Pos; }
 			const point_type& point()const{ return Pos; }
-			const point_type& size()const{ return Indexer.size(); }
+			point_type size()const{ return Indexer.size(); }
 			iterator get_base_iterator()const{ return Begin; }
 		private:
 			point_type make_torus_point(const point_type& Point){
@@ -227,7 +211,8 @@ namespace hmLib{
 			}
 			point_type& point(){ return Pos; }
 			const point_type& point()const{ return Pos; }
-			const point_type& size()const{ return Indexer.size(); }
+			point_type size()const{ return Indexer.size(); }
+			iterator get_base_iterator()const{ return Begin; }
 		private:
 			point_type make_torus_point(const point_type& Point){
 				return lattices::make_torus_point(Point, Indexer.size());
@@ -237,6 +222,40 @@ namespace hmLib{
 			point_type Pos;
 			indexer Indexer;
 		};
+		template<typename iterator_, typename indexer_>
+		typename basic_torus_locator<iterator_, indexer_>::point_type distance(const basic_torus_locator<iterator_, indexer_>& Loc1, const basic_torus_locator<iterator_, indexer_>& Loc2){
+			auto v1 = Loc1.torus_point();
+			auto v2 = Loc2.torus_point();
+
+			point_type Ans;
+			for(unsigned int i = 0; i < dim_; ++i){
+				diff_type Dis = v2[i] - v1[i];
+				if(Dis > Loc1..size()[i] / 2){
+					Dis -= Loc1.size()[i];
+				} else if(Dis < -Loc1.size()[i] / 2){
+					Dis += Loc1.size()[i];
+				}
+				Ans[i] = Dis;
+			}
+			return Ans;
+		}
+		template<typename iterator_, typename indexer_>
+		typename basic_const_torus_locator<iterator_, indexer_>::point_type distance(const basic_const_torus_locator<iterator_, indexer_>& Loc1, const basic_const_torus_locator<iterator_, indexer_>& Loc2){
+			auto v1 = Loc1.torus_point();
+			auto v2 = Loc2.torus_point();
+
+			point_type Ans;
+			for(unsigned int i = 0; i < dim_; ++i){
+				diff_type Dis = v2[i] - v1[i];
+				if(Dis > Loc1..size()[i] / 2){
+					Dis -= Loc1.size()[i];
+				} else if(Dis < -Loc1.size()[i] / 2){
+					Dis += Loc1.size()[i];
+				}
+				Ans[i] = Dis;
+			}
+			return Ans;
+		}
 	}
 }
 #

@@ -96,7 +96,7 @@ namespace hmLib{
 		public:
 			point_type& point(){ return Pos; }
 			const point_type& point()const{ return Pos; }
-			const point_type& size()const{ return Indexer.size(); }
+			point_type size()const{ return Indexer.size(); }
 			iterator get_base_iterator()const{ return Begin; }
 		private:
 			iterator Begin;
@@ -184,7 +184,8 @@ namespace hmLib{
 		public:
 			point_type& point(){ return Pos; }
 			const point_type& point()const{ return Pos; }
-			const point_type& size()const{ return Indexer.size(); }
+			point_type size()const{ return Indexer.size(); }
+			iterator get_base_iterator()const{ return Begin; }
 		private:
 			iterator Begin;
 			point_type Pos;
