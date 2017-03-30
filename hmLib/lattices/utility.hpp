@@ -38,6 +38,20 @@ namespace hmLib{
 
 			return Index;
 		}
+		template<unsigned int dim_>
+		point<dim_> make_torus_point(const point<dim_>& Point, const point<dim_>& Size){
+			point<dim_> Ans = Point;
+			for(unsigned int i = 0; i < dim_; ++i){
+				Ans[i] = algorithm::positive_mod(Ans[i], Size[i]);
+			}
+			return Ans;
+		}
+		template<unsigned int dim_>
+		void torus_point(point<dim_>& Point, const point<dim_>& Size){
+			for(unsigned int i = 0; i < dim_; ++i){
+				Point[i] = algorithm::positive_mod(Ans[i], Size[i]);
+			}
+		}
 	}
 }
 #

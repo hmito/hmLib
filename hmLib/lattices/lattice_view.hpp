@@ -99,7 +99,7 @@ namespace hmLib{
 		point_type size()const{ return Size; }
 		//!Return Point from Index value
 		point_type index_to_point(diff_type Index) {
-			return lattices::index_to_point(Index, Indexer.size())+Pos;
+			return lattices::index_to_point(Index, Size)+Pos;
 		}
 	public:
 		//!Return begin iterator fot the lattice
@@ -219,7 +219,7 @@ namespace hmLib{
 		point_type size()const{ return Size; }
 		//!Return Point from Index value
 		point_type index_to_point(diff_type Index){
-			return lattices::index_to_point(Index, Indexer.size()) + Pos;
+			return lattices::index_to_point(Index, Size) + Pos;
 		}
 	public:
 		//!Return begin iterator fot the lattice

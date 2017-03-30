@@ -234,9 +234,6 @@
     <ClInclude Include="..\..\..\hmLib\lattices\utility.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_indexer.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices\locator.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
@@ -244,6 +241,9 @@
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\torus_locator.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
