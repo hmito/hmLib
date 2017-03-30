@@ -103,6 +103,7 @@
     <ClInclude Include="..\..\..\hmLib\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\iterator.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp" />
+    <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer2.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\locator.hpp" />
     <ClInclude Include="..\..\..\hmLib\lattices\torus_lattice_indexer.hpp" />

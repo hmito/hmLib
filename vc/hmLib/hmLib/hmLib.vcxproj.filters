@@ -228,9 +228,6 @@
     <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h">
       <Filter>hmLib\comgate\winRS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\euclidean.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -244,6 +241,12 @@
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices\iterator.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer2.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>

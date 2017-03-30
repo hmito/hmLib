@@ -122,12 +122,14 @@ namespace hmLib{
 			this_type& operator++(){ ++SeqNo; return *this; }
 			this_type operator++(int){
 				this_type Other(*this);
-				return ++Other;
+				++(*this);
+				return Other;
 			}
 			this_type& operator--(){ --SeqNo; return *this; }
 			this_type operator--(int){
 				this_type Other(*this);
-				return --Other;
+				--(*this);
+				return Other;
 			}
 			this_type& operator+=(diff_type Dif_){ SeqNo += Dif; return *this; }
 			friend this_type operator+(const this_type& Loc, diff_type Dif){
