@@ -18,6 +18,7 @@ namespace hmLib{
 			using pointer = typename lattice::pointer;
 			using const_pointer = typename lattice::const_pointer;
 			using point_type = typename lattice::point_type;
+			using locator = typename lattice::locator;
 			using difference_type = diff_type;
 			using iterator_category = std::random_access_iterator_tag;
 		private:
@@ -38,6 +39,9 @@ namespace hmLib{
 			const_pointer operator->()const{ return &(pLattice->at(index_to_point(SeqNo, pLattice->size()))); }
 			reference operator[](diff_type Dif_){ return pLattice->at(index_to_point(SeqNo + Dif_, pLattice->size())); }
 			const_reference operator[](diff_type Dif_)const{ return pLattice->at(index_to_point(SeqNo + Dif_, pLattice->size())); }
+		public:
+			locator locate(){ return pLattice->locate(index_to_point(SeqNo, pLattice->size())); }
+			operator locator(){ return locate(); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }
 			this_type operator++(int){

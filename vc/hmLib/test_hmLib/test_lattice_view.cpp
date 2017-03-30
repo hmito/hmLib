@@ -20,8 +20,6 @@ public:
 
 		lattice_view<iterator, 2>  Lattice(Con.begin(),Con.end(), 4, 5);
 
-		Assert::AreEqual(4u, Lattice.axis_size<0>(), L"Axis Size Error");
-		Assert::AreEqual(5u, Lattice.axis_size<1>(), L"Axis Size Error");
 		auto Size = Lattice.size();
 		Assert::AreEqual(4, Size[0], L"Size Error");
 		Assert::AreEqual(5, Size[1], L"Size Error");
@@ -38,8 +36,6 @@ public:
 
 		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), UsedSize);
 
-		Assert::AreEqual(4u, Lattice.axis_size<0>(), L"Axis Size Error");
-		Assert::AreEqual(5u, Lattice.axis_size<1>(), L"Axis Size Error");
 		auto Size = Lattice.size();
 		Assert::AreEqual(4, Size[0], L"Size Error");
 		Assert::AreEqual(5, Size[1], L"Size Error");
@@ -147,8 +143,9 @@ public:
 
 		auto Sub = Lattice.sublattice(lattices::make_point(2, 3), lattices::make_point(4, 5));
 
-		Assert::AreEqual(4u, Sub.axis_size<0>());
-		Assert::AreEqual(5u, Sub.axis_size<1>());
+		auto Size = Sub.size();
+		Assert::AreEqual(4, Size[0], L"Size Error");
+		Assert::AreEqual(5, Size[1], L"Size Error");
 
 		Assert::AreEqual(2 + 3 * 9, Sub.at(0, 0));
 		Assert::AreEqual(5 + 4 * 9, Sub.at(3, 1));

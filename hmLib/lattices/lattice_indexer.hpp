@@ -32,92 +32,40 @@ namespace hmLib {
 		public:
 			static constexpr unsigned int dim() { return dim_; }
 		public:
-			lattice_indexer() : Pos(), Size(), OSize() {}
-			lattice_indexer(point_type Size_) : Pos(), Size(Size_), OSize(Size_) {}
-			lattice_indexer(point_type Pos_, point_type Size_, point_type OSize_) : Pos(Pos_), Size(Size_), OSize(OSize_) {}
+			lattice_indexer() : Size() {}
+			lattice_indexer(const point_type& Size_) : Size(Size_){}
+			lattice_indexer(const this_type&) = default;
+			lattice_indexer(this_type&&) = default;
+			this_type& operator=(const this_type&) = default;
+			this_type& operator=(this_type&&) = default;
 		public:
 			//!Get number of elements included in the lattice
 			size_type lattice_size()const { return std::accumulate(Size.begin(), Size.end(), 1, [](int v1, int v2)->int {return v1*v2; }); }
 			//!Get point_type Size
 			point_type size()const {return Size;}
 			//!Set point_type Size and Gap
-			void resize(point_type Size_) {
-				Pos.fill(0);
+			void resize(const point_type& Size_) {
 				Size = Size_;
-				OSize = Size_;
-			}
-			//!Set point_type Size and Gap
-			void resize(point_type Pos_, point_type Size_, point_type OSize_) {
-				Pos = Pos_;
-				Size = Size_;
-				OSize = OSize_;
 			}
 		public:
-			//Get index value from point with checking over range.
-			index_type index(point_type Point_)const {
-				Pos + Point_
+			//Get index value from point without checking over range.
+			index_type operator()(const point_type& Point_)const {
+				index_type Index = 0;
+				index_type Step = 1;
+				for(unsigned int i = 0; i < dim_; ++i){
+					Index += Point_[i] * Step;
+					Step *= Size[i];
+				}
+
+				return Index;
 			}
 			//Get index value from point without checking over range.
-			index_type operator()(point_type Point_)const {
-				return point_operator_index_calc(0, 1 + Gap, 0, Point_);
+			index_type index(const point_type& Point_)const{
+				hmLib_assert((lattices::make_filled_point<dim_>(0) <<= Point_) && (Point_ << Size), lattices::out_of_range_access, "Requested point is out of lattice.");
+				return operator()(Point_);
 			}
 		private:
-			point_type Pos;
 			point_type Size;
-			point_type OSize;
-		};
-		template<>
-		struct lattice_indexer<0> {
-			friend struct lattice_indexer<1>;
-			using this_type = lattice_indexer<0>;
-		public:
-			lattice_indexer() :Base(0) {}
-			template<typename... others>
-			index_type index(diff_type Pos_, others... Others)const {
-				static_assert(sizeof...(Others) == 0, "Argument for lattice_indexer::index is not enough");
-				return operator()(Pos_, Others...);
-			}
-			template<typename... others>
-			index_type operator()(diff_type Pos_, others... Others)const { return 0; }
-			size_type lattice_size()const { return 1; }
-			template<unsigned int req_dim_>
-			size_type axis_size()const {
-				return 1;
-			}
-			template<unsigned int req_dim_>
-			diff_type axis_gap()const {
-				return 0;
-			}
-			diff_type base()const { return Base; }
-			void set_base(diff_type Base_) { Base = Base_; }
-		private:
-			diff_type Base;
-		private:
-			template<typename iterator>
-			void size_element_get(iterator Beg, iterator End)const {}
-			template<typename iterator>
-			void gap_element_get(iterator Beg, iterator End)const {}
-			template<typename iterator>
-			void size_element_set(iterator Beg, iterator End) {}
-			template<typename iterator>
-			void gap_element_set(iterator Beg, iterator End) {}
-			std::pair<index_type, index_type> index_range_calc(index_type Min_, index_type Max_, diff_type Step_)const {
-				return std::pair<index_type, size_type>(Min_ + Base, Max_ + Base);
-			}
-			index_type index_calc(index_type Sum_, diff_type Step_)const {
-				return Sum_ + Base;
-			}
-			index_type operator_index_calc(index_type Sum_, diff_type Step_)const {
-				return Sum_ + Base;
-			}
-			template<typename point_t>
-			index_type point_index_calc(index_type Sum_, diff_type Step_, diff_type No_, const point_t& Point_)const {
-				return Sum_ + Base;
-			}
-			template<typename point_t>
-			index_type point_operator_index_calc(index_type Sum_, diff_type Step_, diff_type No_, const point_t& Point_)const {
-				return Sum_ + Base;
-			}
 		};
 	}
 }

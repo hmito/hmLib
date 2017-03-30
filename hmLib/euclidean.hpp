@@ -124,15 +124,6 @@ namespace hmLib{
 				this_type Ans = This;
 				return Ans /= Val;
 			}
-			friend bool operator==(const this_type& v1, const this_type& v2) {
-				for (unsigned int i = 0; i < dim_; ++i) {
-					if (v1[i] != v2[i])return false;
-				}
-				return true;
-			}
-			friend bool operator!=(const this_type& v1, const this_type& v2) {
-				return !(v1 == v2);
-			}
 		public:
 			T& operator[](int pos){ return Array[pos]; }
 			const T& operator[](int pos)const{ return Array[pos]; }
@@ -146,6 +137,64 @@ namespace hmLib{
 			const_iterator cend()const{ return Array.end(); }
 			void fill(T val){ Array.fill(val); }
 			void swap(this_type& Other){ Array.swap(Other.Array); }
+		public:
+			friend bool operator==(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return false;
+				}
+				return true;
+			}
+			friend bool operator!=(const this_type& v1, const this_type& v2){
+				return !(v1 == v2);
+			}
+			friend bool operator<(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] < v2[i];
+				}
+				return false;
+			}
+			friend bool operator<=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] < v2[i];
+				}
+				return true;
+			}
+			friend bool operator > (const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] > v2[i];
+				}
+				return false;
+			}
+			friend bool operator>=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] > v2[i];
+				}
+				return true;
+			}
+			friend bool operator<<(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] < v2[i]))return false;
+				}
+				return true;
+			}
+			friend bool operator<<=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] <= v2[i]))return false;
+				}
+				return true;
+			}
+			friend bool operator>>(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] > v2[i]))return false;
+				}
+				return true;
+			}
+			friend bool operator>>=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] >= v2[i]))return false;
+				}
+				return true;
+			}
 		};
 
 		template<typename T, typename ...others>
