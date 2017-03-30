@@ -243,9 +243,6 @@
     <ClInclude Include="..\..\..\hmLib\lattices\iterator.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer2.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hmLib\lattices\lattice_indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
