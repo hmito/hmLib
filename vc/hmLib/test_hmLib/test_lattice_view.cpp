@@ -197,6 +197,29 @@ public:
 		Assert::AreEqual(4, Sub.size()[0]);
 		Assert::AreEqual(5, Sub.size()[1]);
 	}
+	TEST_METHOD(sublattice_locator_ex){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(90);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
+
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 9, 10);
+
+		auto Sub = Lattice.sublattice(lattices::make_point(2, 3), lattices::make_point(4, 5));
+
+		auto Lotr = Sub.locate(2, 3);
+
+		Assert::AreEqual(4 + 4 + 9 * (6 + 0), Lotr.at(4, 0));
+		Assert::ExpectException<lattices::out_of_range_access>([&](){Lotr.at(5, 0); });
+		Assert::AreEqual(4 + 0 + 9 * (6 + 3), Lotr.at(0, 3));
+		Assert::ExpectException<lattices::out_of_range_access>([&](){Lotr.at(0, 4); });
+		Assert::AreEqual(4 + -4 + 9 * (6 + 0), Lotr.at(-4, 0));
+		Assert::ExpectException<lattices::out_of_range_access>([&](){Lotr.at(-5, 0); });
+		Assert::AreEqual(4 + 0 + 9 * (6 + -6), Lotr.at(0, -6));
+		Assert::ExpectException<lattices::out_of_range_access>([&](){Lotr.at(0, -7); });
+	}
 };
 
 TEST_CLASS(test_torus_lattice_view){
@@ -403,6 +426,72 @@ public:
 
 		Assert::AreEqual(4, Sub.size()[0]);
 		Assert::AreEqual(5, Sub.size()[1]);
+	}
+	TEST_METHOD(sublattice_locator_ex){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(90);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
+
+		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 9, 10);
+
+		auto Sub = Lattice.sublattice(lattices::make_point(2, 3), lattices::make_point(4, 5));
+
+		auto Lotr = Sub.locate(2, 3);
+
+		Assert::AreEqual(4 + 4 + 9 * (6 + 0), Lotr.at(4, 0));
+		Assert::AreEqual(4 + 5 -9 + 9 * (6 + 0), Lotr.at(5, 0));
+		Assert::AreEqual(4 + 0 + 9 * (6 + 3), Lotr.at(0, 3));
+		Assert::AreEqual(4 + 0 + 9 * (6 + 4 - 10), Lotr.at(0, 4));
+		Assert::AreEqual(4 + -4 + 9 * (6 + 0), Lotr.at(-4, 0));
+		Assert::AreEqual(4 + -5 + 9 + 9 * (6 + 0), Lotr.at(-5, 0));
+		Assert::AreEqual(4 + 0 + 9 * (6 + -6), Lotr.at(0, -6));
+		Assert::AreEqual(4 + 0 + 9 * (6 + -7 + 10), Lotr.at(0, -7));
+	}
+	TEST_METHOD(bsublattice){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(90);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
+
+		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 9, 10);
+
+		auto Sub = Lattice.sublattice(lattices::make_point(-2, -3), lattices::make_point(4, 5));
+
+		Assert::AreEqual(-2 + 0 + 9 + 9 * (-3 + 0 + 10), Sub.at(0, 0));
+		Assert::AreEqual(-2 + 1 + 9 + 9 * (-3 + 0 + 10), Sub.at(1, 0));
+		Assert::AreEqual(-2 + 2 + 9 * (-3 + 0 + 10), Sub.at(2, 0));
+		Assert::AreEqual(-2 + 3 + 9 * (-3 + 0 + 10), Sub.at(3, 0));
+		Assert::AreEqual(-2 + 0 + 9 + 9 * (-3 + 1 + 10), Sub.at(0, 1));
+		Assert::AreEqual(-2 + 0 + 9 + 9 * (-3 + 2 + 10), Sub.at(0, 2));
+		Assert::AreEqual(-2 + 0 + 9 + 9 * (-3 + 3), Sub.at(0, 3));
+		Assert::AreEqual(-2 + 3 + 9 * (-3 + 4), Sub.at(3, 4));
+	}
+	TEST_METHOD(bsublattice_iterator){
+		using container = std::vector<int>;
+		using iterator = container::iterator;
+
+		container Con(90);
+		int Val = 0;
+		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
+
+		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), 9, 10);
+
+		auto Sub = Lattice.sublattice(lattices::make_point(-2, -3), lattices::make_point(4, 5));
+
+		auto Itr = Sub.cbegin();
+
+		for(int y = 0; y < 5; ++y){
+			for(int x = 0; x < 4; ++x){
+				Assert::IsFalse(Itr == Sub.end());
+				Assert::AreEqual(hmLib::algorithm::positive_mod(-2 + x,9) + 9*hmLib::algorithm::positive_mod(-3 + y, 10),*Itr);
+				++Itr;
+			}
+		}
 	}
 };
 
