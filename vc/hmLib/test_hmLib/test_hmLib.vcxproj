@@ -171,6 +171,7 @@
     <ClCompile Include="test_chain.cpp" />
     <ClCompile Include="test_circular.cpp" />
     <ClCompile Include="test_euclidean.cpp" />
+    <ClCompile Include="test_lattice_indexer.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
     <ClCompile Include="test_odeint.cpp" />
     <ClCompile Include="test_resource.cpp" />
