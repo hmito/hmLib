@@ -211,7 +211,7 @@ namespace hmLib{
 			return value;
 		}
 		template<typename T, unsigned int dim>
-		T abs(const point<T, dim>& Elem){
+		double abs(const point<T, dim>& Elem){
 			return std::sqrt(sum_of_square(Elem));
 		}
 

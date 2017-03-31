@@ -2,7 +2,7 @@
 #define HMLIB_EXCEPTIONS_EXCEPTION_INC 100
 #
 #ifndef HMLIB_CONFIG_INC
-#	include "hmLib_config.h"
+//#	include "hmLib_config.h"
 #endif
 /*===exceptions::exception===
 基本的なマクロ宣言

@@ -55,7 +55,7 @@ namespace hmLib{
 				--(*this);
 				return Other;
 			}
-			this_type& operator+=(diff_type Dif_){ SeqNo += Dif; return *this; }
+			this_type& operator+=(diff_type Dif_){ SeqNo += Dif_; return *this; }
 			friend this_type operator+(const this_type& Loc, diff_type Dif){
 				auto Ans(Loc);
 				Ans += Dif;
