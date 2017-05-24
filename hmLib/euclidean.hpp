@@ -34,8 +34,13 @@ namespace hmLib{
 				}
 				return *this;
 			}
-			template<typename T,typename...others>
-			point(T Value, others... Others) :Array{Value,Others...}{}
+			point(std::initializer_list<T> Values) :Array(){
+				std::copy(Values.begin(), Values.end(), Array.begin());
+			}
+			template<typename input_iterator>
+			point(input_iterator Begin_, input_iterator End_) : Array(){
+				std::copy(Begin_, End_, Array.begin());
+			}
 			explicit point(T val) :Array(){ Array.fill(val); }
 		public:
 			this_type& operator+=(const this_type& Other){
@@ -132,6 +137,64 @@ namespace hmLib{
 			const_iterator cend()const{ return Array.end(); }
 			void fill(T val){ Array.fill(val); }
 			void swap(this_type& Other){ Array.swap(Other.Array); }
+		public:
+			friend bool operator==(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return false;
+				}
+				return true;
+			}
+			friend bool operator!=(const this_type& v1, const this_type& v2){
+				return !(v1 == v2);
+			}
+			friend bool operator<(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] < v2[i];
+				}
+				return false;
+			}
+			friend bool operator<=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] < v2[i];
+				}
+				return true;
+			}
+			friend bool operator > (const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] > v2[i];
+				}
+				return false;
+			}
+			friend bool operator>=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(v1[i] != v2[i])return v1[i] > v2[i];
+				}
+				return true;
+			}
+			friend bool operator<<(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] < v2[i]))return false;
+				}
+				return true;
+			}
+			friend bool operator<<=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] <= v2[i]))return false;
+				}
+				return true;
+			}
+			friend bool operator>>(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] > v2[i]))return false;
+				}
+				return true;
+			}
+			friend bool operator>>=(const this_type& v1, const this_type& v2){
+				for(unsigned int i = 0; i < dim_; ++i){
+					if(!(v1[i] >= v2[i]))return false;
+				}
+				return true;
+			}
 		};
 
 		template<typename T, typename ...others>
@@ -140,7 +203,7 @@ namespace hmLib{
 		}
 
 		template<typename T, unsigned int dim>
-		T length2(const point<T, dim>& Elem){
+		T sum_of_square(const point<T, dim>& Elem){
 			T value = Elem[0] * Elem[0];
 			for(unsigned int pos = 1; pos < dim; ++pos){
 				value += Elem[pos] * Elem[pos];
@@ -148,9 +211,23 @@ namespace hmLib{
 			return value;
 		}
 		template<typename T, unsigned int dim>
-		T length(const point<T, dim>& Elem){
-			return std::sqrt(length2(Elem));
+		double abs(const point<T, dim>& Elem){
+			return std::sqrt(sum_of_square(Elem));
 		}
+
+		template<typename T>
+		using point1d = point<T, 1>;
+		template<typename T>
+		using point2d = point<T, 2>;
+		template<typename T>
+		using point3d = point<T, 3>;
+
+		using p1int = point<int, 1>;
+		using p2int = point<int, 2>;
+		using p3int = point<int, 3>;
+		using p1double = point<double, 1>;
+		using p2double = point<double, 2>;
+		using p3double = point<double, 3>;
 	}
 }
 #

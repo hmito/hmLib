@@ -68,8 +68,9 @@ namespace hmLib{
 		//負にならない余り
 		template<class T>
 		inline T positive_mod(T num,T divisor){
-			if(num>=0)return num%divisor;
-			else return divisor-1-((-1-num)%divisor);
+			num %= divisor;
+			if(num < 0)return num + divisor;
+			return num;
 		}
 	}
 }
