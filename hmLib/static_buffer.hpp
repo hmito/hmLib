@@ -9,8 +9,8 @@ namespace hmLib{
 	public:
 		type* begin()noexcept{ return Buffer; }
 		type* end()noexcept{ return Buffer + N; }
-		const type* cbegin()const noexcept{ return Buffer; }
-		const type* cend()const noexcept{ return Buffer + N; }
+		const type* begin()const noexcept{ return Buffer; }
+		const type* end()const noexcept{ return Buffer + N; }
 		const type* cbegin()const noexcept{ return Buffer; }
 		const type* cend()const noexcept{ return Buffer + N; }
 	};
