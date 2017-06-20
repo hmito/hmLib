@@ -60,6 +60,11 @@ algorithm.hpp v1_04
 #ifndef HMLIB_ALGORITHM_NONREPEATRANDOMINTEGRALS_INC
 #	include"algorithm/nonrepeat_random_integrals.hpp"
 #endif
-#include "algorithm/numeric.hpp"
+#ifndef HMLIB_ALGORITHM_NUMERIC_INC
+#	include "algorithm/numeric.hpp"
+#endif
+#ifndef HMLIB_ALGORITHM_SORT_INC
+#	include "algorithm/sort.hpp"
+#endif
 #
 #endif
