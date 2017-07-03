@@ -50,24 +50,19 @@ namespace hmLib {
 		struct monad_traits {
 			using monad_category = typename monad::monad_category;
 			using value_type = typename monad::value_type;
+			template<typename other>
+			using rebind_t = typename monad::template rebind<other>::type;
 		};
 		template<typename monad>
 		struct monad_traits<monad, true> {
 			using monad_category = void;
 			using value_type = void;
 		};
-		template<typename monad, typename value_type>
-		struct rebind {
-		private:
-			using rebinder = typename monad::template rebind<value_type>;
-		public:
-			using type = typename rebinder::type;
-		};
 		template<typename T, typename U>
 		struct is_same_monad{
 		private:
 			template<typename V, typename W>
-			static auto check(V,W)->std::bool_constant<is_monad<V>::value && std::is_same<W, typename rebind<V, typename monad_traits<W>::value_type>::type>::value>;
+			static auto check(V,W)->std::bool_constant<is_monad<V>::value && std::is_same<W, typename monad_traits<V>::rebind_t<typename monad_traits<W>::value_type>>::value>;
 			static auto check(...)->std::false_type;
 		public:
 			using type = decltype(check(std::declval<T>(), std::declval<U>()));
@@ -137,8 +132,8 @@ namespace hmLib {
 		namespace detail{
 			template<typename monad, typename value_type, bool IsNested = is_same_monad<monad, value_type>::value && is_omitable_monad<monad>::value>
 			struct wrap_impl {
-				auto operator()(value_type&& v) { return typename rebind<monad, value_type>::type(std::move(v)); }
-				auto operator()(const value_type& v) { return typename rebind<monad, value_type>::type(v); }
+				auto operator()(value_type&& v) { return typename monad_traits<monad>::rebind_t<value_type>(std::move(v)); }
+				auto operator()(const value_type& v) { return typename monad_traits<monad>::rebind_t<value_type>(v); }
 			};
 			template<typename monad, typename value_type>
 			struct wrap_impl<monad, value_type, true> {
