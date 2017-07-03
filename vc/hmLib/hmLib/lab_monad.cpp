@@ -21,7 +21,6 @@ namespace hmLib {
 				static decltype(Func(std::declval<FuncType>())) Func(T*);
 			};
 		}
-
 		template < typename T >
 		struct result_of {
 			using type = decltype(detail::result_of_impl::Func(std::declval<std::remove_pointer_t<T>*>()));
@@ -35,7 +34,7 @@ namespace hmLib {
 		namespace monad_categories {
 			struct immutable_monad_tag {};
 			struct omitable_monad_tag {};
-			struct serializable_monad_tag {};
+			struct flattenable_monad_tag{};
 		}
 		template<typename T>
 		struct is_monad {
@@ -77,7 +76,7 @@ namespace hmLib {
 		template<typename monad>
 		struct is_omitable_monad : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::omitable_monad_tag> {};
 		template<typename monad>
-		struct is_serializable_monad : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::serializable_monad_tag> {};
+		struct is_flattenable_monad : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::flattenable_monad_tag> {};
 		template<typename T, bool IsMonad = is_monad<T>::value>
 		struct monadic_base {
 			using type = T;
@@ -87,20 +86,33 @@ namespace hmLib {
 			using type = typename monadic_base<typename monad_traits<T>::value_type>::type;
 		};
 
+		namespace detail{
+			template<typename T, bool IsMonad = is_monad<T>::value>
+			struct apply_to_own_impl{
+				template<typename fn>
+				void operator()(fn&& Fn, T& val){ val = std::move(Fn(std::move(val))); }
+			};
+			template<typename T>
+			struct apply_to_own_impl<T, true>{
+				template<typename fn>
+				void operator()(fn&& Fn, T& m){ m.apply_to_own(Fn); }
+			};
+		}
+		template<typename fn, typename T>
+		void apply_to_own(fn&& Func, T& val){
+			detail::apply_to_own_impl<T>()(std::forward<fn>(Func), val);
+		}
+
 		namespace detail {
 			template<typename fn, typename monad, bool CanApplyToOwn = std::is_same<monadic_base<fn>::type, result_of<fn(monadic_base<fn>::type)>::type>::value>
 			struct apply_to_monad_impl {
 				auto operator()(fn& Fn, const monad& m) { return m.apply(Fn); }
-//				auto operator()(fn&& Fn, const monad& m) { return m.apply(Fn); }
 				auto operator()(fn& Fn, monad&& m) { return m.apply(Fn); }
-//				auto operator()(fn&& Fn, monad&& m) { return m.apply(Fn); }
 			};
 			template<typename fn, typename monad>
 			struct apply_to_monad_impl<fn, monad, true> {
 				auto operator()(fn& Fn, const monad& m) { return m.apply(Fn); }
-//				auto operator()(fn&& Fn, const monad& m) { return m.apply(Fn); }
-				auto operator()(fn& Fn, monad&& m) { return m.apply_to_own(Fn); }
-//				auto operator()(fn&& Fn, monad&& m) { return m.apply_to_own(Fn); }
+				auto operator()(fn& Fn, monad&& m) { return std::move(m.apply_to_own(Fn)); }
 			};
 			template<typename T, bool IsMonad = is_monad<T>::value>
 			struct apply_impl {
@@ -114,29 +126,12 @@ namespace hmLib {
 				template<typename fn>
 				auto operator()(fn&& Fn, const T& val) { return apply_to_monad_impl<fn, T>()(std::forward<fn>(Fn), val); }
 				template<typename fn>
-				auto operator()(fn&& Fn, T&& val) { return apply_to_monad_impl<fn, T>()(std::forward<fn>(Fn), std::move(val)); }
+				auto operator()(fn&& Fn, T&& val) { return std::move(apply_to_monad_impl<fn, T>()(std::forward<fn>(Fn), std::move(val))); }
 			};
 		}
 		template<typename fn, typename T>
 		auto apply(fn&& Func, T&& val) {
 			return detail::apply_impl<typename remove_cvref<T>::type>()(std::forward<fn>(Func), std::forward<T>(val));
-		}
-
-		namespace detail {
-			template<typename T, bool IsMonad = is_monad<T>::value>
-			struct apply_to_own_impl{
-				template<typename fn>
-				auto operator()(fn&& Fn, T& val) { return Fn(val); }
-			};
-			template<typename T>
-			struct apply_to_own_impl<T,true> {
-				template<typename fn>
-				auto operator()(fn&& Fn, T& m) { return m.apply_to_own(Fn); }
-			};
-		}
-		template<typename fn, typename T>
-		void apply_to_own(fn&& Func, T& val) {
-			detail::apply_to_own_impl<T>()(std::forward<fn>(Func), std::forward<T>(val));
 		}
 
 		namespace detail{
@@ -176,13 +171,13 @@ namespace hmLib {
 
 		namespace detail{
 			template<typename monad, typename monad_category>
-			struct serialize_impl {
+			struct flatten_impl {
 				auto operator()(monad&& m) { return std::move(m); }
 				auto operator()(const monad& m) { return m; }
 			};
 		}
 		template<typename monad, typename value_type>
-		auto serialize(monad&& m) {
+		auto flatten(monad&& m) {
 			return serialize_impl<monad, value_type>(std::forward<monad>(m));
 		}
 
@@ -200,38 +195,70 @@ namespace hmLib {
 		private:
 			T val;
 		public:
-			identity() = default;
+/*			identity() = default;
 			identity(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
 			identity(this_type&&)= default;
-			this_type& operator=(this_type&&) = default;
+			this_type& operator=(this_type&&) = default;*/
+			identity():val(){
+				std::cout << "construct" << std::endl;
+			}
+			identity(const this_type& other):val(other.val) {
+				std::cout << "construct with copy" << std::endl;
+			}
+			this_type& operator=(const this_type& other){
+				std::cout << "copy" << std::endl;
+				if(this != &other){
+					val = other.val;
+				}
+				return *this;
+			}
+			identity(this_type&& other) noexcept:val(std::move(val)) {
+				std::cout << "construct with move" << std::endl;
+			}
+			this_type& operator=(this_type&& other)noexcept{
+				std::cout << "move" << std::endl;
+				if(this != &other){
+					val = std::move(other.val);
+				}
+				return *this;
+			}
+
 		public:
 			//for monad
-			identity(T val_):val(std::move(val_)){}
+			identity(T val_):val(std::move(val_)){
+				std::cout << "construct with value" << std::endl;
+			}
 			//for omitable_monad
-			identity(identity<identity<T>> m_) :val(std::move(m_.val.val)) {}
+			identity(identity<identity<T>> m_) :val(std::move(m_.val.val)){
+				std::cout << "construct with omit" << std::endl;
+			}
 		public:
 			//for monad
 			template<typename fn>
 			auto apply(fn&& Func)const{
+				std::cout << "\tapply" << std::endl;
 				return wrap<this_type>(hmLib::functional::apply(Func, val));
 			}
 			//for monad
 			template<typename fn>
 			this_type& apply_to_own(fn&& Func){
-				hmLib::functional::pply_to_own(Func, val);
+				std::cout << "\tapply_to_own" << std::endl;
+				hmLib::functional::apply_to_own(Func, val);
 				return *this;
 			}
 		public:
 			//for monad
 			template<typename fn>
-			friend auto operator>>(const this_type& This, fn&& Func) {
-				return hmLib::functional::apply(std::forward<fn>(Func), This);
+			friend auto operator >> (this_type&& This, fn&& Func){
+				std::cout << "\tmove operator>>\n";
+				return std::move( hmLib::functional::apply(std::forward<fn>(Func), std::move(This)) );
 			}
 			//for monad
 			template<typename fn>
-			friend auto operator>>(this_type&& This, fn&& Func) {
-				return hmLib::functional::apply(std::forward<fn>(Func), std::move(This));
+			friend auto operator>>(const this_type& This, fn&& Func) {
+				std::cout << "\tcopy operator>>\n";
+				return hmLib::functional::apply(std::forward<fn>(Func), This);
 			}
 		public:
 			T& get() { return val; }
@@ -241,6 +268,13 @@ namespace hmLib {
 	}
 }
 
+struct hoge{
+	hoge() = default;
+	hoge(const hoge&) = delete;
+	hoge& operator=(const hoge&) = delete;
+	hoge(hoge&&) = default;
+	hoge& operator=(hoge&&) = default;
+};
 int main() {
 	using namespace hmLib::functional;
 
@@ -248,15 +282,19 @@ int main() {
 	std::cout << typeid(a).name() << std::endl;
 	std::cout << is_monad<identity<double>>::value << std::endl;
 	std::cout << is_omitable_monad < decltype(a)>::value << std::endl;
-	std::cout << is_serializable_monad < decltype(a)>::value << std::endl;
+	std::cout << is_flattenable_monad < decltype(a)>::value << std::endl;
 	std::cout << is_same_monad < decltype(a), identity<double>>::value << std::endl;
 	std::cout << is_same_monad <identity<double>, identity<int>>::value << std::endl;
 	std::cout << std::is_same <identity<double>, identity<int>>::value << std::endl;
 
-
-	auto b = a >> [](double v)->int{return v * 2; };
+	std::cout << "=== for b ===" << std::endl;
+	auto b = identity<double>(3.4) >> [](double v)->double{return v * 2; };
 	std::cout << typeid(b).name() << std::endl;
 	std::cout << b.get()<<std::endl;
+
+	std::cout << "=== for c ===" << std::endl;
+	auto c = identity<hoge>() >> [](hoge v)->hoge{return hoge(); };
+	std::cout << typeid(c).name() << std::endl;
 
 	system("pause");
 
