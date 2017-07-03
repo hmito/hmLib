@@ -162,7 +162,7 @@ namespace hmLib {
 			fn Fn;
 		public:
 			lazy_evaluator(monad M_, fn Fn_):M(std::move(M_)),Fn(std::move(Fn_)){}
-			auto evaluate() { return std::move(M.apply(Fn)); }
+			auto evaluate()const { return std::move(M.apply(Fn)); }
 			friend auto operator >> (const this_type& This, evaluate_t) {
 				return std::move(This.evaluate());
 			}
@@ -171,11 +171,11 @@ namespace hmLib {
 			}
 			template<typename nfn>
 			friend auto operator >> (const this_type& This, const nfn& NFn) {
-				return make_lazy_evaluator(This.M, [Fn, NFn](arg_type v)->decltype(auto) {return NFn(Fn(v)); });
+				return make_lazy_evaluator(This.M, [Fn, NFn](arg_type v)->decltype(auto) {return apply(NFn,Fn(v)); });
 			}
 			template<typename nfn>
 			friend auto operator >> (this_type&& This, const nfn& NFn) {
-				return make_lazy_evaluator(std::move(This.M), [Fn=This.Fn, NFn](arg_type v)->decltype(auto) {return NFn(Fn(v)); });
+				return make_lazy_evaluator(std::move(This.M), [Fn=This.Fn, NFn](arg_type v)->decltype(auto) {return apply(NFn, Fn(v)); });
 			}
 		};
 		template<typename monad,typename fn>
@@ -263,7 +263,7 @@ namespace hmLib {
 }
 
 int ftoi(double f) { return static_cast<int>(f * 10); }
-double itod(int i) { return 1.0 / i; }
+hmLib::functional::identity<double> itod(int i) { return 1.0 / i; }
 double mysin(double v) { return std::sin(v); }
 auto ans = itod(ftoi(5.5f));
 
@@ -290,13 +290,15 @@ int main() {
 	std::cout << std::is_same <identity<double>, identity<int>>::value << std::endl;
 
 	std::cout << "=== for b ===" << std::endl;
-	auto b = identity<double>(3.4) 
+	auto bl = identity<double>(3.4) 
 		>> [](double v)->double {return v * 2; } 
-		>> [](double v)->int {return static_cast<int>(v * 10); } 
-		>> [](double v)->double{return std::sqrt(v); } 
+		>> [](double v)->int {return static_cast<int>(v * 10); }
+		>> itod
+		>> [](double v)->double {return std::sqrt(v); }
 		>> mysin
-		>> ftoi
-		>> eval;
+		>> ftoi;
+	std::cout << "--- eval bl ---" << std::endl;
+	auto b = bl >> eval;
 
 	std::cout << typeid(b).name() << std::endl;
 	std::cout << b.get()<<std::endl;
