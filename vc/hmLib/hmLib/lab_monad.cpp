@@ -151,7 +151,6 @@ namespace hmLib {
 		}
 
 		struct evaluate_t {}static const eval;
-
 		template<typename monad, typename fn>
 		struct lazy_evaluator {
 		private:
@@ -180,7 +179,21 @@ namespace hmLib {
 		};
 		template<typename monad,typename fn>
 		auto make_lazy_evaluator(monad&& M, fn&& Fn) { return lazy_evaluator<typename remove_cvref<monad>::type, typename remove_cvref<fn>::type>(std::forward<monad>(M),std::forward<fn>(Fn)); }
-
+		namespace detail{
+			template<typename T>
+			struct evaluate_impl{
+				T&& operator()(T&& val){ return val; }
+				const T& operator()(const T& val){ return val; }
+			};
+			template<typename monad, typename fn>
+			struct evaluate_impl<lazy_evaluator<monad, fn>>{
+				using T = lazy_evaluator<monad, fn>;
+				decltype(auto) operator()(T&& val){ return val.evaluate(); }
+				decltype(auto) operator()(const T& val){ return val.evaluate();}
+			};
+		}
+		template<typename T>
+		decltype(auto) evaluate(T&& val){ return detail::evaluate_impl<T>()(std::forward<T>(val)); }
 
 		template<typename T>
 		struct identity {
@@ -224,7 +237,6 @@ namespace hmLib {
 				}
 				return *this;
 			}
-
 		public:
 			//for monad
 			identity(T val_) :val(std::move(val_)) {
@@ -253,6 +265,18 @@ namespace hmLib {
 			friend auto operator >> (const this_type& This, fn&& Func) {
 				std::cout << "\tcopy operator>>\n";
 				return make_lazy_evaluator(This, std::forward<fn>(Func));
+			}
+			//for monad
+			template<typename fn>
+			friend auto operator|(this_type&& This, fn&& Func){
+				std::cout << "\tmove operator|\n";
+				return Func(evaluate(std::move(This)));
+			}
+			//for monad
+			template<typename fn>
+			friend auto operator|(const this_type& This, fn&& Func){
+				std::cout << "\tcopy operator|\n";
+				return Func(evaluate(This));
 			}
 		public:
 			T& get() { return val; }
