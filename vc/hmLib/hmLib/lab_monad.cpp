@@ -27,14 +27,9 @@ namespace hmLib {
 			using type = decltype(detail::result_of_impl::Func(std::declval<std::remove_pointer_t<T>*>()));
 		};
 
-		template<typename T>
-		struct remove_cvref{
-			using type = typename std::remove_reference<typename std::remove_cv<T>::type>::type;
-		};
-
 		namespace monad_categories {
 			struct immutable_monad_tag {};
-			struct omitable_monad_tag {};
+			struct omittable_monad_tag {};
 			struct flattenable_monad_tag{};
 		}
 		template<typename T>
@@ -47,10 +42,22 @@ namespace hmLib {
 			using type = decltype(check(std::declval<T>()));
 			static constexpr const bool value = type::value;
 		};
+
+		namespace detail {
+			template<typename T, bool IsMonad = is_monad<T>::value>
+			struct monad_base {
+				using type = T;
+			};
+			template<typename T>
+			struct monad_base<T, true> {
+				using type = typename monad_base<typename T::value_type>::type;
+			};
+		}
 		template<typename monad, bool IsNonMonad = !is_monad<monad>::value>
 		struct monad_traits {
 			using monad_category = typename monad::monad_category;
 			using value_type = typename monad::value_type;
+			using base_type = typename detail::monad_base<value_type>::type;
 			template<typename other>
 			using rebind_t = typename monad::template rebind<other>::type;
 		};
@@ -58,6 +65,7 @@ namespace hmLib {
 		struct monad_traits<monad, true> {
 			using monad_category = void;
 			using value_type = void;
+			using base_t = monad;
 		};
 		template<typename T, typename U>
 		struct is_same_monad{
@@ -70,17 +78,11 @@ namespace hmLib {
 			static constexpr const bool value = type::value;
 		};
 		template<typename monad>
-		struct is_omitable_monad : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::omitable_monad_tag> {};
+		struct is_nested_monad : is_same_monad<monad, typename monad_traits<monad>::value_type>{};
 		template<typename monad>
-		struct is_flattenable_monad : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::flattenable_monad_tag> {};
-		template<typename T, bool IsMonad = is_monad<T>::value>
-		struct monadic_base {
-			using type = T;
-		};
-		template<typename T>
-		struct monadic_base<T, true> {
-			using type = typename monadic_base<typename monad_traits<T>::value_type>::type;
-		};
+		struct is_omittable : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::omittable_monad_tag> {};
+		template<typename monad>
+		struct is_flattenable : std::bool_constant<std::is_same<typename monad_traits<monad>::monad_category, monad_categories::flattenable_monad_tag>::value || is_omittable<monad>::value> {};
 
 		namespace detail {
 			template<typename T, bool IsMonad = is_monad<T>::value>
@@ -100,11 +102,11 @@ namespace hmLib {
 		}
 		template<typename fn, typename T>
 		auto apply(fn&& Func, T&& val) {
-			return detail::apply_impl<typename remove_cvref<T>::type>()(std::forward<fn>(Func), std::forward<T>(val));
+			return detail::apply_impl<typename std::decay<T>::type>()(std::forward<fn>(Func), std::forward<T>(val));
 		}
 
 		namespace detail{
-			template<typename monad, typename value_type, bool IsNested = is_same_monad<monad, value_type>::value && is_omitable_monad<monad>::value>
+			template<typename monad, typename value_type, bool IsOmittable = is_same_monad<monad, value_type>::value && is_omittable<monad>::value>
 			struct wrap_impl {
 				auto operator()(value_type&& v) { return typename monad_traits<monad>::template rebind_t<value_type>(std::move(v)); }
 				auto operator()(const value_type& v) { return typename monad_traits<monad>::template rebind_t<value_type>(v); }
@@ -121,10 +123,10 @@ namespace hmLib {
 		}
 
 		namespace detail {
-			template<typename monad, bool IsNested = is_same_monad<monad, monad_traits<monad>::value_type>::value && is_omitable_monad<monad>::value>
+			template<typename monad, bool IsOmittable = is_nested_monad<monad>::value && is_omittable<monad>::value>
 			struct omit_impl {
-				auto operator()(monad&& m) { return std::move(m); }
-				auto operator()(const monad& m) { return m; }
+				decltype(auto) operator()(monad&& m) { return std::move(m); }
+				decltype(auto) operator()(const monad& m) { return m; }
 			};
 			template<typename monad>
 			struct omit_impl<monad, true> {
@@ -134,20 +136,39 @@ namespace hmLib {
 			};
 		}
 		template<typename monad>
-		auto omit(monad&& m) {
+		decltype(auto) omit(monad&& m) {
 			return omit_impl<monad>()(std::forward<monad>(m));
 		}
 
 		namespace detail{
-			template<typename monad, typename monad_category>
+			template<typename monad, bool IsFlattable = is_nested_monad<monad>::value && is_flattenable<monad>::value>
 			struct flatten_impl {
 				auto operator()(monad&& m) { return std::move(m); }
 				auto operator()(const monad& m) { return m; }
 			};
+			template<typename monad>
+			struct flatten_impl<monad, true> {
+				using upper_monad = typename monad_traits<monad>::value_type;
+				auto operator()(monad&& m) { return flatten_impl<upper_monad>()(upper_monad(std::move(m))); }
+				auto operator()(const monad& m) { return flatten_impl<upper_monad>()(upper_monad(m)); }
+			};
 		}
-		template<typename monad, typename value_type>
+		template<typename monad>
 		auto flatten(monad&& m) {
-			return serialize_impl<monad, value_type>(std::forward<monad>(m));
+			return flatten_impl<monad>(std::forward<monad>(m));
+		}
+
+		template<typename fn>
+		struct as_is_wrapper{
+		public:
+			fn Fn;
+		public:
+			as_is_wrapper(const fn& Fn_) :Fn(Fn_) {}
+			as_is_wrapper(fn&& Fn_) :Fn(std::move(Fn_)){}
+		};
+		template<typename fn>
+		as_is_wrapper<fn> as_is(fn&& Fn){
+			return as_is_wrapper<fn>(std::forward<fn>(Fn));
 		}
 
 		struct evaluate_t {}static const eval;
@@ -155,7 +176,7 @@ namespace hmLib {
 		struct lazy_evaluator {
 		private:
 			using this_type = lazy_evaluator<monad, fn>;
-			using arg_type = typename monadic_base<monad>::type;
+			using arg_type = typename monad_traits<monad>::base_type;
 		private:
 			monad M;
 			fn Fn;
@@ -170,11 +191,37 @@ namespace hmLib {
 			}
 			template<typename nfn>
 			friend auto operator >> (const this_type& This, const nfn& NFn) {
-				return make_lazy_evaluator(This.M, [Fn, NFn](arg_type v)->decltype(auto) {return apply(NFn,Fn(v)); });
+				return make_lazy_evaluator(This.M, [Fn = This.Fn, NFn](arg_type v)->decltype(auto) {return apply(NFn, Fn(v)); });
 			}
 			template<typename nfn>
 			friend auto operator >> (this_type&& This, const nfn& NFn) {
 				return make_lazy_evaluator(std::move(This.M), [Fn=This.Fn, NFn](arg_type v)->decltype(auto) {return apply(NFn, Fn(v)); });
+			}
+		};
+		template<typename monad, typename fn>
+		struct lazy_evaluator<monad, as_is_wrapper<fn> >{
+		private:
+			using this_type = lazy_evaluator<monad, fn>;
+			using arg_type = typename monad_traits<monad>::base_type;
+		private:
+			monad M;
+			fn Fn;
+		public:
+			lazy_evaluator(monad M_, as_is_wrapper<fn> AsIsFn_) :M(std::move(M_)), Fn(std::move(AsIsFn.Fn)) {}
+			auto evaluate()const { return std::move(M.apply(Fn)); }
+			friend auto operator >> (const this_type& This, evaluate_t) {
+				return std::move(This.evaluate());
+			}
+			friend auto operator >> (this_type&& This, evaluate_t) {
+				return std::move(This.evaluate());
+			}
+			template<typename nfn>
+			friend auto operator >> (const this_type& This, const nfn& NFn) {
+				return make_lazy_evaluator(This.M, [Fn = This.Fn, NFn](arg_type v)->decltype(auto) {return NFn(evaluate(Fn(v))); });
+			}
+			template<typename nfn>
+			friend auto operator >> (this_type&& This, const nfn& NFn) {
+				return make_lazy_evaluator(std::move(This.M), [Fn = This.Fn, NFn](arg_type v)->decltype(auto) {return NFn(evaluate(Fn(std::move(v)))); });
 			}
 		};
 		template<typename monad,typename fn>
@@ -188,8 +235,8 @@ namespace hmLib {
 			template<typename monad, typename fn>
 			struct evaluate_impl<lazy_evaluator<monad, fn>>{
 				using T = lazy_evaluator<monad, fn>;
-				decltype(auto) operator()(T&& val){ return val.evaluate(); }
-				decltype(auto) operator()(const T& val){ return val.evaluate();}
+				auto operator()(T&& val){ return val.evaluate(); }
+				auto operator()(const T& val){ return val.evaluate();}
 			};
 		}
 		template<typename T>
@@ -197,7 +244,7 @@ namespace hmLib {
 
 		template<typename T>
 		struct identity {
-			using monad_category = monad_categories::omitable_monad_tag;
+			using monad_category = monad_categories::omittable_monad_tag;
 			using value_type = T;
 		private:
 			using this_type = identity<T>;
@@ -242,7 +289,7 @@ namespace hmLib {
 			identity(T val_) :val(std::move(val_)) {
 				std::cout << "construct with value\t" << val<<std::endl;
 			}
-			//for omitable_monad
+			//for omitable_monad (explicit is better for flattenable monad)
 			identity(identity<identity<T>> m_) :val(std::move(m_.val.val)) {
 				std::cout << "construct with omit\t" << val<<std::endl;
 			}
@@ -270,13 +317,13 @@ namespace hmLib {
 			template<typename fn>
 			friend auto operator|(this_type&& This, fn&& Func){
 				std::cout << "\tmove operator|\n";
-				return Func(evaluate(std::move(This)));
+				return make_lazy_evaluator(std::move(This), as_is(std::forward<fn>(Func)));
 			}
 			//for monad
 			template<typename fn>
 			friend auto operator|(const this_type& This, fn&& Func){
 				std::cout << "\tcopy operator|\n";
-				return Func(evaluate(This));
+				return make_lazy_evaluator(This, as_is(std::forward<fn>(Func)));
 			}
 		public:
 			T& get() { return val; }
@@ -287,7 +334,7 @@ namespace hmLib {
 }
 
 int ftoi(double f) { return static_cast<int>(f * 10); }
-hmLib::functional::identity<double> itod(int i) { return 1.0 / i; }
+hmLib::functional::identity<double> itod(int i) { return hmLib::functional::identity<double>(1.0 / i); }
 double mysin(double v) { return std::sin(v); }
 auto ans = itod(ftoi(5.5f));
 
@@ -307,8 +354,8 @@ int main() {
 	auto a = identity<double>(5.6);
 	std::cout << typeid(a).name() << std::endl;
 	std::cout << is_monad<identity<double>>::value << std::endl;
-	std::cout << is_omitable_monad < decltype(a)>::value << std::endl;
-	std::cout << is_flattenable_monad < decltype(a)>::value << std::endl;
+	std::cout << is_omittable < decltype(a)>::value << std::endl;
+	std::cout << is_flattenable < decltype(a)>::value << std::endl;
 	std::cout << is_same_monad < decltype(a), identity<double>>::value << std::endl;
 	std::cout << is_same_monad <identity<double>, identity<int>>::value << std::endl;
 	std::cout << std::is_same <identity<double>, identity<int>>::value << std::endl;
