@@ -425,59 +425,69 @@ namespace hmLib {
 		};
 
 		template<typename T>
-		struct identity :public monad_mixin<identity<T>, T, monad_categories::omittable_monad_tag>{
+		struct just :public monad_mixin<just<T>, T, monad_categories::omittable_monad_tag>{
 		private:
-			using this_type = identity<T>;
+			using this_type = just<T>;
 		private:
 			T val;
 		public:
-			identity() = default;
-			identity(const this_type&) = default;
+			just() = default;
+			just(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
-			identity(this_type&&)= default;
+			just(this_type&&)= default;
 			this_type& operator=(this_type&&) = default;
 		public:
 			//for monad
 			template<typename U>
-			struct rebind { using type = identity<U>; };
-			explicit identity(T val_) :val(std::move(val_)) {}
+			struct rebind { using type = just<U>; };
+			explicit just(T val_) :val(std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
 				return omitted_wrap<this_type>(hmLib::functional::apply(val, Func));
 			}
 		public:
 			//for omitable_monad/flattenable_monad
-			explicit identity(identity<identity<T>> m_) :val(std::move(m_.val.val)) {}
+			explicit just(just<just<T>> m_) :val(std::move(m_.val.val)) {}
 		public:
-			T& get() { return val; }
-			const T& get()const { return val; }
+			T& get()& { return val; }
+			const T& get()const &{ return val; }
+			T get()&&{ return std::move(val); }
 			void set(T val_) { val = std::move(val_); }
 		};
 		template<typename T>
-		struct maybe :public monad_mixin<maybe<T>, T, monad_categories::omittable_monad_tag> {
+		auto as_just(T&& val) { return just<typename std::decay<T>::type>(std::forward<T>(val)); }
+
+		struct do_get {
+			template<typename T>
+			decltype(auto) operator()(T&& v) const{ return v.get(); }
+		};
+
+		template<typename T>
+		struct optional :public monad_mixin<optional<T>, T, monad_categories::omittable_monad_tag> {
 		private:
-			using this_type = maybe<T>;
+			using this_type = optional<T>;
 		private:
 			boost::optional<T> val;
 		public:
-			maybe() = default;
-			maybe(const this_type&) = default;
+			optional() = default;
+			optional(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
-			maybe(this_type&&) = default;
+			optional(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
 			//for monad
 			template<typename U>
-			struct rebind { using type = maybe<U>; };
-			explicit maybe(T val_) :val(std::move(val_)) {}
+			struct rebind { using type = optional<U>; };
+			explicit optional(T val_) :val(std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
-				if (!val)return maybe();
+				using ans_type = decltype(omitted_wrap<this_type>(hmLib::functional::apply(std::declval<T>(), Func)));
+				if (!val)return ans_type();
 				return omitted_wrap<this_type>(hmLib::functional::apply(*val, Func));
 			}
 		public:
 			//for omitable_monad/flattenable_monad
-			explicit maybe(maybe<maybe<T>> m_) :val(std::move(m_.val.val)) {}
+			explicit optional(optional<optional<T>> m_) :val(std::move(m_.val.val)) {}
 		public:
 			operator bool()const { return val; }
 			T& get() { return *val; }
@@ -485,40 +495,44 @@ namespace hmLib {
 			void set(T val_) { *val = std::move(val_); }
 		};
 		template<typename T>
-		struct mvector :public monad_mixin<mvector<T>, T, monad_categories::flattenable_monad_tag> {
+		auto as_maybe(T&& val) { return optional<typename std::decay<T>::type>(std::forward<T>(val)); }
+
+		template<typename T>
+		struct vector :public monad_mixin<vector<T>, T, monad_categories::flattenable_monad_tag> {
 		private:
-			using this_type = mvector<T>;
+			using this_type = vector<T>;
 			using container = std::vector<T>;
 			using iterator = typename container::iterator;
 			using const_iterator = typename container::const_iterator;
 		private:
 			std::vector<T> val;
 		public:
-			mvector() = default;
-			mvector(const this_type&) = default;
+			vector() = default;
+			vector(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
-			mvector(this_type&&) = default;
+			vector(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
-			explicit mvector(std::vector<T> val_):val(std::move(val_)){}
+			explicit vector(std::vector<T> val_):val(std::move(val_)){}
 			template<typename input_iterator>
-			mvector(input_iterator Beg, input_iterator End):val(Beg,End){}
+			vector(input_iterator Beg, input_iterator End):val(Beg,End){}
+			vector(std::initializer_list<T> IL) :vector(std::begin(IL), std::end(IL)) {}
 		public:
 			//for monad
 			template<typename U>
-			struct rebind { using type = mvector<U>; };
-			explicit mvector(T val_) :val(1,std::move(val_)) {}
+			struct rebind { using type = vector<U>; };
+			explicit vector(T val_) :val(1,std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
 				using ans_type = decltype(hmLib::functional::apply(std::declval<T>(), Func));
 				std::vector<ans_type> Applied(val.size());
 				
 				auto Out = std::begin(Applied);
-				for (const auto& v : val)(*Out)++ = hmLib::functional::apply(v, Func);
-				return mvector<ans_type>(std::move(Applied));
+				for (const auto& v : val) *(Out++) = hmLib::functional::apply(v, Func);
+				return vector<ans_type>(std::move(Applied));
 			}
 		public:
 			//for omitable_monad/flattenable_monad
-			explicit mvector(mvector<mvector<T>> m_) {
+			explicit vector(vector<vector<T>> m_) {
 				for (auto&& v : m_.val) {
 					val.insert(v.end(),std::begin(v), std::end(v));
 				}
@@ -532,17 +546,21 @@ namespace hmLib {
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end()const { return cend(); }
 		};
+		template<typename T>
+		auto as_vector(T&& val) { return vector<typename std::decay<T>::type>(std::forward<T>(val)); }
+		template<typename input_iterator>
+		auto as_vector(input_iterator Begin, input_iterator End) { return vector<typename std::decay<T>::type>(Begin, End); }
 	}
 }
 
 int ftoi(double f) { return static_cast<int>(f * 10); }
-hmLib::functional::identity<double> itod(int i) { return hmLib::functional::identity<double>(1.0 / i); }
+hmLib::functional::just<double> itod(int i) { return hmLib::functional::just<double>(1.0 / i); }
 double mysin(double v) { return std::sin(v); }
-hmLib::functional::identity<double> idtoid(hmLib::functional::identity<double> v){
+hmLib::functional::just<double> idtoid(hmLib::functional::just<double> v){
 	v.set(v.get()*2);
 	return std::move(v);
 }
-//auto Ans = identity<float>(5.5) >> ftoi >> itod >> eval;
+//auto Ans = just<float>(5.5) >> ftoi >> itod >> eval;
 
 struct hoge{
 	hoge() = default;
@@ -555,17 +573,17 @@ struct hoge{
 int main() {
 	using namespace hmLib::functional;
 
-	auto a = identity<double>(5.6);
+	auto a = just<double>(5.6);
 	std::cout << typeid(a).name() << std::endl;
-	std::cout << is_monad<identity<double>>::value << std::endl;
+	std::cout << is_monad<just<double>>::value << std::endl;
 	std::cout << is_omittable < decltype(a)>::value << std::endl;
 	std::cout << is_flattenable < decltype(a)>::value << std::endl;
-	std::cout << is_same_monad < decltype(a), identity<double>>::value << std::endl;
-	std::cout << is_same_monad <identity<double>, identity<int>>::value << std::endl;
-	std::cout << std::is_same <identity<double>, identity<int>>::value << std::endl;
+	std::cout << is_same_monad < decltype(a), just<double>>::value << std::endl;
+	std::cout << is_same_monad <just<double>, just<int>>::value << std::endl;
+	std::cout << std::is_same <just<double>, just<int>>::value << std::endl;
 
 	std::cout << "=== for b ===" << std::endl;
-	auto bl = identity<double>(3.4) 
+	auto bl = as_just(3.4) 
 		>> [](double v)->double {return v * 2; } 
 		>> [](double v)->int {return static_cast<int>(v * 10); }
 		>> itod
@@ -581,12 +599,36 @@ int main() {
 	std::cout << typeid(b).name() << std::endl;
 	std::cout << b.get()<<std::endl;
 
+
+	auto Fn=[](double v) {
+		return as_just(v)
+			>> [](double v)->double {return v * 2; }
+			>> [](double v)->int {return static_cast<int>(v * 10); }
+			>> itod
+			>> [](double v)->double {return std::sqrt(v); }
+			>> mysin
+			>> as_is(idtoid)
+			>> ftoi
+			>> as_is(do_flatten())
+			>> as_is(do_get())
+			>> do_evaluate();
+	};
+
+	std::cout << typeid(Fn(5.5)).name() << std::endl;
+	auto maybeval = as_maybe(5.5) >> Fn >> do_evaluate();
+	std::cout << maybeval.get() << std::endl;
+	auto justval = as_just(5.5) >> Fn >> do_evaluate();
+	std::cout << justval.get() << std::endl;
+	std::cout << typeid(as_vector(5.5) >> Fn >> do_evaluate()).name() << std::endl;
+
 	std::cout << "=== for c ===" << std::endl;
-	auto c = identity<hoge>() >> [](const hoge& v)->hoge{return hoge(); };
+	auto c = just<hoge>() >> [](const hoge& v)->hoge{return hoge(); };
 	std::cout << typeid(c).name() << std::endl;
 
-	maybe<int> Maybe;
-	mvector<double> Vec;
+	optional<int> Maybe;
+
+	vector<double> Vec{5.6,3.2,4.5};
+
 
 	system("pause");
 
