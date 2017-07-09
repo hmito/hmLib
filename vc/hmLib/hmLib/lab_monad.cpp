@@ -175,6 +175,72 @@ namespace hmLib {
 			return as_is_wrapper<typename std::decay<fn>::type>(std::forward<fn>(Fn));
 		}
 
+		namespace detail {
+			template<typename arg_type, typename efn, typename enfn>
+			struct functional_composition_impl {
+				template<typename fn, typename nfn>
+				auto operator()(fn&& Fn, nfn&& NFn) {
+					return [Fn = std::forward<fn>(Fn), NFn = std::forward<nfn>(NFn)](const arg_type& v)->auto {return apply(Fn(v), NFn); };
+				}
+			};
+			template<typename arg_type, typename efn, typename enfn>
+			struct functional_composition_impl<arg_type, efn, as_is_wrapper<enfn>> {
+				template<typename fn>
+				auto operator()(fn&& Fn, const as_is_wrapper<efn>& NFn) {
+					return [Fn = std::forward<fn>(Fn), NFn = NFn](const arg_type& v)->auto {return NFn(Fn(v)); };
+				}
+				template<typename fn>
+				auto operator()(fn&& Fn, as_is_wrapper<efn>&& NFn) {
+					return[Fn = std::forward<fn>(Fn), NFn = std::move(NFn)](const arg_type& v)->auto {return NFn(Fn(v)); };
+				}
+			};
+		}
+		template<typename arg_type, typename fn, typename nfn>
+		auto functional_composition(fn&& Fn, nfn&& NFn) {
+			return detail::functional_composition_impl<arg_type, typename std::decay<fn>::type, typename std::decay<nfn>::type()>(std::forward<fn>(Fn), std::forward<nfn>(NFn));
+		}
+
+		template<typename arg_type_, typename fn>
+		struct function {
+		private:
+			using this_type = function<T, fn>;
+			using arg_type = arg_type_;
+			using result_type = decltype(std::declval<fn>()(std::declval<arg_type >()));
+		private:
+			const fn Fn;
+		public:
+			function() = default;
+			function(const this_type&) = default;
+			function(this_type&&) = default;
+			explicit function(fn Fn_) :Fn(std::move(Fn_)) {}
+			this_type& operator=(const this_type&) = default;
+			this_type& operator=(this_type&&) = default;
+		public:
+			auto operator()(arg_type&& val)const { return Fn(std::move(Val)); }
+			auto operator()(const arg_type& val)const { return Fn(Val); }
+		public:
+			template<typename nfn>
+			friend auto operator >> (const this_type& This, nfn&& NFn) {
+				return make_function<arg_type>(functional_composition(This.Fn, std::forward<nfn>(NFn)));
+			}
+			template<typename nfn>
+			friend auto operator >> (this_type&& This, nfn&& NFn) {
+				return make_function<arg_type>(functional_composition(std::move(This.Fn), std::forward<nfn>(NFn)));
+			}
+			template<typename nfn>
+			friend auto operator | (const this_type& This, nfn&& NFn) {
+				return make_function<arg_type>(functional_composition(This.Fn, as_is(std::forward<nfn>(NFn))));
+			}
+			template<typename nfn>
+			friend auto operator | (this_type&& This, nfn&& NFn) {
+				return make_function<arg_type>(functional_composition(std::move(This.Fn), as_is(std::forward<nfn>(NFn))));
+			}
+		};
+		template<typename arg_type_, typename fn>
+		auto make_function(fn&& Fn) {
+			return function<arg_type_, typename std::decay<fn>::type>(std::forward<fn>(Fn));
+		}
+
 		template<typename T, typename fn>
 		struct lazy_apply {
 		private:
@@ -459,7 +525,7 @@ namespace hmLib {
 
 		struct do_get {
 			template<typename T>
-			decltype(auto) operator()(T&& v) const{ return v.get(); }
+			decltype(auto) operator()(T&& v) const{ return std::forward<T>(v).get(); }
 		};
 
 		template<typename T>
