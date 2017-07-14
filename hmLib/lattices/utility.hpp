@@ -1,6 +1,7 @@
 ﻿#ifndef HMLIB_LATTICES_POINT_INC
 #define HMLIB_LATTICES_POINT_INC 100
 #
+#include<array>
 #include<utility>
 #include"../euclidean.hpp"
 namespace hmLib{
@@ -14,7 +15,10 @@ namespace hmLib{
 		using point = euclidean::point<index_type, dim_>;
 
 		template<typename ...others>
-		auto make_point(others... Others)->point<sizeof...(others)>{return point<sizeof...(others)>{Others...};}
+		auto make_point(others... Others)->point<sizeof...(others)>{
+			std::array<int,sizeof...(others)> Array{Others...};
+			return point<sizeof...(others)>(Array.begin(),Array.end());
+		}
 
 		template<unsigned int dim_>
 		auto make_filled_point(index_type Val)->point<dim_> { point<dim_> Pos; Pos.fill(Val); return Pos; }
