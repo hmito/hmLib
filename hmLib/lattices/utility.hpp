@@ -1,8 +1,9 @@
-﻿#ifndef HMLIB_LATTICES_POINT_INC
+#ifndef HMLIB_LATTICES_POINT_INC
 #define HMLIB_LATTICES_POINT_INC 100
 #
 #include<array>
 #include<utility>
+#include"../algorithm/compare.hpp"
 #include"../euclidean.hpp"
 namespace hmLib{
 	namespace lattices{
@@ -53,7 +54,7 @@ namespace hmLib{
 		template<unsigned int dim_>
 		void torus_point(point<dim_>& Point, const point<dim_>& Size){
 			for(unsigned int i = 0; i < dim_; ++i){
-				Point[i] = algorithm::positive_mod(Ans[i], Size[i]);
+				Point[i] = algorithm::positive_mod(Point[i], Size[i]);
 			}
 		}
 	}

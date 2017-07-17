@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_EUCLIDEAN_INC 
+#ifndef HMLIB_EUCLIDEAN_INC 
 #define HMLIB_EUCLIDEAN_INC 100
 #
 #include<array>
@@ -26,7 +26,7 @@ namespace hmLib{
 			this_type& operator=(this_type&&) = default;
 			template<typename U>
 			point(const other_type<U>& Other)
-				: Array(Otehr.begin(), Other.end()){}
+				: Array(Other.begin(), Other.end()){}
 			template<typename U>
 			this_type& operator=(const other_type<U>& Other){
 				for(unsigned int i = 0; i < Array.size(); ++i){
