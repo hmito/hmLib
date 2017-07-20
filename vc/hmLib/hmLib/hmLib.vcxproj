@@ -36,6 +36,7 @@
     <ClInclude Include="..\..\..\hmLib\enumerators.hpp" />
     <ClInclude Include="..\..\..\hmLib\euclidean.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
+    <ClInclude Include="..\..\..\hmLib\factorial.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\functional.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />
