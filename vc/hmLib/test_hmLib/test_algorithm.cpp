@@ -3,8 +3,8 @@
 #include <vector>
 #include <algorithm>
 #include <list>
-#include <hmLib/algorithm.hpp>
-#include <hmLib/random.hpp>
+#include "../../../hmLib/algorithm.hpp"
+#include "../../../random.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{

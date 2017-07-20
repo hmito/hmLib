@@ -162,6 +162,9 @@
     <ClInclude Include="..\..\..\hmLib\algorithm\sort.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hmLib\factorial.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\cdeque.c">
