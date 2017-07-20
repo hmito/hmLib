@@ -72,6 +72,7 @@
     <ClCompile Include="..\..\..\hmLib\cstack.c" />
     <ClCompile Include="..\..\..\hmLib\cstring.c" />
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp" />
+    <ClCompile Include="use_factorial.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>

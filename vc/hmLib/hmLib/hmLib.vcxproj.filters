@@ -7,6 +7,9 @@
     <Filter Include="hmLib\algorithm">
       <UniqueIdentifier>{739ef1c8-ec55-4ab1-8823-ead9dce42d7e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソースファイル">
+      <UniqueIdentifier>{8d50c992-a489-4676-96a8-e1ea3567ae1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm\numeric.hpp">
@@ -187,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\hmLib\debugstream.cpp">
       <Filter>hmLib</Filter>
+    </ClCompile>
+    <ClCompile Include="use_factorial.cpp">
+      <Filter>ソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
