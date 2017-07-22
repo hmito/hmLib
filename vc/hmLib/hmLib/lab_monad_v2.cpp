@@ -7,6 +7,8 @@
 #include<iostream>
 #include<boost/optional.hpp>
 #include<cmath>
+//todo
+//	繰り返し適用（例えばomitの場合、あるメンバー以下にネストされた子メンバーへのomit適用）をどうするか
 namespace hmLib {
 	namespace functional {
 		namespace detail {
@@ -68,19 +70,19 @@ namespace hmLib {
 				using type = typename monad_base<typename T::value_type>::type;
 			};
 		}
-		template<typename monad, bool IsNonMonad = !is_monad<monad>::value>
+		template<typename M, bool IsNonMonad = !is_monad<M>::value>
 		struct monad_traits {
-			using monad_category = typename monad::monad_category;
-			using value_type = typename monad::value_type;
+			using monad_category = typename M::monad_category;
+			using value_type = typename M::value_type;
 			using base_type = typename detail::monad_base<value_type>::type;
 			template<typename other>
-			using rebind_t = typename monad::template rebind<other>::type;
+			using rebind_t = typename M::template rebind<other>::type;
 		};
-		template<typename monad>
-		struct monad_traits<monad, true> {
-			using monad_category = void;
-			using value_type = void;
-			using base_t = monad;
+		template<typename M>
+		struct monad_traits<M, true> {
+			using monad_category = nullptr_t;
+			using value_type = nullptr_t;
+			using base_t = M;
 		};
 
 		template<typename T, typename U>
@@ -93,17 +95,17 @@ namespace hmLib {
 			using type = decltype(check(std::declval<T>(), std::declval<U>()));
 			static constexpr const bool value = type::value;
 		};
-		template<typename monad>
-		struct is_nested_monad : is_same_monad<monad, typename monad_traits<monad>::value_type> {};
-		template<typename monad>
-		struct is_omittable : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::omittable_monad_tag> {};
-		template<typename monad>
-		struct is_flattenable : std::bool_constant<std::is_same<typename monad_traits<monad>::monad_category, monad_categories::flattenable_monad_tag>::value || is_omittable<monad>::value> {};
+		template<typename M>
+		struct is_nested_monad : is_same_monad<M, typename monad_traits<M>::value_type> {};
+		template<typename M>
+		struct is_omittable : std::is_same<typename monad_traits<M>::monad_category, monad_categories::omittable_monad_tag> {};
+		template<typename M>
+		struct is_flattenable : std::bool_constant<std::is_same<typename monad_traits<M>::monad_category, monad_categories::flattenable_monad_tag>::value || is_omittable<M>::value> {};
 
 		template<typename fn>
 		struct target_checker {
 		private:
-			template<typename T, typename efn, typename V = typename efn::template target<void>>
+			template<typename T, typename efn, typename V = typename efn::template target<nullptr_t>>
 			static auto check(efn)->typename efn::template target<T>;
 			template<typename T>
 			static auto check(...)->hmLib::functional::negate_of<is_monad<T>>;
@@ -111,7 +113,9 @@ namespace hmLib {
 			template<typename T>
 			using type = decltype(check<typename std::decay<T>::type>(std::declval<fn>()));
 			template<typename T>
-			bool operator()(T&& v)const { return type<T>::value; }
+			static constexpr bool check() { return type<T>::value; }
+			template<typename T>
+			constexpr bool operator()(T&&)const { return type<T>::value; }
 		};
 
 		template<template<typename> typename context, typename fn>
@@ -132,38 +136,43 @@ namespace hmLib {
 		auto for_monad(fn&& Fn) { return for_monad_wrapper<typename std::decay<fn>::type>(Fn); }
 
 		namespace detail {
-			template<typename eT, bool IsMonad = is_monad<eT>::value>
+			template<typename eT, typename efn, bool IsTarget = target_checker<efn>::check<eT>(), bool IsMonad = is_monad<eT>::value>
 			struct apply_impl {
 				template<typename T, typename fn>
 				auto operator()(T&& val, fn&& Fn) { return Fn(std::forward<T>(val)); }
 			};
-			template<typename eT>
-			struct apply_impl<eT, true> {
+			template<typename eT, typename efn>
+			struct apply_impl<eT, efn, false, true> {
 				template<typename T, typename fn>
 				auto operator()(T&& val, fn&& Fn) { return val.apply(std::forward<fn>(Fn)); }
+			};
+			template<typename eT, typename efn>
+			struct apply_impl<eT, efn, false, false> {
+				template<typename T, typename fn>
+				auto operator()(T&& val, fn&& Fn) { return std::forward<T>(val); }
 			};
 		}
 		template<typename T, typename fn>
 		auto apply(T&& val, fn&& Func) {
-			return detail::apply_impl<typename std::decay<T>::type>()(std::forward<T>(val), std::forward<fn>(Func));
+			return detail::apply_impl<typename std::decay<T>::type, typename std::decay<fn>::type>()(std::forward<T>(val), std::forward<fn>(Func));
 		}
 
 		namespace detail {
-			template<typename monad, bool IsOmittable = is_nested_monad<monad>::value && is_omittable<monad>::value>
+			template<typename M, bool IsOmittable = is_nested_monad<M>::value && is_omittable<M>::value>
 			struct omit_impl {
 				template<typename T>
 				decltype(auto) operator()(T&& m) { return std::forward<T>(m); }
 			};
-			template<typename monad>
-			struct omit_impl<monad, true> {
-				using upper_monad = typename monad_traits<monad>::value_type;
+			template<typename M>
+			struct omit_impl<M, true> {
+				using upper_monad = typename monad_traits<M>::value_type;
 				template<typename T>
 				auto operator()(T&& m) { return omit_impl<upper_monad>()(upper_monad(std::forward<T>(m))); }
 			};
 		}
-		template<typename monad>
-		decltype(auto) omit(monad&& m) {
-			return detail::omit_impl<monad>()(std::forward<monad>(m));
+		template<typename M>
+		decltype(auto) omit(M&& m) {
+			return detail::omit_impl<typename std::decay<M>::type>()(std::forward<M>(m));
 		}
 		struct do_omit {
 			template<typename T>
@@ -173,23 +182,22 @@ namespace hmLib {
 		};
 
 		namespace detail {
-			template<typename monad, bool IsFlattable = is_nested_monad<monad>::value && is_flattenable<monad>::value>
+			template<typename M, bool IsFlattable = is_nested_monad<M>::value && is_flattenable<M>::value>
 			struct flatten_impl {
 				template<typename T>
 				decltype(auto) operator()(T&& m) { return std::forward<T>(m); }
 			};
-			template<typename monad>
-			struct flatten_impl<monad, true> {
-				using upper_monad = typename monad_traits<monad>::value_type;
+			template<typename M>
+			struct flatten_impl<M, true> {
+				using upper_monad = typename monad_traits<M>::value_type;
 				template<typename T>
 				auto operator()(T&& m) { return flatten_impl<upper_monad>()(upper_monad(std::forward<T>(m))); }
 			};
 		}
-		template<typename monad>
-		decltype(auto) flatten(monad&& m) {
-			return detail::flatten_impl<monad>()(std::forward<monad>(m));
+		template<typename M>
+		decltype(auto) flatten(M&& m) {
+			return detail::flatten_impl<typename std::decay<M>::type>()(std::forward<monad>(m));
 		}
-
 		struct do_flatten {
 			template<typename T>
 			using target = is_flattenable<T>;
@@ -197,22 +205,21 @@ namespace hmLib {
 			decltype(auto) operator()(T&& v) const { return flatten(std::forward<T>(v)); }
 		};
 
-
 		namespace detail {
-			template<typename monad, typename value_type, bool IsOmittable = is_same_monad<monad, value_type>::value && is_omittable<monad>::value>
+			template<typename M, typename value_type, bool IsOmittable = is_same_monad<M, value_type>::value && is_omittable<M>::value>
 			struct omitted_wrap_impl {
-				auto operator()(value_type&& v) { return typename monad_traits<monad>::template rebind_t<value_type>(std::move(v)); }
-				auto operator()(const value_type& v) { return typename monad_traits<monad>::template rebind_t<value_type>(v); }
+				auto operator()(value_type&& v) { return typename monad_traits<M>::template rebind_t<value_type>(std::move(v)); }
+				auto operator()(const value_type& v) { return typename monad_traits<M>::template rebind_t<value_type>(v); }
 			};
-			template<typename monad, typename value_type>
-			struct omitted_wrap_impl<monad, value_type, true> {
+			template<typename M, typename value_type>
+			struct omitted_wrap_impl<M, value_type, true> {
 				decltype(auto) operator()(value_type&& v) { return omit(std::move(v)); }
 				decltype(auto) operator()(const value_type& v) { return omit(v); }
 			};
 		}
-		template<typename monad, typename value_type>
+		template<typename M, typename value_type>
 		decltype(auto) omitted_wrap(value_type&& val) {
-			return detail::omitted_wrap_impl<monad, value_type>()(std::forward<value_type>(val));
+			return detail::omitted_wrap_impl<typename std::decay<M>::type, value_type>()(std::forward<value_type>(val));
 		}
 
 		template<typename fn>
@@ -227,25 +234,6 @@ namespace hmLib {
 			return as_is_wrapper<typename std::decay<fn>::type>(std::forward<fn>(Fn));
 		}
 
-/*		template<typename context, typename fn>
-		struct for_context_wrapper {
-		public:
-			fn Fn;
-		public:
-			for_context_wrapper(fn Fn_) :Fn(std::move(Fn_)) {}
-			template<typename U>
-			operator bool(U&& v) { return ; }
-		};
-
-		template<typename context, typename fn>
-		struct for_context_wrapper {
-
-		};
-		template<typename context, typename fn>
-		auto for_context(fn&& Fn) {
-			return as_is_wrapper<typename std::decay<fn>::type>(std::forward<fn>(Fn));
-		}
-		*/
 		namespace detail {
 			template<typename arg_type, typename efn, typename enfn>
 			struct functional_composition_impl {
@@ -590,11 +578,11 @@ namespace hmLib {
 			explicit just(T val_) :val(std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
-				return omitted_wrap<this_type>(hmLib::functional::apply(val, Func));
+				return omitted_wrap<this_type>(hmLib::monad::apply(val, Func));
 			}
 		public:
 			//for omitable_monad/flattenable_monad
-			explicit just(just<just<T>> m_) :val(std::move(m_.val.val)) {}
+			explicit just(just<just<T>> m_) :val(std::move(m_.get().get())) {}
 		public:
 			T& get()& { return val; }
 			const T& get()const & { return val; }
@@ -670,11 +658,11 @@ namespace hmLib {
 			explicit vector(T val_) :val(1, std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
-				using ans_type = decltype(hmLib::functional::apply(std::declval<T>(), Func));
+				using ans_type = decltype(hmLib::monad::apply(std::declval<T>(), Func));
 				std::vector<ans_type> Applied(val.size());
 
 				auto Out = std::begin(Applied);
-				for (const auto& v : val) *(Out++) = hmLib::functional::apply(v, Func);
+				for (const auto& v : val) *(Out++) = hmLib::monad::apply(v, Func);
 				return vector<ans_type>(std::move(Applied));
 			}
 		public:
@@ -692,6 +680,8 @@ namespace hmLib {
 			const_iterator cend()const { return val.cend(); }
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end()const { return cend(); }
+		public:
+			void push_back(const T& e) { return val.push_back(e); }
 		};
 		template<typename T>
 		auto as_vector(T&& val) { return vector<typename std::decay<T>::type>(std::forward<T>(val)); }
@@ -703,8 +693,30 @@ namespace hmLib {
 
 
 int main(void) {
+	{
+		hmLib::monad::just<hmLib::monad::just<hmLib::monad::just<double>>> v1;
 
-	auto V = hmLib::monad::for_monad([](double v) {return v * 2; });
+		auto v2 = hmLib::monad::apply(v1, hmLib::monad::do_omit());
+
+		std::cout << "omit" << std::endl;
+		std::cout << "before:" << typeid(v1).name() << std::endl;
+		std::cout << "after :" << typeid(v2).name() << std::endl;
+	}
+
+	{
+		hmLib::monad::just<hmLib::monad::just<hmLib::monad::just<double>>> e1;
+		hmLib::monad::vector<hmLib::monad::just<hmLib::monad::just<hmLib::monad::just<double>>>> v1;
+		v1.push_back(e1);
+		v1.push_back(e1);
+		v1.push_back(e1);
+
+		auto v2 = hmLib::monad::apply(v1, hmLib::monad::do_omit());
+
+		std::cout << "omit" << std::endl;
+		std::cout << "before:" << typeid(v1).name() << std::endl;
+		std::cout << "after :" << typeid(v2).name() << std::endl;
+	}
+
 	{
 		hmLib::monad::do_omit Do;
 
