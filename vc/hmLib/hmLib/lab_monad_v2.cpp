@@ -58,20 +58,6 @@ namespace hmLib {
 			static constexpr const bool value = type::value;
 		};
 
-		template<typename Fn>
-		struct target_checker{
-		private:
-			template<typename T, typename eFn, typename V = typename eFn::template target<void>>
-			static auto check(eFn)->typename eFn::template target<T>;
-			template<typename T>
-			static auto check(...)->hmLib::functional::negate_of<is_monad<T>>;
-		public:
-			template<typename T>
-			using type = decltype(check<typename std::decay<T>::type>(std::declval<Fn>()));
-			template<typename T>
-			bool operator()(T&& v)const { return type<T>::value; }
-		};
-
 		namespace detail {
 			template<typename T, bool IsMonad = is_monad<T>::value>
 			struct monad_base {
@@ -96,6 +82,7 @@ namespace hmLib {
 			using value_type = void;
 			using base_t = monad;
 		};
+
 		template<typename T, typename U>
 		struct is_same_monad {
 		private:
@@ -112,6 +99,37 @@ namespace hmLib {
 		struct is_omittable : std::is_same<typename monad_traits<monad>::monad_category, monad_categories::omittable_monad_tag> {};
 		template<typename monad>
 		struct is_flattenable : std::bool_constant<std::is_same<typename monad_traits<monad>::monad_category, monad_categories::flattenable_monad_tag>::value || is_omittable<monad>::value> {};
+
+		template<typename fn>
+		struct target_checker {
+		private:
+			template<typename T, typename efn, typename V = typename efn::template target<void>>
+			static auto check(efn)->typename efn::template target<T>;
+			template<typename T>
+			static auto check(...)->hmLib::functional::negate_of<is_monad<T>>;
+		public:
+			template<typename T>
+			using type = decltype(check<typename std::decay<T>::type>(std::declval<fn>()));
+			template<typename T>
+			bool operator()(T&& v)const { return type<T>::value; }
+		};
+
+		template<template<typename> typename context, typename fn>
+		struct for_context_wrapper {
+			template<typename T>
+			using target = context<T>;
+			fn Fn;
+		public:
+			for_context_wrapper(const fn& Fn_):Fn(Fn_){}
+			for_context_wrapper(fn&& Fn_) :Fn(std::move(Fn_)) {}
+			template<typename T>
+			auto operator()(T&& Val) { return Fn(std::forward<T>(Val)); }
+		};
+
+		template<typename fn>
+		using for_monad_wrapper = for_context_wrapper<is_monad, fn>;
+		template<typename fn>
+		auto for_monad(fn&& Fn) { return for_monad_wrapper<typename std::decay<fn>::type>(Fn); }
 
 		namespace detail {
 			template<typename eT, bool IsMonad = is_monad<eT>::value>
@@ -334,7 +352,6 @@ namespace hmLib {
 			struct is_lazy_apply<lazy_apply<T,fn>>{};
 		}
 
-		/**/
 		namespace detail {
 			template<typename T>
 			struct evaluate_impl {
@@ -686,6 +703,8 @@ namespace hmLib {
 
 
 int main(void) {
+
+	auto V = hmLib::monad::for_monad([](double v) {return v * 2; });
 	{
 		hmLib::monad::do_omit Do;
 
