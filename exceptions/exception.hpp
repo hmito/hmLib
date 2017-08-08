@@ -2,23 +2,43 @@
 #define HMLIB_EXCEPTIONS_EXCEPTION_INC 100
 #
 #ifndef HMLIB_CONFIG_INC
-#	include "hmLib_config.h"
+#	include "../../hmLib_config.h"
 #endif
 /*===exceptions::exception===
 基本的なマクロ宣言
 */
+#include"../static_buffer.hpp"
 #include <exception>
 #include <string>
 
 namespace hmLib{
 	namespace exceptions{
-		typedef std::exception exception;
+		namespace details{
+			struct exception_identifier{};
+			using buffer = static_buffer<char, 1024, exception_identifier>;
+		}
+		struct exception : public std::exception{
+		private:
+			details::buffer Buffer;
+		public:
+			exception()noexcept{}
+			explicit exception(const char* What_)noexcept{
+				auto Itr = Buffer.begin();
+				while(*What_ != 0 && Itr != Buffer.end()){
+					*(Itr++) = *(What_++);
+				}
+			}
+			exception(const exception&) = default;
+			exception& operator=(const exception&) = default;
+		public:
+			const char* what() const noexcept override{ return Buffer.cbegin(); }
+		};
 		template<typename identifier_,typename base_type_=exception>
 		struct exception_pattern :public base_type_ {
 			typedef base_type_ base_type;
 		public:
-			explicit exception_pattern(const std::string& Message_) :base_type(Message_.c_str()) {}
-			explicit exception_pattern(const char* Message_) :base_type(Message_) {}
+			explicit exception_pattern(const std::string& What_)noexcept :base_type(What_.c_str()) {}
+			explicit exception_pattern(const char* What_)noexcept :base_type(What_) {}
 		};
 	}
 }
