@@ -23,6 +23,8 @@
     <ClInclude Include="..\..\..\hmLib\circular.hpp" />
     <ClInclude Include="..\..\..\hmLib\color.hpp" />
     <ClInclude Include="..\..\..\hmLib\comgate.hpp" />
+    <ClInclude Include="..\..\..\hmLib\comgate\winRS\ifline.h" />
+    <ClInclude Include="..\..\..\hmLib\comgate\winRS\winrs.h" />
     <ClInclude Include="..\..\..\hmLib\config_vc.h" />
     <ClInclude Include="..\..\..\hmLib\coordinates.hpp" />
     <ClInclude Include="..\..\..\hmLib\csv_iterator.hpp" />
@@ -61,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\hmLib\comgate.cpp" />
+    <ClCompile Include="..\..\..\hmLib\comgate\winRS\winrs.cpp" />
     <ClCompile Include="use_factorial.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
