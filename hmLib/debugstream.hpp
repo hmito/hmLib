@@ -7,21 +7,9 @@ VSのデバッグ用出力窓に文字列を出力する事ができます。
 debugstream v1_01/130328 hmIto
 	streambuf_interfaceに対応
 */
-#ifndef HMLIB_CONFIG_INC
-#	include "hmLib_config.h"
-#endif
-#if !(defined(HMLIB_NOLIB) || defined(HMLIB_DEBUGSTREAM_NOLIB))
-#	ifdef _DEBUG
-#		pragma comment(lib,"hmLib/lib/Debug/debugstream.lib")
-#	else
-#		pragma comment(lib,"hmLib/lib/Release/debugstream.lib")
-#	endif
-#endif
 #include <windows.h>
 #include <iostream>
-#ifndef HMLIB_STREAMBUFINTERFACE_INC
-#	include "streambuf_interface.hpp"
-#endif
+#include "streambuf_interface.hpp"
 
 
 namespace hmLib{
@@ -57,6 +45,6 @@ namespace hmLib{
 		debugstream():std::ostream(m_buf=new debugstreambuf()){return;}
 		~debugstream(){delete m_buf;}
 	};
-	extern debugstream debugout;
 }
+#
 #endif
