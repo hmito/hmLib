@@ -64,7 +64,7 @@ algorithm.hpp v1_04
 #	include "algorithm/numeric.hpp"
 #endif
 #ifndef HMLIB_ALGORITHM_SORT_INC
-#	include "algorithm/sort.hpp"
+#	include "algorithm/algorithm.hpp"
 #endif
 #
 #endif
