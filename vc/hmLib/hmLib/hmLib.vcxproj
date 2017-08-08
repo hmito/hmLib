@@ -13,7 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm.hpp" />
     <ClInclude Include="..\..\..\hmLib\algorithm\compare.hpp" />
-    <ClInclude Include="..\..\..\hmLib\algorithm\sort.hpp" />
+    <ClInclude Include="..\..\..\hmLib\algorithm\algorithm.hpp" />
     <ClInclude Include="..\..\..\hmLib\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\hmLib\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\hmLib\algorithm\sampling.hpp" />
@@ -36,7 +36,6 @@
     <ClInclude Include="..\..\..\hmLib\enumerators.hpp" />
     <ClInclude Include="..\..\..\hmLib\euclidean.hpp" />
     <ClInclude Include="..\..\..\hmLib\exceptions.hpp" />
-    <ClInclude Include="..\..\..\hmLib\factorial.hpp" />
     <ClInclude Include="..\..\..\hmLib\filterbuf.hpp" />
     <ClInclude Include="..\..\..\hmLib\functional.hpp" />
     <ClInclude Include="..\..\..\hmLib\gate.hpp" />

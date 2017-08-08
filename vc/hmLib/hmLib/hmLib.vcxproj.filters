@@ -162,11 +162,8 @@
     <ClInclude Include="..\..\..\hmLib\typemanage.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\algorithm\sort.hpp">
+    <ClInclude Include="..\..\..\hmLib\algorithm\algorithm.hpp">
       <Filter>hmLib\algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hmLib\factorial.hpp">
-      <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
