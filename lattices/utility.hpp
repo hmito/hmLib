@@ -17,8 +17,7 @@ namespace hmLib{
 
 		template<typename ...others>
 		auto make_point(others... Others)->point<sizeof...(others)>{
-			std::array<int,sizeof...(others)> Array{Others...};
-			return point<sizeof...(others)>(Array.begin(),Array.end());
+			return point<sizeof...(others)>{static_cast<int>(Others)...};
 		}
 
 		template<unsigned int dim_>
