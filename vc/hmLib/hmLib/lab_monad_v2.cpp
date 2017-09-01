@@ -3,6 +3,7 @@
 #include<initializer_list>
 #include<functional>
 #include<vector>
+#include<future>
 #include<type_traits>
 #include<iostream>
 #include<boost/optional.hpp>
@@ -40,8 +41,11 @@ namespace hmLib {
 		};
 
 		template<typename Pred>
-		struct negate_of :std::is_same < typename Pred::type, std::false_type> {};
+		struct negate_of: public std::is_same<typename Pred::type, std::false_type> {};
 	}
+}
+//monad traits
+namespace hmLib{
 	namespace monad {
 		namespace monad_categories {
 			struct immutable_monad_tag {};
@@ -59,6 +63,8 @@ namespace hmLib {
 			using type = decltype(check(std::declval<T>()));
 			static constexpr const bool value = type::value;
 		};
+		template<typename T>
+		using is_not_monad = functional::negate_of<is_monad<T>>;
 
 		namespace detail {
 			template<typename T, bool IsMonad = is_monad<T>::value>
@@ -101,61 +107,293 @@ namespace hmLib {
 		struct is_omittable : std::is_same<typename monad_traits<M>::monad_category, monad_categories::omittable_monad_tag> {};
 		template<typename M>
 		struct is_flattenable : std::bool_constant<std::is_same<typename monad_traits<M>::monad_category, monad_categories::flattenable_monad_tag>::value || is_omittable<M>::value> {};
-
+	}
+}
+//fmap
+namespace hmLib {
+	namespace monad {
+		struct default_fmap_target {
+			template<typename T>
+			using type = is_not_monad<T>;
+		};
 		template<typename fn>
-		struct target_checker {
+		struct fmap_target {
 		private:
-			template<typename T, typename efn, typename V = typename efn::template target<nullptr_t>>
-			static auto check(efn)->typename efn::template target<T>;
-			template<typename T>
-			static auto check(...)->hmLib::functional::negate_of<is_monad<T>>;
+			template<typename efn, typename V = typename efn::template context<nullptr_t>>
+			static auto check_impl(efn)->typename efn::fmap_target;
+			static auto check_impl(...)->default_fmap_target;
 		public:
+			using type = decltype(check_impl<typename std::decay<fn>::type>(std::declval<fn>()));
 			template<typename T>
-			using type = decltype(check<typename std::decay<T>::type>(std::declval<fn>()));
+			static constexpr bool check() { return typename type::template type<T>::value; }
 			template<typename T>
-			static constexpr bool check() { return type<T>::value; }
-			template<typename T>
-			constexpr bool operator()(T&&)const { return type<T>::value; }
+			constexpr bool operator()(T&&)const { return typename type::template type<T>::value; }
 		};
-
-		template<template<typename> typename context, typename fn>
-		struct for_context_wrapper {
-			template<typename T>
-			using target = context<T>;
-			fn Fn;
-		public:
-			for_context_wrapper(const fn& Fn_):Fn(Fn_){}
-			for_context_wrapper(fn&& Fn_) :Fn(std::move(Fn_)) {}
-			template<typename T>
-			auto operator()(T&& Val) { return Fn(std::forward<T>(Val)); }
-		};
-
-		template<typename fn>
-		using for_monad_wrapper = for_context_wrapper<is_monad, fn>;
-		template<typename fn>
-		auto for_monad(fn&& Fn) { return for_monad_wrapper<typename std::decay<fn>::type>(Fn); }
 
 		namespace detail {
-			template<typename eT, typename efn, bool IsTarget = target_checker<efn>::check<eT>(), bool IsMonad = is_monad<eT>::value>
-			struct apply_impl {
+			template<typename context_, typename fn>
+			struct for_context_wrapper {
+				using fmap_target = context_;
+				const fn& Fn;
+			public:
+				for_context_wrapper(const fn& Fn_) :Fn(Fn_) {}
+				template<typename T>
+				auto operator()(T&& Val) { return Fn(std::forward<T>(Val)); }
+			};
+		}
+		template<typename context, typename fn>
+		auto for_context(fn&& Fn) {
+			return detail::for_context_wrapper<context, typename std::decay<fn>::type>(std::forward<fn>(Fn));
+		}
+
+		namespace detail {
+			struct for_top_context {
+				template<typename T>
+				using type = std::true_type;
+			};
+		}
+		template<typename fn>
+		auto for_top(fn&& Fn) { return for_context<detail::for_top_context>(Fn); }
+
+		namespace detail {
+			template<typename eT, typename efn, bool IsTarget = fmap_target<efn>::check<eT>(), bool IsMonad = is_monad<eT>::value>
+			struct fmap_impl {
 				template<typename T, typename fn>
 				auto operator()(T&& val, fn&& Fn) { return Fn(std::forward<T>(val)); }
 			};
 			template<typename eT, typename efn>
-			struct apply_impl<eT, efn, false, true> {
+			struct fmap_impl<eT, efn, false, true> {
 				template<typename T, typename fn>
 				auto operator()(T&& val, fn&& Fn) { return val.apply(std::forward<fn>(Fn)); }
 			};
 			template<typename eT, typename efn>
-			struct apply_impl<eT, efn, false, false> {
+			struct fmap_impl<eT, efn, false, false> {
 				template<typename T, typename fn>
 				auto operator()(T&& val, fn&& Fn) { return std::forward<T>(val); }
 			};
 		}
 		template<typename T, typename fn>
-		auto apply(T&& val, fn&& Func) {
-			return detail::apply_impl<typename std::decay<T>::type, typename std::decay<fn>::type>()(std::forward<T>(val), std::forward<fn>(Func));
+		auto fmap(T&& val, fn&& Func) {
+			return detail::fmap_impl<typename std::decay<T>::type, typename std::decay<fn>::type>()(std::forward<T>(val), std::forward<fn>(Func));
 		}
+	}
+}
+//function
+namespace hmLib {
+	namespace monad {
+		namespace detail {
+			template<typename arg_type, typename fn1st, typename fn2nd>
+			struct is_continuous_fmap;
+
+			namespace impl {
+				template<typename arg_type, typename fn1st, typename fn2nd,
+					typename arg_base_type = typename monad_base<arg_type>::type,
+					bool can_fmap_fn1st = fmap_target<fn1st>::check<arg_type>(),
+					bool can_fmap_fn2nd = fmap_target<fn2nd>::check<typename std::decay<decltype(fn1st(std::declval<arg_type>()))>::type>()
+				>struct is_continuous_fmap_impl :public std::false_type {};
+				template<typename arg_type, typename arg_base_type, typename fn1st, typename fn2nd>
+				struct is_continuous_fmap_impl<arg_type, fn1st, fn2nd, true, true> : public std::true_type {};
+				template<typename arg_type, typename arg_base_type, typename fn1st, typename fn2nd>
+				struct is_continuous_fmap_impl<arg_type, fn1st, fn2nd, false, false> : public is_continuous_fmap<typename monad_base<arg_type>::type, fn1st, fn2nd> {};
+			}
+
+			template<typename arg_type, typename fn1st, typename fn2nd>
+			struct is_continuous_fmap : public impl::is_continuous_fmap_impl<arg_type, fn1st, fn2nd> {};
+			template<typename fn1st, typename fn2nd>
+			struct is_continuous_fmap<void, fn1st, fn2nd> : public std::false_type {};
+
+		}
+
+		template<typename arg_type_, typename fn_, typename prevfn_>
+		struct function {
+		private:
+			using this_type = function<arg_type_, fn_, prevfn_>;
+			using fn = fn_;
+			using prevfn = prevfn_;
+		public:
+			using arg_type = arg_type_;
+			using result_type = decltype(std::declval<fn>()(std::declval<arg_type >()));
+		private:
+			const fn Fn;
+			const prevfn PrevFn;
+		public:
+			function() = default;
+			function(const this_type&) = default;
+			this_type& operator=(const this_type&) = default;
+			function(this_type&&) = default;
+			this_type& operator=(this_type&&) = default;
+			function(fn Fn_, prevfn PrevFn_) : Fn(std::move(Fn_)), PrevFn(std::move(PrevFn_)) {}
+		public:
+			auto operator()(arg_type&& Val)const { fmap(PrevFn(std::move(Val)), Fn); }
+			auto operator()(const arg_type& Val)const { fmap(PrevFn(Val), Fn); }
+		public:
+			template<typename nfn>
+			friend auto operator >> (const this_type& This, nfn&& NFn) {
+				return detail::make_composite_function<arg_type>(This.Fn, std::forward<nfn>(NFn), This.PrevFn);
+			}
+			template<typename nfn>
+			friend auto operator >> (this_type&& This, nfn&& NFn) {
+				return detail::make_composite_function<arg_type>(std::move(This.Fn), std::forward<nfn>(NFn), std::move(This.PrevFn));
+			}
+		};
+		template<typename arg_type_, typename fn_>
+		struct function <arg_type_, fn_, void> {
+		private:
+			using this_type = function<arg_type_, fn_, void>;
+			using fn = fn_;
+		public:
+			using arg_type = arg_type_;
+			using result_type = decltype(std::declval<fn>()(std::declval<arg_type >()));
+		private:
+			const fn Fn;
+		public:
+			function() = default;
+			function(const this_type&) = default;
+			this_type& operator=(const this_type&) = default;
+			function(this_type&&) = default;
+			this_type& operator=(this_type&&) = default;
+			explicit function(fn Fn_) :Fn(std::move(Fn_)) {}
+		public:
+			auto operator()(arg_type&& Val)const { fmap(std::move(Val), Fn); }
+			auto operator()(const arg_type& Val)const { fmap(Val, Fn); }
+		public:
+			template<typename nfn>
+			friend auto operator >> (const this_type& This, nfn&& NFn) {
+				return detail::make_composite_function<arg_type>(This.Fn, std::forward<nfn>(NFn));
+			}
+			template<typename nfn>
+			friend auto operator >> (this_type&& This, nfn&& NFn) {
+				return detail::make_composite_function<arg_type>(std::move(This.Fn), std::forward<nfn>(NFn));
+			}
+		};
+
+		template<typename arg_type, typename fn>
+		auto make_function(fn&& Fn) {
+			return function<arg_type, typename std::decay<fn>::type, void>(std::forward<fn>(Fn));
+		}
+		template<typename arg_type, typename fn, typename base_fn>
+		auto make_function(fn&& Fn, base_fn&& BaseFn) {
+			return function<arg_type, typename std::decay<fn>::type, typename std::decay<base_fn>::type>(std::forward<fn>(Fn), std::forward<base_fn>(BaseFn));
+		}
+
+		namespace detail {
+			namespace impl {
+				template<typename arg_type, typename efn1st, typename efn2nd, bool IsContinuous = is_continuous_fmap<arg_type, efn1st, efn2nd>::value>
+				struct make_composite_functon_impl {
+					template<typename fn1st, typename fn2nd>
+					auto operator()(fn1st&& Fn1, fn2nd&& Fn2) {
+						return make_function(
+							for_context<typename fmap_target<efn1st>::type>(
+								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const arg_type& v) {return Fn2(Fn1(v)); }
+						)
+						);
+					}
+					template<typename fn1st, typename fn2nd, typename base_fn>
+					auto operator()(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
+						return make_function(
+							for_context<typename fmap_target<efn1st>::type>(
+								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const arg_type& v) {return Fn2(Fn1(v)); }
+						),
+							std::forward<base_fn>(BaseFn)
+							);
+					}
+				};
+				template<typename arg_type, typename efn1st, typename efn2nd>
+				struct make_composite_functon_impl<arg_type, efn1st, efn2nd, false> {
+					template<typename fn1st, typename fn2nd>
+					auto operator()(fn1st&& Fn1, fn2nd&& Fn2) {
+						return make_function(
+							std::forward<fn2nd>(Fn2),
+							[Fn1 = std::forward<fn1st>(Fn1)](const arg_type& v) {return fmap(v, Fn1); }
+						)
+					}
+					template<typename fn1st, typename fn2nd, typename base_fn>
+					auto operator()(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
+						return make_function(
+							std::forward<fn2nd>(Fn2),
+							[Fn1 = std::forward<fn1st>(Fn1), BaseFn = std::forward<base_fn>(BaseFn)](const arg_type& v) {return fmap(BaseFn(v), Fn1); }
+						)
+					}
+				};
+			}
+			template<typename arg_type, typename fn1st, typename fn2nd>
+			auto make_composite_function(fn1st&& Fn1, fn2nd&& Fn2) {
+				return impl::make_composite_functon_impl<arg_type, typename std::decay<fn1st>::type, typename std::decay<fn2nd>::type>()(
+					std::forward<fn1st>(Fn1),
+					std::forward<fn2nd>(Fn2)
+				);
+			}
+			template<typename arg_type, typename fn1st, typename fn2nd, typename base_fn>
+			auto make_composite_function(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
+				return impl::make_composite_functon_impl<arg_type, typename std::decay<fn1st>::type, typename std::decay<fn2nd>::type>()(
+					std::forward<fn1st>(Fn1),
+					std::forward<fn2nd>(Fn2),
+					std::forward<base_fn>(BaseFn)
+				);
+			}
+		}
+	}
+}
+//fmap_later
+namespace hmLib {
+	namespace monad {
+		namespace detail {
+			template<typename T, typename function_>
+			struct lazy_fmap {
+			private:
+				using this_type = lazy_fmap<T, function_>;
+				using this_function = function_;
+			private:
+				const T& Ref;		//Reference Capture
+				this_function Fn;	//Applier
+			public:
+				lazy_fmap(const T& Ref_, const this_function& Fn_) :Ref(Ref_), Fn(Fn_) {}
+				lazy_fmap(const T& Ref_, this_function&& Fn_): Ref(Ref_), Fn(std::move(Fn_)) {}
+				auto evaluate()const { return Fn(Ref); }
+				template<typename nfn>
+				friend auto operator >> (const this_type& This, nfn&& NFn) {
+					return fmap_later(This.Ref, This.Fn>>NFn);
+				}
+				template<typename nfn>
+				friend auto operator >> (this_type&& This, nfn&& NFn) {
+					return fmap_later(std::move(This.Ref), std::forward<nfn>(NFn), std::move(This.Fn));
+				}
+			};
+
+		}
+		template<typename T, typename fn>
+		auto fmap_later(const T& val, fn&& Fn) {
+			return detail::lazy_fmap<T, typename std::decay<decltype(make_function<T>(Fn))>::type>(val, make_function<T>(Fn));
+		}
+		template<typename T, typename fn, typename function>
+		auto fmap_later(const T& val, fn&& Fn, function&& Function) {
+			return detail::lazy_fmap<T, typename std::decay<decltype(Function>>Fn)>::type>(val, Function>>Fn);
+		}
+	}
+}
+//monad_mixin
+namespace hmLib{
+	namespace monad{
+		namespace detail {
+			template<typename T>
+			struct evaluate_impl {
+				template<typename U>
+				decltype(auto) operator()(U&& val) { return std::forward<U>(val); }
+			};
+			template<typename monad, typename fn>
+			struct evaluate_impl<fmap_later<monad, fn>> {
+				template<typename U>
+				auto operator()(U&& val) { return val.evaluate(); }
+			};
+		}
+		template<typename T>
+		decltype(auto) evaluate(T&& val) { return detail::evaluate_impl<typename std::decay<T>::type>()(std::forward<T>(val)); }
+		struct do_evaluate {
+			//			using fmap_category = detail::is_fmap_later;
+		public:
+			template<typename T>
+			auto operator()(T&& val) { return evaluate(val); }
+		};
 
 		namespace detail {
 			template<typename M, bool IsOmittable = is_nested_monad<M>::value && is_omittable<M>::value>
@@ -176,7 +414,7 @@ namespace hmLib {
 		}
 		struct do_omit {
 			template<typename T>
-			using target = is_omittable<T>;
+			using context = is_omittable<T>;
 			template<typename T>
 			decltype(auto) operator()(T&& v) const { return omit(std::forward<T>(v)); }
 		};
@@ -200,7 +438,7 @@ namespace hmLib {
 		}
 		struct do_flatten {
 			template<typename T>
-			using target = is_flattenable<T>;
+			using context = is_flattenable<T>;
 			template<typename T>
 			decltype(auto) operator()(T&& v) const { return flatten(std::forward<T>(v)); }
 		};
@@ -219,346 +457,101 @@ namespace hmLib {
 		}
 		template<typename M, typename value_type>
 		decltype(auto) omitted_wrap(value_type&& val) {
-			return detail::omitted_wrap_impl<typename std::decay<M>::type, value_type>()(std::forward<value_type>(val));
+			return detail::omitted_wrap_impl<typename std::decay<M>::type, typename std::decay<value_type>::type>()(std::forward<value_type>(val));
 		}
-
-		template<typename fn>
-		struct as_is_wrapper {
-		public:
-			fn Fn;
-		public:
-			as_is_wrapper(fn Fn_) :Fn(std::move(Fn_)) {}
-		};
-		template<typename fn>
-		auto as_is(fn&& Fn) {
-			return as_is_wrapper<typename std::decay<fn>::type>(std::forward<fn>(Fn));
-		}
-
-		namespace detail {
-			template<typename arg_type, typename efn, typename enfn>
-			struct functional_composition_impl {
-				template<typename fn, typename nfn>
-				auto operator()(fn&& Fn, nfn&& NFn) {
-					return[Fn = std::forward<fn>(Fn), NFn = std::forward<nfn>(NFn)](const arg_type& v)->auto {return apply(Fn(v), NFn); };
-				}
-			};
-			template<typename arg_type, typename efn, typename enfn>
-			struct functional_composition_impl<arg_type, efn, as_is_wrapper<enfn>> {
-				template<typename fn>
-				auto operator()(fn&& Fn, const as_is_wrapper<efn>& NFn) {
-					return[Fn = std::forward<fn>(Fn), NFn = NFn](const arg_type& v)->auto {return NFn(Fn(v)); };
-				}
-				template<typename fn>
-				auto operator()(fn&& Fn, as_is_wrapper<efn>&& NFn) {
-					return[Fn = std::forward<fn>(Fn), NFn = std::move(NFn)](const arg_type& v)->auto {return NFn(Fn(v)); };
-				}
-			};
-		}
-		template<typename arg_type, typename fn, typename nfn>
-		auto functional_composition(fn&& Fn, nfn&& NFn) {
-			return detail::functional_composition_impl<arg_type, typename std::decay<fn>::type, typename std::decay<nfn>::type()>(std::forward<fn>(Fn), std::forward<nfn>(NFn));
-		}
-
-		template<typename arg_type_, typename fn>
-		struct function {
-		private:
-			using this_type = function<arg_type_, fn>;
-			using arg_type = arg_type_;
-			using result_type = decltype(std::declval<fn>()(std::declval<arg_type >()));
-		private:
-			const fn Fn;
-		public:
-			function() = default;
-			function(const this_type&) = default;
-			function(this_type&&) = default;
-			explicit function(fn Fn_) :Fn(std::move(Fn_)) {}
-			this_type& operator=(const this_type&) = default;
-			this_type& operator=(this_type&&) = default;
-		public:
-			auto operator()(arg_type&& val)const { return Fn(std::move(Val)); }
-			auto operator()(const arg_type& val)const { return Fn(Val); }
-		public:
-			template<typename nfn>
-			friend auto operator >> (const this_type& This, nfn&& NFn) {
-				return make_function<arg_type>(functional_composition(This.Fn, std::forward<nfn>(NFn)));
-			}
-			template<typename nfn>
-			friend auto operator >> (this_type&& This, nfn&& NFn) {
-				return make_function<arg_type>(functional_composition(std::move(This.Fn), std::forward<nfn>(NFn)));
-			}
-			template<typename nfn>
-			friend auto operator | (const this_type& This, nfn&& NFn) {
-				return make_function<arg_type>(functional_composition(This.Fn, as_is(std::forward<nfn>(NFn))));
-			}
-			template<typename nfn>
-			friend auto operator | (this_type&& This, nfn&& NFn) {
-				return make_function<arg_type>(functional_composition(std::move(This.Fn), as_is(std::forward<nfn>(NFn))));
-			}
-		};
-		template<typename arg_type_, typename fn>
-		auto make_function(fn&& Fn) {
-			return function<arg_type_, typename std::decay<fn>::type>(std::forward<fn>(Fn));
-		}
-
-		template<typename T, typename fn>
-		struct lazy_apply {
-		private:
-			using this_type = lazy_apply<T, fn>;
-		private:
-			T Val;
-			fn Fn;
-		public:
-			lazy_apply(T Val_, fn Fn_) :Val(std::move(Val_)), Fn(std::move(Fn_)) {}
-			auto evaluate()const { return Fn(Val); }
-			template<typename nfn>
-			friend auto operator >> (const this_type& This, nfn&& NFn) {
-				return then(This.Val, std::forward<nfn>(NFn), This.Fn);
-			}
-			template<typename nfn>
-			friend auto operator >> (this_type&& This, nfn&& NFn) {
-				return then(std::move(This.Val), std::forward<nfn>(NFn), std::move(This.Fn));
-			}
-			template<typename nfn>
-			friend auto operator | (const this_type& This, nfn&& NFn) {
-				return then(This.Val, as_is(std::forward<nfn>(NFn)), This.Fn);
-			}
-			template<typename nfn>
-			friend auto operator | (this_type&& This, nfn&& NFn) {
-				return then(std::move(This.Val), as_is(std::forward<nfn>(NFn)), std::move(Fn));
-			}
-		};
-		template<typename T, typename fn>
-		auto make_lazy_apply(T&& val, fn&& Fn) {
-			return lazy_apply<T, fn>(std::forward<T>(val), std::forward<fn>(Fn));
-		}
-		namespace detail {
-			template<typename type>
-			struct is_lazy_apply {
-
-			};
-			template<typename T, typename fn>
-			struct is_lazy_apply<lazy_apply<T,fn>>{};
-		}
-
-		namespace detail {
-			template<typename T>
-			struct evaluate_impl {
-				template<typename U>
-				decltype(auto) operator()(U&& val) { return std::forward<U>(val); }
-			};
-			template<typename monad, typename fn>
-			struct evaluate_impl<lazy_apply<monad, fn>> {
-				template<typename U>
-				auto operator()(U&& val) { return val.evaluate(); }
-			};
-		}
-		template<typename T>
-		decltype(auto) evaluate(T&& val) { return detail::evaluate_impl<typename std::decay<T>::type>()(std::forward<T>(val)); }
-		struct do_evaluate {
-//			using apply_category = detail::is_lazy_apply;
-		public:
-			template<typename T>
-			auto operator()(T&& val) { return evaluate(val); }
-		};
-
-		namespace detail {
-			template<typename eT, typename efn>
-			struct then_impl {
-				template<typename T, typename fn>
-				auto operator()(T&& Val, fn&& Fn) {
-					return make_lazy_apply(
-						std::forward<T>(Val),
-						[Fn = std::forward<fn>(Fn)](const T& v)->decltype(auto) {return apply(v, Fn); }
-					);
-				}
-				template<typename T, typename fn, typename prior>
-				auto operator()(T&& Val, fn&& Fn, prior&& PriorFn) {
-					return make_lazy_apply(
-						std::forward<T>(Val),
-						[Fn = std::forward<fn>(Fn), PriorFn = std::forward<prior>(PriorFn)](const T& v)->decltype(auto) {return apply(PriorFn(v), Fn); }
-					);
-				}
-			};
-			template<typename eT, typename efn>
-			struct then_impl<eT, as_is_wrapper<efn>> {
-				template<typename T>
-				auto operator()(T&& Val, const as_is_wrapper<efn>& AsIsFn) {
-					return make_lazy_apply(
-						std::forward<T>(Val),
-						[Fn = AsIsFn.Fn](const T& v)->decltype(auto){return Fn(v); }
-					);
-				}
-				template<typename T>
-				auto operator()(T&& Val, as_is_wrapper<efn>&& AsIsFn) {
-					return make_lazy_apply(
-						std::forward<T>(Val),
-						[Fn = std::move(AsIsFn.Fn)](const T& v)->decltype(auto){return Fn(v); }
-					);
-				}
-				template<typename T, typename prior>
-				auto operator()(T&& Val, const as_is_wrapper<efn>& AsIsFn, prior&& PriorFn) {
-					return make_lazy_apply(
-						std::forward<T>(Val),
-						[Fn = AsIsFn.Fn, PriorFn = std::forward<prior>(PriorFn)](const T& v)->decltype(auto){return Fn(PriorFn(v)); }
-					);
-				}
-				template<typename T, typename prior>
-				auto operator()(T&& Val, as_is_wrapper<efn>&& AsIsFn, prior&& PriorFn) {
-					return make_lazy_apply(
-						std::forward<T>(Val),
-						[Fn = std::move(AsIsFn.Fn), PriorFn = std::forward<prior>(PriorFn)](const T& v)->decltype(auto){return Fn(PriorFn(v)); }
-					);
-				}
-			};
-			template<typename eT>
-			struct then_impl<eT, do_evaluate> {
-				template<typename T, typename fn>
-				auto operator()(T&& Val, fn&& DoEval) {
-					return std::forward<T>(Val);
-				}
-				template<typename T, typename fn, typename prior>
-				auto operator()(T&& Val, fn&& DoEval, prior&& PriorFn) {
-					return PriorFn(std::forward<T>(Val));
-				}
-			};
-		}
-		template<typename T, typename fn>
-		auto then(T&& M, fn&& Fn) { return detail::then_impl<typename std::decay<T>::type, typename std::decay<fn>::type>()(std::forward<T>(M), std::forward<fn>(Fn)); }
-		template<typename T, typename fn, typename prior>
-		auto then(T&& M, fn&& Fn, prior&& PriorFn) { return detail::then_impl<typename std::decay<T>::type, typename std::decay<fn>::type>()(std::forward<T>(M), std::forward<fn>(Fn), std::forward<prior>(PriorFn)); }
 
 		template<typename Type, typename value_type_, typename monad_category_>
 		struct monad_mixin {
 			using monad_category = monad_category_;
 			using value_type = value_type_;
 		public:
+			//for monad
+			//template<typename U>
+			//struct rebind { using type = Type<U>; };
+			//explicit just(T val_) :val(std::move(val_)) {}
+			//template<typename fn>
+			//auto apply(fn&& Func)const {
+			//	return omitted_wrap<this_type>(hmLib::monad::fmap(val, Func));
+			//}
+		public:
+			//for omitable_monad/flattenable_monad
+			//explicit just(just<just<T>> m_) :val(std::move(m_.get().get())) {}
+		public:
 			template<typename fn>
-			auto then(fn&& Func)& {
-				return hmLib::functional::then(static_cast<const Type&>(*this), std::forward<fn>(Func));
+			auto fmap(fn&& Func)& {
+				return monad::fmap(static_cast<const Type&>(*this), std::forward<fn>(Func));
 			}
 			template<typename fn>
-			auto then(fn&& Func) && {
-				return hmLib::functional::then(static_cast<Type&&>(std::move(*this)), std::forward<fn>(Func));
+			auto fmap(fn&& Func) && {
+				return monad::fmap(static_cast<Type&&>(*this), std::forward<fn>(Func));
+			}
+			template<typename fn>
+			auto fmap_later(fn&& Func)& {
+				return monad::fmap_later(static_cast<const Type&>(*this), std::forward<fn>(Func));
+			}
+			template<typename fn>
+			auto fmap_later(fn&& Func) && {
+				return monad::fmap_later(static_cast<Type&&>(*this), std::forward<fn>(Func));
 			}
 		public:
 			//for monad
 			template<typename fn>
 			friend auto operator >> (Type&& This, fn&& Func) {
-				std::cout << "\tmove operator>>\n";
-				return hmLib::functional::then(std::move(This), std::forward<fn>(Func));
+				return std::move(This).fmap_later(std::forward<fn>(Func));
 			}
 			//for monad
 			template<typename fn>
 			friend auto operator >> (const Type& This, fn&& Func) {
-				std::cout << "\tcopy operator>>\n";
-				return hmLib::functional::then(This, std::forward<fn>(Func));
+				return This.fmap_later(std::forward<fn>(Func));
 			}
-			//for monad
-			template<typename fn>
-			friend auto operator|(Type&& This, fn&& Func) {
-				std::cout << "\tmove operator|\n";
-				return hmLib::functional::then(std::move(This), hmLib::functional::as_is(std::forward<fn>(Func)));
+		};
+	}
+}
+//lazy monad
+namespace hmLib{
+	namespace monad{
+		template<typename T, typename eval, typename P>
+		struct lazy {
+		private:
+			optional<T> Opt;
+			eval Eval;
+			P Val;
+		public:
+			operator T() {
+				return get();
 			}
-			//for monad
-			template<typename fn>
-			friend auto operator|(const Type& This, fn&& Func) {
-				std::cout << "\tcopy operator|\n";
-				return hmLib::functional::then(This, hmLib::functional::as_is(std::forward<fn>(Func)));
+			const T& get() {
+				if (!Opt) {
+					Opt.set(Func(Val));
+				}
+				return Opt.get();
 			}
 		};
 
+		namespace detail {
+			struct later_impl {};
+		}
+		template<typename fn>
+		auto later(fn&& Fn);
+	}
+}
+
+//monadic
+namespace hmLib{
+	namespace monad{
 		template<typename T>
-		struct monad {
-			using monad_category = monad_categories::omittable_monad_tag;
-			using value_type = T;
-		private:
-			using this_type = monad<T>;
-		public:
-			template<typename U>
-			struct rebind {
-				using type = monad<U>;
-			};
-		private:
-			T val;
-		public:
-			monad() :val() {
-				std::cout << "construct" << std::endl;
-			}
-			monad(const this_type& other) :val(other.val) {
-				std::cout << "construct with copy\t" << val << std::endl;
-			}
-			this_type& operator=(const this_type& other) {
-				std::cout << "copy\t" << other.val << std::endl;
-				if (this != &other) {
-					val = other.val;
-				}
-				return *this;
-			}
-			monad(this_type&& other) noexcept:val(std::move(other.val)) {
-				std::cout << "construct with move\t" << val << std::endl;
-			}
-			this_type& operator=(this_type&& other)noexcept {
-				std::cout << "move\t" << other.val << std::endl;
-				if (this != &other) {
-					val = std::move(other.val);
-				}
-				return *this;
-			}
-		public:
-			//for monad
-			explicit monad(T val_) :val(std::move(val_)) {
-				std::cout << "construct with value\t" << val << std::endl;
-			}
-			//for omitable_monad (explicit is better for flattenable monad)
-			explicit monad(monad<monad<T>> m_) :val(std::move(m_.val.val)) {
-				std::cout << "construct with omit\t" << val << std::endl;
-			}
-		public:
-			//for monad
-			template<typename fn>
-			auto apply(fn&& Func)const {
-				std::cout << "\tapply" << std::endl;
-				return omitted_wrap<this_type>(hmLib::functional::apply(val, Func));
-			}
-			template<typename fn>
-			auto then(fn&& Func)& {
-				return hmLib::functional::then(*this, std::forward<fn>(Func));
-			}
-			template<typename fn>
-			auto then(fn&& Func) && {
-				return hmLib::functional::then(std::move(*this), std::forward<fn>(Func));
-			}
-		public:
-			//for monad
-			template<typename fn>
-			friend auto operator >> (this_type&& This, fn&& Func) {
-				std::cout << "\tmove operator>>\n";
-				return hmLib::functional::then(std::move(This), std::forward<fn>(Func));
-			}
-			//for monad
-			template<typename fn>
-			friend auto operator >> (const this_type& This, fn&& Func) {
-				std::cout << "\tcopy operator>>\n";
-				return hmLib::functional::then(This, std::forward<fn>(Func));
-			}
-			//for monad
-			template<typename fn>
-			friend auto operator|(this_type&& This, fn&& Func) {
-				std::cout << "\tmove operator|\n";
-				return hmLib::functional::then(std::move(This), hmLib::functional::as_is(std::forward<fn>(Func)));
-			}
-			//for monad
-			template<typename fn>
-			friend auto operator|(const this_type& This, fn&& Func) {
-				std::cout << "\tcopy operator|\n";
-				return hmLib::functional::then(This, hmLib::functional::as_is(std::forward<fn>(Func)));
-			}
-		public:
-			T& get() { return val; }
-			const T& get()const { return val; }
-			void set(T val_) { val = std::move(val_); }
+		struct monadic_define {
+			//monadic context of this type is not defined.
+			//auto operator()(T v)const noexcept;
 		};
+	}
+	template<typename T>
+	auto monadic(T&& val) { return detail::monadic_define<typename std::decay<T>::type>()(std::forward<T>(val)); }
+}
 
+//each classes
+namespace hmLib {
+	namespace monad {
 		template<typename T>
 		struct just :public monad_mixin<just<T>, T, monad_categories::omittable_monad_tag> {
 		private:
@@ -575,28 +568,85 @@ namespace hmLib {
 			//for monad
 			template<typename U>
 			struct rebind { using type = just<U>; };
-			explicit just(T val_) :val(std::move(val_)) {}
+			explicit just(const T& val_) :val(val_) {}
+			explicit just(T&& val_) :val(std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
-				return omitted_wrap<this_type>(hmLib::monad::apply(val, Func));
+				return omitted_wrap<this_type>(hmLib::monad::fmap(val, Func));
 			}
 		public:
 			//for omitable_monad/flattenable_monad
 			explicit just(just<just<T>> m_) :val(std::move(m_.get().get())) {}
 		public:
-			T& get()& { return val; }
-			const T& get()const & { return val; }
-			T get() && { return std::move(val); }
+			T& get() { return std::move(val); }
+			const T& get()const { return val; }
 			void set(T val_) { val = std::move(val_); }
 		};
+
 		template<typename T>
 		auto as_just(T&& val) { return just<typename std::decay<T>::type>(std::forward<T>(val)); }
 
-		struct do_get {
-			template<typename T>
-			decltype(auto) operator()(T&& v) const { return std::forward<T>(v).get(); }
+		template<>
+		struct monadic_define<bool> {
+			auto operator()(bool v)const noexcept { return just<bool>(v); }
 		};
-
+		template<>
+		struct monadic_define<signed char> {
+			auto operator()(signed char v)const noexcept { return just<signed char >(v); }
+		};
+		template<>
+		struct monadic_define<unsigned char> {
+			auto operator()(unsigned char v)const noexcept { return just<unsigned char>(v); }
+		};
+		template<>
+		struct monadic_define<signed short> {
+			auto operator()(signed short v)const noexcept { return just<signed short>(v); }
+		};
+		template<>
+		struct monadic_define<unsigned short> {
+			auto operator()(unsigned short v)const noexcept { return just<unsigned short >(v); }
+		};
+		template<>
+		struct monadic_define<signed int> {
+			auto operator()(signed int v)const noexcept { return just<signed int>(v); }
+		};
+		template<>
+		struct monadic_define<unsigned int> {
+			auto operator()(unsigned int v)const noexcept { return just<unsigned int >(v); }
+		};
+		template<>
+		struct monadic_define<signed long> {
+			auto operator()(signed long v)const noexcept { return just<signed long>(v); }
+		};
+		template<>
+		struct monadic_define<unsigned long> {
+			auto operator()(unsigned long v)const noexcept { return just<unsigned long >(v); }
+		};
+		template<>
+		struct monadic_define<signed long long> {
+			auto operator()(signed long long v)const noexcept { return just<signed long long>(v); }
+		};
+		template<>
+		struct monadic_define<unsigned long long> {
+			auto operator()(unsigned long long v)const noexcept { return just<unsigned long long >(v); }
+		};
+		template<>
+		struct monadic_define<float> {
+			auto operator()(float v)const noexcept { return just<float>(v); }
+		};
+		template<>
+		struct monadic_define<double> {
+			auto operator()(double v)const noexcept { return just<double>(v); }
+		};
+		template<>
+		struct monadic_define<long double> {
+			auto operator()(long double v)const noexcept { return just<long double>(v); }
+		};
+	}
+}
+//optional monad
+namespace hmLib {
+	namespace monad {
 		template<typename T>
 		struct optional :public monad_mixin<optional<T>, T, monad_categories::omittable_monad_tag> {
 		private:
@@ -609,6 +659,7 @@ namespace hmLib {
 			this_type& operator=(const this_type&) = default;
 			optional(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
+			explicit optional(boost::optional<T> val_) :val(std::move(val_)) {}
 		public:
 			//for monad
 			template<typename U>
@@ -616,9 +667,9 @@ namespace hmLib {
 			explicit optional(T val_) :val(std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
-				using ans_type = decltype(omitted_wrap<this_type>(hmLib::functional::apply(std::declval<T>(), Func)));
+				using ans_type = decltype(omitted_wrap<this_type>(hmLib::functional::fmap(std::declval<T>(), Func)));
 				if (!val)return ans_type();
-				return omitted_wrap<this_type>(hmLib::functional::apply(*val, Func));
+				return omitted_wrap<this_type>(hmLib::functional::fmap(*val, Func));
 			}
 		public:
 			//for omitable_monad/flattenable_monad
@@ -630,8 +681,17 @@ namespace hmLib {
 			void set(T val_) { *val = std::move(val_); }
 		};
 		template<typename T>
-		auto as_maybe(T&& val) { return optional<typename std::decay<T>::type>(std::forward<T>(val)); }
+		auto as_optional(T&& val) { return optional<typename std::decay<T>::type>(std::forward<T>(val)); }
 
+		template<typename T>
+		struct monadic_define<boost::optional<T>> {
+			auto operator()(boost::optional<T> v)const noexcept { return optional<T>(std::move(v)); }
+		};
+	}
+}
+//vector monad and others...
+namespace hmLib{
+	namespace monad{
 		template<typename T>
 		struct vector :public monad_mixin<vector<T>, T, monad_categories::flattenable_monad_tag> {
 		private:
@@ -658,11 +718,11 @@ namespace hmLib {
 			explicit vector(T val_) :val(1, std::move(val_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
-				using ans_type = decltype(hmLib::monad::apply(std::declval<T>(), Func));
+				using ans_type = decltype(hmLib::monad::fmap(std::declval<T>(), Func));
 				std::vector<ans_type> Applied(val.size());
 
 				auto Out = std::begin(Applied);
-				for (const auto& v : val) *(Out++) = hmLib::monad::apply(v, Func);
+				for (const auto& v : val) *(Out++) = hmLib::monad::fmap(v, Func);
 				return vector<ans_type>(std::move(Applied));
 			}
 		public:
@@ -681,22 +741,29 @@ namespace hmLib {
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end()const { return cend(); }
 		public:
-			void push_back(const T& e) { return val.push_back(e); }
+			void push_back(const T& e) { val.push_back(e); }
+			void emplace_back(T&& e) { val.emplace_back(e); }
 		};
 		template<typename T>
 		auto as_vector(T&& val) { return vector<typename std::decay<T>::type>(std::forward<T>(val)); }
 		template<typename input_iterator>
-		auto as_vector(input_iterator Begin, input_iterator End) { return vector<typename std::decay<T>::type>(Begin, End); }
+		auto as_vector(input_iterator Begin, input_iterator End) { return vector<typename std::decay<decltype(*Begin)>::type>(Begin, End); }
+
+		template<typename T>
+		struct future {
+			std::future<T> Future;
+		};
+
+		template<typename T,typename TransformRule>
+		struct transform{};
 	}
 }
-
-
 
 int main(void) {
 	{
 		hmLib::monad::just<hmLib::monad::just<hmLib::monad::just<double>>> v1;
 
-		auto v2 = hmLib::monad::apply(v1, hmLib::monad::do_omit());
+		auto v2 = hmLib::monad::fmap(v1, hmLib::monad::do_omit());
 
 		std::cout << "omit" << std::endl;
 		std::cout << "before:" << typeid(v1).name() << std::endl;
@@ -710,17 +777,24 @@ int main(void) {
 		v1.push_back(e1);
 		v1.push_back(e1);
 
-		auto v2 = hmLib::monad::apply(v1, hmLib::monad::do_omit());
+		auto v2 = hmLib::monad::fmap(v1, hmLib::monad::do_omit());
 
 		std::cout << "omit" << std::endl;
 		std::cout << "before:" << typeid(v1).name() << std::endl;
 		std::cout << "after :" << typeid(v2).name() << std::endl;
 	}
 
+
+	{
+		auto Fn = [](double v) {return v; };
+		auto ForMonad = hmLib::monad::for_context<hmLib::monad::is_monad>(Fn);
+		auto ForOmmitable = hmLib::monad::for_context<hmLib::monad::is_omittable>(Fn);
+	}
+
 	{
 		hmLib::monad::do_omit Do;
 
-		auto Check = hmLib::monad::target_checker<decltype(Do)>();
+		auto Check = hmLib::monad::context_checker<decltype(Do)>();
 		std::cout << "for_omit" << std::endl;
 		std::cout << "double:" << Check(5.5) << std::endl;
 		std::cout << "vector:" << Check(hmLib::monad::vector<double>()) << std::endl;
@@ -730,7 +804,7 @@ int main(void) {
 	{
 		hmLib::monad::do_flatten Do;
 
-		auto Check = hmLib::monad::target_checker<decltype(Do)>();
+		auto Check = hmLib::monad::context_checker<decltype(Do)>();
 		std::cout << "for_flatten" << std::endl;
 		std::cout << "double:" << Check(5.5) << std::endl;
 		std::cout << "vector:" << Check(hmLib::monad::vector<double>()) << std::endl;
@@ -740,12 +814,14 @@ int main(void) {
 	{
 		auto Do = [](double v) {return v * 2; };
 
-		auto Check = hmLib::monad::target_checker<decltype(Do)>();
+		auto Check = hmLib::monad::context_checker<decltype(Do)>();
 		std::cout << "for_normal" << std::endl;
 		std::cout << "double:" << Check(5.5) << std::endl;
 		std::cout << "vector:" << Check(hmLib::monad::vector<double>()) << std::endl;
 		std::cout << "maybe:" << Check(hmLib::monad::just<double>(5.5)) << std::endl;
 	}
+
+	auto Val = hmLib::monadic(4);
 
 	system("pause");
 	return 0;

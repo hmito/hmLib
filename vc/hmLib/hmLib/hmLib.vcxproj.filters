@@ -10,6 +10,9 @@
     <Filter Include="ソース ファイル">
       <UniqueIdentifier>{58a0760e-5e58-470a-9bf0-1bb15dfa01c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\monad">
+      <UniqueIdentifier>{2e6dce5b-9fea-41a0-b15e-f85f140b8576}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hmLib\algorithm\numeric.hpp">
