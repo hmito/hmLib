@@ -183,12 +183,12 @@ namespace hmLib{
 				point_type v2 = Loc2.torus_point();
 
 				point_type Ans;
-				for(unsigned int i = 0; i < dim_; ++i){
+				for(unsigned int i = 0; i < v1.size(); ++i){
 					diff_type Dis = v2[i] - v1[i];
-					if(Dis > Indexer.size()[i] / 2){
-						Dis -= Index.size()[i];
-					} else if(Dis < -Indexer.size()[i] / 2){
-						Dis += Index.size()[i];
+					if(Dis > Loc1.Indexer.size()[i] / 2){
+						Dis -= Loc1.Indexer.size()[i];
+					} else if(Dis < -Loc1.Indexer.size()[i] / 2){
+						Dis += Loc1.Indexer.size()[i];
 					}
 					Ans[i] = Dis;
 				}
@@ -227,10 +227,10 @@ namespace hmLib{
 			auto v1 = Loc1.torus_point();
 			auto v2 = Loc2.torus_point();
 
-			point_type Ans;
-			for(unsigned int i = 0; i < dim_; ++i){
+			typename basic_torus_locator<iterator_, indexer_>::point_type Ans;
+			for(unsigned int i = 0; i < v1.size(); ++i){
 				diff_type Dis = v2[i] - v1[i];
-				if(Dis > Loc1..size()[i] / 2){
+				if(Dis > Loc1.size()[i] / 2){
 					Dis -= Loc1.size()[i];
 				} else if(Dis < -Loc1.size()[i] / 2){
 					Dis += Loc1.size()[i];
@@ -244,10 +244,10 @@ namespace hmLib{
 			auto v1 = Loc1.torus_point();
 			auto v2 = Loc2.torus_point();
 
-			point_type Ans;
-			for(unsigned int i = 0; i < dim_; ++i){
+			typename basic_const_torus_locator<iterator_, indexer_>::point_type Ans;
+			for(unsigned int i = 0; i < v1.size(); ++i){
 				diff_type Dis = v2[i] - v1[i];
-				if(Dis > Loc1..size()[i] / 2){
+				if(Dis > Loc1.size()[i] / 2){
 					Dis -= Loc1.size()[i];
 				} else if(Dis < -Loc1.size()[i] / 2){
 					Dis += Loc1.size()[i];

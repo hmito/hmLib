@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
-#include <hmLib/chain.hpp>
+#include "../../../hmLib/chain.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
