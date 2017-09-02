@@ -44,6 +44,8 @@ namespace hmLib{
 		};
 		using type = typename check<terget, void>::ans_type;
 	};
+	template<typename Pred>
+	struct negate_of : public std::is_same<typename Pred::type, std::false_type> {};
 }
 #
 #endif

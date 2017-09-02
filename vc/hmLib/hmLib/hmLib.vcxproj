@@ -11,12 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\ccontainer\cdeque.c" />
-    <ClCompile Include="..\..\..\ccontainer\cqueue.c" />
-    <ClCompile Include="..\..\..\ccontainer\cstack.c" />
-    <ClCompile Include="..\..\..\ccontainer\cstring.c" />
     <ClCompile Include="..\..\..\comgate.cpp" />
-    <ClCompile Include="use_factorial.cpp" />
+    <ClCompile Include="lab_monad_v2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\algorithm.hpp" />
@@ -28,10 +24,6 @@
     <ClInclude Include="..\..\..\any_iterator.hpp" />
     <ClInclude Include="..\..\..\array_queue.hpp" />
     <ClInclude Include="..\..\..\bufgate.hpp" />
-    <ClInclude Include="..\..\..\ccontainer\cdeque.h" />
-    <ClInclude Include="..\..\..\ccontainer\cqueue.h" />
-    <ClInclude Include="..\..\..\ccontainer\cstack.h" />
-    <ClInclude Include="..\..\..\ccontainer\cstring.h" />
     <ClInclude Include="..\..\..\circular.hpp" />
     <ClInclude Include="..\..\..\color.hpp" />
     <ClInclude Include="..\..\..\comgate.hpp" />
@@ -80,6 +72,15 @@
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
+    <ClInclude Include="..\..\..\monad.hpp" />
+    <ClInclude Include="..\..\..\monad\fmap.hpp" />
+    <ClInclude Include="..\..\..\monad\fmap_later.hpp" />
+    <ClInclude Include="..\..\..\monad\function.hpp" />
+    <ClInclude Include="..\..\..\monad\just.hpp" />
+    <ClInclude Include="..\..\..\monad\lazy.hpp" />
+    <ClInclude Include="..\..\..\monad\monad_mixin.hpp" />
+    <ClInclude Include="..\..\..\monad\monad_traits.hpp" />
+    <ClInclude Include="..\..\..\monad\optional.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />

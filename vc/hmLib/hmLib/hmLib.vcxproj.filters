@@ -40,25 +40,16 @@
     <Filter Include="hmLib\typemanage">
       <UniqueIdentifier>{ea83acd1-4c16-498a-b87c-c4922d4fe42d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\monad">
+      <UniqueIdentifier>{84397fae-5e59-4c19-bcf2-54437755bdf2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_factorial.cpp">
-      <Filter>ソースファイル</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\comgate.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cqueue.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cstack.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cstring.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cdeque.c">
-      <Filter>hmLib\ccontainer</Filter>
+    <ClCompile Include="lab_monad_v2.cpp">
+      <Filter>ソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -202,18 +193,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\algorithm\compare.hpp">
       <Filter>hmLib\algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ccontainer\cqueue.h">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ccontainer\cstack.h">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ccontainer\cstring.h">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ccontainer\cdeque.h">
-      <Filter>hmLib\ccontainer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\enumerators\enumbase.hpp">
       <Filter>hmLib\enumerators</Filter>
@@ -367,6 +346,33 @@
     </ClInclude>
     <ClInclude Include="..\..\..\typemanage\type_name.hpp">
       <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\monad_traits.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\fmap.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\function.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\fmap_later.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\monad_mixin.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\lazy.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\just.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\optional.hpp">
+      <Filter>hmLib\monad</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
