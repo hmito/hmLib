@@ -86,8 +86,8 @@ namespace hmLib{
 		};
 		template<typename M>
 		struct monad_traits<M, true> {
-			using monad_category = nullptr_t;
-			using value_type = nullptr_t;
+			using monad_category = void;
+			using value_type = void;
 			using base_t = M;
 		};
 
@@ -115,6 +115,16 @@ namespace hmLib {
 		template<typename T>
 		using default_fmap_target = is_not_monad<T>;
 
+		namespace detail {
+			template<typename T, template<typename> typename is_target, bool IsTarget= is_target<T>::value>
+			struct fmap_target_type_impl {
+				using type = T;
+			};
+			template<typename T, template<typename> typename is_target>
+			struct fmap_target_type_impl<T, is_target, false> {
+				using type = typename fmap_target_type_impl<typename monad_traits<T>::value_type, is_target>::type;
+			};
+		}
 		template<typename fn>
 		struct fmap_target {
 		private:
@@ -124,11 +134,15 @@ namespace hmLib {
 			static auto check_impl(...)->default_fmap_target<T>;
 		public:
 			template<typename T>
-			using type = decltype(check_impl<T>(std::declval<typename std::decay<fn>::type>()));
+			using is_target = decltype(check_impl<T>(std::declval<typename std::decay<fn>::type>()));
 			template<typename T>
-			static constexpr bool check() { return type<T>::value; }
+			static constexpr bool check() { return is_target<T>::value; }
+
 			template<typename T>
-			constexpr bool operator()(T&&)const { return type<T>::value; }
+			static constexpr bool check(const T&) { return is_target<T>::value; }
+
+			template<typename T>
+			using target_type = typename detail::fmap_target_type_impl<T, is_target>::type;
 		};
 
 		namespace detail {
@@ -140,7 +154,7 @@ namespace hmLib {
 			public:
 				for_context_wrapper(const fn& Fn_) :Fn(Fn_) {}
 				template<typename T>
-				auto operator()(T&& Val) { return Fn(std::forward<T>(Val)); }
+				auto operator()(T&& Val) const { return Fn(std::forward<T>(Val)); }
 			};
 		}
 		template<template<typename> typename context, typename fn>
@@ -176,6 +190,7 @@ namespace hmLib {
 		auto fmap(T&& val, fn&& Func) {
 			return detail::fmap_impl<typename std::decay<T>::type, typename std::decay<fn>::type>()(std::forward<T>(val), std::forward<fn>(Func));
 		}
+
 	}
 }
 //function
@@ -187,18 +202,26 @@ namespace hmLib {
 
 			namespace impl {
 				template<typename arg_type, typename fn1st, typename fn2nd,
-					typename mid_type = typename std::decay<decltype(std::declval<fn1st>()(std::declval<arg_type>()))>::type,
-					bool can_fmap_fn1st = fmap_target<fn1st>::check<arg_type>(),
-					bool can_fmap_fn2nd = fmap_target<fn2nd>::check<mid_type>()
-				>struct is_continuous_fmap_impl :public std::false_type {};
-				template<typename arg_type, typename mid_type, typename fn1st, typename fn2nd>
-				struct is_continuous_fmap_impl<arg_type, fn1st, fn2nd, mid_type, true, true> : public std::true_type {};
-				template<typename arg_type, typename mid_type, typename fn1st, typename fn2nd>
-				struct is_continuous_fmap_impl<arg_type, fn1st, fn2nd, mid_type, false, false> : public is_continuous_fmap<typename monad_base<arg_type>::type, fn1st, fn2nd> {};
+					bool can_fmap_fn1st = fmap_target<fn1st>::check<arg_type>()
+				>struct is_continuous_fmap_impl{
+				private:
+					using mid_type = typename std::decay<decltype(std::declval<fn1st>()(std::declval<arg_type>()))>::type;
+				public:
+					using type = typename fmap_target<fn2nd>::template is_target<mid_type>;
+					static constexpr bool value = type::value;
+				};
+				template<typename arg_type, typename fn1st, typename fn2nd>
+				struct is_continuous_fmap_impl<arg_type, fn1st, fn2nd, false> {
+					using type = std::bool_constant<
+						(! fmap_target<fn2nd>::template is_target<arg_type>::value)
+						&& is_continuous_fmap<typename monad_traits<arg_type>::value_type, fn1st, fn2nd>::value
+					>;
+					static constexpr bool value = type::value;
+				};
 			}
 
 			template<typename arg_type, typename fn1st, typename fn2nd>
-			struct is_continuous_fmap : public impl::is_continuous_fmap_impl<arg_type, fn1st, fn2nd> {};
+			struct is_continuous_fmap : public impl::is_continuous_fmap_impl<arg_type, fn1st, fn2nd>::type {};
 			template<typename fn1st, typename fn2nd>
 			struct is_continuous_fmap<void, fn1st, fn2nd> : public std::false_type {};
 
@@ -224,8 +247,8 @@ namespace hmLib {
 			this_type& operator=(this_type&&) = default;
 			function(fn Fn_, prevfn PrevFn_) : Fn(std::move(Fn_)), PrevFn(std::move(PrevFn_)) {}
 		public:
-			auto operator()(arg_type&& Val)const { fmap(PrevFn(std::move(Val)), Fn); }
-			auto operator()(const arg_type& Val)const { fmap(PrevFn(Val), Fn); }
+			auto operator()(arg_type&& Val)const { return fmap(PrevFn(std::move(Val)), Fn); }
+			auto operator()(const arg_type& Val)const { return fmap(PrevFn(Val), Fn); }
 		public:
 			template<typename nfn>
 			friend auto operator >> (const this_type& This, nfn&& NFn) {
@@ -254,8 +277,8 @@ namespace hmLib {
 			this_type& operator=(this_type&&) = default;
 			explicit function(fn Fn_) :Fn(std::move(Fn_)) {}
 		public:
-			auto operator()(arg_type&& Val)const { fmap(std::move(Val), Fn); }
-			auto operator()(const arg_type& Val)const { fmap(Val, Fn); }
+			auto operator()(arg_type&& Val)const { return fmap(std::move(Val), Fn); }
+			auto operator()(const arg_type& Val)const { return fmap(Val, Fn); }
 		public:
 			template<typename nfn>
 			friend auto operator >> (const this_type& This, nfn&& NFn) {
@@ -280,22 +303,23 @@ namespace hmLib {
 			namespace impl {
 				template<typename arg_type, typename efn1st, typename efn2nd, bool IsContinuous = is_continuous_fmap<arg_type, efn1st, efn2nd>::value>
 				struct make_composite_functon_impl {
+					using farg_type = typename fmap_target<efn1st>::template target_type<arg_type>;
 					template<typename fn1st, typename fn2nd>
 					auto operator()(fn1st&& Fn1, fn2nd&& Fn2) {
-						return make_function(
-							for_context<typename fmap_target<efn1st>::type>(
-								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const arg_type& v) {return Fn2(Fn1(v)); }
-						)
+						return make_function<arg_type>(
+							for_context<typename fmap_target<efn1st>::is_target>(
+								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const farg_type& v) {return Fn2(Fn1(v)); }
+							)
 						);
 					}
 					template<typename fn1st, typename fn2nd, typename base_fn>
 					auto operator()(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
 						return make_function(
-							for_context<typename fmap_target<efn1st>::type>(
-								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const arg_type& v) {return Fn2(Fn1(v)); }
-						),
+							for_context<typename fmap_target<efn1st>::is_target>(
+								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const farg_type& v) {return Fn2(Fn1(v)); }
+							),
 							std::forward<base_fn>(BaseFn)
-							);
+						);
 					}
 				};
 				template<typename arg_type, typename efn1st, typename efn2nd>
@@ -342,8 +366,8 @@ namespace hmLib {
 			struct has_evaluate_function {
 			private:
 				template<typename eT>
-				auto check(eT&& v)->decltype(v.evaluate(), std::true_type);
-				auto check(...)->std::false_type;
+				static auto check(eT&& v)->decltype(v.evaluate(), std::true_type);
+				static auto check(...)->std::false_type;
 			public:
 				using type = decltype(check(std::declval<T>()));
 				static constexpr bool value = type::value;
@@ -351,16 +375,16 @@ namespace hmLib {
 			template<typename T, bool HasEvaluateFunc = has_evaluate_function<T>::value>
 			struct evaluate_impl {
 				template<typename U>
-				decltype(auto) operator()(U&& val) { return std::forward<U>(val); }
+				auto operator()(U&& val) { return std::forward<U>(val); }
 			};
 			template<typename T>
 			struct evaluate_impl<T, true> {
 				template<typename U>
-				decltype(auto) operator()(U&& val) { return val.evaluate(); }
+				auto operator()(U&& val) { return val.evaluate(); }
 			};
 		}
 		template<typename T>
-		decltype(auto) evaluate(T&& val) { return detail::evaluate_impl<typename std::decay<T>::type>()(std::forward<T>(val)); }
+		auto evaluate(T&& val) { return detail::evaluate_impl<typename std::decay<T>::type>()(std::forward<T>(val)); }
 		struct do_evaluate {
 			template<typename T>
 			auto operator()(T&& val) { return evaluate(val); }
@@ -416,6 +440,13 @@ namespace hmLib {
 				template<typename T, typename fn>
 				auto operator()(const T& val, fn&& Fn) {
 					return detail::lazy_fmap<T, fn>(val, std::forward<fn>(Fn));
+				}
+			};
+			template<>
+			struct fmap_later_impl<do_evaluate> {
+				template<typename T, typename fn>
+				auto operator()(const T& val, fn&& Fn) {
+					return evaluate(val);
 				}
 			};
 		}
@@ -652,6 +683,8 @@ namespace hmLib {
 			//for omitable_monad/flattenable_monad
 			static just<T> flatten(just<just<T>> m_) {return just(m_.get().get());}
 		public:
+			operator T&(){ return val; }
+			operator const T&()const { return val; }
 			T& get() { return val; }
 			const T& get()const { return val; }
 			void set(T val_) { val = std::move(val_); }
@@ -754,10 +787,10 @@ namespace hmLib {
 				return this_type(m_.get().get());
 			}
 		public:
-			operator bool()const { return val; }
-			T& get() { return *val; }
-			const T& get()const { return *val; }
-			void set(T val_) { *val = std::move(val_); }
+			operator bool()const { return static_cast<bool>(val); }
+			T& get() { return val.get(); }
+			const T& get()const { return val.get(); }
+			void set(T val_) { val.get() = std::move(val_); }
 		};
 		template<typename T>
 		auto make_optional(T&& val) { return optional<typename std::decay<T>::type>(std::forward<T>(val)); }
@@ -876,9 +909,9 @@ int main(void) {
 
 		auto Check = hmLib::monad::fmap_target<decltype(Do)>();
 		std::cout << "for_omit" << std::endl;
-		std::cout << "double:" << Check(5.5) << std::endl;
-		std::cout << "vector:" << Check(hmLib::monad::vector<double>()) << std::endl;
-		std::cout << "maybe:" << Check(hmLib::monad::just<double>(5.5)) << std::endl;
+		std::cout << "double:" << Check.check(5.5) << std::endl;
+		std::cout << "vector:" << Check.check(hmLib::monad::vector<double>()) << std::endl;
+		std::cout << "maybe:" << Check.check(hmLib::monad::just<double>(5.5)) << std::endl;
 	}
 
 	{
@@ -886,9 +919,9 @@ int main(void) {
 
 		auto Check = hmLib::monad::fmap_target<decltype(Do)>();
 		std::cout << "for_flatten" << std::endl;
-		std::cout << "double:" << Check(5.5) << std::endl;
-		std::cout << "vector:" << Check(hmLib::monad::vector<double>()) << std::endl;
-		std::cout << "maybe:" << Check(hmLib::monad::just<double>(5.5)) << std::endl;
+		std::cout << "double:" << Check.check(5.5) << std::endl;
+		std::cout << "vector:" << Check.check(hmLib::monad::vector<double>()) << std::endl;
+		std::cout << "maybe:" << Check.check(hmLib::monad::just<double>(5.5)) << std::endl;
 	}
 
 	{
@@ -896,16 +929,20 @@ int main(void) {
 
 		auto Check = hmLib::monad::fmap_target<decltype(Do)>();
 		std::cout << "for_normal" << std::endl;
-		std::cout << "double:" << Check(5.5) << std::endl;
-		std::cout << "vector:" << Check(hmLib::monad::vector<double>()) << std::endl;
-		std::cout << "maybe:" << Check(hmLib::monad::just<double>(5.5)) << std::endl;
+		std::cout << "double:" << Check.check(5.5) << std::endl;
+		std::cout << "vector:" << Check.check(hmLib::monad::vector<double>()) << std::endl;
+		std::cout << "maybe:" << Check.check(hmLib::monad::just<double>(5.5)) << std::endl;
 	}
 
-	auto Val = hmLib::monadic(4);
+	auto Val = hmLib::monadic(8);
+	auto Val2 = Val >> [](int a) {return a*0.5; }>>hmLib::monad::do_evaluate();
+	std::cout << typeid(Val2).name() << std::endl;
 
-	auto Ans = Val >> [](int a) {return a*0.5; } >> [](double f) {return hmLib::monad::make_optional(f); } >> hmLib::monad::do_evaluate();
-
-	std::cout << typeid(Ans).name()<<std::endl;
+	std::cout << (hmLib::monadic(8) >> hmLib::monad::do_evaluate()).get() << std::endl;
+	std::cout << (hmLib::monadic(8) >> [](int a) {return a*0.5; } >> hmLib::monad::do_evaluate()).get() << std::endl;
+	auto Ans = hmLib::monadic(8) >> [](int a) {return a*0.5; } >> [](double f) {return hmLib::monad::make_optional(f); } >> hmLib::monad::do_evaluate();
+	if(Ans.get())std::cout << Ans.get().get()<< std::endl;
+	else std::cout << "null" << std::endl;
 
 	system("pause");
 	return 0;
