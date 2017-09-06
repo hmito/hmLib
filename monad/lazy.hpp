@@ -1,6 +1,8 @@
 #ifndef HMLIB_MONAD_LAZY_INC
 #define HMLIB_MONAD_LAZY_INC 100
 #
+#include<functional>
+#include<boost/optional.hpp>
 namespace hmLib {
 	namespace monad {
 		template<typename arg_type, typename eval_func, typename return_type = decltype(std::declval<eval_func>()(std::declval<arg_type>()))>
