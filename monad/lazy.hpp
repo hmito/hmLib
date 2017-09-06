@@ -15,9 +15,9 @@ namespace hmLib {
 			eval_func Eval;
 		public:
 			//for monad
-			template<typename other_return_type, typename other_arg_type, typename other_eval_func>
-			struct rebind { using type = lazy<other_return_type, other_arg_type, other_eval_func>; };
-			explicit lazy(arg_type Val_) :Opt(), Val(std::move(Val_)), Eval() {}
+			template<typename other_arg_type, typename other_eval_func = eval_func, typename other_return_type = return_type>
+			struct rebind { using type = lazy<other_return_type, other_eval_func, other_arg_type>; };
+//			explicit lazy(arg_type Val_) :Opt(), Val(std::move(Val_)), Eval() {}
 			lazy(arg_type Val_, eval_func Eval_) :Opt(), Val(std::move(Val_)), Eval(std::move(Eval_)) {}
 			template<typename fn>
 			auto apply(fn&& Func)const {
@@ -33,9 +33,15 @@ namespace hmLib {
 			operator return_type()const noexcept {
 				return get();
 			}
+			return_type& get()noexcept {
+				if (!Opt) {
+					Opt=Eval(Val);
+				}
+				return Opt.get();
+			}
 			const return_type& get()const noexcept {
 				if (!Opt) {
-					Opt.set(Eval(Val));
+					Opt = Eval(Val);
 				}
 				return Opt.get();
 			}
@@ -55,8 +61,11 @@ namespace hmLib {
 				using eval_func = eval_func_;
 				using return_type = decltype(std::declval<eval_func>()(std::declval<arg_type>()));
 			private:
-				const eval_func& Fn;
+				eval_func Fn;
 			public:
+				later_wrapper() = delete;
+				later_wrapper(const eval_func& Fn_) :Fn(Fn_) {}
+				later_wrapper(eval_func&& Fn_) :Fn(std::move(Fn_)) {}
 				auto operator()(const arg_type& Arg)const noexcept {
 					return lazy<arg_type, eval_func, return_type>(Arg, Fn);
 				}
@@ -66,8 +75,8 @@ namespace hmLib {
 			};
 		}
 		template<typename arg_type, typename fn>
-		auto later(const fn& Fn) {
-			return detail::later_wrapper<arg_type, typename std::decay<fn>::type>(Fn);
+		auto later(fn&& Fn) {
+			return detail::later_wrapper<arg_type, typename std::decay<fn>::type>(std::forward<fn>(Fn));
 		}
 	}
 }

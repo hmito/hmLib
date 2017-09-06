@@ -118,34 +118,34 @@ namespace hmLib {
 						return make_function<arg_type>(
 							for_context<typename fmap_target<efn1st>::is_target>(
 								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const farg_type& v) {return Fn2(Fn1(v)); }
-						)
-							);
+							)
+						);
 					}
 					template<typename fn1st, typename fn2nd, typename base_fn>
 					auto operator()(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
-						return make_function(
+						return make_function<arg_type>(
 							for_context<typename fmap_target<efn1st>::is_target>(
 								[Fn1 = std::forward<fn1st>(Fn1), Fn2 = std::forward<fn2nd>(Fn2)](const farg_type& v) {return Fn2(Fn1(v)); }
-						),
+							),
 							std::forward<base_fn>(BaseFn)
-							);
+						);
 					}
 				};
 				template<typename arg_type, typename efn1st, typename efn2nd>
 				struct make_composite_functon_impl<arg_type, efn1st, efn2nd, false> {
 					template<typename fn1st, typename fn2nd>
 					auto operator()(fn1st&& Fn1, fn2nd&& Fn2) {
-						return make_function(
+						return make_function<arg_type>(
 							std::forward<fn2nd>(Fn2),
 							[Fn1 = std::forward<fn1st>(Fn1)](const arg_type& v) {return fmap(v, Fn1); }
-						)
+						);
 					}
 					template<typename fn1st, typename fn2nd, typename base_fn>
 					auto operator()(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
-						return make_function(
+						return make_function<arg_type>(
 							std::forward<fn2nd>(Fn2),
 							[Fn1 = std::forward<fn1st>(Fn1), BaseFn = std::forward<base_fn>(BaseFn)](const arg_type& v) {return fmap(BaseFn(v), Fn1); }
-						)
+						);
 					}
 				};
 			}
@@ -154,7 +154,7 @@ namespace hmLib {
 				return impl::make_composite_functon_impl<arg_type, typename std::decay<fn1st>::type, typename std::decay<fn2nd>::type>()(
 					std::forward<fn1st>(Fn1),
 					std::forward<fn2nd>(Fn2)
-					);
+				);
 			}
 			template<typename arg_type, typename fn1st, typename fn2nd, typename base_fn>
 			auto make_composite_function(fn1st&& Fn1, fn2nd&& Fn2, base_fn&& BaseFn) {
