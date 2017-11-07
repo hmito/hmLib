@@ -15,7 +15,7 @@ namespace hmLib{
 	namespace algorithm{
 		template<typename type,typename generator>
 		std::vector<type> nonrepeat_random_integrals_by_unique(const std::size_t size, type rand_min, type rand_max, generator& Engine){
-			using unsigned_type = std::make_unsigned<type>::type;
+			using unsigned_type = typename std::make_unsigned<type>::type;
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
 			const unsigned_type max_min_diff = rand_max - rand_min + 1;
@@ -45,7 +45,7 @@ namespace hmLib{
 		}
 		template<typename type, typename generator>
 		std::vector<type> nonrepeat_random_integrals_by_select(const std::size_t size, type rand_min, type rand_max, generator& Engine){
-			using unsigned_type = std::make_unsigned<type>::type;
+			using unsigned_type = typename std::make_unsigned<type>::type;
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
 			const unsigned_type max_min_diff = rand_max - rand_min + 1;
@@ -69,7 +69,7 @@ namespace hmLib{
 		}
 		template<typename type, typename generator>
 		std::vector<type> nonrepeat_random_integrals(const std::size_t size, type rand_min, type rand_max, generator& Engine){
-			using unsigned_type = std::make_unsigned<type>::type;
+			using unsigned_type = typename std::make_unsigned<type>::type;
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
 			const unsigned_type max_min_diff = rand_max - rand_min + 1;

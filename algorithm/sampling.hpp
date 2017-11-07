@@ -32,14 +32,14 @@ namespace hmLib{
 	template<typename InputIterator, typename RandEngine>
 	InputIterator random_sample(InputIterator Begin,InputIterator End, RandEngine&& Engine){
 		if(Begin == End)return End;
-		return std::next(Begin, std::uniform_int<int>(0,std::distance(Begin,End)-1)(Engine));
+		return std::next(Begin, std::uniform_int_distribution<int>(0,std::distance(Begin,End)-1)(Engine));
 	}
 	//ランダム選択 OutputIteratorの範囲を埋めるまで
 	template<typename InputIterator, typename OutputIterator, typename RandEngine>
 	void random_sample(InputIterator Begin,InputIterator End,OutputIterator OutBegin,OutputIterator OutEnd, RandEngine&& Engine){
 		if(Begin == End)return;
 
-		std::uniform_int<int> Dist(0, std::distance(Begin, End) - 1);
+		std::uniform_int_distribution<int> Dist(0, std::distance(Begin, End) - 1);
 		while(OutBegin!=OutEnd){
 			*OutBegin++ = *std::next(Begin, Dist(Engine));
 		}
@@ -49,7 +49,7 @@ namespace hmLib{
 	OutputIterator random_sample(InputIterator Begin,InputIterator End, OutputIterator Out, unsigned int n, RandEngine&& Engine){
 		if(Begin == End)return Out;
 
-		std::uniform_int<int> Dist(0, std::distance(Begin, End) - 1);
+		std::uniform_int_distribution<int> Dist(0, std::distance(Begin, End) - 1);
 		for(unsigned int i = 0; i < n; ++i){
 			*Out++ = *std::next(Begin, Dist(Engine));
 		}
