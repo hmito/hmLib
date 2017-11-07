@@ -111,7 +111,7 @@ namespace hmLib{
 	public:
 		bool operator()(void){ return Engine(); }
 		template<unsigned int bit_size>
-		std::bitset<bit_size> bits(){ return Engine.bits<bit_size>(); }
+		std::bitset<bit_size> bits(){ return Engine.template bits<bit_size>(); }
 	};
 	template<typename tag, typename random_engine_type>
 	random_bits_engine<singleton_random_engine<tag, random_engine_type>> singleton_random_bits_engine<tag, random_engine_type>::Engine(std::move(singleton_random_engine<tag, random_engine_type>()));
