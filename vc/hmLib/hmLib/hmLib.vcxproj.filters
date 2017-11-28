@@ -42,23 +42,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_factorial.cpp">
-      <Filter>ソースファイル</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\comgate.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cqueue.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cstack.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cstring.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cdeque.c">
-      <Filter>hmLib\ccontainer</Filter>
+    <ClCompile Include="use_odeint.cpp">
+      <Filter>ソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\typemanage\type_name.hpp">
       <Filter>hmLib\typemanage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\system_controlled_stepper.hpp">
+      <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

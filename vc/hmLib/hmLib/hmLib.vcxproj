@@ -11,12 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\ccontainer\cdeque.c" />
-    <ClCompile Include="..\..\..\ccontainer\cqueue.c" />
-    <ClCompile Include="..\..\..\ccontainer\cstack.c" />
-    <ClCompile Include="..\..\..\ccontainer\cstring.c" />
     <ClCompile Include="..\..\..\comgate.cpp" />
-    <ClCompile Include="use_factorial.cpp" />
+    <ClCompile Include="use_odeint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\algorithm.hpp" />
@@ -88,6 +84,7 @@
     <ClInclude Include="..\..\..\odeint\eqstate_break_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\iterator_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\range_stepper.hpp" />
+    <ClInclude Include="..\..\..\odeint\system_controlled_stepper.hpp" />
     <ClInclude Include="..\..\..\odeint\stream_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\utility.hpp" />
     <ClInclude Include="..\..\..\optimize.hpp" />
@@ -125,7 +122,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>
     <RootNamespace>hmLib</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
