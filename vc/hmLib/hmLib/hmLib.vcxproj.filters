@@ -356,7 +356,7 @@
     <ClInclude Include="..\..\..\typemanage\type_name.hpp">
       <Filter>hmLib\typemanage</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\system_controlled_stepper.hpp">
+    <ClInclude Include="..\..\..\odeint\composite_stepper.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>

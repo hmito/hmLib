@@ -190,5 +190,4 @@ ModelManifest.xml
 hmLib_config\.h
 
 *.db-shm
-
-vc/hmLib/\.vs/hmLib/v15/Solution\.VC\.db-wal
+*.db-wal
