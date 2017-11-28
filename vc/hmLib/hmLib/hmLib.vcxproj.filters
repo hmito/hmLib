@@ -368,5 +368,8 @@
     <ClInclude Include="..\..\..\typemanage\type_name.hpp">
       <Filter>hmLib\typemanage</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\varray.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
