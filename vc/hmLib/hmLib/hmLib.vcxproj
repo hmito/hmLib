@@ -88,6 +88,7 @@
     <ClInclude Include="..\..\..\odeint\stream_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\utility.hpp" />
     <ClInclude Include="..\..\..\optimize.hpp" />
+    <ClInclude Include="..\..\..\varray.hpp" />
     <ClInclude Include="..\..\..\position.hpp" />
     <ClInclude Include="..\..\..\random.hpp" />
     <ClInclude Include="..\..\..\random\pair_normal_distribution.hpp" />
