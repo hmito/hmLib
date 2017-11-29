@@ -13,14 +13,14 @@ namespace hmLib {
 			}
 			template<typename state_type, typename argebra_type, typename operations_type>
 			double maximum_absolute_error(state_type& err, const state_type& v1, const state_type& v2) {
-				argebra_type::for_each3(err, v1, v2, typename operations_type::scale_sum2<double, double>(1.0, -1.0));
+				argebra_type::for_each3(err, v1, v2, typename operations_type::template scale_sum2<double, double>(1.0, -1.0));
 				using namespace std;
 				return argebra_type::norm_inf(abs(err));
 			}
 		}
 		//composite_system
-		//bool is_exceed(const state_type& State, time_type Time, const state& NewState, time_type NewTime);
-		//void exceed(state& State, time_type& Time, const state& Lower, time_type LowerTime, const state& Upper, time_type UpperTime);
+		//bool is_exceed(const state_type& State, time_type Time, const state_type& NewState, time_type NewTime);
+		//void exceed(state_type& State, time_type& Time, state_type state& Lower, time_type LowerTime, const state_type& Upper, time_type UpperTime);
 		/*!
 		@brief stepper for region_system
 		*/
@@ -98,7 +98,7 @@ namespace hmLib {
 					//If time have insufficient accuracy, try direct linear position fitting
 					while(detail::maximum_absolute_error<state_type, algebra_type, operations_type>(State, LowerState, UpperState) > ExceedError) {
 						algebra_type Algebra;
-						Algebra.for_each3(State, LowerState, UpperState, [=](double& out, double in1, double in2) {out = in1 / 2 + in2 / 2; });
+						Algebra.for_each3(State, LowerState, UpperState, typename operations_type::template scale_sum2<double, double>(0.5, 0.5));
 
 						//update upper or lower condition
 						if(Sys.is_exceed(CurrentState, CurrentTime, State, Time)) {

@@ -1,8 +1,9 @@
 #include<array>
 #include<boost/numeric/odeint.hpp>
 #include"../../../odeint.hpp"
+#include"../../../varray.hpp"
 struct my_system {
-	using state = std::array<double, 2>;
+	using state = hmLib::varray<double, 2>;
 
 	void operator()(const state& x, state& dx, double t) {
 		if(x[0]<=0.0) {
@@ -36,7 +37,7 @@ int main() {
 	state State{ 2.0,1.0 };
 
 	using base_stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state>;
-	auto Stepper = hmLib::odeint::make_composite_system_dense_output(1.0e-10, 1.0e-6, 1.0e-3, base_stepper_type());
+	auto Stepper = hmLib::odeint::make_composite_dense_output(1.0e-10, 1.0e-6, 1.0e-3, base_stepper_type());
 
 	Stepper.initialize(State, 0.0, 0.1);
 
