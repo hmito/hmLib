@@ -2,12 +2,23 @@
 #define HMLIB_ODEINT_COMPOSITESTEPPER_INC 100
 #
 #include<utility>
-#include<boost/numeric/odeint.hpp>
 #include<boost/numeric/odeint/stepper/stepper_categories.hpp>
-#include"utility.hpp"
 namespace hmLib {
 	namespace odeint {
-		//composite_stepper
+		namespace detail {
+			template<typename state_type, typename argebra_type, typename operations_type>
+			double maximum_absolute_error(const state_type& v1, const state_type& v2) {
+				state_type err=v1;
+				return maximum_absolute_error(err, v1, v2);
+			}
+			template<typename state_type, typename argebra_type, typename operations_type>
+			double maximum_absolute_error(state_type& err, const state_type& v1, const state_type& v2) {
+				argebra_type::for_each3(err, v1, v2, typename operations_type::scale_sum2<double, double>(1.0, -1.0));
+				using namespace std;
+				return argebra_type::norm_inf(abs(err));
+			}
+		}
+		//composite_system
 		//bool is_exceed(const state_type& State, time_type Time, const state& NewState, time_type NewTime);
 		//void exceed(state& State, time_type& Time, const state& Lower, time_type LowerTime, const state& Upper, time_type UpperTime);
 		/*!
@@ -53,6 +64,7 @@ namespace hmLib {
 				if(CurrentTime != Stepper.current_time()) {
 					Stepper.initialize(CurrentState, CurrentTime, Stepper.current_time_step());
 				}
+				//boost::numeric::odeint::euler
 
 				auto TimePair = Stepper.do_step(Sys);
 
@@ -66,8 +78,7 @@ namespace hmLib {
 					auto State = CurrentState;
 					auto Time = (LowerTime + UpperTime) / 2.;
 
-					boost::numeric::odeint::euler
-					while(boost::numeric::odeint::detail::abs_distance(LowerState, UpperState) > ExceedError && LowerTime < Time && Time < UpperTimer) {
+					while(detail::maximum_absolute_error<state_type, algebra_type, operations_type>(State,LowerState,UpperState) > ExceedError && LowerTime < Time && Time < UpperTime) {
 						//calculate State at Time
 						Stepper.calc_state(Time, State);
 
@@ -84,8 +95,8 @@ namespace hmLib {
 						Time = (LowerTime + UpperTime) / 2.;
 					}
 
-					//If time cannot have enough difference, next step is direct linear position fitting
-					while(boost::numeric::odeint::detail::abs_distance(LowerState, UpperState) > ExceedError) {
+					//If time have insufficient accuracy, try direct linear position fitting
+					while(detail::maximum_absolute_error<state_type, algebra_type, operations_type>(State, LowerState, UpperState) > ExceedError) {
 						algebra_type Algebra;
 						Algebra.for_each3(State, LowerState, UpperState, [=](double& out, double in1, double in2) {out = in1 / 2 + in2 / 2; });
 

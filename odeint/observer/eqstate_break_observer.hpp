@@ -5,7 +5,7 @@
 #include <boost/geometry.hpp>
 #include "container_observer.hpp"
 #include "break_observer.hpp"
-#include "utility.hpp"
+#include "../utility.hpp"
 namespace hmLib{
 	namespace odeint{
 		namespace detail{
