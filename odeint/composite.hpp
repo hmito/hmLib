@@ -2,7 +2,9 @@
 #define HMLIB_ODEINT_COMPOSITE_INC 100
 #
 #include <vector>
+#include <utility>
 #include <type_traits>
+#include "../utility.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace composite{
@@ -136,12 +138,17 @@ namespace hmLib {
 				true_system TrueSystem;
 				false_system FalseSystem;
 			public:
+				ifelse_system(condition Condition_, const true_system& TrueSystem_, const false_system& FalseSystem_) : Condition(std::move(Condition_)), TrueSystem(TrueSystem_), FalseSystem(FalseSystem_) {}
+				ifelse_system(condition Condition_, true_system&& TrueSystem_, const false_system& FalseSystem_) : Condition(std::move(Condition_)), TrueSystem(std::move(TrueSystem_)), FalseSystem(std::move(FalseSystem_)) {}
+				ifelse_system(condition Condition_, const true_system& TrueSystem_, false_system&& FalseSystem_) : Condition(std::move(Condition_)), TrueSystem(TrueSystem_), FalseSystem(FalseSystem_) {}
+				ifelse_system(condition Condition_, true_system&& TrueSystem_, false_system&& FalseSystem_) : Condition(std::move(Condition_)), TrueSystem(std::move(TrueSystem_)), FalseSystem(std::move(FalseSystem_)) {}
+			public:
 				void update(const state_type& x, time_type t){
 					Condition.update(x,t);
 					if(Condition.condition()){
 						true_applier::update(TrueSystem, x, t);
 					}else{
-						false_system::update(FalseSystem, x, t);
+						false_applier::update(FalseSystem, x, t);
 					}
 				}
 				bool valid(const state_type& x, time_type t)const{
@@ -150,7 +157,7 @@ namespace hmLib {
 					if(Condition.condition()){
 						return true_applier::valid(TrueSystem, x, t);
 					}else{
-						return false_system::valid(FalseSystem, x, t);
+						return false_applier::valid(FalseSystem, x, t);
 					}
 				}
 				void validate(state_type& x, time_type t){
@@ -158,7 +165,7 @@ namespace hmLib {
 					if(Condition.condition()){
 						true_applier::validate(TrueSystem, x, t);
 					}else{
-						false_system::validate(FalseSystem, x, t);
+						false_applier::validate(FalseSystem, x, t);
 					}
 				}
 				void operator()(const state_type& x, state_type& dx, time_type t){
@@ -207,7 +214,11 @@ namespace hmLib {
 		template<typename condition, typename sys, typename... others>
 		auto system_switch(condition&& Cond, sys&& Sys, others... Others){
 			static_assert(composite::is_condition<std::decay<condition>::type>::value, "condition object is required.");
-			return composite::ifelse_system<typename std::decay<condition>::type, typename std::decay<sys>::type, decltype(system_switch(others...))>(std::forward<condition>(Cond),std::forward<sys>(Sys), std::move(system_switch(Others...)));
+			return composite::ifelse_system<typename std::decay<condition>::type, typename std::decay<sys>::type, decltype(system_switch(Others...))>(
+				std::forward<condition>(Cond),
+				std::forward<sys>(Sys), 
+				std::move(system_switch(Others...))
+			);
 		}
 		template<typename sys>
 		auto system_switch(sys Sys){return Sys;}
@@ -244,7 +255,7 @@ namespace hmLib {
 				greater_equal_condition(const state_type& val_) :val(val_) {}
 				greater_equal_condition(state_type&& val_) :val(std::move(val_)) {}
 			public:
-				void update(const state_type& x, time_type t) { return prev = check(x, t); }
+				void update(const state_type& x, time_type t) { prev = check(x, t); }
 				bool valid(const state_type& x, time_type t) const { return prev == check(x, t); }
 				void validate(state_type& x, time_type t) {}
 				bool condition()const { return prev; }
@@ -283,6 +294,31 @@ namespace hmLib {
 		}
 
 		namespace composite {
+			template<typename state_type_, typename time_type_, typename condition_>
+			struct state_at_condition {
+				using state_type = state_type_;
+				using time_type = time_type_;
+				using condition_type = condition_;
+				using element_type = typename condition_type::state_type;
+			private:
+				std::size_t n;
+				condition_type Cond;
+			public:
+				state_at_condition(std::size_t n_, condition_type  Cond_) :n(n_), Cond(std::move(Cond_)) {}
+			public:
+				void update(const state_type& x, time_type t) {
+					Cond.update(x[n], t);
+				}
+				bool valid(const state_type& x, time_type t) const {
+					return Cond.valid(x[n], t);
+				}
+				void validate(state_type& x, time_type t) {
+					Cond.validate(x[n], t);
+				}
+				bool condition() const {
+					return Cond.condition();
+				}
+			};
 			template<typename state_type_, typename time_type_, typename require_>
 			struct state_at_require {
 				using state_type = state_type_;
@@ -360,9 +396,13 @@ namespace hmLib {
 				}
 			};
 		}
-		template<typename state_type, typename require, typename time_type = double>
-		auto state_at(std::size_t n, require&& Req) {
-			return composite::state_at_require<state_type, time_type, typename std::decay<require>::type>(n, std::forward<require>(Req));
+		template<typename state_type, typename type, typename time_type = double, hmLib_static_restrict(composite::is_require<type>::value)>
+		auto state_at(std::size_t n, type&& Req) {
+			return composite::state_at_require<state_type, time_type, typename std::decay<type>::type>(n, std::forward<type>(Req));
+		}
+		template<typename state_type, typename type, typename time_type = double, hmLib_static_restrict(composite::is_condition<type>::value)>
+		auto state_at(std::size_t n, type&& Cond) {
+			return composite::state_at_condition<state_type, time_type, typename std::decay<type>::type>(n, std::forward<type>(Cond));
 		}
 		template<typename state_type, typename require, typename time_type = double>
 		auto state_for_each(std::size_t n, require&& Req) {
