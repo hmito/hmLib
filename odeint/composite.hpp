@@ -96,28 +96,28 @@ namespace hmLib {
 				template<typename T, bool IsCmpSys = is_composite_system<T>::value>
 				struct apply_for_composite_system{
 					template<typename U, typename state_type, typename time_type>
-					static void update(U v, const state_type& x, time_type t) {
+					static void update(U& v, const state_type& x, time_type t) {
 						v.update(x, t);
 					}
 					template<typename U, typename state_type, typename time_type>
-					static void validate(U v,  state_type& x, time_type t) {
+					static void validate(U& v,  state_type& x, time_type t) {
 						v.validate(x, t);
 					}
 					template<typename U, typename state_type, typename time_type>
-					static bool valid(U v, const state_type& x, time_type t) {
+					static bool valid(U& v, const state_type& x, time_type t) {
 						return v.valid(x, t);
 					}
 				};
 				template<typename T>
 				struct apply_for_composite_system<T,false> {
 					template<typename U, typename state_type, typename time_type>
-					static void update(U v, const state_type& x, time_type t) {
+					static void update(U& v, const state_type& x, time_type t) {
 					}
 					template<typename U, typename state_type, typename time_type>
-					static void validate(U v, state_type& x, time_type t) {
+					static void validate(U& v, state_type& x, time_type t) {
 					}
 					template<typename U, typename state_type, typename time_type>
-					static bool valid(U v, const state_type& x, time_type t) {
+					static bool valid(U& v, const state_type& x, time_type t) {
 						return true;
 					}
 				};
@@ -262,26 +262,47 @@ namespace hmLib {
 			private:
 				bool check(const state_type& x, time_type t) const { return val <= x; }
 			};
-
 			template<typename state_type_, typename time_type_ = double >
-			struct greater_equal_require {
+			struct lower_boundary {
 				using state_type = state_type_;
 				using time_type = time_type_;
 			private:
 				state_type val;
 				bool prev;
 			public:
-				greater_equal_require(const state_type& val_) :val(val_) {}
-				greater_equal_require(state_type&& val_) :val(std::move(val_)) {}
+				lower_boundary(const state_type& val_) :val(val_) {}
+				lower_boundary(state_type&& val_) :val(std::move(val_)) {}
 			public:
 				void update(const state_type& x, time_type t) { prev = check(x, t); }
-				bool valid(const state_type& x, time_type t) const { return !prev || check(x, t); }
+				bool valid(const state_type& x, time_type t) const { return prev || !check(x, t); }
 				void validate(state_type& x, time_type t) {
-					if(!check(x, t)) x = val;
+					if(check(x, t)) x = val;
 				}
-				void require(const state_type& x, state_type& dx, time_type t) const { if(!prev) dx = std::max<state_type>(0, dx); }
+				bool condition()const { return prev; }
+				void require(const state_type& x, state_type& dx, time_type t) const { if(prev) dx = std::max<state_type>(0, dx); }
 			private:
-				bool check(const state_type& x, time_type t) const { return val < x; }
+				bool check(const state_type& x, time_type t) const { return val >= x; }
+			};
+			template<typename state_type_, typename time_type_ = double >
+			struct upper_boundary {
+				using state_type = state_type_;
+				using time_type = time_type_;
+			private:
+				state_type val;
+				bool prev;
+			public:
+				upper_boundary(const state_type& val_) :val(val_) {}
+				upper_boundary(state_type&& val_) :val(std::move(val_)) {}
+			public:
+				void update(const state_type& x, time_type t) { prev = check(x, t); }
+				bool valid(const state_type& x, time_type t) const { return prev || !check(x, t); }
+				void validate(state_type& x, time_type t) {
+					if(check(x, t)) x = val;
+				}
+				bool condition()const { return prev; }
+				void require(const state_type& x, state_type& dx, time_type t) const { if(prev) dx = std::min<state_type>(0, dx); }
+			private:
+				bool check(const state_type& x, time_type t) const { return val <= x; }
 			};
 		}
 		template<typename state_type, typename time_type = double>
@@ -289,8 +310,20 @@ namespace hmLib {
 			return composite::greater_equal_condition<state_type, time_type>(x);
 		}
 		template<typename state_type, typename time_type = double>
-		auto require_greater_equal(state_type&& x) {
-			return composite::greater_equal_require<state_type, time_type>(x);
+		auto case_lower_boundary(state_type&& x) {
+			return composite::lower_boundary<state_type, time_type>(x);
+		}
+		template<typename state_type, typename time_type = double>
+		auto require_lower_boundary(state_type&& x) {
+			return composite::lower_boundary<state_type, time_type>(x);
+		}
+		template<typename state_type, typename time_type = double>
+		auto case_upper_boundary(state_type&& x) {
+			return composite::upper_boundary<state_type, time_type>(x);
+		}
+		template<typename state_type, typename time_type = double>
+		auto require_upper_boundary(state_type&& x) {
+			return composite::upper_boundary<state_type, time_type>(x);
 		}
 
 		namespace composite {
@@ -332,7 +365,7 @@ namespace hmLib {
 				state_at_require(std::size_t n_, require_type  Req_) :n(n_), Req(std::move(Req_)) {}
 			public:
 				void update(const state_type& x, time_type t) {
-					Req.update(x[n],t);
+					Req.update(x[n], t);
 				}
 				bool valid(const state_type& x, time_type t) const {
 					return Req.valid(x[n], t);
@@ -340,10 +373,55 @@ namespace hmLib {
 				void validate(state_type& x, time_type t) {
 					Req.validate(x[n], t);
 				}
-				void require(const state_type& x, state_type& dx, time_type t) const { 
+				void require(const state_type& x, state_type& dx, time_type t) const {
 					Req.require(x[n], dx[n], t);
 				}
 			};
+			template<typename state_type_, typename time_type_, typename reqcon_>
+			struct state_at_require_condition {
+				using state_type = state_type_;
+				using time_type = time_type_;
+				using reqcon_type = reqcon_;
+				using element_type = typename reqcon_type::state_type;
+			private:
+				std::size_t n;
+				reqcon_type Req;
+			public:
+				state_at_require_condition(std::size_t n_, reqcon_type  Req_) :n(n_), Req(std::move(Req_)) {}
+			public:
+				void update(const state_type& x, time_type t) {
+					Req.update(x[n], t);
+				}
+				bool valid(const state_type& x, time_type t) const {
+					return Req.valid(x[n], t);
+				}
+				void validate(state_type& x, time_type t) {
+					Req.validate(x[n], t);
+				}
+				void require(const state_type& x, state_type& dx, time_type t) const {
+					Req.require(x[n], dx[n], t);
+				}
+				bool condition() const {
+					return Req.condition();
+				}
+			};
+			namespace detail {
+				template<typename state_type, typename time_type, typename target_type, bool IsRequire = composite::is_require<target_type>::value, bool IsCondition = composite::is_condition<target_type>::value>
+				struct select_state_at{};
+				template<typename state_type, typename time_type, typename target_type>
+				struct select_state_at<state_type, time_type, target_type, true, false> {
+					using type = state_at_require<state_type, time_type, target_type>;
+				};
+				template<typename state_type, typename time_type, typename target_type>
+				struct select_state_at<state_type, time_type, target_type, false, true> {
+					using type = state_at_condition<state_type, time_type, target_type>;
+				};
+				template<typename state_type, typename time_type, typename target_type>
+				struct select_state_at<state_type, time_type, target_type, true, true> {
+					using type = state_at_require_condition<state_type, time_type, target_type>;
+				};
+			}
+
 			template<typename state_type_, typename time_type_, typename require_>
 			struct state_for_each_require {
 				using state_type = state_type_;
@@ -396,13 +474,9 @@ namespace hmLib {
 				}
 			};
 		}
-		template<typename state_type, typename type, typename time_type = double, hmLib_static_restrict(composite::is_require<type>::value)>
-		auto state_at(std::size_t n, type&& Req) {
-			return composite::state_at_require<state_type, time_type, typename std::decay<type>::type>(n, std::forward<type>(Req));
-		}
-		template<typename state_type, typename type, typename time_type = double, hmLib_static_restrict(composite::is_condition<type>::value)>
-		auto state_at(std::size_t n, type&& Cond) {
-			return composite::state_at_condition<state_type, time_type, typename std::decay<type>::type>(n, std::forward<type>(Cond));
+		template<typename state_type, typename target_type, typename time_type = double>
+		auto state_at(std::size_t n, target_type&& Req) {
+			return typename composite::detail::select_state_at<state_type, time_type, typename std::decay<target_type>::type>::type(n, std::forward<target_type>(Req));
 		}
 		template<typename state_type, typename require, typename time_type = double>
 		auto state_for_each(std::size_t n, require&& Req) {
