@@ -80,6 +80,7 @@
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
     <ClInclude Include="..\..\..\odeint\composite.hpp" />
+    <ClInclude Include="..\..\..\odeint\composite\composite_logical.hpp" />
     <ClInclude Include="..\..\..\odeint\composite\float_state_composite.hpp" />
     <ClInclude Include="..\..\..\odeint\composite\composite_stepper.hpp" />
     <ClInclude Include="..\..\..\odeint\composite\composite_system.hpp" />

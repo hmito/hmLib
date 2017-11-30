@@ -1,8 +1,8 @@
 #include<array>
 #include<iostream>
 #include<vector>
-#include"../../../odeint/varray_wrapper.hpp"
 #include<boost/numeric/odeint.hpp>
+#include"../../../odeint/varray_wrapper.hpp"
 #include"../../../odeint.hpp"
 #include"../../../varray.hpp"
 
@@ -39,7 +39,10 @@ int main() {
 	namespace bode = boost::numeric::odeint;
 	namespace hode = hmLib::odeint;
 	auto CmpSys = hode::system_switch(
-		hode::state_at<state>(1,hode::case_lower_boundary(0.0)), my_system3(),
+		hode::case_logical_and(
+			hode::state_at<state>(1, hode::case_lower_boundary(0.0)),
+			hode::state_at<state>(0, hode::case_greater_equal(-1.0))
+		), my_system3(),
 		hode::state_at<state>(0,hode::case_greater_equal(0.0)), my_system2(),
 		my_system1()
 	);

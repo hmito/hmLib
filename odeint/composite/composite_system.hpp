@@ -29,7 +29,7 @@ namespace hmLib {
 				);
 				static auto check(...)->std::false_type;
 			public:
-				using type = decltype(check(std::declval<condition_>()));
+				using type = decltype(check(std::declval<typename std::decay<condition_>::type>()));
 				static constexpr bool value = type::value;
 			};
 			template<typename require_>
@@ -58,7 +58,7 @@ namespace hmLib {
 				);
 				static auto check(...)->std::false_type;
 			public:
-				using type = decltype(check(std::declval<require_>()));
+				using type = decltype(check(std::declval<typename std::decay<require_>::type>()));
 				static constexpr bool value = type::value;
 			};
 			template<typename sys_>
@@ -87,7 +87,7 @@ namespace hmLib {
 				);
 				static auto check(...)->std::false_type;
 			public:
-				using type = decltype(check(std::declval<sys_>()));
+				using type = decltype(check(std::declval<typename std::decay<sys_>::type>()));
 				static constexpr bool value = type::value;
 			};
 
@@ -212,7 +212,7 @@ namespace hmLib {
 
 		template<typename condition, typename sys, typename... others>
 		auto system_switch(condition&& Cond, sys&& Sys, others... Others) {
-			static_assert(composite::is_condition<std::decay<condition>::type>::value, "condition object is required.");
+			static_assert(composite::is_condition<condition>::value, "condition object is required.");
 			return composite::ifelse_system<typename std::decay<condition>::type, typename std::decay<sys>::type, decltype(system_switch(Others...))>(
 				std::forward<condition>(Cond),
 				std::forward<sys>(Sys),

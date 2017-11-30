@@ -380,5 +380,8 @@
     <ClInclude Include="..\..\..\odeint\composite\float_state_composite.hpp">
       <Filter>hmLib\odeint\composite</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\composite_logical.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

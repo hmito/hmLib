@@ -5,5 +5,6 @@
 #include"composite/composite_stepper.hpp"
 #include"composite/float_state_composite.hpp"
 #include"composite/container_state_composite.hpp"
+#include"composite/composite_logical.hpp"
 #
 #endif
