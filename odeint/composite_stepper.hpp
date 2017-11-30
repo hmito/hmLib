@@ -5,6 +5,7 @@
 #include<cmath>
 #include<functional>
 #include<boost/numeric/odeint/stepper/stepper_categories.hpp>
+#include "../functional.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
@@ -18,6 +19,26 @@ namespace hmLib {
 				argebra_type::for_each3(err, v1, v2, typename operations_type::template scale_sum2<double, double>(1.0, -1.0));
 				return argebra_type::norm_inf(err);
 			}
+			template<typename state_type, typename time_type>
+			struct validator {
+				template<typename cmp_system>
+				static void call_validate(void* Ptr, state_type& x, time_type t) {
+					static_cast<cmp_system*>(Ptr)->validate(x, t);
+				}
+			private:
+				void* Ptr;
+				function_ptr<void(void*, state_type&, time_type)> Fn;
+			public:
+				validator() :Ptr(nullptr) {}
+				void reset() { Ptr = nullptr; }
+				template<typename cmp_system>
+				void reset(cmp_system& Sys) {
+					Ptr = static_cast<void*>(&Sys);
+					Fn = call_validate<cmp_system>;
+				}
+				void operator()(state_type& x, time_type t) { if(Ptr)Fn(Ptr, x, t); }
+			};
+
 		}
 		//composite_system
 		//bool is_exceed(const state_type& State, time_type Time, const state_type& NewState, time_type NewTime);
@@ -40,12 +61,14 @@ namespace hmLib {
 			using operations_type = typename stepper_type::operations_type;
 			using resizer_type = typename stepper_type::resizer_type;
 			using stepper_category = boost::numeric::odeint::dense_output_stepper_tag;
+			using validator = detail::validator<state_type, time_type>;
 		private:
 			stepper_type Stepper;
 			double ExceedError;
 			state_type CurrentState;
 			time_type CurrentTime;
-			std::function<void(state_type&, time_type)> ValidateStateFn;
+			void* LastSys;
+			validator Validator;
 		public:
 			composite_stepper(const stepper_type& Stepper_, double ExceedError_)
 				: Stepper(Stepper_)
@@ -115,16 +138,16 @@ namespace hmLib {
 
 					CurrentState = UpperState;
 					CurrentTime = UpperTime;
+					Validator.reset(Sys);
 
 					//updat  current state and time
-					Sys.validate(CurrentState, CurrentTime, LowerState, LowerTime, UpperState, UpperTime);
+					Sys.validate(CurrentState, CurrentTime);
 					TimePair.second = CurrentTime;
 				} else {
 					CurrentState = Stepper.current_state();
 					CurrentTime = Stepper.current_time();
+					Validator.reset();
 				}
-
-				ValidateStateFn = [&Sys](state_type& x, time_type t) {Sys.validate(x, t); }
 
 				return TimePair;
 			}
@@ -133,7 +156,7 @@ namespace hmLib {
 					x = CurrentState;
 				} else {
 					Stepper.calc_state(t, x);
-					ValidateStateFn(x,t);
+					Validator(x,t);
 				}
 			}
 			const time_type& current_time()const {

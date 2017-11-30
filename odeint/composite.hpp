@@ -17,10 +17,6 @@ namespace hmLib {
 					),
 					std::declval<T>().validate(
 						std::declval<typename T::state_type&>(),
-						std::declval<typename T::time_type&>(),
-						std::declval<const typename T::state_type&>(),
-						std::declval<typename T::time_type>(),
-						std::declval<const typename T::state_type&>(),
 						std::declval<typename T::time_type>()
 					),
 					std::declval<T>().valid(
@@ -46,10 +42,6 @@ namespace hmLib {
 					),
 					std::declval<T>().validate(
 						std::declval<typename T::state_type&>(),
-						std::declval<typename T::time_type&>(),
-						std::declval<const typename T::state_type&>(),
-						std::declval<typename T::time_type>(),
-						std::declval<const typename T::state_type&>(),
 						std::declval<typename T::time_type>()
 					),
 					std::declval<T>().valid(
@@ -79,10 +71,6 @@ namespace hmLib {
 					),
 					std::declval<T>().validate(
 						std::declval<typename T::state_type&>(),
-						std::declval<typename T::time_type&>(),
-						std::declval<const typename T::state_type&>(),
-						std::declval<typename T::time_type>(),
-						std::declval<const typename T::state_type&>(),
 						std::declval<typename T::time_type>()
 					),
 					std::declval<T>().valid(
@@ -110,8 +98,8 @@ namespace hmLib {
 						v.update(x, t);
 					}
 					template<typename U, typename state_type, typename time_type>
-					static void validate(U v,  state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut) {
-						v.validate(x, t,vx,vt,ux,ut);
+					static void validate(U v,  state_type& x, time_type t) {
+						v.validate(x, t);
 					}
 					template<typename U, typename state_type, typename time_type>
 					static bool valid(U v, const state_type& x, time_type t) {
@@ -124,7 +112,7 @@ namespace hmLib {
 					static void update(U v, const state_type& x, time_type t) {
 					}
 					template<typename U, typename state_type, typename time_type>
-					static void validate(U v, state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut) {
+					static void validate(U v, state_type& x, time_type t) {
 					}
 					template<typename U, typename state_type, typename time_type>
 					static bool valid(U v, const state_type& x, time_type t) {
@@ -165,12 +153,12 @@ namespace hmLib {
 						return false_system::valid(FalseSystem, x, t);
 					}
 				}
-				void validate(state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut){
-					Condition.update(x,t,vx,vt,ux,ut);
+				void validate(state_type& x, time_type t){
+					Condition.validate(x,t);
 					if(Condition.condition()){
-						true_applier::validate(TrueSystem, x, t, vx, vt, ux, ut);
+						true_applier::validate(TrueSystem, x, t);
 					}else{
-						false_system::validate(FalseSystem, x, t, vx, vt, ux, ut);
+						false_system::validate(FalseSystem, x, t);
 					}
 				}
 				void operator()(const state_type& x, state_type& dx, time_type t){
@@ -205,9 +193,9 @@ namespace hmLib {
 					if(!applier::valid(System,x,t))return false;
 					return Require.valid(x,t);
 				}
-				void validate(state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut){
-					applier::validate(System, x, t, vx, vt, ux, ut);
-					Require.validate(x,t, vx, vt, ux, ut);
+				void validate(state_type& x, time_type t){
+					applier::validate(System, x, t);
+					Require.validate(x,t);
 				}
 				void operator()(const state_type& x, state_type& dx, time_type t){
 					System(x,dx,t);
@@ -258,7 +246,7 @@ namespace hmLib {
 			public:
 				void update(const state_type& x, time_type t) { return prev = check(x, t); }
 				bool valid(const state_type& x, time_type t) const { return prev == check(x, t); }
-				void validate(state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut) {}
+				void validate(state_type& x, time_type t) {}
 				bool condition()const { return prev; }
 			private:
 				bool check(const state_type& x, time_type t) const { return val <= x; }
@@ -277,7 +265,7 @@ namespace hmLib {
 			public:
 				void update(const state_type& x, time_type t) { prev = check(x, t); }
 				bool valid(const state_type& x, time_type t) const { return !prev || check(x, t); }
-				void validate(state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut) {
+				void validate(state_type& x, time_type t) {
 					if(!check(x, t)) x = val;
 				}
 				void require(const state_type& x, state_type& dx, time_type t) const { if(!prev) dx = std::max<state_type>(0, dx); }
@@ -313,8 +301,8 @@ namespace hmLib {
 				bool valid(const state_type& x, time_type t) const {
 					return Req.valid(x[n], t);
 				}
-				void validate(state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut) {
-					Req.validate(x[n], t, vx[n], vt, ux[n], ut);
+				void validate(state_type& x, time_type t) {
+					Req.validate(x[n], t);
 				}
 				void require(const state_type& x, state_type& dx, time_type t) const { 
 					Req.require(x[n], dx[n], t);
@@ -353,14 +341,12 @@ namespace hmLib {
 					}
 					return true;
 				}
-				void validate(state_type& x, time_type& t, const state_type& vx, time_type vt, const state_type& ux, time_type ut) {
+				void validate(state_type& x, time_type t) {
 					auto ritr = boost::begin(Req);
 					auto itr = boost::begin(x);
 					auto end = boost::end(x);
-					auto vitr = boost::begin(vx);
-					auto uitr = boost::begin(ux);
 					while(itr!=end) {
-						(*ritr++).validate(*itr++, t, *vitr++, vt, *uitr++, ut);
+						(*ritr++).validate(*itr++, t);
 					}
 				}
 				void require(const state_type& x, state_type& dx, time_type t) const {
