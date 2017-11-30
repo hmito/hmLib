@@ -1,11 +1,11 @@
-#ifndef HMLIB_ODEINT_COMPOSITESTEPPER_INC
-#define HMLIB_ODEINT_COMPOSITESTEPPER_INC 100
+#ifndef HMLIB_ODEINT_COMPOSITE_COMPOSITESTEPPER_INC
+#define HMLIB_ODEINT_COMPOSITE_COMPOSITESTEPPER_INC 100
 #
 #include<utility>
 #include<cmath>
 #include<functional>
 #include<boost/numeric/odeint/stepper/stepper_categories.hpp>
-#include "../functional.hpp"
+#include "../../functional.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {

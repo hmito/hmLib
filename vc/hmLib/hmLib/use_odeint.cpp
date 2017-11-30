@@ -4,7 +4,6 @@
 #include"../../../odeint/varray_wrapper.hpp"
 #include<boost/numeric/odeint.hpp>
 #include"../../../odeint.hpp"
-#include"../../../odeint/composite.hpp"
 #include"../../../varray.hpp"
 
 std::ostream& operator<<(std::ostream& out, const hmLib::varray<double, 2>& v) {
@@ -31,7 +30,7 @@ struct my_system3 {
 	using state = hmLib::varray<double, 2>;
 	void operator()(const state& x, state& dx, double t) {
 		dx[0] = -1;
-		dx[1] = std::max(0.0,-1-x[0]);
+		dx[1] = 0;
 		//std::cout<<"3"<<std::endl;
 	}
 };

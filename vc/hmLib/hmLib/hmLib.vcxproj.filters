@@ -43,6 +43,9 @@
     <Filter Include="hmLib\odeint\observer">
       <UniqueIdentifier>{e920b87d-d779-4464-a362-9503a938bdd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\odeint\composite">
+      <UniqueIdentifier>{0a3758b3-b1b8-40fd-835e-5e8624add2b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\comgate.cpp">
@@ -341,9 +344,6 @@
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\composite_stepper.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\range_stepper.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
@@ -367,6 +367,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\composite.hpp">
       <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\composite_system.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\container_state_composite.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\composite_stepper.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\float_state_composite.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
