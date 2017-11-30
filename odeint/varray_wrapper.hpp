@@ -11,13 +11,23 @@ namespace boost {
 				typedef T result_type;
 				result_type operator()(const hmLib::varray<T, N> &x) const {
 					T val = std::abs(x.front());
-					for(auto itr = std::next(x.begin()); itr!=x.end(); ++x){
-						if(val <std::abs(*val)) val = std::abs(*val);
+					for(auto itr = std::next(x.begin()); itr!=x.end(); ++itr){
+						if(val <std::abs(*itr)) val = std::abs(*itr);
 					}
 					return val;
 				}
 			};
 		}
+	}
+}
+namespace hmLib {
+	template< typename value_type, typename T, std::size_t N>
+	value_type max(value_type ini, const hmLib::varray<T, N>& x) {
+		value_type val = ini;
+		for(auto itr = x.begin(); itr!=x.end(); ++itr) {
+			if(val < std::abs(*itr)) val = std::abs(*itr);
+		}
+		return val;
 	}
 }
 #

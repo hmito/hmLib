@@ -2,6 +2,8 @@
 #define HMLIB_ODEINT_COMPOSITESTEPPER_INC 100
 #
 #include<utility>
+#include<cmath>
+#include<functional>
 #include<boost/numeric/odeint/stepper/stepper_categories.hpp>
 namespace hmLib {
 	namespace odeint {
@@ -14,8 +16,7 @@ namespace hmLib {
 			template<typename state_type, typename argebra_type, typename operations_type>
 			double maximum_absolute_error(state_type& err, const state_type& v1, const state_type& v2) {
 				argebra_type::for_each3(err, v1, v2, typename operations_type::template scale_sum2<double, double>(1.0, -1.0));
-				using namespace std;
-				return argebra_type::norm_inf(abs(err));
+				return argebra_type::norm_inf(err);
 			}
 		}
 		//composite_system
@@ -44,6 +45,7 @@ namespace hmLib {
 			double ExceedError;
 			state_type CurrentState;
 			time_type CurrentTime;
+			std::function<void(state_type&, time_type)> ValidateStateFn;
 		public:
 			composite_stepper(const stepper_type& Stepper_, double ExceedError_)
 				: Stepper(Stepper_)
@@ -65,11 +67,12 @@ namespace hmLib {
 					Stepper.initialize(CurrentState, CurrentTime, Stepper.current_time_step());
 				}
 				//boost::numeric::odeint::euler
+				Sys.update(CurrentState, CurrentTime);
 
 				auto TimePair = Stepper.do_step(Sys);
 
 				//check if state exceed the range where currecnt system can calculate.
-				if(Sys.is_exceed(CurrentState, CurrentTime, Stepper.current_state(), Stepper.current_time())) {
+				if(!Sys.valid(Stepper.current_state(), Stepper.current_time())) {
 					auto LowerState = CurrentState;
 					auto LowerTime = CurrentTime;
 					auto UpperState = Stepper.current_state();
@@ -83,7 +86,7 @@ namespace hmLib {
 						Stepper.calc_state(Time, State);
 
 						//update upper or lower condition
-						if(Sys.is_exceed(CurrentState, CurrentTime, State, Time)) {
+						if(!Sys.valid(State, Time)) {
 							UpperState = std::move(State);
 							UpperTime = Time;
 						} else {
@@ -101,7 +104,7 @@ namespace hmLib {
 						Algebra.for_each3(State, LowerState, UpperState, typename operations_type::template scale_sum2<double, double>(0.5, 0.5));
 
 						//update upper or lower condition
-						if(Sys.is_exceed(CurrentState, CurrentTime, State, Time)) {
+						if(!Sys.valid(State, Time)) {
 							UpperState = std::move(State);
 							UpperTime = Time;
 						} else {
@@ -110,13 +113,18 @@ namespace hmLib {
 						}
 					}
 
+					CurrentState = UpperState;
+					CurrentTime = UpperTime;
+
 					//updat  current state and time
-					Sys.exceed(CurrentState, CurrentTime, LowerState, LowerTime, UpperState, UpperTime);
+					Sys.validate(CurrentState, CurrentTime, LowerState, LowerTime, UpperState, UpperTime);
 					TimePair.second = CurrentTime;
 				} else {
 					CurrentState = Stepper.current_state();
 					CurrentTime = Stepper.current_time();
 				}
+
+				ValidateStateFn = [&Sys](state_type& x, time_type t) {Sys.validate(x, t); }
 
 				return TimePair;
 			}
@@ -125,6 +133,7 @@ namespace hmLib {
 					x = CurrentState;
 				} else {
 					Stepper.calc_state(t, x);
+					ValidateStateFn(x,t);
 				}
 			}
 			const time_type& current_time()const {

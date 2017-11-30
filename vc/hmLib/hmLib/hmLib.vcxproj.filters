@@ -365,7 +365,7 @@
     <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\boundary_stepper.hpp">
+    <ClInclude Include="..\..\..\odeint\composite.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,47 +1,49 @@
 #include<array>
+#include<iostream>
+#include<vector>
+#include"../../../odeint/varray_wrapper.hpp"
 #include<boost/numeric/odeint.hpp>
 #include"../../../odeint.hpp"
+#include"../../../odeint/composite.hpp"
 #include"../../../varray.hpp"
+
+std::ostream& operator<<(std::ostream& out, const hmLib::varray<double, 2>& v) {
+	out<<"("<<v[0]<<", "<<v[1]<<")";
+	return out;
+}
 struct my_system {
-	using state = hmLib::varray<double, 2>;
-
-	void operator()(const state& x, state& dx, double t) {
-		if(x[0]<=0.0) {
-			dx[0] = std::max(0.0, dx[1] - 5);
-			dx[1] = 1;
-		} else {
-			dx[0] = -dx[1];
-			dx[1] = dx[0];
-		}
-	}
-	bool is_exceed(const state& px, double pt, const state& nx, double nt) {
-		return (px[0]>0 && nx[0]<=0 || px[1]>0 && nx[1]<=0);
-	}
-	void exceed(state& px, double& pt, const state& nx1, double nt1, const state& nx2, double nt2) {
-		px[0] = (nx1[0]+nx2[0])/2.0;
-		px[1] = (nx1[1]+nx2[1])/2.0;
-		pt = (nt1+nt2)/2.0;
-
-		if(px[0]<=0.0) {
-			px[0] = 0.0;
-		}
-		if(px[1]<=0.0) {
-			px[1] = 0.0;
+	using state = std::vector<hmLib::varray<double, 2>>;
+	void operator()(const state& xseq, state& dxseq, double t) {
+		auto itr = xseq.begin();
+		auto ditr = dxseq.begin();
+		for(; itr!=xseq.end(); ++itr, ++ditr) {
+			(*ditr)[0] = 1.0 - 0.2*t;
+			(*ditr)[1] = 0.2*t-(*itr)[0];
 		}
 	}
 };
 
 int main() {
+	namespace bodeint = boost::numeric::odeint;
 	my_system Sys;
 	using state = typename my_system::state;
-	state State{ 2.0,1.0 };
+	state x;
+	x.push_back(hmLib::varray<double, 2>{ 1.0, 1.0 });
+	x.push_back(hmLib::varray<double, 2>{ 0.5, 1.5 });
 
+
+	auto CmpSys = hmLib::odeint::system_compose(
+		Sys, hmLib::odeint::state_for_each<state>(x.size(), hmLib::odeint::state_for_each<hmLib::varray<double,2>>(2, hmLib::odeint::require_greater_equal(0.0)))
+	);
 	using base_stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state>;
 	auto Stepper = hmLib::odeint::make_composite_dense_output(1.0e-10, 1.0e-6, 1.0e-3, base_stepper_type());
 
-	Stepper.initialize(State, 0.0, 0.1);
+	hmLib::odeint::stream_observer Observer(std::cout,"\t");
 
-	auto Ans = Stepper.do_step(Sys);
+	CmpSys.update(x,0.0);
+	Stepper.initialize(x, 0, 0.01);
+	bodeint::integrate_const(Stepper, CmpSys, x, 0.0, 10.0, 0.1, Observer);
 
+	system("pause");
 	return 0;
 }
