@@ -23,13 +23,13 @@ namespace hmLib {
 				void update(const state_type& x, time_type t) {
 					Cond.update(x[n], t);
 				}
-				bool valid(const state_type& x, time_type t) const {
+				bool valid(const state_type& x, time_type t)  {
 					return Cond.valid(x[n], t);
 				}
 				void validate(state_type& x, time_type t) {
 					Cond.validate(x[n], t);
 				}
-				bool condition() const {
+				bool condition()  {
 					return Cond.condition();
 				}
 			};
@@ -48,13 +48,13 @@ namespace hmLib {
 				void update(const state_type& x, time_type t) {
 					Req.update(x[n], t);
 				}
-				bool valid(const state_type& x, time_type t) const {
+				bool valid(const state_type& x, time_type t)  {
 					return Req.valid(x[n], t);
 				}
 				void validate(state_type& x, time_type t) {
 					Req.validate(x[n], t);
 				}
-				void require(const state_type& x, state_type& dx, time_type t) const {
+				void require(const state_type& x, state_type& dx, time_type t)  {
 					Req.require(x[n], dx[n], t);
 				}
 			};
@@ -73,13 +73,13 @@ namespace hmLib {
 				void update(const state_type& x, time_type t) {
 					Req.update(x[n], t);
 				}
-				bool valid(const state_type& x, time_type t) const {
+				bool valid(const state_type& x, time_type t)  {
 					return Req.valid(x[n], t);
 				}
 				void validate(state_type& x, time_type t) {
 					Req.validate(x[n], t);
 				}
-				void require(const state_type& x, state_type& dx, time_type t) const {
+				void require(const state_type& x, state_type& dx, time_type t)  {
 					Req.require(x[n], dx[n], t);
 				}
 				bool condition() const {
@@ -108,47 +108,45 @@ namespace hmLib {
 				using state_type = state_type_;
 				using time_type = time_type_;
 				using require_type = require_;
-				using element_type = typename require_type::state_type;
 			private:
+				require_type  ReqBase;
 				std::vector<require_type> Req;
 			public:
-				state_for_each_require(std::size_t n, require_type  Req_) {
-					Req.reserve(n);
-					for(std::size_t i = 0; i<n; ++i) {
-						Req.push_back(Req_);
-					}
-				}
+				state_for_each_require(require_type  Req_):ReqBase(Req_) {}
 			public:
 				void update(const state_type& x, time_type t) {
-					auto ritr = boost::begin(Req);
-					auto itr = boost::begin(x);
-					auto end = boost::end(x);
+					if(x.size()!=Req.size()) {
+						Req.assign(x.size(), ReqBase);
+					}
+					auto ritr = std::begin(Req);
+					auto itr = std::begin(x);
+					auto end = std::end(x);
 					while(itr!=end) {
 						(*ritr++).update(*itr++, t);
 					}
 				}
-				bool valid(const state_type& x, time_type t) const {
-					auto ritr = boost::begin(Req);
-					auto itr = boost::begin(x);
-					auto end = boost::end(x);
+				bool valid(const state_type& x, time_type t)  {
+					auto ritr = std::begin(Req);
+					auto itr = std::begin(x);
+					auto end = std::end(x);
 					while(itr!=end) {
 						if(!(*ritr++).valid(*itr++, t))return false;
 					}
 					return true;
 				}
 				void validate(state_type& x, time_type t) {
-					auto ritr = boost::begin(Req);
-					auto itr = boost::begin(x);
-					auto end = boost::end(x);
+					auto ritr = std::begin(Req);
+					auto itr = std::begin(x);
+					auto end = std::end(x);
 					while(itr!=end) {
 						(*ritr++).validate(*itr++, t);
 					}
 				}
-				void require(const state_type& x, state_type& dx, time_type t) const {
-					auto ritr = boost::begin(Req);
-					auto itr = boost::begin(x);
-					auto end = boost::end(x);
-					auto ditr = boost::begin(dx);
+				void require(const state_type& x, state_type& dx, time_type t)  {
+					auto ritr = std::begin(Req);
+					auto itr = std::begin(x);
+					auto end = std::end(x);
+					auto ditr = std::begin(dx);
 					while(itr!=end) {
 						(*ritr++).require(*itr++, *ditr++, t);
 					}
@@ -160,8 +158,8 @@ namespace hmLib {
 			return typename composite::detail::select_state_at<state_type, time_type, typename std::decay<target_type>::type>::type(n, std::forward<target_type>(Req));
 		}
 		template<typename state_type, typename require, typename time_type = double>
-		auto state_for_each(std::size_t n, require&& Req) {
-			return composite::state_for_each_require<state_type, time_type, typename std::decay<require>::type>(n, std::forward<require>(Req));
+		auto state_for_each(require&& Req) {
+			return composite::state_for_each_require<state_type, time_type, typename std::decay<require>::type>(std::forward<require>(Req));
 		}
 	}
 }

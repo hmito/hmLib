@@ -156,7 +156,7 @@ namespace hmLib {
 						false_applier::update(FalseSystem, x, t);
 					}
 				}
-				bool valid(const state_type& x, time_type t)const {
+				bool valid(const state_type& x, time_type t) {
 					if(!Condition.valid(x, t))return false;
 
 					if(Condition.condition()) {
@@ -180,6 +180,9 @@ namespace hmLib {
 						FalseSystem(x, dx, t);
 					}
 				}
+			public:
+				true_system& true_base() { return TrueSystem; }
+				false_system& false_base() { return FalseSystem; }
 			};
 
 			template<typename system_, typename require_, typename state_type_ = typename require_::state_type, typename time_type_ = typename require_::time_type>
@@ -201,7 +204,7 @@ namespace hmLib {
 					applier::update(System, x, t);
 					Require.update(x, t);
 				}
-				bool valid(const state_type& x, time_type t)const {
+				bool valid(const state_type& x, time_type t) {
 					if(!applier::valid(System, x, t))return false;
 					return Require.valid(x, t);
 				}
@@ -213,6 +216,8 @@ namespace hmLib {
 					System(x, dx, t);
 					Require.require(x, dx, t);
 				}
+			public:
+				base_system& base() { return System; }
 			};
 		}
 

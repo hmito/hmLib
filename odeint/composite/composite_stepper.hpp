@@ -174,7 +174,7 @@ namespace hmLib {
 		template<typename stepper_>
 		auto make_composite_dense_output(double AbsError, double RelError, double ExceedError, stepper_ BaseStepper) {
 			auto DenseOutput = boost::numeric::odeint::make_dense_output(AbsError, RelError, BaseStepper);
-			return composite_stepper<decltype(DenseOutput)>(DenseOutput, ExceedError);
+			return composite_stepper<decltype(DenseOutput)>(std::move(DenseOutput), ExceedError);
 		}
 	}
 }
