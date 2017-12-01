@@ -6,6 +6,12 @@
 #include "../../utility.hpp"
 namespace hmLib {
 	namespace odeint {
+		/*
+		composite system
+			update will called once before stepper start to call system operator().
+			valid will checked after each step.
+			validate will called if the step might not be valid.
+		*/
 		namespace composite {
 			template<typename condition_>
 			struct is_condition {

@@ -6,5 +6,6 @@
 #include"composite/float_state_composite.hpp"
 #include"composite/container_state_composite.hpp"
 #include"composite/composite_logical.hpp"
+#include"composite/tuple_state_composite.hpp"
 #
 #endif
