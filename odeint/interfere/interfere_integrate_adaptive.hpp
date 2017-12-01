@@ -144,6 +144,11 @@ namespace hmLib {
 						} else if(ifrans == interfere_type::terminate) {
 							obs(st.current_state(), st.current_time());
 							return st.current_time();
+						} else if(ifrans == interfere_type::reconstruct) {
+							start_time = st.current_time();
+							using base_stepper = boost::numeric::odeint::runge_kutta_dopri5<State>;
+							st = hmLib::odeint::make_composite_dense_output<base_stepper>(1e-6, 1e-6, 1e-4, base_stepper());
+							st.initialize(start_state, start_time, dt);
 						}
 
 						obs(st.current_state(), st.current_time());
