@@ -85,6 +85,10 @@
     <ClInclude Include="..\..\..\odeint\composite\composite_stepper.hpp" />
     <ClInclude Include="..\..\..\odeint\composite\composite_system.hpp" />
     <ClInclude Include="..\..\..\odeint\composite\container_state_composite.hpp" />
+    <ClInclude Include="..\..\..\odeint\interfere.hpp" />
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_adaptive.hpp" />
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_const.hpp" />
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_type.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\break_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\container_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\eqstate_break_observer.hpp" />

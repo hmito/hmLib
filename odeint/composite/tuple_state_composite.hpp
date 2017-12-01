@@ -68,7 +68,7 @@ namespace hmLib {
 			private:
 				require_type Reqcon;
 			public:
-				tuple_at_require(require_type Req_) : Reqcon(std::move(Req_)) {}
+				tuple_at_require_condition(require_type Req_) : Reqcon(std::move(Req_)) {}
 			public:
 				void update(const state_type& x, time_type t) {
 					Reqcon.update(std::get<n>(x), t);

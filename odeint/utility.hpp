@@ -1,6 +1,7 @@
 ﻿#ifndef HMLIB_ODEINT_UTILITY_INC
 #define HMLIB_ODEINT_UTILITY_INC 100
 #
+#include<utility>
 #include<type_traits>
 #include<boost/numeric/odeint/algebra/vector_space_algebra.hpp>
 #include"../utility.hpp"
@@ -20,7 +21,15 @@ namespace hmLib{
 			struct can_initialize {
 			private:
 				template<typename T>
-				static auto check(T)->decltype(std::declval<T>().initialize(std::declval<system_>(), std::declval<state_type>(), std::decl_val<time_type>, std::decl_val<time_type>), std::true_type{});
+				static auto check(T)->decltype(
+					std::declval<T>().initialize(
+						std::declval<system_>(),
+						std::declval<state_type>(),
+						std::declval<time_type>, 
+						std::declval<time_type>
+					), 
+					std::true_type{}
+				);
 				static auto check(...)->std::false_type;
 			public:
 				using type = decltype(check(std::declval<stepper_>()));

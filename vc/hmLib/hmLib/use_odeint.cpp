@@ -34,6 +34,13 @@ struct my_system3 {
 		//std::cout<<"3"<<std::endl;
 	}
 };
+struct interferer {
+	using state = hmLib::varray<double, 2>;
+	hmLib::odeint::interfere_type operator()(const state& x, state& ix, double t) {
+		if(x.at(1)>1)return hmLib::odeint::interfere_type::terminate;
+		return hmLib::odeint::interfere_type::ignore;
+	}
+};
 int main() {
 	using state = hmLib::varray<double, 2>;
 	namespace bode = boost::numeric::odeint;
@@ -55,9 +62,10 @@ int main() {
 	auto Stepper = hmLib::odeint::make_composite_dense_output(1.0e-10, 1.0e-6, 1.0e-3, base_stepper_type());
 
 	hmLib::odeint::stream_observer Observer(std::cout,"\t");
+	interferer Interferer;
 
 	Stepper.initialize(x, 0, 0.01);
-	bode::integrate_adaptive(Stepper, CmpSys, x, 0.0, 10.0, 0.1, Observer);
+	hode::interfere_integrate_const(Stepper, CmpSys, x, 0.0, 10.0, 0.1, Interferer, Observer);
 
 	system("pause");
 	return 0;

@@ -41,8 +41,10 @@ namespace hmLib {
 					auto ifrans = ifr(start_state, start_state, time);
 					if(ifrans==interfere_type::interfere) {
 						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
-					} else if(ifrans == interfere_type::terminate) {
+					} else if(ifrans == interfere_type::interfere_terminate) {
 						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
+						break;
+					} else if(ifrans == interfere_type::terminate) {
 						break;
 					}
 				}
@@ -50,7 +52,6 @@ namespace hmLib {
 
 				return time;
 			}
-
 
 
 			template< class Stepper, class System, class State, class Time, class Interferer, class Observer >
@@ -95,10 +96,13 @@ namespace hmLib {
 							fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
 
 							auto ifrans = ifr(start_state, start_state, step_start_time);
-							if(ifrans!=interfere_type::interfere) {
+							if(ifrans==interfere_type::interfere) {
 								try_initialize<Stepper, System, State, Time>(stepper, system, start_state, step_start_time, dt);
+							} else if(ifrans == interfere_type::interfere_terminate) {
+								try_initialize<Stepper, System, State, Time>(stepper, system, start_state, step_start_time, dt);
+								obs(start_state, step_start_time);
+								return step_start_time;
 							} else if(ifrans == interfere_type::terminate) {
-								try_initialize<Stepper, System, State, Time>(stepper, system, start_state, step_start_time, dt);
 								obs(start_state, step_start_time);
 								return step_start_time;
 							}
@@ -142,8 +146,10 @@ namespace hmLib {
 						ifrans = ifr(start_state, start_state, time);
 						obs(start_state, time);
 
-						if(ifrans==interfere_type::terminate) {
-							st.initilize(start_state, time, dt);
+						if(ifrans==interfere_type::interfere_terminate) {
+							st.initialize(start_state, time, dt);
+							return time;
+						}else if(ifrans==interfere_type::terminate) {
 							return time;
 						}
 
@@ -154,36 +160,80 @@ namespace hmLib {
 					}
 					// we have not reached the end, do another real step
 					if(boost::numeric::odeint::detail::less_with_sign(static_cast<Time>(st.current_time()+st.current_time_step()),end_time,st.current_time_step())) {
-						while(less_eq_with_sign(st.current_time(), time, dt)) {
+						while(boost::numeric::odeint::detail::less_eq_with_sign(st.current_time(), time, dt)) {
 							st.do_step(system);
 
 							ifrans = ifr(st.current_state(), start_state, st.current_time());
 							if(ifrans == interfere_type::interfere) {
 								st.initialize(start_state, st.current_time(), dt);
-							} else if(ifrans == interfere_type::terminate) {
-								st.initialize(start_state, st.current_time(), dt);
-								obs(start_state, st.current_time());
-								return st.current_time();
+							} else if(ifrans == interfere_type::interfere_terminate|| ifrans == interfere_type::terminate) {
+								while(boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
+									st.calc_state(time, start_state);
+									auto ifrans2 = ifr(start_state, start_state, time);
+									obs(start_state, time);
+
+									if(ifrans2==interfere_type::interfere_terminate) {
+										st.initialize(start_state, time, dt);
+										return time;
+									} else if(ifrans2==interfere_type::terminate) {
+										return time;
+									}
+
+									++obs_step;
+									// direct computation of the time avoids error propagation happening when using time += dt
+									// we need clumsy type analysis to get boost units working here
+									time = start_time + static_cast<typename boost::numeric::odeint::unit_value_type<Time>::type>(obs_step) * dt;
+								}
+								if(ifrans == interfere_type::interfere_terminate){
+									st.initialize(start_state, st.current_time(), dt);
+									obs(start_state, st.current_time());
+									return st.current_time();
+								} else if(ifrans == interfere_type::terminate) {
+									obs(st.current_state(), st.current_time());
+									return st.current_time();
+								}
 							}
 						}
-					} else if(less_with_sign(st.current_time(), end_time, st.current_time_step())) { // do the last step ending exactly on the end point
+					} else if(boost::numeric::odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())) { // do the last step ending exactly on the end point
 						st.initialize(st.current_state(), st.current_time(), end_time - st.current_time());
 						st.do_step(system);
 
 						ifrans = ifr(st.current_state(), start_state, st.current_time());
 						if(ifrans == interfere_type::interfere) {
 							st.initialize(start_state, st.current_time(), end_time - st.current_time());
-						} else if(ifrans == interfere_type::terminate) {
-							st.initialize(start_state, st.current_time(), end_time - st.current_time());
-							obs(start_state, st.current_time());
-							return st.current_time();
+						} else if(ifrans == interfere_type::interfere_terminate|| ifrans == interfere_type::terminate) {
+							while(boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
+								st.calc_state(time, start_state);
+								auto ifrans2 = ifr(start_state, start_state, time);
+								obs(start_state, time);
+
+								if(ifrans2==interfere_type::interfere_terminate) {
+									st.initialize(start_state, time, dt);
+									return time;
+								} else if(ifrans2==interfere_type::terminate) {
+									return time;
+								}
+
+								++obs_step;
+								// direct computation of the time avoids error propagation happening when using time += dt
+								// we need clumsy type analysis to get boost units working here
+								time = start_time + static_cast<typename boost::numeric::odeint::unit_value_type<Time>::type>(obs_step) * dt;
+							}
+							if(ifrans == interfere_type::interfere_terminate) {
+								st.initialize(start_state, st.current_time(), dt);
+								obs(start_state, st.current_time());
+								return st.current_time();
+							} else if(ifrans == interfere_type::terminate) {
+								obs(st.current_state(), st.current_time());
+								return st.current_time();
+							}
 						}
 					}
 
 				}
 				// last observation, if we are still in observation interval
 				// might happen due to finite precision problems when computing the the time
-				if(less_eq_with_sign(time, end_time, dt)) {
+				if(boost::numeric::odeint::detail::less_eq_with_sign(time, end_time, dt)) {
 					st.calc_state(time, start_state);
 					ifr(start_state, start_state, time);
 					obs(start_state, time);

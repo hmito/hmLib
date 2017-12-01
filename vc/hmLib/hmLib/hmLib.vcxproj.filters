@@ -46,6 +46,9 @@
     <Filter Include="hmLib\odeint\composite">
       <UniqueIdentifier>{0a3758b3-b1b8-40fd-835e-5e8624add2b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\odeint\interfere">
+      <UniqueIdentifier>{bfd5b6a4-9c20-462c-a96b-ae482a1d7bbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\comgate.cpp">
@@ -382,6 +385,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\composite\composite_logical.hpp">
       <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_adaptive.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_const.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_type.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere.hpp">
+      <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

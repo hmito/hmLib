@@ -3,7 +3,7 @@
 #
 namespace hmLib {
 	namespace odeint {
-		enum class interfere_type { ignore, interfere, terminate };
+		enum class interfere_type { ignore, interfere, terminate, interfere_terminate};
 	}
 }
 #

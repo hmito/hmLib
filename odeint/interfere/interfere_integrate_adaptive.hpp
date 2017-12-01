@@ -43,12 +43,16 @@ namespace hmLib {
 					time = start_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(step) * dt;
 
 					auto ifrans = ifr(start_state, start_state, time);
-					if(ifrans!=interfere_type::interfere) {
+					if(ifrans==interfere_type::interfere) {
 						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
-					} else if(ifrans == interfere_type::terminate){
+					} else if(ifrans == interfere_type::interfere_terminate){
 						obs(start_state, time);
 						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
 						return time;
+					} else if(ifrans == interfere_type::terminate) {
+						obs(start_state, time);
+						return time;
+
 					}
 				}
 
@@ -91,10 +95,12 @@ namespace hmLib {
 					fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
 
 					auto ifrans = ifr(start_state, start_state, start_time);
-					if(ifrans!=interfere_type::interfere) {
+					if(ifrans==interfere_type::interfere) {
 						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, start_time, dt);
-					} else if(ifrans == interfere_type::terminate) {
+					} else if(ifrans == interfere_type::interfere_terminate) {
 						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, start_time, dt);
+						break;
+					}else if(ifrans == interfere_type::terminate) {
 						break;
 					}
 				}
@@ -129,11 +135,14 @@ namespace hmLib {
 						st.do_step(system);
 
 						auto ifrans = ifr(st.current_state(), start_state, st.current_time());
-						if(ifrans!=interfere_type::interfere) {
+						if(ifrans==interfere_type::interfere) {
 							st.initialize(start_state, st.current_time(), dt);
-						} else if(ifrans == interfere_type::terminate) {
+						} else if(ifrans == interfere_type::interfere_terminate) {
 							st.initialize(start_state, st.current_time(), dt);
 							obs(start_state, st.current_time());
+							return st.current_time();
+						} else if(ifrans == interfere_type::terminate) {
+							obs(st.current_state(), st.current_time());
 							return st.current_time();
 						}
 
