@@ -14,7 +14,7 @@ namespace hmLib{
 		Iterator MaxItr = Beg;
 
 		for(++Beg; Beg != End; ++Beg){
-			auto Val = Fn(*(Beg++));
+			auto Val = Fn(*Beg);
 			if(Val > Max){
 				Max = Val;
 				MaxItr = Beg;
@@ -32,7 +32,7 @@ namespace hmLib{
 		Iterator MinItr = Beg;
 
 		for(++Beg; Beg != End; ++Beg){
-			auto Val = Fn(*(Beg++));
+			auto Val = Fn(*Beg);
 			if(Val < Min){
 				Min = Val;
 				MinItr = Beg;
