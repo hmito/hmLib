@@ -12,7 +12,6 @@
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 
-#include "interfere_type.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
@@ -125,8 +124,6 @@ namespace hmLib {
 
 				int obs_step(1);
 				
-				interfere_type ifrans = interfere_type::ignore;
-
 				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+dt), end_time, dt)) {
 					while(boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
 						if (ifr.calc_state(st, time, start_state))break;
@@ -151,6 +148,9 @@ namespace hmLib {
 									// we need clumsy type analysis to get boost units working here
 									time = start_time + static_cast<typename boost::numeric::odeint::unit_value_type<Time>::type>(obs_step) * dt;
 								}
+								return st.current_time();
+							}
+							if (ifr(st, system) ){
 								return st.current_time();
 							}
 						}
@@ -178,6 +178,11 @@ namespace hmLib {
 							}
 							return st.current_time();
 						}
+
+						if (ifr(st, system) ){
+							return st.current_time();
+						}
+
 					}
 
 				}

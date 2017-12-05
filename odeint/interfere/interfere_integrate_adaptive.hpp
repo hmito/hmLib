@@ -13,8 +13,6 @@
 #include <boost/numeric/odeint/util/copy.hpp>
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 
-#include "interfere_type.hpp"
-#include "../utility.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
@@ -131,6 +129,10 @@ namespace hmLib {
 							return st.current_time();
 						}
 						obs(st.current_state(), st.current_time());
+
+						if (ifr(st, system)) {
+							return st.current_time();
+						}
 					}
 					// calculate time step to arrive exactly at end time
 					if (ifr.initialize(st, st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()))) {
