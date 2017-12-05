@@ -57,6 +57,7 @@ namespace hmLib {
 				void require(const state_type& x, state_type& dx, time_type t)  {
 					Req.require(x[n], dx[n], t);
 				}
+				void adjust_size(const state_type& x) { Req.adjust_size(x); }
 			};
 			template<typename state_type_, typename time_type_, typename reqcon_>
 			struct state_at_require_condition {

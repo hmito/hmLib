@@ -67,7 +67,6 @@ namespace hmLib {
 			double ExceedError;
 			state_type CurrentState;
 			time_type CurrentTime;
-			void* LastSys;
 			validator Validator;
 		public:
 			composite_stepper(const stepper_type& Stepper_, double ExceedError_)
@@ -169,6 +168,9 @@ namespace hmLib {
 				return Stepper.current_time_step();
 			}
 			stepper_type& base_stepper() { return Stepper; }
+			void adjust_size(state_type& x){
+				Stepper.adjust_size(x);
+			}
 		};
 
 		template<typename stepper_>

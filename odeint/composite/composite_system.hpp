@@ -126,6 +126,27 @@ namespace hmLib {
 						return true;
 					}
 				};
+
+				template<typename system_>
+				struct has_base_system {
+				private:
+					template<typename T>
+					static auto check(T)->decltype(std::declval<typename T::base_system>(), std::true_type{});
+					static auto check(...)->std::false_type;
+				public:
+					using type = decltype(check(std::declval<system_>()));
+					static constexpr bool value = type::value;
+				};
+				template<typename system_, bool has_base_system_ = has_base_system<system_>::value>
+				struct get_base_system {
+					template<typename T>
+					auto& operator()(T&& Sys) { return Sys; }
+				};
+				template<typename system_>
+				struct get_base_system<system_,true> {
+					template<typename T>
+					auto& operator()(T&& Sys) { return Sys.base(); }
+				};
 			}
 
 			template<typename condition_, typename true_system_, typename false_system_, typename state_type_ = typename condition_::state_type, typename time_type_ = typename condition_::time_type>
@@ -217,7 +238,7 @@ namespace hmLib {
 					Require.require(x, dx, t);
 				}
 			public:
-				base_system& base() { return System; }
+				auto& base() { return detail::get_base_system<base_system>()(System); }
 			};
 		}
 
