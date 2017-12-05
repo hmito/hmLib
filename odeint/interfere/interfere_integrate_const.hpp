@@ -13,7 +13,6 @@
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 
 #include "interfere_type.hpp"
-#include "utility.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
@@ -32,21 +31,15 @@ namespace hmLib {
 				// cast time+dt explicitely in case of expression templates (e.g. multiprecision)
 				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+dt), end_time, dt)) {
 					obs(start_state, time);
-					st.do_step(system, start_state, time, dt);
+
+					bool ans = ifr.do_step(st, system, start_state, time, dt);
+
 					// direct computation of the time avoids error propagation happening when using time += dt
 					// we need clumsy type analysis to get boost units working here
 					++step;
 					time = start_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(step) * dt;
 
-					auto ifrans = ifr(start_state, start_state, time);
-					if(ifrans==interfere_type::interfere) {
-						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
-					} else if(ifrans == interfere_type::interfere_terminate) {
-						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
-						break;
-					} else if(ifrans == interfere_type::terminate) {
-						break;
-					}
+					if (ans)break;
 				}
 				obs(start_state, time);
 
@@ -88,22 +81,15 @@ namespace hmLib {
 								dt = end_time - step_start_time;
 							}
 
-							boost::numeric::odeint::controlled_step_result res;
+							std::pair<bool,boost::numeric::odeint::controlled_step_result> res;
 							do {
-								res = st.try_step(system, start_state, step_start_time, dt);
+								res = ifr.try_step(st, system, start_state, step_start_time, dt);
 								fail_checker();  // check number of failed steps
-							} while(res == fail);
+							} while((!res.first) && res.second == fail);
 							fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
 
-							auto ifrans = ifr(start_state, start_state, step_start_time);
-							if(ifrans==interfere_type::interfere) {
-								try_initialize<Stepper, System, State, Time>(stepper, system, start_state, step_start_time, dt);
-							} else if(ifrans == interfere_type::interfere_terminate) {
-								try_initialize<Stepper, System, State, Time>(stepper, system, start_state, step_start_time, dt);
-								obs(start_state, step_start_time);
-								return step_start_time;
-							} else if(ifrans == interfere_type::terminate) {
-								obs(start_state, step_start_time);
+							if (res.first) {
+								if(res.second!=boost::numeric::odeint::controlled_step_result::fail)obs(start_state, step_start_time);
 								return step_start_time;
 							}
 						}
@@ -132,8 +118,9 @@ namespace hmLib {
 
 				Time time = start_time;
 
-				st.initialize(start_state, time, dt);
+				auto inians = ifr.initialize(st,start_state, time, dt);
 				obs(start_state, time);
+				if (inians) return time;
 				time += dt;
 
 				int obs_step(1);
@@ -142,17 +129,8 @@ namespace hmLib {
 
 				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+dt), end_time, dt)) {
 					while(boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
-						st.calc_state(time, start_state);
-						ifrans = ifr(start_state, start_state, time);
+						if (ifr.calc_state(st, time, start_state))break;
 						obs(start_state, time);
-
-						if(ifrans==interfere_type::interfere_terminate) {
-							st.initialize(start_state, time, dt);
-							return time;
-						}else if(ifrans==interfere_type::terminate) {
-							return time;
-						}
-
 						++obs_step;
 						// direct computation of the time avoids error propagation happening when using time += dt
 						// we need clumsy type analysis to get boost units working here
@@ -161,81 +139,52 @@ namespace hmLib {
 					// we have not reached the end, do another real step
 					if(boost::numeric::odeint::detail::less_with_sign(static_cast<Time>(st.current_time()+st.current_time_step()),end_time,st.current_time_step())) {
 						while(boost::numeric::odeint::detail::less_eq_with_sign(st.current_time(), time, dt)) {
-							st.do_step(system);
+							auto ans = ifr.do_step(st,system);
 
-							ifrans = ifr(st.current_state(), start_state, st.current_time());
-							if(ifrans == interfere_type::interfere) {
-								st.initialize(start_state, st.current_time(), dt);
-							} else if(ifrans == interfere_type::interfere_terminate|| ifrans == interfere_type::terminate) {
+							if(ans.first) {
 								while(boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
-									st.calc_state(time, start_state);
-									auto ifrans2 = ifr(start_state, start_state, time);
+									if (ifr.calc_state(st, time, start_state))break;
+
 									obs(start_state, time);
-
-									if(ifrans2==interfere_type::interfere_terminate) {
-										st.initialize(start_state, time, dt);
-										return time;
-									} else if(ifrans2==interfere_type::terminate) {
-										return time;
-									}
-
 									++obs_step;
 									// direct computation of the time avoids error propagation happening when using time += dt
 									// we need clumsy type analysis to get boost units working here
 									time = start_time + static_cast<typename boost::numeric::odeint::unit_value_type<Time>::type>(obs_step) * dt;
 								}
-								if(ifrans == interfere_type::interfere_terminate){
-									st.initialize(start_state, st.current_time(), dt);
-									obs(start_state, st.current_time());
-									return st.current_time();
-								} else if(ifrans == interfere_type::terminate) {
-									obs(st.current_state(), st.current_time());
-									return st.current_time();
-								}
+								return st.current_time();
 							}
 						}
 					} else if(boost::numeric::odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())) { // do the last step ending exactly on the end point
-						st.initialize(st.current_state(), st.current_time(), end_time - st.current_time());
-						st.do_step(system);
+						if (ifr.initialize(st, st.current_state(), st.current_time(), end_time - st.current_time())) {
+							obs(st.current_state(), time);
+							return time;
+						}
 
-						ifrans = ifr(st.current_state(), start_state, st.current_time());
-						if(ifrans == interfere_type::interfere) {
-							st.initialize(start_state, st.current_time(), end_time - st.current_time());
-						} else if(ifrans == interfere_type::interfere_terminate|| ifrans == interfere_type::terminate) {
-							while(boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
-								st.calc_state(time, start_state);
-								auto ifrans2 = ifr(start_state, start_state, time);
-								obs(start_state, time);
+						auto ans = ifr.do_step(st, system);
 
-								if(ifrans2==interfere_type::interfere_terminate) {
-									st.initialize(start_state, time, dt);
-									return time;
-								} else if(ifrans2==interfere_type::terminate) {
+						if (ans.first) {
+							while (boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
+								if (ifr.calc_state(st, time, start_state)) {
+									obs(start_state, time);
 									return time;
 								}
 
+								obs(start_state, time);
 								++obs_step;
 								// direct computation of the time avoids error propagation happening when using time += dt
 								// we need clumsy type analysis to get boost units working here
 								time = start_time + static_cast<typename boost::numeric::odeint::unit_value_type<Time>::type>(obs_step) * dt;
+
 							}
-							if(ifrans == interfere_type::interfere_terminate) {
-								st.initialize(start_state, st.current_time(), dt);
-								obs(start_state, st.current_time());
-								return st.current_time();
-							} else if(ifrans == interfere_type::terminate) {
-								obs(st.current_state(), st.current_time());
-								return st.current_time();
-							}
+							return st.current_time();
 						}
 					}
 
 				}
 				// last observation, if we are still in observation interval
 				// might happen due to finite precision problems when computing the the time
-				if(boost::numeric::odeint::detail::less_eq_with_sign(time, end_time, dt)) {
-					st.calc_state(time, start_state);
-					ifr(start_state, start_state, time);
+				if (boost::numeric::odeint::detail::less_eq_with_sign(time, end_time, dt)) {
+					ifr.calc_state(st, time, start_state);
 					obs(start_state, time);
 				}
 

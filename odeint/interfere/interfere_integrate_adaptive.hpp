@@ -36,30 +36,22 @@ namespace hmLib {
 				// cast time+dt explicitely in case of expression templates (e.g. multiprecision)
 				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+dt), end_time, dt)) {
 					obs(start_state, time);
-					st.do_step(system, start_state, time, dt);
+					auto ans = ifr.do_step(st, system, start_state, time, dt);
 					// direct computation of the time avoids error propagation happening when using time += dt
 					// we need clumsy type analysis to get boost units working here
 					++step;
 					time = start_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(step) * dt;
 
-					auto ifrans = ifr(start_state, start_state, time);
-					if(ifrans==interfere_type::interfere) {
-						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
-					} else if(ifrans == interfere_type::interfere_terminate){
-						obs(start_state, time);
-						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, time, dt);
-						return time;
-					} else if(ifrans == interfere_type::terminate) {
-						obs(start_state, time);
-						return time;
 
+					if (ans) {
+						obs(start_state, time);
+						return time;
 					}
 				}
 
 				if(boost::numeric::odeint::detail::less_with_sign(time, end_time, dt)) {   //make a last step to end exactly at end_time
-					st.do_step(system, start_state, time, end_time - time);
+					ifr.do_step(st,system, start_state, time, end_time - time);
 					steps++;
-					ifr(start_state, start_state, end_time);
 					obs(start_state, end_time);
 				}
 				return end_time;
@@ -87,21 +79,18 @@ namespace hmLib {
 						dt = end_time - start_time;
 					}
 
-					boost::numeric::odeint::controlled_step_result res;
+					std::pair<bool,boost::numeric::odeint::controlled_step_result> res;
 					do {
-						res = st.try_step(system, start_state, start_time, dt);
+						res = ifr.try_step(st,system, start_state, start_time, dt);
 						fail_checker();  // check number of failed steps
-					} while(res == fail);
+					} while(!res.first && res.second == boost::numeric::odeint::controlled_step_result::fail);
 					fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
 
-					auto ifrans = ifr(start_state, start_state, start_time);
-					if(ifrans==interfere_type::interfere) {
-						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, start_time, dt);
-					} else if(ifrans == interfere_type::interfere_terminate) {
-						try_initialize<Stepper, System, State, Time>(stepper, system, start_state, start_time, dt);
-						break;
-					}else if(ifrans == interfere_type::terminate) {
-						break;
+					if (res.first) {
+						if (res.second != boost::numeric::odeint::controlled_step_result::fail) {
+							obs(start_state, start_time);
+						}
+						return start_time;
 					}
 				}
 
@@ -126,39 +115,31 @@ namespace hmLib {
 				typename boost::numeric::odeint::unwrap_reference< Observer >::type &obs = observer;
 				typename boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
 
-				st.initialize(start_state, start_time, dt);
+				auto inians = ifr.initialize(st,start_state, start_time, dt);
 				obs(st.current_state(), st.current_time());
+				if (inians)return start_time;
 
 				while(boost::numeric::odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())) {
 					while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()), end_time,st.current_time_step())) {   
 						//make sure we don't go beyond the end_time
-						st.do_step(system);
+						auto ans = ifr.do_step(st,system);
 
-						auto ifrans = ifr(st.current_state(), start_state, st.current_time());
-						if(ifrans==interfere_type::interfere) {
-							st.initialize(start_state, st.current_time(), dt);
-						} else if(ifrans == interfere_type::interfere_terminate) {
-							st.initialize(start_state, st.current_time(), dt);
-							obs(start_state, st.current_time());
+						if (ans.first) {
+							// overwrite start_state with the final point
+							start_state = st.current_state();
+
 							return st.current_time();
-						} else if(ifrans == interfere_type::terminate) {
-							obs(st.current_state(), st.current_time());
-							return st.current_time();
-						} else if(ifrans == interfere_type::reconstruct) {
-							start_time = st.current_time();
-							using base_stepper = boost::numeric::odeint::runge_kutta_dopri5<State>;
-							st = hmLib::odeint::make_composite_dense_output<base_stepper>(1e-6, 1e-6, 1e-4, base_stepper());
-							st.initialize(start_state, start_time, dt);
 						}
-
 						obs(st.current_state(), st.current_time());
 					}
 					// calculate time step to arrive exactly at end time
-					st.initialize(st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()));
+					if (ifr.initialize(st, st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()))) {
+						break;
+					}
 				}
 
 				// overwrite start_state with the final point
-				boost::numeric::odeint::copy(st.current_state(), start_state);
+				start_state = st.current_state();
 
 				return st.current_time();
 			}
