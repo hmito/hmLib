@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ODEINT_UTILITY_INC
+#ifndef HMLIB_ODEINT_UTILITY_INC
 #define HMLIB_ODEINT_UTILITY_INC 100
 #
 #include<utility>
@@ -11,7 +11,7 @@ namespace hmLib{
 		struct base_stepper {
 		private:
 			template<typename T>
-			static auto check(T)->decltype(typename system_::base_stepper);
+			static auto check(T)->decltype(typename system_::base_stepper{});
 			static auto check(...)->typename std::decay<system_>::type;
 		public:
 			using type = decltype(check(std::declval<typename std::decay<system_>::type>()));
@@ -50,7 +50,7 @@ namespace hmLib{
 		}
 		template<typename stepper, typename sys, typename state_type, typename time_type>
 		void try_initialize(stepper& Stepper, sys&& Sys, state_type&& State, time_type Time, time_type dT) {
-			detail::try_initilize_impl<typename std::decay<stepper>::type, typename std::decay<sys>::type, typename std::decay<state_type>::type, typename std::decay<time_type>::type>()(Stepper, std::forward<sys>(Sys), std::forward<state_type>(State), Time, dT);
+			detail::try_initialize_impl<typename std::decay<stepper>::type, typename std::decay<sys>::type, typename std::decay<state_type>::type, typename std::decay<time_type>::type>()(Stepper, std::forward<sys>(Sys), std::forward<state_type>(State), Time, dT);
 		}
 	}
 }

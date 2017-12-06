@@ -39,7 +39,7 @@ namespace hmLib {
 			std::copy(other.begin(), other.end(), Arr.begin());
 		}
 		template<typename U>
-		this_type& operator=(const varray<U, N>& Ototherher) {
+		this_type& operator=(const varray<U, N>& other) {
 			if(&other!=this) {
 				std::copy(other.begin(), other.end(), Arr.begin());
 			}
@@ -65,8 +65,8 @@ namespace hmLib {
 		constexpr const_reference front() const{ return Arr.front(); }
 		reference back() { return Arr.back(); }
 		constexpr const_reference back() const { return Arr.back(); }
-		T* data()noexcept { return return Arr.data(); }
-		const T* data()const noexcept { return return Arr.data(); }
+		T* data()noexcept { return Arr.data(); }
+		const T* data()const noexcept { return Arr.data(); }
 	public:
 		iterator begin() noexcept{ return Arr.begin(); }
 		const_iterator begin()const noexcept { return Arr.begin(); }
@@ -91,7 +91,6 @@ namespace hmLib {
 		this_type operator+()const { return *this; }
 		this_type operator-()const { 
 			this_type Ans = *this;
-			auto Beg = other.begin();
 			for(auto& v:*this) v = -v;
 			return Ans;
 		}
@@ -141,13 +140,13 @@ namespace hmLib {
 		}
 	public:
 		T sum()const{
-			return std::accumulate(std::next(begin()), std::end(), front());
+			return std::accumulate(std::next(begin()), end(), front());
 		}
 		T min()const {
-			return *std::min_element(begin(), std::end());
+			return *std::min_element(begin(), end());
 		}
 		T max()const {
-			return *std::max_element(begin(), std::end());
+			return *std::max_element(begin(), end());
 		}
 		template<typename func>
 		varray<decltype(std::declval<func>()(std::declval<T>())),N> apply(func Fn) {

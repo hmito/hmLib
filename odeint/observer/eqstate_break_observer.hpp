@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
+#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
 #define HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC 100
 #
 #include <array>
@@ -32,7 +32,7 @@ namespace hmLib{
 					Beg += IgnoreNum;
 
 					for(auto Itr = Beg; Itr != End; ++Itr){
-						if(detail::abs_distance(x, Itr->second) < Error){
+						if(hmLib::odeint::detail::abs_distance(x, Itr->second) < Error){
 							return true;
 						}
 					}

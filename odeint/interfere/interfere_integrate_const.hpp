@@ -136,6 +136,9 @@ namespace hmLib {
 					// we have not reached the end, do another real step
 					if(boost::numeric::odeint::detail::less_with_sign(static_cast<Time>(st.current_time()+st.current_time_step()),end_time,st.current_time_step())) {
 						while(boost::numeric::odeint::detail::less_eq_with_sign(st.current_time(), time, dt)) {
+							if (ifr(st, system) ){
+								return st.current_time();
+							}
 							auto ans = ifr.do_step(st,system);
 
 							if(ans.first) {
@@ -150,9 +153,7 @@ namespace hmLib {
 								}
 								return st.current_time();
 							}
-							if (ifr(st, system) ){
-								return st.current_time();
-							}
+
 						}
 					} else if(boost::numeric::odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())) { // do the last step ending exactly on the end point
 						if (ifr.initialize(st, st.current_state(), st.current_time(), end_time - st.current_time())) {
@@ -160,6 +161,9 @@ namespace hmLib {
 							return time;
 						}
 
+						if (ifr(st, system) ){
+							return st.current_time();
+						}
 						auto ans = ifr.do_step(st, system);
 
 						if (ans.first) {
@@ -179,9 +183,6 @@ namespace hmLib {
 							return st.current_time();
 						}
 
-						if (ifr(st, system) ){
-							return st.current_time();
-						}
 
 					}
 

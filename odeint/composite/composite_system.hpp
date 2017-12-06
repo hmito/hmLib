@@ -140,12 +140,12 @@ namespace hmLib {
 				template<typename system_, bool has_base_system_ = has_base_system<system_>::value>
 				struct get_base_system {
 					template<typename T>
-					auto& operator()(T&& Sys) { return Sys; }
+					T& operator()(T&& Sys) { return Sys; }
 				};
 				template<typename system_>
 				struct get_base_system<system_,true> {
 					template<typename T>
-					auto& operator()(T&& Sys) { return Sys.base(); }
+					decltype(std::declval<T>().base())& operator()(T&& Sys) { return Sys.base(); }
 				};
 			}
 
@@ -238,7 +238,7 @@ namespace hmLib {
 					Require.require(x, dx, t);
 				}
 			public:
-				auto& base() { return detail::get_base_system<base_system>()(System); }
+				decltype(detail::get_base_system<base_system>()(System))& base() { return detail::get_base_system<base_system>()(System); }
 			};
 		}
 
@@ -249,7 +249,7 @@ namespace hmLib {
 				std::forward<condition>(Cond),
 				std::forward<sys>(Sys),
 				std::move(system_switch(Others...))
-				);
+			);
 		}
 		template<typename sys>
 		auto system_switch(sys Sys) { return Sys; }

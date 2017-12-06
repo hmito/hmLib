@@ -119,6 +119,9 @@ namespace hmLib {
 
 				while(boost::numeric::odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())) {
 					while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()), end_time,st.current_time_step())) {   
+						if (ifr(st, system)) {
+							return st.current_time();
+						}
 						//make sure we don't go beyond the end_time
 						auto ans = ifr.do_step(st,system);
 
@@ -130,9 +133,6 @@ namespace hmLib {
 						}
 						obs(st.current_state(), st.current_time());
 
-						if (ifr(st, system)) {
-							return st.current_time();
-						}
 					}
 					// calculate time step to arrive exactly at end time
 					if (ifr.initialize(st, st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()))) {
