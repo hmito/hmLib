@@ -5,6 +5,7 @@
 #include<type_traits>
 #include<boost/numeric/odeint/algebra/vector_space_algebra.hpp>
 #include"../utility.hpp"
+#include"../type_traits.hpp"
 namespace hmLib{
 	namespace odeint{
 		template<typename system_>
@@ -51,6 +52,26 @@ namespace hmLib{
 		template<typename stepper, typename sys, typename state_type, typename time_type>
 		void try_initialize(stepper& Stepper, sys&& Sys, state_type&& State, time_type Time, time_type dT) {
 			detail::try_initialize_impl<typename std::decay<stepper>::type, typename std::decay<sys>::type, typename std::decay<state_type>::type, typename std::decay<time_type>::type>()(Stepper, std::forward<sys>(Sys), std::forward<state_type>(State), Time, dT);
+		}
+
+		namespace detail {
+			template<typename state, hmLib_static_restrict(has_begin_and_end<state>::value)>
+			double abs_distance(const state& State1, const state& State2) {
+				auto itr1 = State1.begin();
+				auto end1 = State1.end();
+				auto itr2 = State2.begin();
+
+				double Max = 0;
+				for (; itr1 != end1; ++itr1, ++itr2) {
+					Max = std::max(Max, boost::numeric::odeint::vector_space_norm_inf<decltype(*itr1)>()(*itr1 - *itr2));
+				}
+
+				return Max;
+			}
+			template<typename state, hmLib_static_restrict(!has_begin_and_end<state>::value)>
+			double abs_distance(const state& State1, const state& State2) {
+				return boost::numeric::odeint::vector_space_norm_inf<state>()(State1 + (State2 * -1.0));
+			}
 		}
 	}
 }

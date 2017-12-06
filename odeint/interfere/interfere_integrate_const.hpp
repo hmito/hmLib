@@ -58,7 +58,7 @@ namespace hmLib {
 
 				Time time = start_time;
 				const Time time_step = dt;
-				int real_steps = 0;
+//				int real_steps = 0;
 				int step = 0;
 
 				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+time_step), end_time, dt)) {
@@ -84,7 +84,7 @@ namespace hmLib {
 							do {
 								res = ifr.try_step(st, system, start_state, step_start_time, dt);
 								fail_checker();  // check number of failed steps
-							} while((!res.first) && res.second == fail);
+							} while((!res.first) && res.second == boost::numeric::odeint::controlled_step_result::fail);
 							fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
 
 							if (res.first) {

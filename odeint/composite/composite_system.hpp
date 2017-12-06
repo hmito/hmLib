@@ -254,17 +254,6 @@ namespace hmLib {
 		template<typename sys>
 		auto system_switch(sys Sys) { return Sys; }
 
-		template<typename sys, typename require, typename... others>
-		auto system_compose(sys&& Sys, require&& Require, others... Others) {
-			static_assert(composite::is_require<typename std::decay<require>::type>::value, "require object is required.");
-			return system_compose(
-				composite::composite_system<typename std::decay<sys>::type, typename std::decay<require>::type>(
-					std::forward<sys>(Sys),
-					std::forward<require>(Require)
-					),
-				Others...
-			);
-		}
 		template<typename sys, typename require>
 		auto system_compose(sys&& Sys, require&& Require) {
 			static_assert(composite::is_require<typename std::decay<require>::type>::value, "require object is required.");
@@ -272,6 +261,17 @@ namespace hmLib {
 				std::forward<sys>(Sys),
 				std::forward<require>(Require)
 				);
+		}
+		template<typename sys, typename require, typename require2, typename... others>
+		auto system_compose(sys&& Sys, require&& Require, require2&& Require2, others... Others) {
+			static_assert(composite::is_require<typename std::decay<require>::type>::value, "require object is required.");
+			return system_compose(
+				composite::composite_system<typename std::decay<sys>::type, typename std::decay<require>::type>(
+					std::forward<sys>(Sys),
+					std::forward<require>(Require)
+				),
+				Require2, Others...
+			);
 		}
 
 	}

@@ -49,7 +49,7 @@ namespace hmLib {
 
 				if(boost::numeric::odeint::detail::less_with_sign(time, end_time, dt)) {   //make a last step to end exactly at end_time
 					ifr.do_step(st,system, start_state, time, end_time - time);
-					steps++;
+					step++;
 					obs(start_state, end_time);
 				}
 				return end_time;

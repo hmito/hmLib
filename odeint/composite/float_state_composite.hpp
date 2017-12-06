@@ -98,7 +98,7 @@ namespace hmLib {
 		auto case_greater_equal(state_type&& x) {
 			return composite::greater_equal_condition<typename std::decay<state_type>::type, time_type>(std::forward<state_type>(x));
 		}
-		template<typename state_type, typename time_type = double>
+/*		template<typename state_type, typename time_type = double>
 		auto case_greater(state_type&& x) {
 			return composite::greater_condition<typename std::decay<state_type>::type, time_type>(std::forward<state_type>(x));
 		}
@@ -109,7 +109,7 @@ namespace hmLib {
 		template<typename state_type, typename time_type = double>
 		auto case_less(state_type&& x) {
 			return composite::less_condition<typename std::decay<state_type>::type, time_type>(std::forward<state_type>(x));
-		}
+		}*/
 
 		template<typename state_type, typename time_type = double>
 		auto case_lower_boundary(state_type&& x) {
