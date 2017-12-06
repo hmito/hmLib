@@ -1,6 +1,7 @@
 ﻿#ifndef HMLIB_UTILITY_INC
 #define HMLIB_UTILITY_INC 100
 #
+#include<utility>
 /*===utility===
 主にオブジェクトの操作等に関わる汎用クラス/マクロ類を宣言する
 
