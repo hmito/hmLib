@@ -39,7 +39,7 @@ namespace hmLib {
 			std::copy(other.begin(), other.end(), Arr.begin());
 		}
 		template<typename U>
-		this_type& operator=(const varray<U, N>& Ototherher) {
+		this_type& operator=(const varray<U, N>& other) {
 			if(&other!=this) {
 				std::copy(other.begin(), other.end(), Arr.begin());
 			}
@@ -65,8 +65,8 @@ namespace hmLib {
 		constexpr const_reference front() const{ return Arr.front(); }
 		reference back() { return Arr.back(); }
 		constexpr const_reference back() const { return Arr.back(); }
-		T* data()noexcept { return return Arr.data(); }
-		const T* data()const noexcept { return return Arr.data(); }
+		T* data()noexcept { return Arr.data(); }
+		const T* data()const noexcept { return Arr.data(); }
 	public:
 		iterator begin() noexcept{ return Arr.begin(); }
 		const_iterator begin()const noexcept { return Arr.begin(); }
@@ -91,7 +91,6 @@ namespace hmLib {
 		this_type operator+()const { return *this; }
 		this_type operator-()const { 
 			this_type Ans = *this;
-			auto Beg = other.begin();
 			for(auto& v:*this) v = -v;
 			return Ans;
 		}
@@ -141,13 +140,13 @@ namespace hmLib {
 		}
 	public:
 		T sum()const{
-			return std::accumulate(std::next(begin()), std::end(), front());
+			return std::accumulate(std::next(begin()), end(), front());
 		}
 		T min()const {
-			return *std::min_element(begin(), std::end());
+			return *std::min_element(begin(), end());
 		}
 		T max()const {
-			return *std::max_element(begin(), std::end());
+			return *std::max_element(begin(), end());
 		}
 		template<typename func>
 		varray<decltype(std::declval<func>()(std::declval<T>())),N> apply(func Fn) {
@@ -237,101 +236,117 @@ namespace hmLib {
 	template<typename T, std::size_t N>
 	void swap(varray<T, N>& v1, varray<T, N>& v2)noexcept { std::swap(v1, v2); }
 	template<typename T, std::size_t N>
-	varray<decltype(std::sin(std::declval<T>())),N> sin(varray<T, N>& v){ 
+	varray<decltype(std::sin(std::declval<T>())),N> sin(const varray<T, N>& v){
 		varray<decltype(std::sin(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::sin(*(itr++));
+		for(auto& a:Ans)a = std::sin(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::cos(std::declval<T>())), N> cos(varray<T, N>& v) {
+	varray<decltype(std::cos(std::declval<T>())), N> cos(const varray<T, N>& v) {
 		varray<decltype(std::cos(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::cos(*(itr++));
+		for(auto& a:Ans)a = std::cos(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::tan(std::declval<T>())), N> tan(varray<T, N>& v) {
+	varray<decltype(std::tan(std::declval<T>())), N> tan(const varray<T, N>& v) {
 		varray<decltype(std::tan(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::tan(*(itr++));
+		for(auto& a:Ans)a = std::tan(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::asin(std::declval<T>())), N> asin(varray<T, N>& v) {
+	varray<decltype(std::asin(std::declval<T>())), N> asin(const varray<T, N>& v) {
 		varray<decltype(std::asin(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::asin(*(itr++));
+		for(auto& a:Ans)a = std::asin(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::acos(std::declval<T>())), N> acos(varray<T, N>& v) {
+	varray<decltype(std::acos(std::declval<T>())), N> acos(const varray<T, N>& v) {
 		varray<decltype(std::acos(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::acos(*(itr++));
+		for(auto& a:Ans)a = std::acos(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::atan(std::declval<T>())), N> atan(varray<T, N>& v) {
+	varray<decltype(std::atan(std::declval<T>())), N> atan(const varray<T, N>& v) {
 		varray<decltype(std::atan(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::atan(*(itr++));
+		for(auto& a:Ans)a = std::atan(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::sinh(std::declval<T>())), N> sinh(varray<T, N>& v) {
+	varray<decltype(std::sinh(std::declval<T>())), N> sinh(const varray<T, N>& v) {
 		varray<decltype(std::sinh(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::sinh(*(itr++));
+		for(auto& a:Ans)a = std::sinh(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::cosh(std::declval<T>())), N> cosh(varray<T, N>& v) {
+	varray<decltype(std::cosh(std::declval<T>())), N> cosh(const varray<T, N>& v) {
 		varray<decltype(std::cosh(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::cosh(*(itr++));
+		for(auto& a:Ans)a = std::cosh(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::tanh(std::declval<T>())), N> tanh(varray<T, N>& v) {
+	varray<decltype(std::tanh(std::declval<T>())), N> tanh(const varray<T, N>& v) {
 		varray<decltype(std::tanh(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::tanh(*(itr++));
+		for(auto& a:Ans)a = std::tanh(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::exp(std::declval<T>())), N> exp(varray<T, N>& v) {
+	varray<decltype(std::exp(std::declval<T>())), N> exp(const varray<T, N>& v) {
 		varray<decltype(std::exp(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::exp(*(itr++));
+		for(auto& a:Ans)a = std::exp(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::log(std::declval<T>())), N> log(varray<T, N>& v) {
+	varray<decltype(std::log(std::declval<T>())), N> log(const varray<T, N>& v) {
 		varray<decltype(std::log(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::log(*(itr++));
+		for(auto& a:Ans)a = std::log(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::log10(std::declval<T>())), N> log10(varray<T, N>& v) {
+	varray<decltype(std::log10(std::declval<T>())), N> log10(const varray<T, N>& v) {
 		varray<decltype(std::log10(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::log10(*(itr++));
+		for(auto& a:Ans)a = std::log10(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::sqrt(std::declval<T>())), N> sqrt(varray<T, N>& v) {
+	varray<decltype(std::sqrt(std::declval<T>())), N> sqrt(const varray<T, N>& v) {
 		varray<decltype(std::sqrt(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::sqrt(*(itr++));
+		for(auto& a:Ans)a = std::sqrt(*(itr++));
 		return Ans;
 	}
 	template<typename T, std::size_t N>
-	varray<decltype(std::abs(std::declval<T>())), N> abs(varray<T, N>& v) {
+	varray<decltype(std::abs(std::declval<T>())), N> abs(const varray<T, N>& v) {
 		varray<decltype(std::abs(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
-		for(auto& v:Ans)v = std::abs(*(itr++));
+		for(auto& a:Ans)a = std::abs(*(itr++));
+		return Ans;
+	}
+	template<typename T, std::size_t N>
+	decltype(std::sqrt(std::declval<T>()*std::declval<T>())) norm(const varray<T, N>& v) {
+		static_assert(N>0, "norm can be calculated only when N>0.");
+
+		auto Ans = v.front()* v.front();
+		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
+		return std::sqrt(Ans);
+	}
+	template<typename T, std::size_t N>
+	decltype(std::declval<T>()*std::declval<T>()) norm2(const varray<T, N>& v) {
+		static_assert(N>0, "norm can be calculated only when N>0.");
+
+		auto Ans = v.front()* v.front();
+		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
 		return Ans;
 	}
 }
