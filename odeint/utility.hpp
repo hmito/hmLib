@@ -72,6 +72,17 @@ namespace hmLib{
 			double abs_distance(const state& State1, const state& State2) {
 				return boost::numeric::odeint::vector_space_norm_inf<state>()(State1 + (State2 * -1.0));
 			}
+
+			template<typename state_type, typename argebra_type, typename operations_type>
+			double maximum_absolute_error(state_type& err, const state_type& v1, const state_type& v2) {
+				argebra_type::for_each3(err, v1, v2, typename operations_type::template scale_sum2<double, double>(1.0, -1.0));
+				return argebra_type::norm_inf(err);
+			}
+			template<typename state_type, typename argebra_type, typename operations_type>
+			double maximum_absolute_error(const state_type& v1, const state_type& v2) {
+				state_type err = v1;
+				return maximum_absolute_error(err, v1, v2);
+			}
 		}
 	}
 }

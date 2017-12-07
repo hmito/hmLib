@@ -126,7 +126,7 @@ namespace hmLib {
 						(*ritr++).update(*itr++, t);
 					}
 				}
-				bool valid(const state_type& x, time_type t)  {
+				bool valid_step(const state_type& x, time_type t)  {
 					auto ritr = std::begin(Req);
 					auto itr = std::begin(x);
 					auto end = std::end(x);
@@ -135,13 +135,16 @@ namespace hmLib {
 					}
 					return true;
 				}
-				void validate(state_type& x, time_type t) {
+				bool validate(state_type& x, time_type t) {
 					auto ritr = std::begin(Req);
 					auto itr = std::begin(x);
 					auto end = std::end(x);
+
+					bool ans = false;
 					while(itr!=end) {
-						(*ritr++).validate(*itr++, t);
+						ans |= (*ritr++).validate(*itr++, t);
 					}
+					return ans;
 				}
 				void require(const state_type& x, state_type& dx, time_type t)  {
 					auto ritr = std::begin(Req);

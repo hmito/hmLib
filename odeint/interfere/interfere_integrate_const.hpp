@@ -11,7 +11,8 @@
 #include <boost/numeric/odeint/util/copy.hpp>
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
-
+#include "interfere_type.hpp"
+#include "../utility.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
