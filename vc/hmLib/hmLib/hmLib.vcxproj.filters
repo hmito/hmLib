@@ -392,10 +392,13 @@
     <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_const.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\odeint\interfere\interfere_type.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere.hpp">
+    <ClInclude Include="..\..\..\odeint\utility.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
   </ItemGroup>
