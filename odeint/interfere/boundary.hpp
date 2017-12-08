@@ -2,8 +2,11 @@
 #
 namespace hmLib {
 	namespace odeint {
-		
-
+		struct bounadry_diff_mode {
+			struct always{};
+			struct step_base{};
+			struct never {};
+		};
 		template<typename state_type_>
 		struct sigmoid_boundary_diff{
 			template<typename functor>
@@ -30,6 +33,7 @@ namespace hmLib {
 				return vk / (1 + std::exp(-va*(x - boundary_error))) + bk / (1 + std::exp(ba*x)) + bv;
 			}
 		};
+		template<typename diff_type_,typename diff_mode_>
 		struct float_lower_boundary {
 			using state_type = double;
 		private:
