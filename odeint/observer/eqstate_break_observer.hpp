@@ -1,11 +1,11 @@
-﻿#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
+#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
 #define HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC 100
 #
 #include <array>
 #include <boost/geometry.hpp>
 #include "container_observer.hpp"
 #include "break_observer.hpp"
-#include "utility.hpp"
+#include "../utility.hpp"
 namespace hmLib{
 	namespace odeint{
 		namespace detail{
@@ -32,7 +32,7 @@ namespace hmLib{
 					Beg += IgnoreNum;
 
 					for(auto Itr = Beg; Itr != End; ++Itr){
-						if(detail::abs_distance(x, Itr->second) < Error){
+						if(hmLib::odeint::detail::abs_distance(x, Itr->second) < Error){
 							return true;
 						}
 					}

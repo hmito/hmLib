@@ -15,6 +15,11 @@ namespace hmLib{
 			template<typename state, typename time>
 			void operator()(const state& x, time t){ (*Itr++) = std::pair<time,state>(t,x); }
 		};
+		template<typename pair_iterator>
+		pair_iterator_observer<pair_iterator> make_pair_iterator_observer(pair_iterator Itr) {
+			return pair_iterator_observer<pair_iterator>(Itr);
+		}
+
 		template<typename state_iterator, typename time_iterator>
 		struct iterator_observer{
 		private:
@@ -57,10 +62,6 @@ namespace hmLib{
 		template<typename state_iterator,typename time_iterator>
 		iterator_observer<state_iterator, time_iterator> make_iterator_observer(state_iterator StateItr, time_iterator TimeItr){
 			return iterator_observer<state_iterator, time_iterator>(StateItr, TimeItr);
-		}
-		template<typename pair_iterator>
-		pair_iterator_observer<pair_iterator> make_pair_iterator_observer(pair_iterator Itr){
-			return pair_iterator_observer<pair_iterator>(Itr);
 		}
 	}
 }

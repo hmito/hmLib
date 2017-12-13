@@ -40,25 +40,22 @@
     <Filter Include="hmLib\typemanage">
       <UniqueIdentifier>{ea83acd1-4c16-498a-b87c-c4922d4fe42d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\odeint\observer">
+      <UniqueIdentifier>{e920b87d-d779-4464-a362-9503a938bdd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\odeint\composite">
+      <UniqueIdentifier>{0a3758b3-b1b8-40fd-835e-5e8624add2b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\odeint\interfere">
+      <UniqueIdentifier>{bfd5b6a4-9c20-462c-a96b-ae482a1d7bbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_factorial.cpp">
-      <Filter>ソースファイル</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\comgate.cpp">
       <Filter>hmLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cqueue.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cstack.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cstring.c">
-      <Filter>hmLib\ccontainer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ccontainer\cdeque.c">
-      <Filter>hmLib\ccontainer</Filter>
+    <ClCompile Include="use_odeint.cpp">
+      <Filter>ソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,30 +296,6 @@
     <ClInclude Include="..\..\..\lattices\utility.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\break_observer.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\container_observer.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\eqstate_break_observer.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\iterator_observer.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\range_stepper.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\stream_observer.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\utility.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\random\pair_normal_distribution.hpp">
       <Filter>hmLib\random</Filter>
     </ClInclude>
@@ -370,6 +343,66 @@
     </ClInclude>
     <ClInclude Include="..\..\..\varray.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\range_stepper.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\eqstate_break_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\break_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\container_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\composite_system.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\container_state_composite.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\composite_stepper.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\float_state_composite.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\composite\composite_logical.hpp">
+      <Filter>hmLib\odeint\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_adaptive.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_const.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\interfere_type.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\utility.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
