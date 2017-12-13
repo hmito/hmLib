@@ -401,7 +401,7 @@
     <ClInclude Include="..\..\..\odeint\utility.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp">
+    <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
   </ItemGroup>
