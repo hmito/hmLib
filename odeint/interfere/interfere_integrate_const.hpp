@@ -26,7 +26,7 @@ namespace hmLib {
 				typename boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
 
 				Time time = start_time;
-				TIme ostart_time = start_time
+				Time ostart_time = start_time;
 				const Time time_step = dt;
 				int step = 0;
 
@@ -53,7 +53,7 @@ namespace hmLib {
 								try_initialize(st, ifrsys, start_state, start_time, dt);
 							}
 
-							boost::numeric::odeint::controlled_step_result res;
+//							boost::numeric::odeint::controlled_step_result res;
 							Time pdt = dt;
 							do {
 								st.do_step(ifrsys, start_state, start_time, dt);
@@ -80,7 +80,7 @@ namespace hmLib {
 
 			template< class Stepper, class InterfereSystem, class State, class Time, class Observer >
 			Time interfere_integrate_const(
-				Stepper stepper, InterfereSystem ifrsys, , State &start_state,
+				Stepper stepper, InterfereSystem ifrsys, State &start_state,
 				Time start_time, Time end_time, Time dt, Time time_error,
 				Observer observer, boost::numeric::odeint::controlled_stepper_tag
 			) {
@@ -152,7 +152,7 @@ namespace hmLib {
 
 			template< class Stepper, class InterfereSystem, class State, class Time, class Observer >
 			Time interfere_integrate_const(
-				Stepper stepper, InterfereSystem ifrsys, , State &start_state,
+				Stepper stepper, InterfereSystem ifrsys, State &start_state,
 				Time start_time, Time end_time, Time dt, Time time_error,
 				Observer observer, boost::numeric::odeint::dense_output_stepper_tag
 			) {
@@ -179,7 +179,7 @@ namespace hmLib {
 							return st.current_time();
 						}
 						else if (ifr == interfere_request::initialize) {
-							st.initilize(start_state, st.current_time(), st.current_time_step());
+							st.initialize(start_state, st.current_time(), st.current_time_step());
 						}
 						st.do_step(ifrsys);
 					}else{
@@ -189,7 +189,7 @@ namespace hmLib {
 							return st.current_time();
 						}
 						else if (ifr == interfere_request::initialize) {
-							st.initilize(start_state, st.current_time(), end_time - st.current_time()));
+							st.initialize(start_state, st.current_time(), end_time - st.current_time());
 						}
 						else {
 							st.initialize(st.current_state(), st.current_time(), end_time - st.current_time());
@@ -197,7 +197,7 @@ namespace hmLib {
 						st.do_step(ifrsys);
 					}
 
-					if (!ifrsys.valid_step(st.current_state(), st.current_time()) {
+					if (!ifrsys.valid_step(st.current_state(), st.current_time())) {
 						auto AnsPair = boost::math::tools::bisect(
 							[&](Time t) {
 								st.calc_state(t, start_state);
@@ -219,7 +219,7 @@ namespace hmLib {
 						}
 
 						st.calc_state(prev_time, start_state);
-						st.initilize(start_state, prev_time, st.current_time_step());
+						st.initialize(start_state, prev_time, st.current_time_step());
 					}
 					else {
 						while (boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
@@ -238,16 +238,16 @@ namespace hmLib {
 			}
 		}
 
-		template< class Stepper, class System, class State, class Time, class Observer >
-		Time interfere_integrate_const(Stepper stepper, System system, State &start_state, Time start_time, Time end_time, Time dt, Time time_error, Observer observer) {
+		template< class Stepper, class InterfereSystem, class State, class Time, class Observer >
+		Time interfere_integrate_const(Stepper stepper, InterfereSystem ifrsys, State &start_state, Time start_time, Time end_time, Time dt, Time time_error, Observer observer) {
 			using stepper_category = typename boost::numeric::odeint::unwrap_reference<Stepper>::type::stepper_category;
-			return detail::interfere_integrate_const(stepper, system, start_state, start_time, end_time, dt, time_error, observer, stepper_category());
+			return detail::interfere_integrate_const(stepper, ifrsys, start_state, start_time, end_time, dt, time_error, observer, stepper_category());
 		}
 
-		template< class Stepper, class System, class State, class Time>
-		Time interfere_integrate_const(Stepper stepper, System system, State &start_state, Time start_time, Time end_time, Time dt, Time time_error) {
+		template< class Stepper, class InterfereSystem, class State, class Time>
+		Time interfere_integrate_const(Stepper stepper, InterfereSystem ifrsys, State &start_state, Time start_time, Time end_time, Time dt, Time time_error) {
 			using stepper_category = typename boost::numeric::odeint::unwrap_reference<Stepper>::type::stepper_category;
-			return detail::interfere_integrate_const(stepper, system, start_state, start_time, end_time, dt, time_error, boost::numeric::odeint::null_observer(), stepper_category());
+			return detail::interfere_integrate_const(stepper, ifrsys, start_state, start_time, end_time, dt, time_error, boost::numeric::odeint::null_observer(), stepper_category());
 		}
 	}
 }

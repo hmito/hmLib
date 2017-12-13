@@ -14,7 +14,7 @@ namespace hmLib {
 		public:
 			float_boundary(const state_type& val_) :val(val_) {}
 			float_boundary(state_type&& val_) :val(val_) {}
-		public://for composite system
+		public://for interfere system
 			void ready(const state_type& x) { prev = is_violated(x); }
 			bool valid_step(const state_type& x)const { return prev || !is_violated(x); }
 			bool validate(const state_type& x, state_type& vx) const {
@@ -42,13 +42,13 @@ namespace hmLib {
 		struct limited_diff_boundary : public float_boundary<condition_, state_type_> {
 			using base_type = float_boundary<condition_, state_type_>;
 			using state_type = state_type_;
-			using condition = typename float_lower_boundary::condition;
+			using condition = typename base_type::condition;
 		private:
 			state_type approximate_range;
 			state_type strength;
 		public:
-			limited_diff_boundary(state_type approximate_range_, state_type strength_)
-				: approximate_range(approximate_range_), strength(strength_) {
+			limited_diff_boundary(state_type val, state_type approximate_range_, state_type strength_)
+				: base_type(val), approximate_range(approximate_range_), strength(strength_) {
 			}
 			template<typename functor>
 			state_type operator()(state_type x, functor&& dx) {
@@ -72,19 +72,17 @@ namespace hmLib {
 		struct strict_limited_diff_boundary : public float_boundary<condition_, state_type_> {
 			using base_type = float_boundary<condition_, state_type_>;
 			using state_type = state_type_;
-			using condition = typename float_lower_boundary::condition;
+			using condition = typename base_type::condition;
 		private:
 			static constexpr double sign = (condition()(0.0, 1.0) ? 1.0 : -1.0);
 		private:
 			state_type approximate_range;
-			state_type absolute_error;
 			state_type strength;
 		public:
-			strict_limited_diff_boundary(state_type approximate_range_, state_type absolute_error_, state_type strength_)
-				: approximate_range(approximate_range_), absolute_error(absolute_error_), strength(strength_) {
+			strict_limited_diff_boundary(state_type val, state_type approximate_range_, state_type strength_)
+				: base_type(val), approximate_range(approximate_range_), strength(strength_) {
 			}
 		private:
-			template<typename functor>
 			state_type diff_validate(state_type x, state_type d) {
 				//Fix Upper/Lower limit value of diffenrential with zero
 				state_type tmp1 = strength*(approximate_range / (base_type::sign*(x - base_type::boundary()) + approximate_range) - 1);
@@ -117,6 +115,11 @@ namespace hmLib {
 				return diff_validate(x, dx(x));
 			}
 		};
+
+		using limited_diff_upper_bounadr = limited_diff_boundary< std::greater_equal<double>, double>;
+		using limited_diff_lower_bounadr = limited_diff_boundary< std::less_equal<double>, double>;
+		using strict_limited_diff_upper_bounadr = strict_limited_diff_boundary< std::greater_equal<double>, double>;
+		using strict_limited_diff_lower_bounadr = strict_limited_diff_boundary< std::less_equal<double>, double>;
 
 	}
 }

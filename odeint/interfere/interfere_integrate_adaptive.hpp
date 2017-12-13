@@ -44,7 +44,7 @@ namespace hmLib {
 						try_initialize(st, ifrsys, start_state, start_time, dt);
 					}
 
-					boost::numeric::odeint::controlled_step_result res;
+//					boost::numeric::odeint::controlled_step_result res;
 					Time pdt = dt;
 					do {
 						st.do_step(ifrsys, start_state, start_time, dt);
@@ -126,7 +126,7 @@ namespace hmLib {
 			template< class Stepper, class InterfereSystem, class State, class Time, class Observer >
 			Time interfere_integrate_adaptive(
 				Stepper stepper, InterfereSystem ifrsys, State &start_state,
-				Time start_time, Time end_time, Time dt,
+				Time start_time, Time end_time, Time dt, Time time_error,
 				Observer observer, boost::numeric::odeint::dense_output_stepper_tag) {
 
 				typename boost::numeric::odeint::unwrap_reference< Observer >::type &obs = observer;
@@ -145,7 +145,7 @@ namespace hmLib {
 						if (ifr == interfere_request::terminate) {
 							return st.current_time();
 						} else if(ifr == interfere_request::initialize){
-							st.initilize(start_state, st.current_time(), st.current_time_step());
+							st.initialize(start_state, st.current_time(), st.current_time_step());
 						}
 						start_time = st.current_time();
 						st.do_step(system);
@@ -160,11 +160,9 @@ namespace hmLib {
 							);
 							start_time = (AnsPair.first + AnsPair.second) / 2.;
 							st.calc_state(start_time, start_state);
-							st.initilize(start_state, start_time, st.current_time_step());
-						}
-						if (ifrsys(st.current_state(), st.current_time(), start_state, )) {
+							st.initialize(start_state, start_time, st.current_time_step());
 							obs(start_state, st.current_time());
-						} else {
+						}else {
 							obs(st.current_state(), st.current_time());
 						}
 					}
@@ -172,12 +170,9 @@ namespace hmLib {
 					st.initialize(st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()));
 				}
 
-				if (ifrsys(st.current_state(), st.current_time(), start_state, )) {
-					obs(start_state, st.current_time());
-				}
-				else {
-					obs(st.current_state(), st.current_time());
-				}
+
+				obs(st.current_state(), st.current_time());
+
 				// overwrite start_state with the final point
 				boost::numeric::odeint::copy(st.current_state(), start_state);
 				return st.current_time();
