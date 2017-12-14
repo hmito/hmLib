@@ -1,11 +1,13 @@
 #include<array>
 #include<iostream>
 #include<vector>
+#include<string>
 #include<boost/numeric/odeint.hpp>
 #include"../../../odeint/varray_wrapper.hpp"
 #include"../../../odeint.hpp"
 #include"../../../varray.hpp"
-
+#include"../../../tuple.hpp"
+/*
 std::ostream& operator<<(std::ostream& out, const hmLib::varray<double, 2>& v) {
 	out<<"("<<v[0]<<", "<<v[1]<<")";
 	return out;
@@ -68,5 +70,31 @@ int main() {
 	hode::interfere_integrate_const(Stepper, CmpSys, x, 0.0, 10.0, 0.1, Interferer, Observer);
 
 	system("pause");
+	return 0;
+}
+*/
+double f2(double a, double b) {
+	return a+b;
+}
+std::string f2(double a, int b) {
+	return "double_int";
+}
+int f2(int a, int b) {
+	return a+b;
+}
+std::string f2(const std::string& a, int b) {
+	std::string n;
+	for(int i = 0; i < b; ++i)n += a;
+	return n;
+}
+std::string f2(const std::string& a, const std::string& b) {
+	return a + b;
+}
+int main(void) {
+	auto Tuple1 = std::make_tuple(0.4, 0.7, "test", "std", 5);
+	auto Tuple2 = std::make_tuple(0.4, 5, "game", 4, 5);
+
+	auto A = hmLib::tuple_for_each([](auto a, auto b) {return f2(a,b); }, Tuple1, Tuple2);
+
 	return 0;
 }

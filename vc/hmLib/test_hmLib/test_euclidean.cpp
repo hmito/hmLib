@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
-#include <hmLib/euclidean.hpp>
+#include "../../../euclidean.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
