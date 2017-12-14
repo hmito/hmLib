@@ -1,5 +1,5 @@
-#ifndef HMLIB_ODEINT_INTERFERE_BOUNDARY_INC
-#define HMLIB_ODEINT_INTERFERE_BOUNDARY_INC
+#ifndef HMLIB_ODEINT_INTERFERE_FLOATBOUNDARY_INC
+#define HMLIB_ODEINT_INTERFERE_FLOATBOUNDARY_INC 100
 #
 #include<functional>
 namespace hmLib {
@@ -66,6 +66,8 @@ namespace hmLib {
 				return d;
 			}
 		};
+		using limited_diff_upper_bounadr = limited_diff_boundary< std::greater_equal<double>, double>;
+		using limited_diff_lower_bounadr = limited_diff_boundary< std::less_equal<double>, double>;
 
 		//This boundary requires that the differential equation dx can return mathematically valid value for inside of the range.
 		template<typename condition_, typename state_type_ = double>
@@ -115,9 +117,6 @@ namespace hmLib {
 				return diff_validate(x, dx(x));
 			}
 		};
-
-		using limited_diff_upper_bounadr = limited_diff_boundary< std::greater_equal<double>, double>;
-		using limited_diff_lower_bounadr = limited_diff_boundary< std::less_equal<double>, double>;
 		using strict_limited_diff_upper_bounadr = strict_limited_diff_boundary< std::greater_equal<double>, double>;
 		using strict_limited_diff_lower_bounadr = strict_limited_diff_boundary< std::less_equal<double>, double>;
 

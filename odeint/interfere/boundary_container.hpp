@@ -4,10 +4,10 @@
 #include<vector>
 namespace hmLib {
 	namespace odeint {
-		template<typename state_type_, typename boundary_>
-		struct boundary_container {
+		template<typename boundary_>
+		struct for_each_boundary{
 			using boundary_type = boundary_;
-			using state_type = state_type_;
+			using state_type = typename boundary_type::state_type;
 			using container = std::vector<boundary_type>;
 			using iterator = typename container::iterator;
 			using const_iterator = typename container::const_iterator;
@@ -15,8 +15,9 @@ namespace hmLib {
 			boundary_type Original;
 			container Container;
 		public:
-			boundary_container(boundary_type Original_):Original(std::move(Original_)){}
+			for_each_boundary(boundary_type Original_):Original(std::move(Original_)){}
 		public://for interfere system
+			template<typename state_type>
 			void ready(const state_type& x) { 
 				if(Container.size() != x.size()) {
 					Container.assign(x.size(), Original);
@@ -28,6 +29,7 @@ namespace hmLib {
 					bitr->ready(*itr);
 				}
 			}
+			template<typename state_type>
 			bool valid_step(const state_type& x)const {
 				auto itr = x.begin();
 
@@ -36,6 +38,7 @@ namespace hmLib {
 				}
 				return true;
 			}
+			template<typename state_type>
 			bool validate(const state_type& x, state_type& vx) const {
 				bool IsValidated = false;
 				auto itr = x.begin();
@@ -58,8 +61,8 @@ namespace hmLib {
 			boundary_type& at(std::size_t n) { return Container.at(n); }
 			const boundary_type& at(std::size_t n)const{ return Container.at(n); }
 		};
-		template<typename state_type, typename boundary>
-		auto make_boundary_container(const state_type& x, boundary b) {
+		template<typename boundary>
+		auto make_for_each_boundary(boundary b) {
 			return boundary_container<typename std::decay<state_type>::type, typename std::decay<boundary>::type>(std::move(b));
 		}
 	}
