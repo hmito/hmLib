@@ -5,7 +5,6 @@
 #include"interfere/interfere_integrate_const.hpp"
 #include"interfere/interfere_integrate_adaptive.hpp"
 #include"interfere/float_boundary.hpp"
-#include"interfere/container_boundary.hpp"
-#include"interfere/tuple_boundary.hpp"
+#include"interfere/boundary.hpp"
 #
 #endif

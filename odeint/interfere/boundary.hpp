@@ -37,13 +37,13 @@ namespace hmLib {
 			}
 		public:
 			template<std::size_t n>
-			auto& get() { return std::get<n>(Pair); }
+			auto& get() { return std::get<n>(Tuple); }
 			template<std::size_t n>
-			const auto& get()const { return std::get<n>(Pair); }
+			const auto& get()const { return std::get<n>(Tuple); }
 		};
 		template<typename... boundaries>
 		auto make_boundary_composite(boundaries... bs) {
-			return boundary_composite<typename std::decay<boundaries>::type...>(std;; forward<boundaries>(bs)...);
+			return boundary_composite<typename std::decay<boundaries>::type...>(std::forward<boundaries>(bs)...);
 		}
 
 		template<typename boundary_>
@@ -154,7 +154,7 @@ namespace hmLib {
 		};
 		template<typename boundary1, typename boundary2>
 		auto make_pair_boundary(boundary1 b1, boundary2 b2) {
-			return pair_boundary<typename std::decay<boundary1>::type, typename std::decay<boundary2>::type>(std;; forward<boundary1>(b1), std::forward<boundary2>(b2));
+			return pair_boundary<typename std::decay<boundary1>::type, typename std::decay<boundary2>::type>(std::forward<boundary1>(b1), std::forward<boundary2>(b2));
 		}
 
 		template<typename... boundaries>
@@ -186,13 +186,13 @@ namespace hmLib {
 			}
 		public:
 			template<std::size_t n>
-			auto& get() { return std::get<n>(Pair); }
+			auto& get() { return std::get<n>(Tuple); }
 			template<std::size_t n>
-			const auto& get()const { return std::get<n>(Pair); }
+			const auto& get()const { return std::get<n>(Tuple); }
 		};
 		template<typename... boundaries>
 		auto make_tuple_boundary(boundaries... bs) {
-			return tuple_boundary<typename std::decay<boundaries>::type...>(std;; forward<boundaries>(bs)...);
+			return tuple_boundary<typename std::decay<boundaries>::type...>(std::forward<boundaries>(bs)...);
 		}
 	}
 }

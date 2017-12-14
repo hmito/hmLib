@@ -32,8 +32,8 @@ namespace hmLib {
 			static constexpr double sign = (condition()(0.0, 1.0) ? 1.0 : -1.0);
 			bool is_violated(const state_type& x) const { return condition()(x, val); }
 		};
-		using float_upper_bounadr = float_boundary< std::greater_equal<double>, double> ;
-		using float_lower_bounadr = float_boundary< std::less_equal<double>, double>;
+		using float_upper_boundary = float_boundary< std::greater_equal<double>, double> ;
+		using float_lower_boundary = float_boundary< std::less_equal<double>, double>;
 
 		//This boundary requires that the differential equation dx can return mathematically valid value for both inside and outside of range.
 		//	i.e., the function return any value of [numeric_limits<state_type>::lowest(), numeric_limits<state_type>::max()] or inf, -inf.
@@ -66,8 +66,8 @@ namespace hmLib {
 				return d;
 			}
 		};
-		using limited_diff_upper_bounadr = limited_diff_boundary< std::greater_equal<double>, double>;
-		using limited_diff_lower_bounadr = limited_diff_boundary< std::less_equal<double>, double>;
+		using limited_diff_upper_boundary = limited_diff_boundary< std::greater_equal<double>, double>;
+		using limited_diff_lower_boundary = limited_diff_boundary< std::less_equal<double>, double>;
 
 		//This boundary requires that the differential equation dx can return mathematically valid value for inside of the range.
 		template<typename condition_, typename state_type_ = double>
@@ -117,8 +117,8 @@ namespace hmLib {
 				return diff_validate(x, dx(x));
 			}
 		};
-		using strict_limited_diff_upper_bounadr = strict_limited_diff_boundary< std::greater_equal<double>, double>;
-		using strict_limited_diff_lower_bounadr = strict_limited_diff_boundary< std::less_equal<double>, double>;
+		using strict_limited_diff_upper_boundary = strict_limited_diff_boundary< std::greater_equal<double>, double>;
+		using strict_limited_diff_lower_boundary = strict_limited_diff_boundary< std::less_equal<double>, double>;
 
 	}
 }
