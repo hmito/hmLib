@@ -380,14 +380,11 @@
     <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\tuple_boundary.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\container_boundary.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\tuple.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp">
+      <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
