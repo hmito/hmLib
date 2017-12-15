@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
-#include <hmLib/varray.hpp>
+#include "../../../varray.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {
