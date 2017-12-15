@@ -46,7 +46,7 @@ namespace hmLib{
 				Ans += Dif;
 				return Ans;
 			}
-			friend this_type operator+(const point_type& Dif, const this_type& Loc){ return operator+(Loc, Dif); }
+			friend this_type operator+(const point_type& Dif, const this_type& Loc){ return Loc+Dif; }
 			this_type& operator-=(const point_type& Dif){ Pos -= Dif;  return *this; }
 			friend this_type operator-(const this_type& Loc, const point_type& Dif){
 				auto Ans(Loc);
@@ -59,14 +59,14 @@ namespace hmLib{
 				Ans *= val;
 				return Ans;
 			}
-			friend this_type operator*(int val, const this_type& Loc){ return operator*(Loc, val); }
+			friend this_type operator*(int val, const this_type& Loc){ return Loc*val; }
 			this_type& operator*=(double val){ Pos *= val;  return *this; }
 			friend this_type operator*(const this_type& Loc, double val){
 				auto Ans(Loc);
 				Ans *= val;
 				return Ans;
 			}
-			friend this_type operator*(double  val, const this_type& Loc){ return operator*(Loc, val); }
+			friend this_type operator*(double  val, const this_type& Loc){ return Loc*val; }
 			this_type& operator/=(int val){ Pos /= val;  return *this; }
 			friend this_type operator/(const this_type& Loc, int val){
 				auto Ans(Loc);
@@ -134,7 +134,7 @@ namespace hmLib{
 				Ans += Dif;
 				return Ans;
 			}
-			friend this_type operator+(const point_type& Dif, const this_type& Loc){ return operator+(Loc, Dif); }
+			friend this_type operator+(const point_type& Dif, const this_type& Loc){ return Loc+Dif; }
 			this_type& operator-=(const point_type& Dif){ Pos -= Dif;  return *this; }
 			friend this_type operator-(const this_type& Loc, const point_type& Dif){
 				auto Ans(Loc);
@@ -147,14 +147,14 @@ namespace hmLib{
 				Ans *= val;
 				return Ans;
 			}
-			friend this_type operator*(int val, const this_type& Loc){ return operator*(Loc, val); }
+			friend this_type operator*(int val, const this_type& Loc){ return Loc*val; }
 			this_type& operator*=(double val){ Pos *= val;  return *this; }
 			friend this_type operator*(const this_type& Loc, double val){
 				auto Ans(Loc);
 				Ans *= val;
 				return Ans;
 			}
-			friend this_type operator*(double  val, const this_type& Loc){ return operator*(Loc, val); }
+			friend this_type operator*(double  val, const this_type& Loc){ return Loc*val; }
 			this_type& operator/=(int val){ Pos /= val;  return *this; }
 			friend this_type operator/(const this_type& Loc, int val){
 				auto Ans(Loc);
