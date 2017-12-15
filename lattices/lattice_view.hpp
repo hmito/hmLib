@@ -14,6 +14,7 @@
 namespace hmLib{
 	template<typename iterator_, unsigned int dim_, bool is_const = std::is_const<typename iterator_::value_type>::value>
 	struct lattice_view{
+    private:
 		using this_type = lattice_view<iterator_, dim_, is_const>;
 	public:
 		using iterator_base = iterator_;
