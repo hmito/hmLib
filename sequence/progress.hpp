@@ -11,11 +11,11 @@ namespace hmLib{
 		}
 		template<typename system, typename state, typename observer>
 		void progress(system System, state& State, unsigned int BeginStep, unsigned int EndStep, observer Observer){
-			while(BeginStep != EndStep){
-				System(State, BeginStep);
-				++BeginStep;
+			for(; BeginStep != EndStep; ++BeginStep){
 				Observer(State, BeginStep);
+				System(State, BeginStep);
 			}
+			Observer(State, BeginStep);
 		}
 	}
 }
