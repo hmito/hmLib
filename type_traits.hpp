@@ -44,6 +44,17 @@ namespace hmLib{
 		};
 		using type = typename check<terget, void>::ans_type;
 	};
+
+	namespace detail {
+		struct has_begin_and_end_impl {
+			template <class T>
+			static auto check(T&& x)->decltype(x.begin(), x.end(), std::true_type{});
+			template <class T>
+			static auto check(...)->std::false_type;
+		};
+	}
+	template <class T>
+	class has_begin_and_end :public decltype(detail::has_begin_and_end_impl::check<T>(std::declval<T>())) {};
 }
 #
 #endif

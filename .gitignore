@@ -188,3 +188,10 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 hmLib_config\.h
+
+
+*.db-shm
+*.db-wal
+*.db
+
+*.opendb
