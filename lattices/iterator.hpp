@@ -40,7 +40,7 @@ namespace hmLib{
 			reference operator[](diff_type Dif_){ return pLattice->at(pLattice->index_to_point(SeqNo + Dif_)); }
 			const_reference operator[](diff_type Dif_)const{ return pLattice->at(pLattice->index_to_point(SeqNo+ Dif_)); }
 		public:
-			locator locate(){ return pLattice->locate(index_to_point(SeqNo, pLattice->size())); }
+			locator locate(){ return pLattice->locate(pLattice->index_to_point(SeqNo)); }
 			operator locator(){ return locate(); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }
@@ -124,7 +124,7 @@ namespace hmLib{
 			pointer operator->()const{ return &(pLattice->at(pLattice->index_to_point(SeqNo))); }
 			reference operator[](diff_type Dif_)const{ return pLattice->at(pLattice->index_to_point(SeqNo+Dif_)); }
 		public:
-			locator locate(){ return pLattice->locate(index_to_point(SeqNo, pLattice->size())); }
+			locator locate(){ return pLattice->locate(pLattice-?index_to_point(SeqNo)); }
 			operator locator(){ return locate(); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }

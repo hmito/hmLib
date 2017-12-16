@@ -139,6 +139,64 @@ namespace hmLib {
 			return *this;
 		}
 	public:
+		friend bool operator==(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return false;
+			}
+			return true;
+		}
+		friend bool operator!=(const this_type& v1, const this_type& v2) {
+			return !(v1 == v2);
+		}
+		friend bool operator<(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] < v2[i];
+			}
+			return false;
+		}
+		friend bool operator<=(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] < v2[i];
+			}
+			return true;
+		}
+		friend bool operator > (const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] > v2[i];
+			}
+			return false;
+		}
+		friend bool operator>=(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] > v2[i];
+			}
+			return true;
+		}
+		friend bool operator<<(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(!(v1[i] < v2[i]))return false;
+			}
+			return true;
+		}
+		friend bool operator<<=(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(!(v1[i] <= v2[i]))return false;
+			}
+			return true;
+		}
+		friend bool operator>>(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(!(v1[i] > v2[i]))return false;
+			}
+			return true;
+		}
+		friend bool operator>>=(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(!(v1[i] >= v2[i]))return false;
+			}
+			return true;
+		}
+	public:
 		T sum()const{
 			return std::accumulate(std::next(begin()), end(), front());
 		}

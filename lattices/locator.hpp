@@ -21,7 +21,7 @@ namespace hmLib{
 			using point_type = typename indexer::point_type;
 		public:
 			basic_locator() = default;
-			basic_locator(iterator Begin_, point_type Pos_, indexer Indexer_) :Begin(Begin_), Pos(Pos_), Indexer(Indexer_){}
+			basic_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_){}
 			basic_locator(const this_type&) = default;
 			basic_locator(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
@@ -53,32 +53,6 @@ namespace hmLib{
 				Ans -= Dif;
 				return Ans;
 			}
-			this_type& operator*=(int val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(int val, const this_type& Loc){ return Loc*val; }
-			this_type& operator*=(double val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(double  val, const this_type& Loc){ return Loc*val; }
-			this_type& operator/=(int val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
-			this_type& operator/=(double val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
 				return Loc1.point() - Loc2.point();
 			}
@@ -94,14 +68,15 @@ namespace hmLib{
 			template<typename... args>
 			this_type plus(args... Args){ return *this + lattices::make_point(Args...); }
 		public:
-			point_type& point(){ return Pos; }
-			const point_type& point()const{ return Pos; }
-			point_type size()const{ return Indexer.size(); }
-			iterator get_base_iterator()const{ return Begin; }
+			iterator get_base_iterator()const { return Begin; }
+			const indexer& get_indexer()const { return Indexer; }
+			point_type& raw_point(){ return Pos; }
+			const point_type& raw_point()const{ return Pos; }
+			point_type raw_size()const{ return Indexer.size(); }
 		private:
 			iterator Begin;
-			point_type Pos;
 			indexer Indexer;
+			point_type Pos;
 		};
 		template<typename iterator_, typename indexer_>
 		struct basic_const_locator{
@@ -114,12 +89,12 @@ namespace hmLib{
 			using point_type = typename indexer::point_type;
 		public:
 			basic_const_locator() = default;
-			basic_const_locator(iterator Begin_, point_type Pos_, indexer Indexer_) :Begin(Begin_), Pos(Pos_), Indexer(Indexer_){}
+			basic_const_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_) {}
 			basic_const_locator(const this_type&) = default;
 			basic_const_locator(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
-			basic_const_locator(basic_locator<iterator_, indexer_> Locator) : Begin(Locator.Begin), Pos(Locator.Pos), Indexer(Locator.Indexer){}
+			basic_const_locator(basic_locator<iterator_, indexer_> Locator) : Begin(Locator.Begin), Indexer(Locator.Indexer), Pos(Locator.Pos) {}
 		public:
 			reference operator*()const{ return Begin[Indexer(Pos)]; }
 			pointer operator->()const{ return &(operator*()); }
@@ -141,32 +116,6 @@ namespace hmLib{
 				Ans -= Dif;
 				return Ans;
 			}
-			this_type& operator*=(int val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(int val, const this_type& Loc){ return Loc*val; }
-			this_type& operator*=(double val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(double  val, const this_type& Loc){ return Loc*val; }
-			this_type& operator/=(int val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
-			this_type& operator/=(double val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
 				return Loc1.point() - Loc2.point();
 			}
@@ -182,14 +131,15 @@ namespace hmLib{
 			template<typename... args>
 			this_type plus(args... Args){ return *this + lattices::make_point(Args...); }
 		public:
-			point_type& point(){ return Pos; }
-			const point_type& point()const{ return Pos; }
-			point_type size()const{ return Indexer.size(); }
-			iterator get_base_iterator()const{ return Begin; }
+			iterator get_base_iterator()const { return Begin; }
+			const indexer& get_indexer()const { return Indexer; }
+			point_type& raw_point(){ return Pos; }
+			const point_type& raw_point()const{ return Pos; }
+			point_type raw_size()const{ return Indexer.size(); }
 		private:
 			iterator Begin;
-			point_type Pos;
 			indexer Indexer;
+			point_type Pos;
 		};
 	}
 }
