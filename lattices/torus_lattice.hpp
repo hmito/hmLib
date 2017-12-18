@@ -1,5 +1,5 @@
-#ifndef HMLIB_LATTICES_LATTICE_INC
-#define HMLIB_LATTICES_LATTICE_INC 100
+#ifndef HMLIB_LATTICES_TORUSLATTICE_INC
+#define HMLIB_LATTICES_TORUSLATTICE_INC 100
 #
 #include<vector>
 #include<utility>
@@ -9,14 +9,14 @@
 #include"exceptions.hpp"
 #include"lattice_indexer.hpp"
 #include"iterator.hpp"
-#include"locator.hpp"
-#include"lattice_view.hpp"
+#include"torus_locator.hpp"
+#include"torus_lattice_view.hpp"
 
-namespace hmLib{
+namespace hmLib {
 	template<typename T, unsigned int dim_>
-	struct lattice {
+	struct torus_lattice {
 	private:
-		using this_type = lattice<T, dim_>;
+		using this_type = torus_lattice<T, dim_>;
 	public:
 		using data_type = std::vector<T>;
 	private:
@@ -36,8 +36,8 @@ namespace hmLib{
 		using const_pointer = typename std::add_const<pointer>::type;
 	public:
 		using indexer = lattices::lattice_indexer<dim_>;
-		using locator = lattices::basic_locator<iterator_base, indexer>;
-		using const_locator = lattices::basic_const_locator<iterator_base, indexer>;
+		using locator = lattices::basic_torus_locator<iterator_base, indexer>;
+		using const_locator = lattices::basic_const_torus_locator<iterator_base, indexer>;
 		using iterator = lattices::basic_iterator<this_type>;
 		using const_iterator = lattices::basic_const_iterator<this_type>;
 	public:
@@ -46,34 +46,34 @@ namespace hmLib{
 	public:
 		static constexpr unsigned int dim() { return dim_; }
 	public:
-		lattice() = default;
-		lattice(const this_type&) = default;
+		torus_lattice() = default;
+		torus_lattice(const this_type&) = default;
 		this_type& operator=(const this_type&) = default;
-		lattice(this_type&&) = default;
+		torus_lattice(this_type&&) = default;
 		this_type& operator=(this_type&&) = default;
-		lattice(const extent_type& Extent_)
+		torus_lattice(const extent_type& Extent_)
 			: Indexer(Extent_) {
 			Data.assign(Indexer.lattice_size());
 		}
-		lattice(const extent_type& Extent_, const_reference IniVal)
-			: Indexer(Extent_){
+		torus_lattice(const extent_type& Extent_, const_reference IniVal)
+			: Indexer(Extent_) {
 			Data.assign(Indexer.lattice_size(), IniVal);
 		}
-		lattice(const extent_type& Extent_, const data_type& Data_){
+		torus_lattice(const extent_type& Extent_, const data_type& Data_) {
 			resize(Extent_, Data_);
 		}
-		lattice(const extent_type& Extent_, data_type&& Data_){
+		torus_lattice(const extent_type& Extent_, data_type&& Data_) {
 			resize(Extent_, std::move(Data_));
 		}
 		template<typename input_iterator>
-		lattice(const extent_type& Extent_, input_iterator Begin, input_iterator End){
+		torus_lattice(const extent_type& Extent_, input_iterator Begin, input_iterator End) {
 			resize(Extent_, Begin, End);
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
-		reference at(const point_type& Point_) { return Data[Indexer.index(Point_ )]; }
+		reference at(const point_type& Point_) { return Data[Indexer.torus_index(Point_)]; }
 		//!Return const_reference of the elemtn at the given point with range check
-		const_reference at(const point_type& Point_)const { return Data[Indexer.index(Point_)]; }
+		const_reference at(const point_type& Point_)const { return Data[Indexer.torus_index(Point_)]; }
 		//!Return reference of the elemtn at the given elements point with range check
 		template<typename... others>
 		reference at(index_type Pos_, others... Others_) {
@@ -85,9 +85,9 @@ namespace hmLib{
 			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
-		reference operator[](const point_type& Point_) { return Data[Indexer(Point_)]; }
+		reference operator[](const point_type& Point_) { return Data[Indexer.torus_index(Point_)]; }
 		//!Return const_reference of the elemtn at the given point
-		const_reference operator[](const point_type& Point_)const { return Data[Indexer(Point_)]; }
+		const_reference operator[](const point_type& Point_)const { return Data[Indexer.torus_index(Point_)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
 		reference ref(index_type Pos_, others... Others_) {
@@ -171,7 +171,7 @@ namespace hmLib{
 			Data = std::move(Data_);
 		}
 		template<typename input_iterator>
-		void resize(const extent_type& Extent_, input_iterator Begin, input_iterator End){
+		void resize(const extent_type& Extent_, input_iterator Begin, input_iterator End) {
 			indexer NewIndexer(Extent_);
 			hmLib_assert(std::distance(Begin, End) >= NewIndexer.lattice_size(), lattices::invalid_range, "The given Data is smaller than the lattice size.");
 			Indexer = NewIndexer;
@@ -179,7 +179,7 @@ namespace hmLib{
 		}
 		const data_type& data()const { return Data; }
 		data_type release() {
-			auto ReturnData = std::move(Data); 
+			auto ReturnData = std::move(Data);
 			Indexer.resize(extent_type(0));
 			Data.clear();
 			return std::move(ReturnData);
@@ -190,12 +190,12 @@ namespace hmLib{
 	};
 
 	template<typename T, typename... others>
-	auto make_lattice(const T& inival, lattices::size_type Size, others... Others) {
-		return lattice<typename std::decay<T>::type, sizeof...(others)>(inival, Size, Others...);
+	auto make_torus_lattice(const T& inival, lattices::size_type Size, others... Others) {
+		return torus_lattice<typename std::decay<T>::type, sizeof...(others)>(inival, Size, Others...);
 	}
 	template<typename T, unsigned int dim>
-	auto make_lattice(const T& inival, const lattices::extent_type<dim>& Extent) {
-		return lattice<typename std::decay<T>::type, dim>(inival, Extent);
+	auto make_torus_lattice(const T& inival, const lattices::extent_type<dim>& Extent) {
+		return torus_lattice<typename std::decay<T>::type, dim>(inival, Extent);
 	}
 }
 #

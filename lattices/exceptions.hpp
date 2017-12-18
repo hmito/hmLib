@@ -7,8 +7,8 @@ namespace hmLib{
 		struct exception_tag{};
 		using exception = hmLib::exceptions::exception_pattern<exception_tag>;
 		using out_of_range_access = hmLib::exceptions::access::out_of_range_access<exception>;
-		struct invalid_view_range_exception_tag{};
-		using invalid_view_range = hmLib::exceptions::exception_pattern<invalid_view_range_exception_tag, exception>;
+		struct invalid_range_exception_tag {};
+		using invalid_range = hmLib::exceptions::exception_pattern<invalid_range_exception_tag, exception>;
 	}
 }
 #

@@ -66,7 +66,7 @@ namespace hmLib {
 			}
 			//Get point from index value with checking over range
 			point_type point(index_type Index)const {
-				hmLib_assert(0 <= Index && Index <size(), lattices::out_of_range_access, "Requested index is out of lattice.");
+				hmLib_assert(0 <= Index && Index <extent(), lattices::out_of_range_access, "Requested index is out of lattice.");
 				return calc_point(Index);
 			}
 			//Get point from index value without checking over range

@@ -48,7 +48,7 @@ namespace hmLib{
 			, Indexer(Extent_)
 			, Pos()
 			, Extent(Extent_){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
+			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_range, "The given range is smaller than the lattice size.");
 		}
 		torus_lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const extent_type& Extent_)
 			: Begin(Begin_)
@@ -177,7 +177,7 @@ namespace hmLib{
 			, Indexer(Extent_)
 			, Pos()
 			, Extent(Extent_){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
+			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_range, "The given range is smaller than the lattice size.");
 		}
 		torus_lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const extent_type& Extent_)
 			: Begin(Begin_)

@@ -48,14 +48,14 @@ namespace hmLib{
 			, Indexer(Extent_)
 			, Pos(0)
 			, Extent(Extent_){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
+			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_range, "The given range is smaller than the lattice size.");
 		}
 		lattice_view(iterator_base Begin_, indexer Indexer, const point_type& Pos_, const extent_type& Extent_)
 			: Begin(Begin_)
 			, Indexer(Indexer)
 			, Pos(Pos_)
 			, Extent(Extent_) {
-			hmLib_assert(point_type(0) <<= Pos_ && Pos_+ Extent_ <<= Indexer.extent(), lattices::invalid_view_range, "range of sublattice is out of lattice");
+			hmLib_assert(point_type(0) <<= Pos_ && Pos_+ Extent_ <<= Indexer.extent(), lattices::invalid_range, "range of sublattice is out of lattice");
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
@@ -174,14 +174,14 @@ namespace hmLib{
 			, Indexer(Extent_)
 			, Pos(0)
 			, Extent(Extent_){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
+			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_range, "The given range is smaller than the lattice size.");
 		}
 		lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const extent_type& Extent_)
 			: Begin(Begin_)
 			, Indexer(Indexer_)
 			, Pos(Pos_)
 			, Extent(Extent_) {
-			hmLib_assert(point_type(0) <<= Pos_ && Pos_ + Extent_ <<= Indexer.extent(), lattices::invalid_view_range, "range of sublattice is out of lattice");
+			hmLib_assert(point_type(0) <<= Pos_ && Pos_ + Extent_ <<= Indexer.extent(), lattices::invalid_range, "range of sublattice is out of lattice");
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
