@@ -46,7 +46,6 @@
     <ClInclude Include="..\..\..\enumerators\numeric_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\random_algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\traversal_ability.hpp" />
-    <ClInclude Include="..\..\..\euclidean.hpp" />
     <ClInclude Include="..\..\..\exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\access_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\application_exceptions.hpp" />
@@ -69,6 +68,7 @@
     <ClInclude Include="..\..\..\lattices.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
+    <ClInclude Include="..\..\..\lattices\lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\locator.hpp" />

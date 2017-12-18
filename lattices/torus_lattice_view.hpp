@@ -18,7 +18,8 @@ namespace hmLib{
 		using this_type = torus_lattice_view<iterator_, dim_, is_const>;
 	public:
 		using iterator_base = iterator_;
-		using point_type = lattices::point<dim_>;
+		using point_type = lattices::point_type<dim_>;
+		using extent_type = lattices::extent_type<dim_>;
 		using size_type = lattices::size_type;
 		using diff_type = lattices::diff_type;
 		using index_type = lattices::index_type;
@@ -42,26 +43,18 @@ namespace hmLib{
 		this_type& operator=(const this_type&) = default;
 		torus_lattice_view(this_type&&) = default;
 		this_type& operator=(this_type&&) = default;
-		template<typename... others>
-		torus_lattice_view(iterator_base Begin_, iterator_base End_, others... Others_)
+		torus_lattice_view(iterator_base Begin_, iterator_base End_, const extent_type& Extent_)
 			: Begin(Begin_)
-			, Indexer(lattices::make_point(Size_, Others_...))
+			, Indexer(Extent_)
 			, Pos()
-			, Size(lattices::make_point(Size_, Others_...)){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<diff_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
+			, Extent(Extent_){
+			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
 		}
-		torus_lattice_view(iterator_base Begin_, iterator_base End_, const point_type& Size_)
-			: Begin(Begin_)
-			, Indexer(Size_)
-			, Pos()
-			, Size(Size_){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<diff_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
-		}
-		torus_lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const point_type& Size_)
+		torus_lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const extent_type& Extent_)
 			: Begin(Begin_)
 			, Indexer(Indexer)
 			, Pos(Pos_)
-			, Size(Size_) {
+			, Extent(Extent_) {
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
@@ -70,13 +63,13 @@ namespace hmLib{
 		const_reference at(const point_type& Point_)const{ return Begin[Indexer.torus_index(Point_ + Pos)]; }
 		//!Return reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		reference at(diff_type Pos_, others... Others_){
-			return at(lattices::make_point(Pos_, Others_...));
+		reference at(index_type Pos_, others... Others_){
+			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return const_reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		const_reference at(diff_type Pos_, others... Others_)const{
-			return at(lattices::make_point(Pos_, Others_...));
+		const_reference at(index_type Pos_, others... Others_)const{
+			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
 		reference operator[](const point_type& Point_){ return Begin[Indexer.torus_index(Point_ + Pos)]; }
@@ -84,21 +77,21 @@ namespace hmLib{
 		const_reference operator[](const point_type& Point_)const { return Begin[Indexer.torus_index(Point_ + Pos)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		reference ref(diff_type Pos_, others... Others_){
-			return operator[](lattices::make_point(Pos_, Others_...));
+		reference ref(index_type Pos_, others... Others_){
+			return operator[](lattices::point(Pos_, Others_...));
 		}
 		//!Return const_reference of the elemtn at the given elements point
 		template<typename... others>
-		const_reference ref(diff_type Pos_, others... Others_)const{
-			return operator[](lattices::make_point(Pos_, Others_...));
+		const_reference ref(index_type Pos_, others... Others_)const{
+			return operator[](lattices::point(Pos_, Others_...));
 		}
 	public:
 		//!Get number of elements included in the lattice
-		size_type lattice_size()const { return indexer(Size).lattice_size(); }
+		size_type lattice_size()const { return indexer(Extent).lattice_size(); }
 		//!Get point_type Size
-		const point_type& size()const { return Size; }
+		const extent_type& extent()const { return Extent; }
 		//!Return Point from Index value
-		point_type index_to_point(diff_type Index)const { return indexer(Size).point(Index); }
+		point_type index_to_point(index_type Index)const { return indexer(Extent).point(Index); }
 		//!Return Point inside of the torus
 		point_type translate_for_torus(const point_type& Point)const{
 			return Indexer.translate_for_torus(Point);
@@ -123,21 +116,21 @@ namespace hmLib{
 		const_locator locate(const point_type& Point_)const{ return const_locator(Begin, Indexer, Point_ + Pos); }
 		//!Return locator of given point elements
 		template<typename... others>
-		locator locate(diff_type Pos_, others... Others_){ return locate(lattices::make_point(Pos_, Others_...)); }
+		locator locate(index_type Pos_, others... Others_){ return locate(lattices::point(Pos_, Others_...)); }
 		//!Return const locator of given point elements
 		template<typename... others>
-		const_locator locate(diff_type Pos_, others... Others_)const{ return locate(lattices::make_point(Pos_, Others_...)); }
+		const_locator locate(index_type Pos_, others... Others_)const{ return locate(lattices::point(Pos_, Others_...)); }
 		//!Return locator of (0,0,0...)
-		locator front_locate(){ return locate(lattices::point<dim_>(0)); }
+		locator front_locate(){ return locate(point_type(0)); }
 		//!Return locator of (0,0,0...)
-		const_locator front_locate()const{ return locate(lattices::point<dim_>(0)); }
+		const_locator front_locate()const{ return locate(point_type(0)); }
 		//!Return locator of (size-1)
-		locator back_locate(){ return locate(size() + lattices::point<dim_>(-1)); }
+		locator back_locate(){ return locate(extent() + point_type(-1)); }
 		//!Return const locator of (size-1)
-		const_locator back_locate()const{ return locate(size() + lattices::point<dim_>(-1)); }
+		const_locator back_locate()const{ return locate(extent() + point_type(-1)); }
 	public:
-		this_type sublattice(point_type Point_, point_type Size_){
-			return this_type(Begin, Indexer, Point_, Size_);
+		this_type subview(const point_type& Point_, const extent_type& Extent_){
+			return this_type(Begin, Indexer, Point_, Extent_);
 		}
 	private:
 		//!Begin iterator of the original (i.e. first order) lattice
@@ -147,14 +140,15 @@ namespace hmLib{
 		//!Front point on the original (i.e. first order) lattice
 		point_type Pos;
 		//!Size of lattice
-		point_type Size;
+		extent_type Extent;
 	};
 	template<typename iterator_, unsigned int dim_>
 	struct torus_lattice_view<iterator_, dim_, true>{
 		using this_type = torus_lattice_view<iterator_, dim_, true>;
 	public:
 		using iterator_base = iterator_;
-		using point_type = lattices::point<dim_>;
+		using point_type = lattices::point_type<dim_>;
+		using extent_type = lattices::extent_type<dim_>;
 		using size_type = lattices::size_type;
 		using diff_type = lattices::diff_type;
 		using index_type = lattices::index_type;
@@ -178,49 +172,41 @@ namespace hmLib{
 		this_type& operator=(const this_type&) = default;
 		torus_lattice_view(this_type&&) = default;
 		this_type& operator=(this_type&&) = default;
-		template<typename... others>
-		torus_lattice_view(iterator_base Begin_, iterator_base End_, index_type Size_, others... Others_)
+		torus_lattice_view(iterator_base Begin_, iterator_base End_, const extent_type& Extent_)
 			: Begin(Begin_)
-			, Indexer(lattices::make_point(Size_, Others_...))
+			, Indexer(Extent_)
 			, Pos()
-			, Size(lattices::make_point(Size_, Others_...)){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<diff_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
+			, Extent(Extent_){
+			hmLib_assert(std::distance(Begin_, End_) >= static_cast<index_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
 		}
-		torus_lattice_view(iterator_base Begin_, iterator_base End_, const point_type& Size_)
-			: Begin(Begin_)
-			, Indexer(Size_)
-			, Pos()
-			, Size(Size_){
-			hmLib_assert(std::distance(Begin_, End_) >= static_cast<diff_type>(lattice_size()), lattices::invalid_view_range, "The given range is smaller than the lattice size.");
-		}
-		torus_lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const point_type& Size_)
+		torus_lattice_view(iterator_base Begin_, const indexer& Indexer_, const point_type& Pos_, const extent_type& Extent_)
 			: Begin(Begin_)
 			, Indexer(Indexer_)
 			, Pos(Pos_)
-			. Size(Size_){
+			, Extent(Extent_){
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
 		reference at(const point_type& Point_)const{ return Begin[Indexer.torus_index(Point_ + Pos)]; }
 		//!Return reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		reference at(diff_type Pos_, others... Others_)const{
-			return at(lattices::make_point(Pos_, Others_...));
+		reference at(index_type Pos_, others... Others_)const{
+			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
 		reference operator[](const point_type& Point_)const{ return Begin[Indexer.torus_index(Point_ + Pos)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		reference ref(diff_type Pos_, others... Others_)const{
-			return operator[](lattices::make_point(Pos_, Others_...));
+		reference ref(index_type Pos_, others... Others_)const{
+			return operator[](lattices::point(Pos_, Others_...));
 		}
 	public:
 		//!Get number of elements included in the lattice
-		size_type lattice_size()const { return indexer(Size).lattice_size(); }
+		size_type lattice_size()const { return indexer(Extent).lattice_size(); }
 		//!Get point_type Size
-		const point_type& size()const { return Size; }
+		const point_type& extent()const { return Extent; }
 		//!Return Point from Index value
-		point_type index_to_point(diff_type Index)const { return indexer(Size).point(Index); }
+		point_type index_to_point(index_type Index)const { return indexer(Extent).point(Index); }
 		//!Return Point inside of the torus
 		point_type translate_for_torus(const point_type& Point)const {
 			return Indexer.translate_for_torus(Point);
@@ -235,14 +221,14 @@ namespace hmLib{
 		locator locate(const point_type& Point_)const{ return locator(Begin, Indexer, Point_ + Pos); }
 		//!Return locator of given point elements
 		template<typename... others>
-		locator locate(diff_type Pos_, others... Others_)const{ return locate(lattices::make_point(Pos_, Others_...)); }
+		locator locate(index_type Pos_, others... Others_)const{ return locate(lattices::point(Pos_, Others_...)); }
 		//!Return locator of (0,0,0...)
-		locator front_locate()const{ return locate(lattices::point<dim_>(0)); }
+		locator front_locate()const{ return locate(point_type(0)); }
 		//!Return locator of (size-1)
-		locator back_locate()const{ return locate(size() + lattices::point<dim_>(-1)); }
+		locator back_locate()const{ return locate(extent() + point_type(-1)); }
 	public:
-		this_type sublattice(point_type Point_, point_type Size_){
-			return this_type(Begin, Indexer, Point_, Size_);
+		this_type subview(const point_type& Point_, const extent_type& Extent_){
+			return this_type(Begin, Indexer, Point_, Extent_);
 		}
 	private:
 		//!Begin iterator of the original (i.e. first order) lattice
@@ -252,26 +238,26 @@ namespace hmLib{
 		//!Front point on the original (i.e. first order) lattice
 		point_type Pos;
 		//!Size of lattice
-		point_type Size;
+		extent_type Extent;
 	};
 
 	template<typename iterator, typename... others>
-	auto make_torus_lattice_view(iterator Begin, iterator End, lattices::index_type Size, others... Others){
+	auto make_torus_lattice_view(iterator Begin, iterator End, lattices::size_type Size, others... Others){
 		return torus_lattice_view<iterator, sizeof...(others)>(Begin, End, Size, Others...);
 	}
 	template<typename iterator, unsigned int dim>
-	auto make_torus_lattice_view(iterator Begin, iterator End, const lattices::point<dim>& Size){
-		return torus_lattice_view<iterator, dim>(Begin, End, Size);
+	auto make_torus_lattice_view(iterator Begin, iterator End, const lattices::extent_type<dim>& Extent){
+		return torus_lattice_view<iterator, dim>(Begin, End, Extent);
 	}
 
 	template<typename iterator, typename indexer>
-	auto sublattice(const lattices::basic_torus_locator<iterator, indexer>& Lat1, const lattices::basic_torus_locator<iterator, indexer>& Lat2){
+	auto subview(const lattices::basic_torus_locator<iterator, indexer>& Lat1, const lattices::basic_torus_locator<iterator, indexer>& Lat2){
 		return torus_lattice_view<iterator, indexer::dim(), std::is_const<typename iterator::value_type>::value>(
 			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), Lat2.raw_point() - Lat1.raw_point() + lattices::point<indexer::dim()>(1)
 		);
 	}
 	template<typename iterator, typename indexer>
-	auto sublattice(const lattices::basic_const_torus_locator<iterator, indexer>& Lat1, const lattices::basic_const_torus_locator<iterator, indexer>& Lat2){
+	auto subview(const lattices::basic_const_torus_locator<iterator, indexer>& Lat1, const lattices::basic_const_torus_locator<iterator, indexer>& Lat2){
 		return torus_lattice_view<iterator, indexer::dim(), true>(
 			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), Lat2.raw_point() - Lat1.raw_point() + lattices::point<indexer::dim()>(1)
 		);

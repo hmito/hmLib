@@ -12,24 +12,26 @@ namespace hmLib {
 		template<unsigned int dim_>
 		struct lattice_indexer {
 			using this_type = lattice_indexer<dim_>;
-			using point_type = point<dim_>;
+			using point_type = lattices::point_type<dim_>;
+			using extnt_type = lattices::extent_type<dim_>;
+			using index_type = lattices::index_type;
 		public:
 			static constexpr unsigned int dim() { return dim_; }
 		public:
-			lattice_indexer() : Size() {}
-			lattice_indexer(const point_type& Size_) : Size(Size_){}
+			lattice_indexer() : Extent(0) {}
+			lattice_indexer(const extnt_type& Extent_) : Extent(Extent_){}
 			lattice_indexer(const this_type&) = default;
 			lattice_indexer(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
 			//!Get number of elements included in the lattice
-			size_type lattice_size()const { return std::accumulate(Size.begin(), Size.end(), 1, [](int v1, int v2)->int {return v1*v2; }); }
-			//!Get point_type Size
-			point_type size()const {return Size;}
-			//!Set point_type Size and Gap
-			void resize(const point_type& Size_) {
-				Size = Size_;
+			size_type lattice_size()const { return std::accumulate(Extent.begin(), Extent.end(), 1, [](int v1, int v2)->int {return v1*v2; }); }
+			//!Get point_type Extent
+			const extnt_type& extent()const {return Extent;}
+			//!Set point_type Extent and Gap
+			void resize(const extnt_type& Extent_) {
+				Extent = Extent_;
 			}
 		public:
 			//Get index value from point without checking over range.
@@ -38,33 +40,33 @@ namespace hmLib {
 				index_type Step = 1;
 				for(unsigned int i = 0; i < dim_; ++i) {
 					Index += Point_[i] * Step;
-					Step *= Size[i];
+					Step *= Extent[i];
 				}
 
 				return Index;
 			}
 			//Get index value from point with checking over range.
 			index_type index(const point_type& Point_)const {
-				hmLib_assert((lattices::point<dim_>(0) <<= Point_) && (Point_ << Size), lattices::out_of_range_access, "Requested point is out of lattice.");
+				hmLib_assert((lattices::point<dim_>(0) <<= Point_) && (Point_ << Extent), lattices::out_of_range_access, "Requested point is out of lattice.");
 				return operator()(Point_);
 			}
 			//Get index value from point without checking over range.
 			index_type operator()(const point_type& Point_)const {
-				return index_nocheck();
+				return calc_index();
 			}
 			//Get point from index value without checking over range
 			point_type calc_point(index_type Index)const {
 				point_type Pos;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Pos[i] = (Index%Size[i]);
-					Index /= Size[i];
+					Pos[i] = (Index%Extent[i]);
+					Index /= Extent[i];
 				}
 
 				return Pos;
 			}
 			//Get point from index value with checking over range
 			point_type point(index_type Index)const {
-				hmLib_assert(0 <= Index && Index <lattice_size(), lattices::out_of_range_access, "Requested index is out of lattice.");
+				hmLib_assert(0 <= Index && Index <size(), lattices::out_of_range_access, "Requested index is out of lattice.");
 				return calc_point(Index);
 			}
 			//Get point from index value without checking over range
@@ -75,13 +77,13 @@ namespace hmLib {
 			point_type translate_for_torus(const point_type& Point)const {
 				point_type Ans = Point;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Ans[i] = positive_mod(Ans[i], Size[i]);
+					Ans[i] = positive_mod(Ans[i], Extent[i]);
 				}
 				return Ans;
 			}
 			void fit_for_torus(point_type& Point) {
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Point[i] = positive_mod(Point[i], Size[i]);
+					Point[i] = positive_mod(Point[i], Extent[i]);
 				}
 			}
 			//Get index value from torus point
@@ -89,7 +91,7 @@ namespace hmLib {
 				return calc_index(translate_for_torus(Point_));
 			}
 		private:
-			point_type Size;
+			extnt_type Extent;
 		};
 	}
 }
