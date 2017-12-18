@@ -23,7 +23,7 @@ namespace hmLib{
 		using extent_type = varray<size_type, dim_>;
 		template<typename ...others>
 		auto extent(others... Others) {
-			return point_type<sizeof...(others)>{static_cast<size_type>(Others)...};
+			return extent_type<sizeof...(others)>{static_cast<size_type>(Others)...};
 		}
 	}
 }

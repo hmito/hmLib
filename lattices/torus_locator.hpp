@@ -57,7 +57,7 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.point() - Loc2.point();
+				return Loc1.raw_point() - Loc2.raw_point();
 			}
 			friend point_type distance(const this_type& Loc1, const this_type& Loc2) {
 				point_type v1 = Loc1.raw_torus_point();
@@ -76,7 +76,7 @@ namespace hmLib{
 				return Ans;
 			}
 		public:
-			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.torus_point() == Loc2.torus_point(); }
+			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.raw_torus_point() == Loc2.raw_torus_point(); }
 			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
@@ -91,7 +91,7 @@ namespace hmLib{
 			const indexer& get_indexer()const { return Indexer; }
 			point_type& raw_point(){ return Pos; }
 			const point_type& raw_point()const{ return Pos; }
-			point_type raw_torus_point() { return translate_for_torus(Pos); }
+			point_type raw_torus_point()const { return translate_for_torus(Pos); }
 			const extent_type& raw_extent()const{ return Indexer.extent(); }
 		private:
 			//!Return Point inside of the torus
@@ -144,7 +144,7 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.point() - Loc2.point();
+				return Loc1.raw_point() - Loc2.raw_point();
 			}
 			friend point_type distance(const this_type& Loc1, const this_type& Loc2){
 				point_type v1 = Loc1.raw_torus_point();

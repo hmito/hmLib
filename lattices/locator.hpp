@@ -56,7 +56,7 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.point() - Loc2.point();
+				return Loc1.raw_point() - Loc2.raw_point();
 			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
@@ -121,7 +121,7 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.point() - Loc2.point();
+				return Loc1.raw_point() - Loc2.raw_point();
 			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }

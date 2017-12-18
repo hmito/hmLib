@@ -243,7 +243,7 @@ namespace hmLib{
 
 	template<typename iterator, typename... others>
 	auto make_torus_lattice_view(iterator Begin, iterator End, lattices::size_type Size, others... Others){
-		return torus_lattice_view<iterator, sizeof...(others)>(Begin, End, Size, Others...);
+		return make_torus_lattice_view(Begin, End, lattices::extent(Size, Others...));
 	}
 	template<typename iterator, unsigned int dim>
 	auto make_torus_lattice_view(iterator Begin, iterator End, const lattices::extent_type<dim>& Extent){
@@ -253,13 +253,13 @@ namespace hmLib{
 	template<typename iterator, typename indexer>
 	auto subview(const lattices::basic_torus_locator<iterator, indexer>& Lat1, const lattices::basic_torus_locator<iterator, indexer>& Lat2){
 		return torus_lattice_view<iterator, indexer::dim(), std::is_const<typename iterator::value_type>::value>(
-			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), Lat2.raw_point() - Lat1.raw_point() + lattices::point<indexer::dim()>(1)
+			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), Lat2.raw_point() - Lat1.raw_point() + typename indexer::point_type(1)
 		);
 	}
 	template<typename iterator, typename indexer>
 	auto subview(const lattices::basic_const_torus_locator<iterator, indexer>& Lat1, const lattices::basic_const_torus_locator<iterator, indexer>& Lat2){
 		return torus_lattice_view<iterator, indexer::dim(), true>(
-			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), Lat2.raw_point() - Lat1.raw_point() + lattices::point<indexer::dim()>(1)
+			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), Lat2.raw_point() - Lat1.raw_point() + typename indexer::point_type(1)
 		);
 	}
 }

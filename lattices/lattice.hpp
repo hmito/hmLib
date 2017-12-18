@@ -191,7 +191,7 @@ namespace hmLib{
 
 	template<typename T, typename... others>
 	auto make_lattice(const T& inival, lattices::size_type Size, others... Others) {
-		return lattice<typename std::decay<T>::type, sizeof...(others)>(inival, Size, Others...);
+		return lattice<typename std::decay<T>::type, sizeof...(others)>(inival, lattices::extent(Size, Others...));
 	}
 	template<typename T, unsigned int dim>
 	auto make_lattice(const T& inival, const lattices::extent_type<dim>& Extent) {
