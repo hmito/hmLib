@@ -81,11 +81,11 @@ namespace hmLib{
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
 			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif){ return *this + (Dif); }
+			this_type plus(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
 			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
 			template<typename... args>
-			this_type plus(args... Args){ return *this + lattices::point(Args...); }
+			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
 		public:
 			iterator get_base_iterator()const { return Begin; }
 			const indexer& get_indexer()const { return Indexer; }
@@ -168,11 +168,11 @@ namespace hmLib{
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
 			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif){ return *this + (Dif); }
+			this_type plus(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
 			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
 			template<typename... args>
-			this_type plus(args... Args){ return *this + lattices::point(Args...); }
+			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
 		public:
 			iterator get_base_iterator()const { return Begin; }
 			const indexer& get_indexer()const { return Indexer; }
