@@ -139,6 +139,40 @@ namespace hmLib {
 			return *this;
 		}
 	public:
+		friend bool operator==(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return false;
+			}
+			return true;
+		}
+		friend bool operator!=(const this_type& v1, const this_type& v2) {
+			return !(v1 == v2);
+		}
+		friend bool operator<(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] < v2[i];
+			}
+			return false;
+		}
+		friend bool operator<=(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] < v2[i];
+			}
+			return true;
+		}
+		friend bool operator > (const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] > v2[i];
+			}
+			return false;
+		}
+		friend bool operator>=(const this_type& v1, const this_type& v2) {
+			for(unsigned int i = 0; i < N; ++i) {
+				if(v1[i] != v2[i])return v1[i] > v2[i];
+			}
+			return true;
+		}
+	public:
 		T sum()const{
 			return std::accumulate(std::next(begin()), end(), front());
 		}
@@ -167,6 +201,34 @@ namespace hmLib {
 	bool operator>(const varray<T, N>& v1, const varray<U, N>& v2) { return v1>v2; }
 	template<typename T, typename U, std::size_t N>
 	bool operator>=(const varray<T, N>& v1, const varray<U, N>& v2) { return v1>=v2; }
+	template<typename T, typename U, std::size_t N>
+	bool all_less_equal_than(const varray<T, N>& v1, const varray<U, N>& v2) {
+		for(std::size_t i = 0; i < v1.size(); ++i) {
+			if(v1[i] > v2[i])return false;
+		}
+		return true;
+	}
+	template<typename T, typename U, std::size_t N>
+	bool all_less_than(const varray<T, N>& v1, const varray<U, N>& v2) {
+		for(std::size_t i = 0; i < v1.size(); ++i) {
+			if(v1[i] >= v2[i])return false;
+		}
+		return true;
+	}
+	template<typename T, typename U, std::size_t N>
+	bool all_greater_equal_than(const varray<T, N>& v1, const varray<U, N>& v2) {
+		for(std::size_t i = 0; i < v1.size(); ++i) {
+			if(v1[i] < v2[i])return false;
+		}
+		return true;
+	}
+	template<typename T, typename U, std::size_t N>
+	bool all_greater_than(const varray<T, N>& v1, const varray<U, N>& v2) {
+		for(std::size_t i = 0; i < v1.size(); ++i) {
+			if(v1[i] <= v2[i])return false;
+		}
+		return true;
+	}
 	template<typename T, typename U, std::size_t N>
 	varray<decltype(std::declval<T>()+std::declval<U>()), N> operator+(const varray<T, N>& v1, const varray<U, N>& v2) {
 		varray<decltype(std::declval<T>()+std::declval<U>()), N> Ans(v1);

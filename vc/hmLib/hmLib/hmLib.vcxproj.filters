@@ -143,9 +143,6 @@
     <ClInclude Include="..\..\..\enumerators.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\euclidean.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\exceptions.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -385,6 +382,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\torus_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -13,15 +13,17 @@ namespace hmLib{
 		public:
 			using this_type = basic_locator<iterator_, indexer_>;
 			using iterator = iterator_;
-			using indexer = indexer_;
 			using reference = typename iterator::reference;
 			using const_reference = typename std::add_const<reference>::type;
 			using pointer = typename iterator::pointer;
 			using const_pointer = typename std::add_const<pointer>::type;
+		public:
+			using indexer = indexer_;
 			using point_type = typename indexer::point_type;
+			using extent_type = typename indexer::extent_type;
 		public:
 			basic_locator() = default;
-			basic_locator(iterator Begin_, point_type Pos_, indexer Indexer_) :Begin(Begin_), Pos(Pos_), Indexer(Indexer_){}
+			basic_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_){}
 			basic_locator(const this_type&) = default;
 			basic_locator(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
@@ -36,9 +38,9 @@ namespace hmLib{
 			reference at(const point_type& Pos_){ return Begin[Indexer.index(Pos + Pos_)]; }
 			const_reference at(const point_type& Pos_)const{ return Begin[Indexer.index(Pos + Pos_)]; }
 			template<typename... args>
-			reference at(args... Args){ return at(lattices::make_point(Args...)); }
+			reference at(args... Args){ return at(lattices::point(Args...)); }
 			template<typename... args>
-			const_reference at(args... Args)const{ return at(lattices::make_point(Args...)); }
+			const_reference at(args... Args)const{ return at(lattices::point(Args...)); }
 		public:
 			this_type& operator+=(const point_type& Dif){ Pos += Dif;  return *this; }
 			friend this_type operator+(const this_type& Loc, const point_type& Dif){
@@ -53,34 +55,8 @@ namespace hmLib{
 				Ans -= Dif;
 				return Ans;
 			}
-			this_type& operator*=(int val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(int val, const this_type& Loc){ return Loc*val; }
-			this_type& operator*=(double val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(double  val, const this_type& Loc){ return Loc*val; }
-			this_type& operator/=(int val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
-			this_type& operator/=(double val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.point() - Loc2.point();
+				return Loc1.raw_point() - Loc2.raw_point();
 			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
@@ -88,45 +64,48 @@ namespace hmLib{
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
 			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif){ return *this + (Dif); }
+			this_type plus(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
-			this_type& add(args... Args){ return operator+=(lattices::make_point(Args...)); }
+			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
 			template<typename... args>
-			this_type plus(args... Args){ return *this + lattices::make_point(Args...); }
+			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
 		public:
-			point_type& point(){ return Pos; }
-			const point_type& point()const{ return Pos; }
-			point_type size()const{ return Indexer.size(); }
-			iterator get_base_iterator()const{ return Begin; }
+			iterator get_base_iterator()const { return Begin; }
+			const indexer& get_indexer()const { return Indexer; }
+			point_type& raw_point(){ return Pos; }
+			const point_type& raw_point()const{ return Pos; }
+			const extent_type& raw_extent()const{ return Indexer.extent(); }
 		private:
 			iterator Begin;
-			point_type Pos;
 			indexer Indexer;
+			point_type Pos;
 		};
 		template<typename iterator_, typename indexer_>
 		struct basic_const_locator{
 		public:
 			using this_type = basic_const_locator<iterator_, indexer_>;
 			using iterator = iterator_;
-			using indexer = indexer_;
 			using pointer = typename iterator::pointer;
 			using reference = typename iterator::reference;
+		public:
+			using indexer = indexer_;
 			using point_type = typename indexer::point_type;
+			using extent_type = typename indexer::extent_type;
 		public:
 			basic_const_locator() = default;
-			basic_const_locator(iterator Begin_, point_type Pos_, indexer Indexer_) :Begin(Begin_), Pos(Pos_), Indexer(Indexer_){}
+			basic_const_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_) {}
 			basic_const_locator(const this_type&) = default;
 			basic_const_locator(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
-			basic_const_locator(basic_locator<iterator_, indexer_> Locator) : Begin(Locator.Begin), Pos(Locator.Pos), Indexer(Locator.Indexer){}
+			basic_const_locator(basic_locator<iterator_, indexer_> Locator) : Begin(Locator.Begin), Indexer(Locator.Indexer), Pos(Locator.Pos) {}
 		public:
 			reference operator*()const{ return Begin[Indexer(Pos)]; }
 			pointer operator->()const{ return &(operator*()); }
 			reference operator[](const point_type& Pos_)const{ return Begin[Indexer(Pos + Pos_)]; }
 			reference at(const point_type& Pos_)const{ return Begin[Indexer.index(Pos + Pos_)]; }
 			template<typename... args>
-			reference at(args... Args)const{ return at(lattices::make_point(Args...)); }
+			reference at(args... Args)const{ return at(lattices::point(Args...)); }
 		public:
 			this_type& operator+=(const point_type& Dif){ Pos += Dif;  return *this; }
 			friend this_type operator+(const this_type& Loc, const point_type& Dif){
@@ -141,34 +120,8 @@ namespace hmLib{
 				Ans -= Dif;
 				return Ans;
 			}
-			this_type& operator*=(int val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(int val, const this_type& Loc){ return Loc*val; }
-			this_type& operator*=(double val){ Pos *= val;  return *this; }
-			friend this_type operator*(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans *= val;
-				return Ans;
-			}
-			friend this_type operator*(double  val, const this_type& Loc){ return Loc*val; }
-			this_type& operator/=(int val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, int val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
-			this_type& operator/=(double val){ Pos /= val;  return *this; }
-			friend this_type operator/(const this_type& Loc, double val){
-				auto Ans(Loc);
-				Ans /= val;
-				return Ans;
-			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.point() - Loc2.point();
+				return Loc1.raw_point() - Loc2.raw_point();
 			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
@@ -176,20 +129,21 @@ namespace hmLib{
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
 			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif){ return *this + (Dif); }
+			this_type plus(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
-			this_type& add(args... Args){ return operator+=(lattices::make_point(Args...)); }
+			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
 			template<typename... args>
-			this_type plus(args... Args){ return *this + lattices::make_point(Args...); }
+			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
 		public:
-			point_type& point(){ return Pos; }
-			const point_type& point()const{ return Pos; }
-			point_type size()const{ return Indexer.size(); }
-			iterator get_base_iterator()const{ return Begin; }
+			iterator get_base_iterator()const { return Begin; }
+			const indexer& get_indexer()const { return Indexer; }
+			point_type& raw_point(){ return Pos; }
+			const point_type& raw_point()const{ return Pos; }
+			const extent_type& raw_extent()const{ return Indexer.extent(); }
 		private:
 			iterator Begin;
-			point_type Pos;
 			indexer Indexer;
+			point_type Pos;
 		};
 	}
 }
