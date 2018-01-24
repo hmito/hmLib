@@ -7,6 +7,23 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
+TEST_CLASS(test_lattice_utility) {
+public:
+	TEST_METHOD(point) {
+		auto Point = lattices::point(2, 3, 4);
+		Assert::AreEqual(3u, Point.size(), L"point size error");
+		Assert::AreEqual(2, Point[0], L"value error");
+		Assert::AreEqual(3, Point[1], L"value error");
+		Assert::AreEqual(4, Point[2], L"value error");
+	}
+	TEST_METHOD(extent) {
+		auto Point = lattices::extent(2, 3, 4);
+		Assert::AreEqual(3u, Point.size(), L"point size error");
+		Assert::AreEqual(2u, Point[0], L"value error");
+		Assert::AreEqual(3u, Point[1], L"value error");
+		Assert::AreEqual(4u, Point[2], L"value error");
+	}
+};
 
 TEST_CLASS(test_lattice_view){
 public:
@@ -120,16 +137,16 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
-auto lotr = Lattice.front_locate();
-auto blotr = Lattice.locate(7, 5);
+		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		auto lotr = Lattice.front_locate();
+		auto blotr = Lattice.locate(7, 5);
 
-auto Dif = lotr - blotr;
-Assert::AreEqual(-7, Dif[0]);
-Assert::AreEqual(-5, Dif[1]);
+		auto Dif = lotr - blotr;
+		Assert::AreEqual(-7, Dif[0]);
+		Assert::AreEqual(-5, Dif[1]);
 
-lotr -= Dif;
-Assert::IsTrue(lotr == blotr);
+		lotr -= Dif;
+		Assert::IsTrue(lotr == blotr);
 	}
 	TEST_METHOD(subview){
 		using container = std::vector<int>;
@@ -799,4 +816,175 @@ public:
 	}
 };
 
+TEST_CLASS(test_lattice) {
+public:
+	TEST_METHOD(default_construct) {
+		lattice<int, 2> Lat;
+		Assert::IsTrue(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(0u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(0u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(0u, Lat.lattice_size(), L"Initial size error.");
+	}
+	TEST_METHOD(extent_construct){
+		lattice<int, 2> Lat(lattices::extent(3, 4),1);
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(1, Lat.at(0, 0), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 0), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(1, 2), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(0, 3), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 3), L"Ini Value error.");
+	}
+	TEST_METHOD(extent_construct_3d) {
+		lattice<int, 3> Lat(lattices::extent(3, 4, 5), 1);
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(5u, Lat.extent()[2], L"Initial size error.");
+		Assert::AreEqual(60u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(1, Lat.at(0, 0, 0), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 0, 1), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(1, 2, 2), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(0, 3, 4), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 3, 4), L"Ini Value error.");
+	}
+	TEST_METHOD(itr_construct) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		lattice<int, 2> Lat(lattices::extent(3, 4), Vec.begin(), Vec.end());
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(0, Lat.at(0, 0), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(2, 0), L"Ini Value error.");
+		Assert::AreEqual(9, Lat.at(0, 3), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(2, 3), L"Ini Value error.");
+	}
+	TEST_METHOD(datamove_construct) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		lattice<int, 2> Lat(lattices::extent(3, 4), std::move(Vec));
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(0, Lat.at(0, 0), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(2, 0), L"Ini Value error.");
+		Assert::AreEqual(9, Lat.at(0, 3), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(2, 3), L"Ini Value error.");
+	}
+	TEST_METHOD(locate) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		lattice<int, 2> Lat(lattices::extent(3, 4), std::move(Vec));
+		auto Ltr1 = Lat.front_locate();
+		auto Ltr2 = Lat.back_locate();
+		Assert::AreEqual(0, *Ltr1);
+		Assert::AreEqual(11, *Ltr2);
+		Assert::AreEqual((Ltr2 - Ltr1)[0], 2);
+		Assert::AreEqual((Ltr2 - Ltr1)[1], 3);
+	}
+	TEST_METHOD(out_of_range) {
+		lattice<int, 2> Lat(lattices::extent(3, 4), 0);
+		Assert::ExpectException<lattices::out_of_range_access>([&]() {Lat.at(0, -1); });
+		Assert::ExpectException<lattices::out_of_range_access>([&]() {Lat.at(-1, 0); });
+		Assert::ExpectException<lattices::out_of_range_access>([&]() {Lat.at(3, 0); });
+		Assert::ExpectException<lattices::out_of_range_access>([&]() {Lat.at(0, 4); });
+		Assert::ExpectException<lattices::out_of_range_access>([&]() {Lat.at(3, 4); });
+	}
+};
+
+TEST_CLASS(test_torus_lattice) {
+public:
+	TEST_METHOD(default_construct) {
+		torus_lattice<int, 2> Lat;
+		Assert::IsTrue(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(0u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(0u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(0u, Lat.lattice_size(), L"Initial size error.");
+	}
+	TEST_METHOD(extent_construct) {
+		torus_lattice<int, 2> Lat(lattices::extent(3, 4), 1);
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(1, Lat.at(0, 0), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 0), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(1, 2), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(0, 3), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 3), L"Ini Value error.");
+	}
+	TEST_METHOD(extent_construct_3d) {
+		torus_lattice<int, 3> Lat(lattices::extent(3, 4, 5), 1);
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(5u, Lat.extent()[2], L"Initial size error.");
+		Assert::AreEqual(60u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(1, Lat.at(0, 0, 0), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 0, 1), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(1, 2, 2), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(0, 3, 4), L"Ini Value error.");
+		Assert::AreEqual(1, Lat.at(2, 3, 4), L"Ini Value error.");
+	}
+	TEST_METHOD(itr_construct) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		torus_lattice<int, 2> Lat(lattices::extent(3, 4), Vec.begin(), Vec.end());
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(0, Lat.at(0, 0), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(2, 0), L"Ini Value error.");
+		Assert::AreEqual(9, Lat.at(0, 3), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(2, 3), L"Ini Value error.");
+	}
+	TEST_METHOD(datamove_construct) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		torus_lattice<int, 2> Lat(lattices::extent(3, 4), std::move(Vec));
+		Assert::IsFalse(Lat.empty(), L"Empty error.");
+		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
+		Assert::AreEqual(0, Lat.at(0, 0), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(2, 0), L"Ini Value error.");
+		Assert::AreEqual(9, Lat.at(0, 3), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(2, 3), L"Ini Value error.");
+	}
+	TEST_METHOD(locate) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		torus_lattice<int, 2> Lat(lattices::extent(3, 4), std::move(Vec));
+		auto Ltr1 = Lat.front_locate();
+		auto Ltr2 = Lat.back_locate();
+		Assert::AreEqual(0, *Ltr1);
+		Assert::AreEqual(11, *Ltr2);
+		Assert::AreEqual((Ltr2 - Ltr1)[0], 2);
+		Assert::AreEqual((Ltr2 - Ltr1)[1], 3);
+	}
+	TEST_METHOD(out_of_range) {
+		std::vector<int> Vec(12, 0);
+		int n = 0;
+		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
+		torus_lattice<int, 2> Lat(lattices::extent(3, 4), std::move(Vec));
+		Assert::AreEqual(11, Lat.at(-1, -1), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(-4, -5), L"Ini Value error.");
+		Assert::AreEqual(0, Lat.at(-3, -4), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(-1, 0), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(-1, -8), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(-4, 8), L"Ini Value error.");
+	}
+};
 }

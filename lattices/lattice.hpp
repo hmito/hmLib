@@ -31,7 +31,7 @@ namespace hmLib{
 	public:
 		using value_type = T;
 		using reference = typename std::add_lvalue_reference<T>::type;
-		using const_reference = typename std::add_const<reference>::type;
+		using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
 		using pointer = typename std::add_pointer<T>::type;
 		using const_pointer = typename std::add_const<pointer>::type;
 	public:
@@ -51,10 +51,6 @@ namespace hmLib{
 		this_type& operator=(const this_type&) = default;
 		lattice(this_type&&) = default;
 		this_type& operator=(this_type&&) = default;
-		lattice(const extent_type& Extent_)
-			: Indexer(Extent_) {
-			Data.assign(Indexer.lattice_size());
-		}
 		lattice(const extent_type& Extent_, const_reference IniVal)
 			: Indexer(Extent_){
 			Data.assign(Indexer.lattice_size(), IniVal);
@@ -173,7 +169,7 @@ namespace hmLib{
 		template<typename input_iterator>
 		void resize(const extent_type& Extent_, input_iterator Begin, input_iterator End){
 			indexer NewIndexer(Extent_);
-			hmLib_assert(std::distance(Begin, End) >= NewIndexer.lattice_size(), lattices::invalid_range, "The given Data is smaller than the lattice size.");
+			hmLib_assert(static_cast<size_type>(std::distance(Begin, End)) >= NewIndexer.lattice_size(), lattices::invalid_range, "The given Data is smaller than the lattice size.");
 			Indexer = NewIndexer;
 			Data.assign(Begin, End);
 		}

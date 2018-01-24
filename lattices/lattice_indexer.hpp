@@ -47,7 +47,7 @@ namespace hmLib {
 			}
 			//Get index value from point with checking over range.
 			index_type index(const point_type& Point_)const {
-				hmLib_assert((point_type(0) <<= Point_) && (Point_ << Extent), lattices::out_of_range_access, "Requested point is out of lattice.");
+				hmLib_assert((all_less_equal_than(point_type(0),Point_) && all_less_than(Point_, static_cast<point_type>(Extent))), lattices::out_of_range_access, "Requested point is out of lattice.");
 				return operator()(Point_);
 			}
 			//Get index value from point without checking over range.
@@ -77,13 +77,13 @@ namespace hmLib {
 			point_type translate_for_torus(const point_type& Point)const {
 				point_type Ans = Point;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Ans[i] = positive_mod(Ans[i], Extent[i]);
+					Ans[i] = positive_mod<index_type>(Ans[i], Extent[i]);
 				}
 				return Ans;
 			}
 			void fit_for_torus(point_type& Point) {
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Point[i] = positive_mod(Point[i], Extent[i]);
+					Point[i] = positive_mod<index_type>(Point[i], Extent[i]);
 				}
 			}
 			//Get index value from torus point
