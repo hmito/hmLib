@@ -392,5 +392,8 @@
     <ClInclude Include="..\..\..\axis.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

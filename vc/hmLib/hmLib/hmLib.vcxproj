@@ -66,6 +66,7 @@
     <ClInclude Include="..\..\..\inquiries\signal_inquiry.hpp" />
     <ClInclude Include="..\..\..\inquiries\unique_connections.hpp" />
     <ClInclude Include="..\..\..\iocsv.hpp" />
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
