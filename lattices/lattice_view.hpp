@@ -237,11 +237,16 @@ namespace hmLib{
 
 	template<typename iterator, typename... others>
 	auto make_lattice_view(iterator Begin, iterator End, lattices::size_type Size, others... Others){
-		return make_lattice_view(Begin, End, lattices::extent(Size, Others...));
+		auto Extent = lattices::extent(Size, Others...);
+		return lattice_view<iterator, sizeof...(others)+1, std::is_const<typename iterator::value_type>::value>(
+			Begin, End, Extent
+		);
 	}
 	template<typename iterator, unsigned int dim>
 	auto make_lattice_view(iterator Begin, iterator End, const lattices::extent_type<dim>& Extent){
-		return lattice_view<iterator, dim>(Begin, End, Extent);
+		return lattice_view<iterator, dim, std::is_const<typename iterator::value_type>::value>(
+			Begin, End, Extent
+		);
 	}
 
 	template<typename iterator, typename indexer>
