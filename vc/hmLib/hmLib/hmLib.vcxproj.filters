@@ -389,5 +389,8 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\axis.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
