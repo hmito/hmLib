@@ -121,9 +121,12 @@ namespace hmLib {
 		value_type min()const { return Min; }
 		value_type max()const { return Max; }
 		difference_type width()const { return Max - Min; }
+		difference_type grid_width()const { return width() / (size()-1); }
 		std::size_t size()const { return Size; }
 		bool empty()const { return Size == 0; }
-		value_type operator[](std::size_t Index)const { return (Min*(Size - 1 - Index) + Max*Index) / (Size - 1); }
+		value_type operator[](std::size_t Index)const { 
+			return (Min*(Size - 1 - Index) + Max*Index) / (Size - 1); 
+		}
 		value_type at(index_type Index)const {
 			hmLib_assert(Index < Size, hmLib::access_exceptions::out_of_range_access, "Out of axis range.");
 			return operator[](Index);
