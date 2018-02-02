@@ -30,8 +30,17 @@ namespace hmLib {
 		container Arr;
 	public:
 		varray() :Arr() {}
-		varray(std::initializer_list<T> il) {
-			std::copy(il.begin(), il.end(), Arr.begin());
+		varray(std::initializer_list<T> il)noexcept {
+			auto out = Arr.begin();
+
+			auto itr = il.begin();
+
+			while(out != Arr.end() && itr != il.end()) {
+				*out = *itr;
+				++out;
+				++itr;
+			}
+
 		}
 		explicit varray(const T& val) { Arr.fill(val); }
 		template<typename U>
