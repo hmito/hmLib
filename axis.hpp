@@ -13,7 +13,7 @@ namespace hmLib {
 	public:
 		using value_type = T;
 		using difference_type = decltype(std::declval<T>() - std::declval<T>());
-		using index_type = std::size_t;
+		using index_type = unsigned long long;
 	public:
 		struct iterator {
 		public:
@@ -24,14 +24,14 @@ namespace hmLib {
 			using iterator_category = std::random_access_iterator_tag;
 		private:
 			const this_type* pAxis;
-			std::size_t Pos;
+			index_type Pos;
 		public:
 			iterator() :pAxis(0), Pos(0) {}
 			iterator(const iterator&) = default;
 			iterator& operator=(const iterator&) = default;
 			iterator(iterator&&) = default;
 			iterator& operator=(iterator&&) = default;
-			iterator(const this_type& Axis_, std::size_t Pos_) : pAxis(&Axis_), Pos(Pos_) {}
+			iterator(const this_type& Axis_, index_type Pos_) : pAxis(&Axis_), Pos(Pos_) {}
 		public:
 			value_type operator*()const { return (*pAxis)[Pos]; }
 			value_type operator[](difference_type Val)const { return (*pAxis)[Pos + Val]; }
@@ -90,7 +90,7 @@ namespace hmLib {
 				return Itr1.Pos > Itr2.Pos;
 			}
 		public:
-			std::size_t index()const { return Pos; }
+			index_type index()const { return Pos; }
 		};
 		struct index_translator {
 			double a;
@@ -122,9 +122,13 @@ namespace hmLib {
 		value_type max()const { return Max; }
 		difference_type width()const { return Max - Min; }
 		difference_type grid_width()const { return width() / (size()-1); }
-		std::size_t size()const { return Size; }
+		axis<T> subaxis(index_type MinIndex, index_type MaxIndex) {
+			return axis<T>(operator[](MinIndex), operator[](MaxIndex), MaxIndex - MinIndex + 1);
+		}
+	public:
+		index_type size()const { return Size; }
 		bool empty()const { return Size == 0; }
-		value_type operator[](std::size_t Index)const { 
+		value_type operator[](index_type Index)const {
 			return (Min*(Size - 1 - Index) + Max*Index) / (Size - 1); 
 		}
 		value_type at(index_type Index)const {
@@ -161,13 +165,13 @@ namespace hmLib {
 		}
 	public:
 		axis() :Min(0), Max(0), Size(0) {}
-		axis(value_type Min_, value_type Max_, std::size_t Size_) :Min(Min_), Max(Max_), Size(Size_) {}
+		axis(value_type Min_, value_type Max_, index_type Size_) :Min(Min_), Max(Max_), Size(Size_) {}
 		axis(const this_type&) = default;
 		axis& operator=(const this_type&) = default;
 		axis(this_type&&) = default;
 		axis& operator=(this_type&&) = default;
 	public:
-		void assign(value_type Min_, value_type Max_, std::size_t Size_) {
+		void assign(value_type Min_, value_type Max_, index_type Size_) {
 			Min = Min_;
 			Max = Max_;
 			Size = Size_;
@@ -180,7 +184,7 @@ namespace hmLib {
 	private:
 		value_type Min;
 		value_type Max;
-		std::size_t Size;
+		index_type Size;
 	};
 	template<typename T>
 	typename axis<T>::index_translator make_axis_index_translator(const axis<T>& From, const axis<T>& To) {
