@@ -46,6 +46,9 @@
     <Filter Include="hmLib\odeint\interfere">
       <UniqueIdentifier>{bfd5b6a4-9c20-462c-a96b-ae482a1d7bbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\iterators">
+      <UniqueIdentifier>{72210415-8987-4401-99c7-796733475510}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\comgate.cpp">
@@ -102,9 +105,6 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\algorithm.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\any_iterator.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\array_queue.hpp">
@@ -390,9 +390,17 @@
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\axis.hpp">
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\inserter.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>

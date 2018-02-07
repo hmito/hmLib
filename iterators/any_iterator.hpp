@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_ANYITERATOR_INC
-#define HMLIB_ANYITERATOR_INC 101
+﻿#ifndef HMLIB_ITERATORS_ANYITERATOR_INC
+#define HMLIB_ITERATORS_ANYITERATOR_INC 101
 #
 /*===any_iterator.hpp===
 様々なiteratorを受け取り、オリジナルと同様にふるまう事の出来る汎用iteratorクラス。
