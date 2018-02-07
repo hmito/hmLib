@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />
-    <ClInclude Include="..\..\..\any_iterator.hpp" />
-    <ClInclude Include="..\..\..\array_queue.hpp" />
-    <ClInclude Include="..\..\..\axis.hpp" />
     <ClInclude Include="..\..\..\bufgate.hpp" />
     <ClInclude Include="..\..\..\ccontainer\cdeque.h" />
     <ClInclude Include="..\..\..\ccontainer\cqueue.h" />
@@ -47,6 +44,7 @@
     <ClInclude Include="..\..\..\enumerators\numeric_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\random_algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\traversal_ability.hpp" />
+    <ClInclude Include="..\..\..\euclidean.hpp" />
     <ClInclude Include="..\..\..\exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\access_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\application_exceptions.hpp" />
@@ -57,7 +55,10 @@
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
     <ClInclude Include="..\..\..\gate.hpp" />
+    <ClInclude Include="..\..\..\geometry\position.hpp" />
+    <ClInclude Include="..\..\..\geometry\rectangle.hpp" />
     <ClInclude Include="..\..\..\gps.hpp" />
+    <ClInclude Include="..\..\..\hmLib_config.h" />
     <ClInclude Include="..\..\..\inquiries.hpp" />
     <ClInclude Include="..\..\..\inquiries\inquiry.hpp" />
     <ClInclude Include="..\..\..\inquiries\inquiry_abstruct.hpp" />
@@ -82,6 +83,8 @@
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
+    <ClInclude Include="..\..\..\math\axis.hpp" />
+    <ClInclude Include="..\..\..\math\optimize.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
@@ -98,16 +101,11 @@
     <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\utility.hpp" />
     <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp" />
-    <ClInclude Include="..\..\..\optimize.hpp" />
-    <ClInclude Include="..\..\..\tuple.hpp" />
-    <ClInclude Include="..\..\..\varray.hpp" />
-    <ClInclude Include="..\..\..\position.hpp" />
     <ClInclude Include="..\..\..\random.hpp" />
     <ClInclude Include="..\..\..\random\pair_normal_distribution.hpp" />
     <ClInclude Include="..\..\..\random\random_bits.hpp" />
     <ClInclude Include="..\..\..\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\random\xorshift.hpp" />
-    <ClInclude Include="..\..\..\rectangle.hpp" />
     <ClInclude Include="..\..\..\resource.hpp" />
     <ClInclude Include="..\..\..\sequence.hpp" />
     <ClInclude Include="..\..\..\sequence\breakable_progress.hpp" />
@@ -119,6 +117,7 @@
     <ClInclude Include="..\..\..\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\stream_utility.hpp" />
     <ClInclude Include="..\..\..\table.hpp" />
+    <ClInclude Include="..\..\..\tuple.hpp" />
     <ClInclude Include="..\..\..\type.h" />
     <ClInclude Include="..\..\..\typemanage.hpp" />
     <ClInclude Include="..\..\..\typemanage\listup_name.hpp" />
@@ -130,6 +129,7 @@
     <ClInclude Include="..\..\..\typemanage\type_name.hpp" />
     <ClInclude Include="..\..\..\type_traits.hpp" />
     <ClInclude Include="..\..\..\utility.hpp" />
+    <ClInclude Include="..\..\..\varray.hpp" />
     <ClInclude Include="..\..\..\version.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
