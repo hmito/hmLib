@@ -1,12 +1,7 @@
 ﻿#ifndef HMLIB_COLOR_INC
 #define HMLIB_COLOR_INC 100
-#ifndef HMLIB_BYTEBASETYPE_INC
-#	include "bytebase_type.hpp"
-#endif
-#ifndef HMLIB_OPERATORPATTERN_INC
-#	include "operator_pattern.hpp"
-#endif
 #include <algorithm>
+#include <type_traits>
 namespace hmLib{
 	namespace color{
 		class rgb_color;	//RGB型カラー	r:赤強度 g:緑強度 b:青強度 を指定
@@ -15,85 +10,129 @@ namespace hmLib{
 		class rgba_color;	//RGBA型カラー	r:赤強度 g:緑強度 b:青強度 a:透過度 を指定
 		class hsva_color;	//HSVA型カラー	hue:色相 sat:彩度 vlu:強度 a:透過度 を指定
 		class hlsa_color;	//HLSA型カラー	hue:色相 lgt:彩度 sat:明度 a:透過度 を指定
-		class rgb_color:
-			public pattern::add_pattern<rgb_color>,
-			public pattern::sub_pattern<rgb_color>,
-			public pattern::multi_pattern<rgb_color>,
-			public pattern::and_pattern<rgb_color>,
-			public pattern::or_pattern<rgb_color>,
-			public pattern::bidirectional_multi_pattern<rgb_color,type::float64>,
-			public pattern::forward_div_pattern<rgb_color,type::float64>,
-			public pattern::equal_pattern<rgb_color>{
+		class rgb_color{
 		public:
-			type::uint8 r,g,b;
-		protected:
-			virtual void forward_add(const rgb_color& My_){
-				if(256-r>My_.r)r+=My_.r;
-				else r=255;
-				if(256-g>My_.g)g+=My_.g;
-				else g=255;
-				if(256-b>My_.b)b+=My_.b;
-				else b=255;
+			unsigned char r,g,b;
+		public:
+			rgb_color& operator+=(const rgb_color& Other) {
+				if(256 - r>Other.r)r += Other.r;
+				else r = 255;
+				if(256 - g>Other.g)g += Other.g;
+				else g = 255;
+				if(256 - b>Other.b)b += Other.b;
+				else b = 255;
+				return *this;
 			}
-			virtual void forward_sub(const rgb_color& My_){
-				if(r>My_.r)r-=My_.r;
-				else r=0;
-				if(g>My_.g)g-=My_.g;
-				else g=0;
-				if(b>My_.b)b-=My_.b;
-				else b=0;
+			friend rgb_color operator+(const rgb_color& v1, const rgb_color& v2) {
+				rgb_color v(v1);
+				v += v2;
+				return v;
 			}
-			virtual void forward_multi(const rgb_color& My_){
-				r=static_cast<type::uint8>(static_cast<type::uint32>(r)*static_cast<type::uint32>(My_.r)/256);
-				g=static_cast<type::uint8>(static_cast<type::uint32>(g)*static_cast<type::uint32>(My_.g)/256);
-				b=static_cast<type::uint8>(static_cast<type::uint32>(b)*static_cast<type::uint32>(My_.b)/256);
+			rgb_color& operator-=(const rgb_color& Other) {
+				if(r>Other.r)r -= Other.r;
+				else r = 0;
+				if(g>Other.g)g -= Other.g;
+				else g = 0;
+				if(b>Other.b)b -= Other.b;
+				else b = 0;
+				return *this;
 			}
-			virtual void forward_and(const rgb_color& My_){
-				r=std::min(r,My_.r);
-				g=std::min(g,My_.g);
-				b=std::min(b,My_.b);
+			friend rgb_color operator-(const rgb_color& v1, const rgb_color& v2) {
+				rgb_color v(v1);
+				v -= v2;
+				return v;
 			}
-			virtual void forward_or(const rgb_color& My_){
-				r=std::max(r,My_.r);
-				g=std::max(g,My_.g);
-				b=std::max(b,My_.b);
+			rgb_color& operator*=(const rgb_color& Other) {			
+				r = static_cast<unsigned char>(static_cast<std::uint32_t>(r)*static_cast<std::uint32_t>(Other.r) / 256);
+				g = static_cast<unsigned char>(static_cast<std::uint32_t>(g)*static_cast<std::uint32_t>(Other.g) / 256);
+				b = static_cast<unsigned char>(static_cast<std::uint32_t>(b)*static_cast<std::uint32_t>(Other.b) / 256);
+				return *this;
 			}
-			virtual void forward_multi(const type::float64& f_){
-				type::sint32 tmpr,tmpg,tmpb;
-				tmpr=static_cast<type::sint32>(r*f_);
-				tmpg=static_cast<type::sint32>(g*f_);
-				tmpb=static_cast<type::sint32>(b*f_);
-				if(tmpr<0)r=0;
-				else if(tmpr>255)r=255;
-				else r=tmpr;
-				if(tmpg<0)g=0;
-				else if(tmpg>255)g=255;
-				else g=tmpg;
-				if(tmpb<0)b=0;
-				else if(tmpb>255)b=255;
-				else b=tmpb;
+			friend rgb_color operator*(const rgb_color& v1, const rgb_color& v2) {
+				rgb_color v(v1);
+				v *= v2;
+				return v;
 			}
-			virtual void forward_div(const type::float64& f_){
-				type::sint32 tmpr,tmpg,tmpb;
-				tmpr=static_cast<type::sint32>(r/f_);
-				tmpg=static_cast<type::sint32>(g/f_);
-				tmpb=static_cast<type::sint32>(b/f_);
-				if(tmpr<0)r=0;
-				else if(tmpr>255)r=255;
-				else r=tmpr;
-				if(tmpg<0)g=0;
-				else if(tmpg>255)g=255;
-				else g=tmpg;
-				if(tmpb<0)b=0;
-				else if(tmpb>255)b=255;
-				else b=tmpb;
+			rgb_color& operator&=(const rgb_color& Other) {
+				r = std::min(r, Other.r);
+				g = std::min(g, Other.g);
+				b = std::min(b, Other.b);
+				return *this;
 			}
-			virtual bool forward_equal(const rgb_color& My_)const{return ((r==My_.r)&&(g==My_.g)&&(b==My_.b));}
+			friend rgb_color operator&(const rgb_color& v1, const rgb_color& v2) {
+				rgb_color v(v1);
+				v &= v2;
+				return v;
+			}
+			rgb_color& operator|=(const rgb_color& Other) {
+				r = std::max(r, Other.r);
+				g = std::max(g, Other.g);
+				b = std::max(b, Other.b);
+				return *this;
+			}
+			friend rgb_color operator|(const rgb_color& v1, const rgb_color& v2) {
+				rgb_color v(v1);
+				v |= v2;
+				return v;
+			}
+			rgb_color& operator*=(double val) {
+				std::int32_t tmpr, tmpg, tmpb;
+				tmpr = static_cast<std::int32_t>(r*val);
+				tmpg = static_cast<std::int32_t>(g*val);
+				tmpb = static_cast<std::int32_t>(b*val);
+				if(tmpr<0)r = 0;
+				else if(tmpr>255)r = 255;
+				else r = tmpr;
+				if(tmpg<0)g = 0;
+				else if(tmpg>255)g = 255;
+				else g = tmpg;
+				if(tmpb<0)b = 0;
+				else if(tmpb>255)b = 255;
+				else b = tmpb;
+				return *this;
+			}
+			friend rgb_color operator*(const rgb_color& v1, double val) {
+				rgb_color v(v1);
+				v *= val;
+				return v;
+			}
+			friend rgb_color operator*(double val, const rgb_color& v1) {
+				rgb_color v(v1);
+				v *= val;
+				return v;
+			}
+			rgb_color& operator/=(double val) {
+				std::int32_t tmpr, tmpg, tmpb;
+				tmpr = static_cast<std::int32_t>(r/val);
+				tmpg = static_cast<std::int32_t>(g/val);
+				tmpb = static_cast<std::int32_t>(b/val);
+				if(tmpr<0)r = 0;
+				else if(tmpr>255)r = 255;
+				else r = tmpr;
+				if(tmpg<0)g = 0;
+				else if(tmpg>255)g = 255;
+				else g = tmpg;
+				if(tmpb<0)b = 0;
+				else if(tmpb>255)b = 255;
+				else b = tmpb;
+				return *this;
+			}
+			friend rgb_color operator/(const rgb_color& v1, double val) {
+				rgb_color v(v1);
+				v /= val;
+				return v;
+			}
+			friend bool operator==(const rgb_color& v1, const rgb_color& v2) {
+				return (v1.r == v2.r && v1.g == v2.g && v1.b == v2.b);
+			}
+			friend bool operator!=(const rgb_color& v1, const rgb_color& v2) {
+				return !(v1.r == v2.r && v1.g == v2.g && v1.b == v2.b);
+			}
 		public:
 			rgb_color(){set(0,0,0);}
-			rgb_color(type::uint8 _r,type::uint8 _g,type::uint8 _b){set(_r,_g,_b);}
+			rgb_color(unsigned char _r,unsigned char _g,unsigned char _b){set(_r,_g,_b);}
 			rgb_color(const rgb_color& _rgb){set(_rgb);}
-			void set(type::uint8 _r,type::uint8 _g,type::uint8 _b){
+			void set(unsigned char _r,unsigned char _g,unsigned char _b){
 				r=_r;
 				g=_g;
 				b=_b;
@@ -112,13 +151,13 @@ namespace hmLib{
 		};
 		class hsv_color{
 		public:
-			type::sint32 hue;
-			type::uint8 sat,vlu;
+			std::int32_t hue;
+			unsigned char sat,vlu;
 		public:
 			hsv_color(){set(0,0,0);}
-			hsv_color(type::sint32 _hue,type::uint8 _sat,type::uint8 _vlu){set(_hue,_sat,_vlu);}
+			hsv_color(std::int32_t _hue,unsigned char _sat,unsigned char _vlu){set(_hue,_sat,_vlu);}
 			hsv_color(const hsv_color& _hsv){set(_hsv);}
-			void set(type::sint32 _hue,type::uint8 _sat,type::uint8 _vlu){
+			void set(std::int32_t _hue,unsigned char _sat,unsigned char _vlu){
 				hue=_hue;
 				sat=_sat;
 				vlu=_vlu;
@@ -137,13 +176,13 @@ namespace hmLib{
 		};
 		class hls_color{
 		public:
-			type::sint32 hue;
-			type::uint8 sat,lgt;
+			std::int32_t hue;
+			unsigned char sat,lgt;
 		public:
 			hls_color(){set(0,0,0);}
-			hls_color(type::sint32 _hue,type::uint8 _lgt,type::uint8 _sat){set(_hue,_lgt,_sat);}
+			hls_color(std::int32_t _hue,unsigned char _lgt,unsigned char _sat){set(_hue,_lgt,_sat);}
 			hls_color(const hls_color& _hls){set(_hls);}
-			void set(type::sint32 _hue,type::uint8 _lgt,type::uint8 _sat){
+			void set(std::int32_t _hue,unsigned char _lgt,unsigned char _sat){
 				hue=_hue;
 				lgt=_lgt;
 				sat=_sat;
@@ -160,9 +199,9 @@ namespace hmLib{
 			inline operator rgb_color()const;
 			inline operator hsv_color()const;
 		};
-		namespace{
-			inline void HXXToRGB(rgb_color& rgb,type::sint32 hue,type::uint8 minv,type::uint8 maxv){
-				type::sint32 adjh=hue%360;
+		namespace detail{
+			inline void HXXToRGB(rgb_color& rgb,std::int32_t hue,unsigned char minv,unsigned char maxv){
+				std::int32_t adjh=hue%360;
 				if(adjh>=0 && adjh<60){
 					rgb.r=maxv;
 					rgb.b=minv;
@@ -189,7 +228,7 @@ namespace hmLib{
 					rgb.b=minv+(maxv-minv)*(360-adjh)/60;
 				}
 			}
-			inline void RGBToHXX(type::sint32& hue,type::uint8& minv,type::uint8& maxv,rgb_color rgb){
+			inline void RGBToHXX(std::int32_t& hue,unsigned char& minv,unsigned char& maxv,rgb_color rgb){
 				if(rgb.r==rgb.g && rgb.g==rgb.b){
 					hue=0;
 					minv=rgb.r;
@@ -224,66 +263,66 @@ namespace hmLib{
 		inline rgb_color::operator hsv_color()const{
 			hsv_color tmp(0,0,0);
 
-			type::uint8 maxv,minv;
-			RGBToHXX(tmp.hue,minv,maxv,*this);
+			unsigned char maxv,minv;
+			detail::RGBToHXX(tmp.hue,minv,maxv,*this);
 			if(maxv==0 && minv==0)return tmp;
 			tmp.vlu=maxv;
-			tmp.sat=(type::sint32)(maxv-minv)*255/maxv;
+			tmp.sat=(std::int32_t)(maxv-minv)*255/maxv;
 
 			return tmp;
 		}
 		inline rgb_color::operator hls_color()const{
 			hls_color tmp(0,0,0);
 
-			type::uint8 maxv,minv;
-			RGBToHXX(tmp.hue,minv,maxv,*this);
+			unsigned char maxv,minv;
+			detail::RGBToHXX(tmp.hue,minv,maxv,*this);
 
-			tmp.lgt=(type::sint32)(maxv+minv)/2;
+			tmp.lgt=(std::int32_t)(maxv+minv)/2;
 			if(maxv==minv)tmp.sat=0;
 			else{
-				if(tmp.lgt>127)tmp.sat=(type::sint32)(maxv-minv)*255/(510-maxv-minv);
-				else tmp.sat=(type::sint32)(maxv-minv)*255/((type::sint32)maxv+(type::sint32)minv);
+				if(tmp.lgt>127)tmp.sat=(std::int32_t)(maxv-minv)*255/(510-maxv-minv);
+				else tmp.sat=(std::int32_t)(maxv-minv)*255/((std::int32_t)maxv+(std::int32_t)minv);
 			}
 			return tmp;
 		};
 		inline hsv_color::operator rgb_color()const{
 			rgb_color tmp(0,0,0);
-			HXXToRGB(tmp,this->hue,this->vlu-((type::sint32)this->sat*this->vlu/255),this->vlu);
+			detail::HXXToRGB(tmp,this->hue,this->vlu-((std::int32_t)this->sat*this->vlu/255),this->vlu);
 			return tmp;
 		}
 		inline hsv_color::operator hls_color()const{return static_cast<hls_color>(static_cast<rgb_color>(*this));}
 		inline hls_color::operator rgb_color()const{
 			rgb_color tmp(0,0,0);
 			if(this->lgt>127){
-				type::uint8 maxv,minv;
-				minv=(type::sint32)this->lgt*2-(type::sint32)this->lgt*(255-this->sat)/255-(type::sint32)this->sat;
-				maxv=(type::sint32)this->lgt*(255-this->sat)/255+(type::sint32)this->sat;
-				HXXToRGB(tmp,this->hue,minv,maxv);
+				unsigned char maxv,minv;
+				minv=(std::int32_t)this->lgt*2-(std::int32_t)this->lgt*(255-this->sat)/255-(std::int32_t)this->sat;
+				maxv=(std::int32_t)this->lgt*(255-this->sat)/255+(std::int32_t)this->sat;
+				detail::HXXToRGB(tmp,this->hue,minv,maxv);
 			}else{
-				type::uint8 maxv,minv;
-				minv=(type::sint32)this->lgt*2-(type::sint32)this->lgt*(255+this->sat)/255;
-				maxv=(type::sint32)this->lgt*(255+this->sat)/255;
-				HXXToRGB(tmp,this->hue,minv,maxv);
+				unsigned char maxv,minv;
+				minv=(std::int32_t)this->lgt*2-(std::int32_t)this->lgt*(255+this->sat)/255;
+				maxv=(std::int32_t)this->lgt*(255+this->sat)/255;
+				detail::HXXToRGB(tmp,this->hue,minv,maxv);
 			}
 			return tmp;
 		};
 		inline hls_color::operator hsv_color()const{return static_cast<hsv_color>(static_cast<rgb_color>(*this));}
-		inline rgb_color clrRGB(type::uint8 r,type::uint8 g,type::uint8 b){return rgb_color(r,g,b);}
-		inline hsv_color clrHSV(type::sint32 hue,type::uint8 sat,type::uint8 vlu){return hsv_color(hue,sat,vlu);}
-		inline hls_color clrHLS(type::sint32 hue,type::uint8 lgt,type::uint8 sat){return hls_color(hue,lgt,sat);}
+		inline rgb_color clrRGB(unsigned char r,unsigned char g,unsigned char b){return rgb_color(r,g,b);}
+		inline hsv_color clrHSV(std::int32_t hue,unsigned char sat,unsigned char vlu){return hsv_color(hue,sat,vlu);}
+		inline hls_color clrHLS(std::int32_t hue,unsigned char lgt,unsigned char sat){return hls_color(hue,lgt,sat);}
 		class rgba_color:public rgb_color{
 		public:
-			type::uint8 a;
+			unsigned char a;
 		public:
 			rgba_color(){set(0,0,0,0xff);}
-			rgba_color(type::uint8 _r,type::uint8 _g,type::uint8 _b,type::uint8 _a=0xff){set(_r,_g,_b,_a);}
-			rgba_color(const rgb_color& _rgb,type::uint8 _a=0xff){set(_rgb,_a);}
+			rgba_color(unsigned char _r,unsigned char _g,unsigned char _b,unsigned char _a=0xff){set(_r,_g,_b,_a);}
+			rgba_color(const rgb_color& _rgb,unsigned char _a=0xff){set(_rgb,_a);}
 			rgba_color(const rgba_color& _rgba){set(_rgba);}
-			void set(type::uint8 _r,type::uint8 _g,type::uint8 _b,type::uint8 _a=0xff){
+			void set(unsigned char _r,unsigned char _g,unsigned char _b,unsigned char _a=0xff){
 				rgb_color::set(_r,_g,_b);
 				a=_a;
 			}
-			void set(const rgb_color& _rgb,type::uint8 _a=0xff){
+			void set(const rgb_color& _rgb,unsigned char _a=0xff){
 				rgb_color::set(_rgb);
 				a=_a;
 			}
@@ -300,17 +339,17 @@ namespace hmLib{
 		};
 		class hsva_color:public hsv_color{
 		public:
-			type::uint8 a;
+			unsigned char a;
 		public:
 			hsva_color(){set(0,0,0,0xff);}
-			hsva_color(type::sint32 _hue,type::uint8 _sat,type::uint8 _vlu,type::uint8 _a=0xff){set(_hue,_sat,_vlu,_a);}
-			hsva_color(const hsv_color& _hsv,type::uint8 _a=0xff){set(_hsv,_a);}
+			hsva_color(std::int32_t _hue,unsigned char _sat,unsigned char _vlu,unsigned char _a=0xff){set(_hue,_sat,_vlu,_a);}
+			hsva_color(const hsv_color& _hsv,unsigned char _a=0xff){set(_hsv,_a);}
 			hsva_color(const hsv_color& _hsva){set(_hsva);}
-			void set(type::sint32 _hue,type::uint8 _sat,type::uint8 _vlu,type::uint8 _a=0xff){
+			void set(std::int32_t _hue,unsigned char _sat,unsigned char _vlu,unsigned char _a=0xff){
 				hsv_color::set(_hue,_sat,_vlu);
 				a=_a;
 			}
-			void set(const hsv_color& _hsv,type::uint8 _a=0xff){
+			void set(const hsv_color& _hsv,unsigned char _a=0xff){
 				hsv_color::set(_hsv);
 				a=_a;
 			}
@@ -327,17 +366,17 @@ namespace hmLib{
 		};
 		class hlsa_color:public hls_color{
 		public:
-			type::uint8 a;
+			unsigned char a;
 		public:
 			hlsa_color(){set(0,0,0,0xff);}
-			hlsa_color(type::sint32 _hue,type::uint8 _lgt,type::uint8 _sat,type::uint8 _a=0xff){set(_hue,_lgt,_sat,_a);}
-			hlsa_color(const hls_color& _hls,type::uint8 _a=0xff){set(_hls,_a);}
+			hlsa_color(std::int32_t _hue,unsigned char _lgt,unsigned char _sat,unsigned char _a=0xff){set(_hue,_lgt,_sat,_a);}
+			hlsa_color(const hls_color& _hls,unsigned char _a=0xff){set(_hls,_a);}
 			hlsa_color(const hlsa_color& _hlsa){set(_hlsa);}
-			void set(type::sint32 _hue,type::uint8 _lgt,type::uint8 _sat,type::uint8 _a=0xff){
+			void set(std::int32_t _hue,unsigned char _lgt,unsigned char _sat,unsigned char _a=0xff){
 				hls_color::set(_hue,_lgt,_sat);
 				a=_a;
 			}
-			void set(const hlsa_color& _hls,type::uint8 _a=0xff){
+			void set(const hlsa_color& _hls,unsigned char _a=0xff){
 				hls_color::set(_hls);
 				a=_a;
 			}
@@ -354,9 +393,9 @@ namespace hmLib{
 		inline hsva_color::operator hlsa_color()const{return hlsa_color(static_cast<hls_color>(*this),this->a);}
 		inline hlsa_color::operator rgba_color()const{return rgba_color(static_cast<rgb_color>(*this),this->a);}
 		inline hlsa_color::operator hsva_color()const{return hsva_color(static_cast<hsv_color>(*this),this->a);}
-		inline rgba_color clrRGBA(type::uint8 r,type::uint8 g,type::uint8 b,type::uint8 a){return rgba_color(r,g,b,a);}
-		inline hsva_color clrHSVA(type::sint32 hue,type::uint8 sat,type::uint8 vlu,type::uint8 a){return hsva_color(hue,sat,vlu,a);}
-		inline hlsa_color clrHLSA(type::sint32 hue,type::uint8 lgt,type::uint8 sat,type::uint8 a){return hlsa_color(hue,lgt,sat,a);}
+		inline rgba_color clrRGBA(unsigned char r,unsigned char g,unsigned char b,unsigned char a){return rgba_color(r,g,b,a);}
+		inline hsva_color clrHSVA(std::int32_t hue,unsigned char sat,unsigned char vlu,unsigned char a){return hsva_color(hue,sat,vlu,a);}
+		inline hlsa_color clrHLSA(std::int32_t hue,unsigned char lgt,unsigned char sat,unsigned char a){return hlsa_color(hue,lgt,sat,a);}
 	}
 }
 #endif
