@@ -14,6 +14,8 @@ namespace hmLib {
 		using this_type = varray<T, N>;
 		using container = std::array<T, N>;
 	public:
+		static constexpr std::size_t static_size() { return N; }
+	public:
 		using value_type = typename container::value_type;
 		using reference = typename container::reference;
 		using const_reference = typename container::const_reference;

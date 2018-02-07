@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\comgate.cpp" />
     <ClCompile Include="use_odeint.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -21,14 +20,12 @@
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />
-    <ClInclude Include="..\..\..\bufgate.hpp" />
     <ClInclude Include="..\..\..\ccontainer\cdeque.h" />
     <ClInclude Include="..\..\..\ccontainer\cqueue.h" />
     <ClInclude Include="..\..\..\ccontainer\cstack.h" />
     <ClInclude Include="..\..\..\ccontainer\cstring.h" />
     <ClInclude Include="..\..\..\circular.hpp" />
     <ClInclude Include="..\..\..\color.hpp" />
-    <ClInclude Include="..\..\..\comgate.hpp" />
     <ClInclude Include="..\..\..\config_vc.h" />
     <ClInclude Include="..\..\..\coordinates.hpp" />
     <ClInclude Include="..\..\..\csv_iterator.hpp" />
@@ -44,7 +41,6 @@
     <ClInclude Include="..\..\..\enumerators\numeric_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\random_algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\traversal_ability.hpp" />
-    <ClInclude Include="..\..\..\euclidean.hpp" />
     <ClInclude Include="..\..\..\exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\access_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\application_exceptions.hpp" />
@@ -54,7 +50,13 @@
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
-    <ClInclude Include="..\..\..\gate.hpp" />
+    <ClInclude Include="..\..\..\gates.hpp" />
+    <ClInclude Include="..\..\..\gates\bufgate.hpp" />
+    <ClInclude Include="..\..\..\gates\comgate.hpp" />
+    <ClInclude Include="..\..\..\gates\comgate\ifline.h" />
+    <ClInclude Include="..\..\..\gates\comgate\winrs.hpp" />
+    <ClInclude Include="..\..\..\gates\exceptions.hpp" />
+    <ClInclude Include="..\..\..\gates\gate.hpp" />
     <ClInclude Include="..\..\..\geometry\position.hpp" />
     <ClInclude Include="..\..\..\geometry\rectangle.hpp" />
     <ClInclude Include="..\..\..\gps.hpp" />
@@ -118,7 +120,6 @@
     <ClInclude Include="..\..\..\stream_utility.hpp" />
     <ClInclude Include="..\..\..\table.hpp" />
     <ClInclude Include="..\..\..\tuple.hpp" />
-    <ClInclude Include="..\..\..\type.h" />
     <ClInclude Include="..\..\..\typemanage.hpp" />
     <ClInclude Include="..\..\..\typemanage\listup_name.hpp" />
     <ClInclude Include="..\..\..\typemanage\listup_parameter.hpp" />
