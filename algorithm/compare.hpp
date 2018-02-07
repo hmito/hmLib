@@ -1,8 +1,10 @@
 ﻿#ifndef HMLIB_ALGORITHM_COMPARE_INC
-#define HMLIB_ALGORITHM_COMPARE_INC 200
+#define HMLIB_ALGORITHM_COMPARE_INC 201
 #
 /*===algorithm::compare===
 大小関係のアルゴリズムを提供
+algorithm::compare v2_00/170207 hmIto
+	sort_value is now renamed to sorting_swap
 algorithm::compare v2_00/160509 hmIto
 	min,maxを多変数版、min_value, max_valueに変更
 	swap_sortをsort_valueに変更
@@ -14,12 +16,12 @@ algorithm::compare v1_00/130328 hmIto
 namespace hmLib{
 	//非コンテナ引数をソートする
 	template<typename T>
-	inline void sort_value(T& val1,T& val2){
+	inline void sorting_swap(T& val1,T& val2){
 		if(val1>val2)std::swap(val1,val2);
 	}
 	//非コンテナ引数をソートする
 	template<typename T>
-	inline void sort_value(T& val1,T& val2,T& val3){
+	inline void sorting_swap(T& val1,T& val2,T& val3){
 		if(val1>val2){
 			if(val2>val3){
 				//val3 < val2 < val1
