@@ -1,10 +1,13 @@
-#ifndef HMLIB_MATH_ROOT_INC
-#define HMLIB_MATH_ROOT_INC 100
+#ifndef HMLIB_MATH_PLANEROOT_INC
+#define HMLIB_MATH_PLANEROOT_INC 100
 #
 #include<bitset>
+#include<array>
+#include<vector>
 #include<utility>
 #include<iterator>
 #include<boost/math/tools/roots.hpp>
+#include<boost/function_output_iterator.hpp>
 #include"axis.hpp"
 #include"../geometry.hpp"
 namespace hmLib {
@@ -58,9 +61,9 @@ namespace hmLib {
 					for(const auto& c : Cross) {
 						search_border_grid(
 							Fn,
-							xaxis.subaxis(c[0] * xaxis_curdiv, (c[0] + 1) * xaxis_curdiv),
-							yaxis.subaxis(c[1] * yaxis_curdiv, (c[1] + 1) * yaxis_curdiv),
-							boost::make_function_output_iterator([&](const grid_point& v) {NewCross.push_back(grid_point(c[0] * xaxis_curdiv + v[0], c[1] * yaxis_curdiv + v[1])); })
+							xaxis.subaxis(c.x * xaxis_curdiv, (c.x + 1) * xaxis_curdiv),
+							yaxis.subaxis(c.y * yaxis_curdiv, (c.y + 1) * yaxis_curdiv),
+							boost::make_function_output_iterator([&](const grid_point& v) {NewCross.push_back(grid_point(c.x * xaxis_curdiv + v.x, c.y * yaxis_curdiv + v.y)); })
 						);
 					}
 
@@ -128,9 +131,9 @@ namespace hmLib {
 					for(const auto& c : Cross) {
 						search_cross_grid(
 							Fn1, Fn2,
-							xaxis.subaxis(c[0] * xaxis_curdiv, (c[0] + 1) * xaxis_curdiv),
-							yaxis.subaxis(c[1] * yaxis_curdiv, (c[1] + 1) * yaxis_curdiv),
-							boost::make_function_output_iterator([&](const grid_point& v) {NewCross.push_back(grid_point(c[0] * xaxis_curdiv + v[0], c[1] * yaxis_curdiv + v[1])); })
+							xaxis.subaxis(c.x * xaxis_curdiv, (c.x + 1) * xaxis_curdiv),
+							yaxis.subaxis(c.y * yaxis_curdiv, (c.y + 1) * yaxis_curdiv),
+							boost::make_function_output_iterator([&](const grid_point& v) {NewCross.push_back(grid_point(c.x * xaxis_curdiv + v.x, c.y * yaxis_curdiv + v.y)); })
 						);
 					}
 
@@ -297,17 +300,19 @@ namespace hmLib {
 			grid::search_cross_grid(Fn1, Fn2, xaxis, yaxis, grid_density.x, grid_density.y, std::back_inserter(Grid));
 
 			for(const auto& g : Grid) {
-				std::array<point<T>, 4> p1;
-				std::array<point<T>, 4> p2;
+				std::array<point<T>, 4> dp1;
+				std::array<point<T>, 4> dp2;
 
-				auto s1 = std::distance(p1.begin(), grid::bisect_grid_border_point(Fn1, xaxis[g[0]], xaxis[g[0] + 1], yaxis[g[1]], yaxis[g[1] + 1], error.x, error.y, p1.begin()));
-				auto s2 = std::distance(p2.begin(), grid::bisect_grid_border_point(Fn2, xaxis[g[0]], xaxis[g[0] + 1], yaxis[g[1]], yaxis[g[1] + 1], error.x, error.y, p2.begin()));
+				auto s1 = std::distance(dp1.begin(), grid::bisect_grid_border_point(Fn1, xaxis[g.x], xaxis[g.x + 1], yaxis[g.y], yaxis[g.y + 1], error.x, error.y, dp1.begin()));
+				auto s2 = std::distance(dp2.begin(), grid::bisect_grid_border_point(Fn2, xaxis[g.x], xaxis[g.x + 1], yaxis[g.y], yaxis[g.y + 1], error.x, error.y, dp2.begin()));
 
-				if(s1 == 0 || s2 == 0)return false;
-				if(s1 == 4 || s2 == 4)return true;
+				if(s1 == 0 || s2 == 0) {
+					continue;
+				} else if(s1 == 4 || s2 == 4) {
+					*(out++) = point<T>((xaxis[g.x] + xaxis[g.x + 1]) / 2, (yaxis[g.y] + yaxis[g.y + 1]) / 2);
 
-				if(geometry::is_cross(geometry::segment<T>(p1[0], p1[1]), geometry::segment<T>(p2[0], p2[1]))) {
-					*(out++) = point<T>((xaxis[g[0]] + xaxis[g[0] + 1]) / 2, (yaxis[g[1]] + yaxis[g[1] + 1]) / 2);
+				}else if(geometry::is_cross(geometry::segment<T>(dp1[0], dp1[1]), geometry::segment<T>(dp2[0], dp2[1]))) {
+					*(out++) = point<T>((xaxis[g.x] + xaxis[g.x + 1]) / 2, (yaxis[g.y] + yaxis[g.y + 1]) / 2);
 				}
 			}
 			return out;

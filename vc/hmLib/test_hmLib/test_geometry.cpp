@@ -5,6 +5,12 @@
 #include <list>
 #include "../../../geometry/point.hpp"
 #include "../../../geometry/segment.hpp"
+#include "../../../math/axis.hpp"
+#include "../../../math/constants.hpp"
+#include "../../../math/factorial.hpp"
+#include"../../../math/optimize.hpp"
+#include"../../../math/root.hpp"
+#include"../../../math/plane_root.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {

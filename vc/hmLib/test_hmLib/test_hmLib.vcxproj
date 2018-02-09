@@ -169,6 +169,7 @@
     </ClCompile>
     <ClCompile Include="test_geometry.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
+    <ClCompile Include="test_math.cpp" />
     <ClCompile Include="test_varray.cpp" />
   </ItemGroup>
   <ItemGroup>
