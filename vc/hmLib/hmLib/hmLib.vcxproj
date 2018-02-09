@@ -57,8 +57,9 @@
     <ClInclude Include="..\..\..\gates\comgate\winrs.hpp" />
     <ClInclude Include="..\..\..\gates\exceptions.hpp" />
     <ClInclude Include="..\..\..\gates\gate.hpp" />
-    <ClInclude Include="..\..\..\geometry\position.hpp" />
-    <ClInclude Include="..\..\..\geometry\rectangle.hpp" />
+    <ClInclude Include="..\..\..\geometry.hpp" />
+    <ClInclude Include="..\..\..\geometry\segment.hpp" />
+    <ClInclude Include="..\..\..\geometry\point.hpp" />
     <ClInclude Include="..\..\..\gps.hpp" />
     <ClInclude Include="..\..\..\hmLib_config.h" />
     <ClInclude Include="..\..\..\inquiries.hpp" />
@@ -86,7 +87,10 @@
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
+    <ClInclude Include="..\..\..\math\constants.hpp" />
     <ClInclude Include="..\..\..\math\optimize.hpp" />
+    <ClInclude Include="..\..\..\math\root.hpp" />
+    <ClInclude Include="..\..\..\math\factorial.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
@@ -148,7 +152,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
