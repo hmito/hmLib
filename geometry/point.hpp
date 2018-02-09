@@ -1,180 +1,160 @@
-﻿#ifndef HMLIB_POSITION_INC
-#define HMLIB_POSITION_INC 100
+﻿#ifndef HMLIB_GEOMETRY_POSITION_INC
+#define HMLIB_GEOMETRY_POSITION_INC 100
 #include<cmath>
-#include<iostream>
 #include<type_traits>
 #include"../utility.hpp"
 namespace hmLib{
-	namespace pgeometry {
+	namespace geometry {
 		template<class T>
 		struct point {
+		private:
+			using this_type = point<T>;
 		public:
 			T x;
 			T y;
 		public:
 			point():x(0),y(0) {}
-			template<typename S, hmLib_static_restrict(std::is_convertible<S, T>::value)>
-			point(S x_, S y_) : x(x_), y(y_) {}
-			template<typename S, hmLib_static_restrict(std::is_convertible<S, T>::value)>
-			point(const point<S>& Other) : x(Other.x), y(Other.y) {}
-//			template<typename S, typename std::enable_if<std::is_convertible<S, T>::value>::type*& = hmLib::utility::detail::enabler>
-//			point(S _x, S _y): x(x_), y(y_) {}
+			point(const this_type&) = default;
+			this_type& operator=(const this_type&) = default;
+			point(this_type&&) = default;
+			this_type& operator=(this_type&&) = default;
 		public:
-			template<typename S, hmLib_static_restrict(std::is_convertible<S, T>::value)>
-			void reset(S x_, S y_) {
-				x = x_;
-				y = y_;
-			}
-		public:
-			bool operator!=(const point<T>& _T)const {
-				if(x != _T.x || y != _T.y)return true;
-				else return false;
-			}
-			bool operator==(const point<T>& _T)const {
-				if(x != _T.x || y != _T.y)return false;
-				else return true;
-			}
-			bool operator<(const point<T>& _T)const {
-				if(x >= _T.x || y >= _T.y)return false;
-				else return true;
-			}
-			bool operator>(const point<T>& _T)const {
-				if(x <= _T.x || y <= _T.y)return false;
-				else return true;
-			}
-			bool operator<=(const point<T>& _T)const {
-				if(x>_T.x || y>_T.y)return false;
-				else return true;
-			}
-			bool operator>=(const point<T>& _T)const {
-				if(x<_T.x || y<_T.y)return false;
-				else return true;
-			}
-			const point<T> operator=(const point<T>& _T) {
-				if(this != &_T) {
-					x = _T.x;
-					y = _T.y;
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+			point(U x_, U y_) : x(x_), y(y_) {}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+			point(const point<U>& Other) : x(Other.x), y(Other.y) {}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+			this_type& operator=(const point<U>& Other) {
+				if(this != static_cast<const void*>(&Other)) {
+					set(Other.x, Other.y);
 				}
 				return *this;
 			}
-			template<class S>
-			const point<T> operator=(const point<S>& _S) {
-				x = (T)_S.x;
-				y = (T)_S.y;
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+			void set(U x_, U y_) {
+				x = x_;
+				y = y_;
+			}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+			void set(const point<U>& Other) {
+				if(this != static_cast<const void*>(&Other)) {
+					set(Other.p1, Other.p2);
+				}
+			}
+		public:
+			point<T> operator+()const { return *this; }
+			point<T> operator-()const { return point<T>(-x, -y); }
+			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() + std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+			point<T>& operator+=(const point<U>& Other) {
+				x += Other.x;
+				y += Other.y;
 				return *this;
 			}
-			const point<T> operator+=(const point<T>& _T) {
-				x += _T.x;
-				y += _T.y;
+			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() - std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+			point<T>& operator-=(const point<U>& Other) {
+				x -= Other.x;
+				y -= Other.y;
 				return *this;
 			}
-			template<class S>
-			const di_position<T> operator+=(const di_position<S>& _S) {
-				x += (T)_S.x;
-				y += (T)_S.y;
+			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() * std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+			point<T>& operator*=(const point<U>& Other) {
+				x *= Other.x;
+				y *= Other.y;
 				return *this;
 			}
-			const di_position<T> operator-=(const di_position<T>& _T) {
-				x -= _T.x;
-				y -= _T.y;
+			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() / std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+			point<T>& operator/=(const point<U>& Other) {
+				x /= Other.x;
+				y /= Other.y;
 				return *this;
 			}
-			template<class S>
-			const di_position<T> operator-=(const di_position<S>& _S) {
-				x -= (T)_S.x;
-				y -= (T)_S.y;
+			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() * std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+			point<T>& operator*=(U val) {
+				x *= val;
+				y *= val;
 				return *this;
 			}
-			di_position<T> operator+()const { return *this; }
-			di_position<T> operator-()const {
-				di_position<T> ans(*this);
-				ans.x *= -1;
-				ans.y *= -1;
-				return ans;
+			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() / std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+			point<T>& operator/=(U val) {
+				x /= val;
+				y /= val;
+				return *this;
 			}
-			di_position<T> operator+(const di_position<T>& _T)const {
-				di_position<T> ans(*this);
-				ans += _T;
-				return ans;
-			}
-			di_position<T> operator-(const di_position<T>& _T)const {
-				di_position<T> ans(*this);
-				ans -= _T;
-				return ans;
-			}
-			di_position<T> operator*(const di_position<T>& _T)const {
-				di_position<T> ans(*this);
-				ans.x *= _T.x;
-				ans.y *= _T.y;
-				return ans;
-			}
-			di_position<T> operator/(const di_position<T>& _T)const {
-				di_position<T> ans(*this);
-				if(_T.x == 0 || _T.y == 0)throw "di_position<T>::operator/(const di_position<T>& _T)const  div with 0";
-				ans.x /= _T.x;
-				ans.y /= _T.y;
-				return ans;
-			}
-			template<class S>
-			operator S()const {
-				di_position<S> ans(*this);
-				return ans;
-			}
-			//friend関数群
-			//	friend bool operator==(const di_position<T>& _T1,const di_position<T>& _T2);
-			friend di_position<T> operator*(const di_position<T>& _T, const T& p) {
-				di_position<T> ans(_T);
-				ans.x *= p;
-				ans.y *= p;
-				return ans;
-			}
-			friend di_position<T> operator*(const T& p, const di_position<T>& _T) {
-				di_position<T> ans(_T);
-				ans.x *= p;
-				ans.y *= p;
-				return ans;
-			}
-			friend di_position<T> operator/(const di_position<T>& _T, const T& p) {
-				di_position<T> ans(_T);
-				ans.x /= p;
-				ans.y /= p;
-				return ans;
-			}
-			template<class S, class U>
-			friend di_position<U> operator+(const di_position<T>& _T, const di_position<S>& _S);
-			template<class S, class U>
-			friend di_position<U> operator-(const di_position<T>& _T, const di_position<S>& _S);
-			template<class S, class U>
-			friend di_position<U> operator*(const di_position<T>& _T, const di_position<S>& _S);
-			template<class S, class U>
-			friend di_position<U> operator/(const di_position<T>& _T, const di_position<S>& _S);
-			template<class S, class U>
-			friend di_position<U> operator*(const di_position<T>& _T, const S& _S);
-			template<class S, class U>
-			friend di_position<U> operator/(const di_position<T>& _T, const S& _S);
-			template<class S, class U>
-			friend di_position<U> operator*(const S& _S, const di_position<T>& _T);
-			friend std::ostream& operator<<(std::ostream& out, const di_position<T>& pos) {
-				out << '(' << pos.x << ',' << pos.y << ')';
-				return out;
+			template<typename U, typename std::enable_if<std::is_convertible<T, U>::value>::type*& = hmLib::utility::enabler>
+			explicit operator point<U>()const {
+				return point<U>(static_cast<U>(x),static_cast<U>(y));
 			}
 		};
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() + std::declval<U>())>
+		point<ans_type> operator+(const point<T>& v1, const point<U>& v2) {
+			return point<ans_type>(v1.x + v2.x, v1.y + v2.y);
+		}
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() - std::declval<U>())>
+		point<ans_type> operator-(const point<T>& v1, const point<U>& v2) {
+			return point<ans_type>(v1.x - v2.x, v1.y - v2.y);
+		}
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() * std::declval<U>())>
+		point<ans_type> operator*(const point<T>& v1, const point<U>& v2) {
+			return point<ans_type>(v1.x * v2.x, v1.y * v2.y);
+		}
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() / std::declval<U>())>
+		point<ans_type> operator/(const point<T>& v1, const point<U>& v2) {
+			return point<ans_type>(v1.x / v2.x, v1.y / v2.y);
+		}
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() * std::declval<U>())>
+		point<ans_type> operator*(const point<T>& v1, U val) {
+			return point<ans_type>(v1.x * val, v1.y * val);
+		}
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() * std::declval<U>())>
+		point<ans_type> operator*(T val, const point<U>& v2) {
+			return point<ans_type>(val * v2.x, val * v2.y);
+		}
+		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() / std::declval<U>())>
+		point<ans_type> operator/(const point<T>& v1, U val) {
+			return point<ans_type>(v1.x / val, v1.y / val);
+		}
+		template<typename T, typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() == std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
+		bool operator==(const point<T>& v1, const point<U>& v2) {
+			return static_cast<bool>(v1.x == v2.x) && static_cast<bool>(v1.y == v2.y);
+		}
+		template<typename T, typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() == std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
+		bool operator!=(const point<T>& v1, const point<U>& v2) {
+			return !(v1 == v2);
+		}
+		template<typename T, typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
+		bool operator<(const point<T>& v1, const point<U>& v2) {
+			if(v1.x == v2.x)return v1.y < v2.y;
+			return v1.x < v2.x;
+		}
+		template<typename T, typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
+		bool operator<=(const point<T>& v1, const point<U>& v2) {
+			if(v1.x == v2.x) {
+				return v1.y <= v2.y;
+			}
+			return v1.x < v2.x;
+		}
+		template<typename T, typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
+		bool operator>(const point<T>& v1, const point<U>& v2) {
+			if(v1.x == v2.x)return v1.y > v2.y;
+			return v1.x > v2.x;
+		}
+		template<typename T, typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
+		bool operator>=(const point<T>& v1, const point<U>& v2) {
+			if(v1.x == v2.x) {
+				return v1.y >= v2.y;
+			}
+			return v1.x > v2.x;
+		}
+		template<typename T>
+		decltype(std::sqrt(std::declval<T>()*std::declval<T>())) norm(const point<T>& v) {
+			return std::sqrt(v.x*v.x+v.y*v.y);
+		}
+		template<typename T>
+		decltype(std::declval<T>()*std::declval<T>()) norm2(const point<T>& v) {
+			return (v.x*v.x + v.y*v.y);
+		}
 		using pint = point<int>;
 		using pdouble = point<double>;
-		inline pdouble operator+(const pint& i, const pdouble& d) { return pdouble(i) + d; }
-		inline pdouble operator-(const pint& i, const pdouble& d) { return pdouble(i) - d; }
-		inline pdouble operator*(const pint& i, const pdouble& d) { return pdouble(i)*d; }
-		inline pdouble operator/(const pint& i, const pdouble& d) { return pdouble(i) / d; }
-		inline pdouble operator*(const pint& i, const double& d) { return pdouble(i)*d; }
-		inline pdouble operator/(const pint& i, const double& d) { return pdouble(i) / d; }
-		inline pdouble operator*(const double& d, const pint& i) { return pdouble(i)*d; }
-		inline pdouble operator+(const pdouble& d, const pint& i) { return d + pdouble(i); }
-		inline pdouble operator-(const pdouble& d, const pint& i) { return d - pdouble(i); }
-		inline pdouble operator*(const pdouble& d, const pint& i) { return d*pdouble(i); }
-		inline pdouble operator/(const pdouble& d, const pint& i) { return d / pdouble(i); }
-		inline pdouble operator*(const pdouble& d, const int& i) { return d*double(i); }
-		inline pdouble operator/(const pdouble& d, const int& i) { return d / double(i); }
-		inline pdouble operator*(const int& i, const pdouble& d) { return d*double(i); }
 	}
 }
 #endif
