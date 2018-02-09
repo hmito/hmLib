@@ -100,6 +100,13 @@ namespace hmLib{
 				*(My.pstream) << Val;
 				return *this;
 			}
+			template<typename T, typename U>
+			output_proxy& write(U Val) {
+				cell_head_treat();
+				T TmpVal = Val;
+				*(My.pstream) << TmpVal;
+				return *this;
+			}
 			friend std::basic_istream<Elem, Traits>& operator>>(std::basic_istream<Elem, Traits>& in, output_proxy p){
 				string_type Str;
 				in >> Str;
@@ -246,6 +253,13 @@ namespace hmLib{
 				My.read() >> Val;
 				return *this;
 			}
+			template<typename T,typename U>
+			input_proxy& read(U& Val) {
+				T TmpVal;
+				My.read() >> TmpVal;
+				Val = TmpVal;
+				return *this;
+			}
 			friend std::basic_ostream<Elem, Traits>& operator<<(std::basic_ostream<Elem, Traits>& out, input_proxy p){
 				return out << static_cast<string_type>(p);
 			}
@@ -308,18 +322,18 @@ namespace hmLib{
 	using icsv_iterator = basic_icsv_iterator < char, std::char_traits<char> >;
 
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> icsv_begin(std::basic_istream < Elem, Traits >& Stream_, basic_icsv_iterator < Elem, Traits > CSVMode_ = csv::mode::csv){
+	inline basic_icsv_iterator<Elem, Traits> icsv_begin(std::basic_istream < Elem, Traits >& Stream_, basic_csv_mode < Elem, Traits > CSVMode_ = basic_csv_mode<Elem, Traits>(',')){
 		Stream_.seekg(0, std::ios::beg);
 		auto Pos = Stream_.tellg();
 		return basic_icsv_iterator<Elem, Traits>(Stream_, Pos, CSVMode_, true);
 	}
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> icsv_current(std::basic_istream < Elem, Traits >& Stream_, basic_icsv_iterator < Elem, Traits > CSVMode_ = csv::mode::csv){
+	inline basic_icsv_iterator<Elem, Traits> icsv_current(std::basic_istream < Elem, Traits >& Stream_, basic_csv_mode < Elem, Traits > CSVMode_ = basic_csv_mode<Elem, Traits>(',')){
 		auto Pos = Stream_.tellg();
 		return basic_icsv_iterator<Elem, Traits>(Stream_, Pos, CSVMode_, false);
 	}
 	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> icsv_end(std::basic_istream < Elem, Traits >& Stream_, basic_icsv_iterator < Elem, Traits > CSVMode_ = csv::mode::csv){
+	inline basic_icsv_iterator<Elem, Traits> icsv_end(std::basic_istream < Elem, Traits >& Stream_, basic_csv_mode < Elem, Traits > CSVMode_ = basic_csv_mode<Elem, Traits>(',')){
 		Stream_.seekg(0, std::ios::end);
 		auto Pos = Stream_.tellg();
 		return basic_icsv_iterator<Elem, Traits>(Stream_, Pos, CSVMode_, true);

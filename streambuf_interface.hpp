@@ -141,16 +141,16 @@ namespace hmLib{
 		Elem* ibuf_begin(){return this->eback();}
 		Elem* ibuf_end(){return this->egptr();}
 		Elem* ibuf_getpos(){return this->gptr();}
-		void ibuf_setpos(Elem* ptr){this->gbump((int)(ptr-ibuf_pos()));}
-		int ibuf_used(){return static_cast<int>(ibuf_pos()-ibuf_begin());}
+		void ibuf_setpos(Elem* ptr){this->gbump((int)(ptr- ibuf_getpos()));}
+		int ibuf_used(){return static_cast<int>(ibuf_getpos()-ibuf_begin());}
 		int ibuf_size(){return static_cast<int>(ibuf_end()-ibuf_begin());}
 	protected://obuf functions
 		void obuf_set(Elem* pstrt,Elem* pend){setp(pstrt,pend);}
 		Elem* obuf_begin(){return this->pbase();}
 		Elem* obuf_end(){return this->epptr();}
 		Elem* obuf_getpos(){return this->pptr();}
-		void obuf_setpos(Elem* ptr){this->pbump((int)(ptr-obuf_pos()));}
-		int obuf_used(){return static_cast<int>(obuf_pos()-obuf_begin());}
+		void obuf_setpos(Elem* ptr){this->pbump((int)(ptr- obuf_getpos()));}
+		int obuf_used(){return static_cast<int>(obuf_getpos()-obuf_begin());}
 		int obuf_size(){return static_cast<int>(obuf_end()-obuf_begin());}
 	private://streambuf override functions
 		streamsize xsputn(const Elem* c_p,std::streamsize size)override{return obuf_puts(c_p,size);}
