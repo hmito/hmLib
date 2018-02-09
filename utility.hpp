@@ -15,12 +15,10 @@ v1_00/130717
 */
 namespace hmLib{
 	namespace utility{
-		namespace _enabler{
-			extern void* enabler;
-		}
+		extern void* enabler;
 	}
 }
-#define hmLib_static_restrict(condition) typename std::enable_if<condition>::type *& = hmLib::utility::_enabler::enabler
+#define hmLib_static_restrict(condition) typename std::enable_if<condition>::type*& = hmLib::utility::enabler
 namespace hmLib{
 	//クローン関数
 	template<typename T>
