@@ -89,6 +89,7 @@
     <ClInclude Include="..\..\..\math\axis.hpp" />
     <ClInclude Include="..\..\..\math\constants.hpp" />
     <ClInclude Include="..\..\..\math\optimize.hpp" />
+    <ClInclude Include="..\..\..\math\plane_root.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
     <ClInclude Include="..\..\..\math\factorial.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
