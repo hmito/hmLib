@@ -14,6 +14,8 @@ namespace hmLib {
 		using this_type = varray<T, N>;
 		using container = std::array<T, N>;
 	public:
+		static constexpr std::size_t static_size() { return N; }
+	public:
 		using value_type = typename container::value_type;
 		using reference = typename container::reference;
 		using const_reference = typename container::const_reference;
@@ -30,8 +32,17 @@ namespace hmLib {
 		container Arr;
 	public:
 		varray() :Arr() {}
-		varray(std::initializer_list<T> il) {
-			std::copy(il.begin(), il.end(), Arr.begin());
+		varray(std::initializer_list<T> il)noexcept {
+			auto out = Arr.begin();
+
+			auto itr = il.begin();
+
+			while(out != Arr.end() && itr != il.end()) {
+				*out = *itr;
+				++out;
+				++itr;
+			}
+
 		}
 		explicit varray(const T& val) { Arr.fill(val); }
 		template<typename U>

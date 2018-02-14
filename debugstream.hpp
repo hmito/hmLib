@@ -43,7 +43,7 @@ namespace hmLib{
 		debugstreambuf* m_buf;
 	public:
 		debugstream():std::ostream(m_buf=new debugstreambuf()){return;}
-		~debugstream(){delete m_buf;}
+		virtual ~debugstream(){delete m_buf;}
 	};
 }
 #

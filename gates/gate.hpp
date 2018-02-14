@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_GATE_INC
-#define HMLIB_GATE_INC 201
+﻿#ifndef HMLIB_GATES_GATE_INC
+#define HMLIB_GATES_GATE_INC 201
 #
 /*===gate===
 受信送信を簡易で行うクラス
@@ -29,18 +29,10 @@ v1_02/130324 hmIto
 	basic_gatestreambufの初期化にポインタではなく参照を渡していた致命的な問題を修正
 */
 #include<iostream>
-#ifndef HMLIB_STREAMBUINTERFACE_INC
-#	include "streambuf_interface.hpp"
-#endif
-#ifndef HMLIB_EXCEPTIONS_INC
-#	include "exceptions.hpp"
-#endif
-namespace hmLib{
-	struct gate_exception_identifier {};
-	typedef exceptions::exception_pattern<gate_exception_identifier> gate_exception;
-	typedef exceptions::io::not_opened<gate_exception> gate_not_opened_exception;
-	typedef exceptions::io::opened<gate_exception> gate_opened_exception;
+#include "../streambuf_interface.hpp"
+#include "exceptions.hpp"
 
+namespace hmLib{
 	template<typename _Elem, typename _Traits=std::char_traits<_Elem> >
 	class basic_gate{
 	public:

@@ -109,6 +109,21 @@ namespace hmLib{
 
 		return BPair;
 	}
+
+	template<typename input_iterator1, typename input_iterator2, typename output_iterator>
+	void sorted_set_intersection(input_iterator1 beg1, input_iterator1 end1, input_iterator2 beg2, input_iterator2 end2, output_iterator result) {
+		while(beg1 != end1 && beg2 != end2) {
+			if(*beg1 > *beg2) {
+				++beg2;
+			} else if(*beg1 < *beg2) {
+				++beg1;
+			} else {
+				*(result++) = *beg1;
+				++beg1;
+				++beg2;
+			}
+		}
+	}
 }
 #
 #endif
