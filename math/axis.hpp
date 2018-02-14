@@ -100,20 +100,20 @@ namespace hmLib {
 			index_translator(const index_translator&) = default;
 			index_translator& operator=(const index_translator&) = default;
 			index_translator(const this_type& from, const this_type& to) {
-				a = static_cast<double>(from.Max - from.Min) / (to.Max - to.Min) * (from.size() - 1) / (to.size() - 1);
-				b = (from.Min - to.Min) / (to.Max - to.Min);
+				a = static_cast<double>(from.Max - from.Min) / (to.Max - to.Min) * (to.size() - 1) / (from.size() - 1);
+				b = (from.Min - to.Min) / (to.Max - to.Min)* (to.size() - 1);
 			}
 		public:
-			double index_float(index_type from) {
+			double index_float(index_type from)const {
 				return a*from + b;
 			}
-			index_type round(index_type from) {
+			index_type round(index_type from)const {
 				return static_cast<index_type>(std::round(index_float(from)));
 			}
-			index_type ceil(index_type from) {
+			index_type ceil(index_type from)const {
 				return static_cast<index_type>(std::ceil(index_float()));
 			}
-			index_type floor(index_type from) {
+			index_type floor(index_type from)const {
 				return static_cast<index_type>(std::floor(index_float()));
 			}
 		};
