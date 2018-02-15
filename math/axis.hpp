@@ -4,7 +4,7 @@
 #include<utility>
 #include<iterator>
 #include<cmath>
-#include"exceptions.hpp"
+#include"../exceptions.hpp"
 namespace hmLib {
 	template<typename T>
 	struct axis {
