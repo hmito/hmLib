@@ -20,12 +20,12 @@ public:
 		Assert::AreSame(0.1, Axis.grid_width(), L"");
 	}
 	TEST_METHOD(plane_root_use) {
-		std::vector<geometry::point<double>> Ans;
+		std::vector<plane_geometry::point<double>> Ans;
 		hmLib::plane_root::grid_cross_search(
 			[](double x, double y) {return x*x - y; },
 			[](double x, double y) {return -x*x - y+10; },
-			geometry::point<double>(-10.0,-10.0), geometry::point<double>(10.0, 10.0),
-			101, geometry::point<double>(1e-3, 1e-3), geometry::point<double>(1e-6, 1e-6),back_inserter(Ans)
+			plane_geometry::point<double>(-10.0,-10.0), plane_geometry::point<double>(10.0, 10.0),
+			101, plane_geometry::point<double>(1e-3, 1e-3), plane_geometry::point<double>(1e-6, 1e-6),back_inserter(Ans)
 		);
 
 		Assert::AreEqual(2u, Ans.size(), L"");

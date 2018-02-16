@@ -3,8 +3,9 @@
 #include<cmath>
 #include<type_traits>
 #include"../utility.hpp"
+#include"../algorithm/compare.hpp"
 namespace hmLib{
-	namespace geometry {
+	namespace plane_geometry {
 		template<class T>
 		struct point {
 		private:
@@ -152,6 +153,25 @@ namespace hmLib{
 		template<typename T>
 		decltype(std::declval<T>()*std::declval<T>()) norm2(const point<T>& v) {
 			return (v.x*v.x + v.y*v.y);
+		}
+		template<typename T>
+		void sorting_element_swap(point<T>& v1, point<T>& v2){
+			sorting_swap(v1.x, v2.x);
+			sorting_swap(v1.y, v2.y);
+		}
+		template<typename T>
+		point<T> min_element(const point<T>& v1, const point<T>& v2) {
+			return point<T>(
+				min_value(v1.x, v2.x),
+				min_value(v1.y, v2.y)
+			);
+		}
+		template<typename T>
+		point<T> max_element(const point<T>& v1, const point<T>& v2) {
+			return point<T>(
+				max_value(v1.x, v2.x),
+				max_value(v1.y, v2.y)
+			);
 		}
 		using pint = point<int>;
 		using pdouble = point<double>;

@@ -17,7 +17,7 @@ namespace hmLib {
 	TEST_CLASS(test_geometry) {
 public:
 	TEST_METHOD(is_convertible) {
-		using namespace hmLib::geometry;
+		using namespace hmLib::plane_geometry;
 
 		pint p1(0, 0);
 		pdouble p2(0u, 0u);

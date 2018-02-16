@@ -3,7 +3,7 @@
 #
 #include"point.hpp"
 namespace hmLib {
-	namespace geometry {
+	namespace plane_geometry {
 		template<typename T>
 		struct segment {
 		private:
