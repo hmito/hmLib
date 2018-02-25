@@ -111,10 +111,10 @@ namespace hmLib {
 				return static_cast<index_type>(std::round(index_float(from)));
 			}
 			index_type ceil(index_type from)const {
-				return static_cast<index_type>(std::ceil(index_float()));
+				return static_cast<index_type>(std::ceil(index_float(from)));
 			}
 			index_type floor(index_type from)const {
-				return static_cast<index_type>(std::floor(index_float()));
+				return static_cast<index_type>(std::floor(index_float(from)));
 			}
 		};
 	public:
