@@ -330,64 +330,80 @@ namespace hmLib {
 
 		template<typename T>
 		struct grid_border_bisect_solver{
-			//グリッド内のドットの点の探し方を定義するクラス。単純にはボーダーのみ。複雑なら、サークルチェック
-			//fromを無視してto方向へ探索する
+			using value_type = T;
+			using point_type = point<T>;
+		private:
+			point_type err;
+		public:
 			template<typename func, typename output_iterator>
-			void operator()(func fn, const hmLib::axis<T>& xaxis, const hmLib::axis<T>& yaxis, grid_point p, detail::direction_type from, detail::direction_type to, output_iterator out) {
-				if(to == grid::directions::top) {
+			point_type find(func fn, const hmLib::axis<T>& xaxis, const hmLib::axis<T>& yaxis, grid_point g, detail::direction_type dir) {
+				using boost::math::tools::bisect;
+
+				if(dir == grid::directions::top) {
 					T y = yaxis[g.y];
-					auto xpair = bisect([=, &fn](double x) {return fn(x, y); }, xaxis[g.x], xaxis[g.x + 1], [=](double v1, double v2) {return v2 - v1 < error.x; });
+					auto xpair = bisect([=, &fn](double x) {return fn(x, y); }, xaxis[g.x], xaxis[g.x + 1], [=](double v1, double v2) {return v2 - v1 < err.x; });
 					T x = (xpair.first + xpair.second) / 2;
-					*(out++) = (point<T>(x, y));
-				} else if(to & grid::directions::bottom) {
+					return point<T>(x, y);
+				} else if(dir & grid::directions::bottom) {
 					T y = yaxis[g.y + 1];
-					auto xpair = bisect([=, &fn](double x) {return fn(x, y); }, xaxis[g.x], xaxis[g.x + 1], [=](double v1, double v2) {return v2 - v1 < error.x; });
+					auto xpair = bisect([=, &fn](double x) {return fn(x, y); }, xaxis[g.x], xaxis[g.x + 1], [=](double v1, double v2) {return v2 - v1 < err.x; });
 					T x = (xpair.first + xpair.second) / 2;
-					*(out++) = (point<T>(x, y));
-				} else if(to & grid::directions::left) {
+					return point<T>(x, y);
+				} else if(dir & grid::directions::left) {
 					T x = xaxis[g.x];
-					auto ypair = bisect([=, &Fn](double y) {return fn(x, y); }, yaxis[g.y], yaxis[g.y + 1], [=](double v1, double v2) {return v2 - v1 < error.y; });
+					auto ypair = bisect([=, &Fn](double y) {return fn(x, y); }, yaxis[g.y], yaxis[g.y + 1], [=](double v1, double v2) {return v2 - v1 < err.y; });
 					T y = (ypair.first + ypair.second) / 2;
-					*(out++) = (point<T>(x, y));
-				} else if(to & grid::directions::right) {
+					return point<T>(x, y);
+				} else if(dir & grid::directions::right) {
 					T x = xaxis[g.x + 1];
-					auto ypair = bisect([=, &Fn](double y) {return Fn(x, y); }, yaxis[g.y], yaxis[g.y + 1], [=](double v1, double v2) {return v2 - v1 < error.y; });
+					auto ypair = bisect([=, &Fn](double y) {return Fn(x, y); }, yaxis[g.y], yaxis[g.y + 1], [=](double v1, double v2) {return v2 - v1 < err.y; });
 					T y = (ypair.first + ypair.second) / 2;
-					*(out++) = (point<T>(x, y));
+					return point<T>(x, y);
 				}
 			}
+			template<typename func, typename output_iterator>
+			detail::direction_type operator()(func fn, const hmLib::axis<T>& xaxis, const hmLib::axis<T>& yaxis, grid_point g, detail::direction_type from, point_type fromp, detail::direction_type to, output_iterator out) {
+				*(out++) = find(fn, xaxis, yaxis, g, to);
+				return to;
+			}
+			point_type error()const { return err; }
 		};
 
 		template<typename solver>
 		struct noncross_stpper{
+			using value_type = typename solver::value_type;
+			using point_type = typename point<value_type>;
 		private:
 			solver Solver;
 			std::vector<grid_point> Searched;
+			std::vector<std::vector<point_type>> Lines;
 		public:
-			bool is_searched(grid_point g)const {
-				auto ans = std::equal_range(Searched.begin(), Searched.end(), g);
-				return ans.first != ans.second;
-			}
-			//ステッパーは、グリッドの状態に応じてグリッドを動かす＆グリッドのベクトルをつなげたりするとかそういう話を決める
 			template<typename func>
-			void operator()(func fn, const hmLib::axis<T>& xaxis, const hmLib::axis<T>& yaxis, grid_point p) {
+			void operator()(func fn, const hmLib::axis<T>& xaxis, const hmLib::axis<T>& yaxis, grid_point g, detail::corner_type cor, point_type error) {
+				std::vector<std::pair<grid_point, detail::direction_type>> Waiting;
+
 				//ignore if this point has been already searched.
-				if(is_searched(p))return;
+				auto ans = std::equal_range(Searched.begin(), Searched.end(), g);
+				if(first != ans.second)return;
+
+				auto dir = detail::corner_to_direction(cor);
+
+				if(dir.count() == 2) {
+					std::vector<point_type> Line;
+					//line sequence
+					if((dir&detail::directions::left).any()) {
+						grid_border_bisect_solver<value_type>(Solver.error()).find(fn, xaxis, yaxis, g, detail::directions::left);
+
+						if(!Line.empty())std::reverse(Line.begin().Line.end());
+						Solver(fn, xaxis, yaxis, g, std::back_inserter(Line));
+					}
+				} else {
+
+				}
 
 				//役割が二つ
 				//一つは、ステップの進め方。どっちのグリッドに行くかとか、クロスドットの場合はどうするか、とか、そういう話。
 				//もう一つは、探索済みを覚えたりするのもある。これもステップ側。
-			}
-			void operator()(grid_point g, grid::direction_type dir, bool is_calc) {
-				//remove searched grid
-				auto Itr = std::find(Searched.begin(), End, g);
-				if(Itr != End) {
-					--End;
-					std::swap(*Itr, *End);
-				}
-				if(!is_calc) {
-					WaitingList.push_back();
-				}
 			}
 		};
 		template<typename stepper, typename func, typename T>
@@ -408,11 +424,13 @@ namespace hmLib {
 
 					//Find grid including solutions
 					if(cor != detail::corners::none && cor == detail::corners::all) {
-						Stepper(fn, xaxis, yaxis, grid_point(x, y));
+						Stepper(fn, xaxis, yaxis, cor, grid_point(x, y));
 					}
 				}
 			}
 		}
+
+
 		namespace old_grid {
 			template<typename func, typename T, typename point_output_iterator>
 			point_output_iterator bisect_grid_border_point(func Fn, unsigned char CornerStatus, T xlower, T xupper, T ylower, T yupper, T xerror, T yerror, point_output_iterator out) {
