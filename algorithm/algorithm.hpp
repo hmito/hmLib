@@ -96,10 +96,10 @@ namespace hmLib{
 		return BPair;
 	}
 
-	template<typename T, typename output_iterator>
+	template<typename T, typename output_iterator, typename internal_cast_type = double>
 	output_iterator generate_range(T lower, T upper, unsigned int n, output_iterator out) {
 		for(unsigned int i = 0; i < n; ++i) {
-			*(out++) = (lower*(n - 1 - i) + upper *i) / (n - 1);
+			*(out++) = static_cast<internal_cast_type>(lower*(n - 1 - i) + upper *i) / (n - 1);
 		}
 		return out;
 	}
