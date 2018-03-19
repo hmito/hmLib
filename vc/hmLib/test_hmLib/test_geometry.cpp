@@ -10,7 +10,7 @@
 #include "../../../math/factorial.hpp"
 #include"../../../math/optimize.hpp"
 #include"../../../math/root.hpp"
-#include"../../../math/plane_root.hpp"
+//#include"../../../math/plane_root.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {

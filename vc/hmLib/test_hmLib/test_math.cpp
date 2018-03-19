@@ -4,31 +4,33 @@
 #include <algorithm>
 #include <list>
 #include "../../../iterators.hpp"
-#include "../../../math/axis.hpp"
-#include "../../../math/constants.hpp"
-#include "../../../math/factorial.hpp"
-#include"../../../math/optimize.hpp"
-#include"../../../math/root.hpp"
-#include"../../../math/plane_root.hpp"
+#include "../../../math/root.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {
 	TEST_CLASS(test_math) {
-public:
-	TEST_METHOD(axis_use) {
-		axis<double> Axis(0,10,100);
-		Assert::AreSame(0.1, Axis.grid_width(), L"");
-	}
-	TEST_METHOD(plane_root_use) {
-		std::vector<plane_geometry::point<double>> Ans;
-		hmLib::plane_root::grid_cross_search(
-			[](double x, double y) {return x*x - y; },
-			[](double x, double y) {return -x*x - y+10; },
-			plane_geometry::point<double>(-10.0,-10.0), plane_geometry::point<double>(10.0, 10.0),
-			101, plane_geometry::point<double>(1e-3, 1e-3), plane_geometry::point<double>(1e-6, 1e-6),back_inserter(Ans)
-		);
+	public:
+		TEST_METHOD(root_finding_toms748) {
+		auto f = [](double x) {return (x - 0.3)*(x - 0.4549)*(x - 0.8991); };
 
-		Assert::AreEqual(2u, Ans.size(), L"");
-	}
+		std::vector<double> Ans;
+		hmLib::root::root_toms748(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
+
+		Assert::AreEqual(3u, Ans.size(), L"Ans Num Error");
+		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(0.4549, Ans.at(1), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(0.8991, Ans.at(2), 1e-5, L"Ans Num Error");
+		}
+		TEST_METHOD(root_finding_bisect) {
+		auto f = [](double x) {return (x - 0.3)*(x - 0.4549)*(x - 0.8991); };
+
+		std::vector<double> Ans;
+		hmLib::root::root_bisect(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
+
+		Assert::AreEqual(3u, Ans.size(), L"Ans Num Error");
+		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(0.4549, Ans.at(1), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(0.8991, Ans.at(2), 1e-5, L"Ans Num Error");
+		}
 	};
 }

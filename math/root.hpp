@@ -20,7 +20,8 @@ namespace hmLib {
 					startFnVal = fb;
 					return std::make_pair(b, b);
 				} else if (fa * fb < 0.0) {
-					auto ans = boost::math::tools::toms748_solve(Fn, a, b, fa, fb, [error](ans_type v1, ans_type v2) {return v2 - v1 < error; });
+					boost::uintmax_t max_iter = 128;
+					auto ans = boost::math::tools::toms748_solve(Fn, a, b, fa, fb, [error](ans_type v1, ans_type v2) {return v2 - v1 < error; }, max_iter);
 					start = b;
 					startFnVal = fb;
 					return ans;
@@ -66,47 +67,27 @@ namespace hmLib {
 			return std::make_pair(a, a);
 		}
 		template<typename fn, typename T, typename output_iterator>
-		output_iterator root_toms748(fn Fn, T minval, T maxval, std::size_t n, T error, output_iterator out) {
+		output_iterator root_toms748(fn Fn, T minval, T maxval, T step, T error, output_iterator out) {
 			auto FnVal = Fn(minval);
-			T step = (maxval - minval) / n;
-
-			if (FnVal == 0) {
-				*(out++) = minval;
-			}
-
 			while (minval<maxval) {
-				Ans = root_step_toms748(Fn, minval, FnVal, maxval, step, error);
+				auto Ans = root_step_toms748(Fn, minval, FnVal, maxval, step, error);
 
-				if (Ans.first < end) {
+				if (Ans.first < maxval) {
 					*(out++) = (Ans.first + Ans.second) / 2.0;
 				}
-			}
-
-			if (FnVal == 0) {
-				*(out++) = maxval;
 			}
 
 			return out;
 		}
 		template<typename fn, typename T, typename output_iterator>
-		output_iterator root_bisect(fn Fn, T minval, T maxval, std::size_t n, T error, output_iterator out) {
+		output_iterator root_bisect(fn Fn, T minval, T maxval, T step, T error, output_iterator out) {
 			auto FnVal = Fn(minval);
-			T step = (maxval - minval) / n;
-
-			if (FnVal == 0) {
-				*(out++) = minval;
-			}
-
 			while (minval<maxval) {
-				Ans = root_step_bisect(Fn, minval, FnVal, maxval, step, error);
+				auto Ans = root_step_bisect(Fn, minval, FnVal, maxval, step, error);
 
-				if (Ans.first < end) {
+				if (Ans.first < maxval) {
 					*(out++) = (Ans.first + Ans.second) / 2.0;
 				}
-			}
-
-			if (FnVal == 0) {
-				*(out++) = maxval;
 			}
 
 			return out;

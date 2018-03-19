@@ -18,7 +18,7 @@ namespace hmLib {
 	private:
 		struct proxy {
 		public:
-			proxy(container* Ptr_) :Ptr(Ptr_) {}
+			proxy(this_type* This_) :This(This_) {}
 			proxy(const proxy&) = default;
 			proxy& operator=(const proxy&) = default;
 			proxy(proxy&&) = default;
@@ -53,6 +53,11 @@ namespace hmLib {
 		container* Ptr;
 	};
 	template<typename container>
+	back_insert_iterator<container> back_inserter(container& Container) {
+		return back_insert_iterator<container>(Container);
+	}
+
+	template<typename container>
 	class front_insert_iterator {
 	private:
 		using this_type = front_insert_iterator<container>;
@@ -66,13 +71,13 @@ namespace hmLib {
 	private:
 		struct proxy {
 		public:
-			proxy(container* Ptr_) :Ptr(Ptr_) {}
+			proxy(this_type* This_) :This(This_) {}
 			proxy(const proxy&) = default;
 			proxy& operator=(const proxy&) = default;
 			proxy(proxy&&) = default;
 			proxy& operator=(proxy&&) = default;
 		public:
-			proxy& operator=(const value_type& val) {
+			proxy & operator=(const value_type& val) {
 				This->insert(val);
 				return *this;
 			}
@@ -100,6 +105,11 @@ namespace hmLib {
 	private:
 		container* Ptr;
 	};
+	template<typename container>
+	front_insert_iterator<container> front_inserter(container& Container) {
+		return front_insert_iterator<container>(Container);
+	}
+
 	template<typename container,typename iterator>
 	class insert_iterator {
 	private:
@@ -114,7 +124,7 @@ namespace hmLib {
 	private:
 		struct proxy {
 		public:
-			proxy(container* Ptr_) :Ptr(Ptr_) {}
+			proxy(this_type* This_) :This(This_) {}
 			proxy(const proxy&) = default;
 			proxy& operator=(const proxy&) = default;
 			proxy(proxy&&) = default;
@@ -149,6 +159,11 @@ namespace hmLib {
 		container* Ptr;
 		iterator Itr;
 	};
+	template<typename container, typename iterator>
+	insert_iterator<container, iterator> inserter(container& Container, iterator Itr) {
+		return insert_iterator<container, iterator>(Container, Itr);
+	}
+
 }
 # 
 #endif 
