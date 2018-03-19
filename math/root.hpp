@@ -6,56 +6,107 @@
 #include<boost/math/tools/roots.hpp>
 namespace hmLib {
 	namespace root {
-		template<typename fn, typename T, typename output_iterator>
-		output_iterator small_step_toms748(fn Fn, T minval, T maxval, std::size_t n, T error, output_iterator out) {
-			using ans_t = decltype(Fn(minval));
-			T val = minval;
-			auto fval = Fn(val);
-			if(fval == 0) {
-				*(out++) = val;
+		template<typename fn, typename T,typename ans_type>
+		std::pair<T,T> root_step_toms748(fn Fn, T& start, ans_type& startFnVal, T end, T step, T error) {
+			T a = start;
+			ans_type fa = startFnVal;
+
+			while (a < end) {
+				auto b = std::min(a + step, end);
+				auto fb = Fn(b);
+
+				if (fb == 0) {
+					start = b;
+					startFnVal = fb;
+					return std::make_pair(b, b);
+				} else if (fa * fb < 0.0) {
+					auto ans = boost::math::tools::toms748_solve(Fn, a, b, fa, fb, [error](ans_type v1, ans_type v2) {return v2 - v1 < error; });
+					start = b;
+					startFnVal = fb;
+					return ans;
+				}
+				
+				a = b;
+				fa = fb;
 			}
 
-			for(std::size_t i = 1; i <= n; ++i) {
-				auto nval = minval + i*(maxval - minval) / n;
-				auto nfval = Fn(nval);
+			start = a;
+			startFnVal = fa;
 
-				if(fval*nfval <= 0) {
-					if(nfval == 0) {
-						*(out++) = nval;
-					} else if(fval != 0) {
-						auto valpair = boost::math::tools::toms748_solve(Fn, val, nval,fval, nfval, [=](ans_t v1, ans_t v2) {return v2 - v1 < error; });
-						*(out++) = (valpair.first + valpair.second) / 2;
-					}
+			return std::make_pair(a, a);
+		}
+		template<typename fn, typename T, typename ans_type>
+		std::pair<T,T> root_step_bisect(fn Fn, T& start, ans_type& startFnVal, T end, T step, T error) {
+			T a = start;
+			ans_type fa = startFnVal;
+
+			while (a < end) {
+				auto b = std::min(a + step, end);
+				auto fb = Fn(b);
+
+				if (fb == 0) {
+					start = b;
+					startFnVal = fb;
+					return std::make_pair(b, b);
 				}
-				val = std::move(nval);
-				fval = std::move(nfval);
+				else if (fa * fb < 0.0) {
+					auto ans = boost::math::tools::bisect(Fn, a, b, [error](ans_type v1, ans_type v2) {return v2 - v1 < error; });
+					start = b;
+					startFnVal = fb;
+					return ans;
+				}
+
+				a = b;
+				fa = fb;
+			}
+
+			start = a;
+			startFnVal = fa;
+
+			return std::make_pair(a, a);
+		}
+		template<typename fn, typename T, typename output_iterator>
+		output_iterator root_toms748(fn Fn, T minval, T maxval, std::size_t n, T error, output_iterator out) {
+			auto FnVal = Fn(minval);
+			T step = (maxval - minval) / n;
+
+			if (FnVal == 0) {
+				*(out++) = minval;
+			}
+
+			while (minval<maxval) {
+				Ans = root_step_toms748(Fn, minval, FnVal, maxval, step, error);
+
+				if (Ans.first < end) {
+					*(out++) = (Ans.first + Ans.second) / 2.0;
+				}
+			}
+
+			if (FnVal == 0) {
+				*(out++) = maxval;
 			}
 
 			return out;
 		}
 		template<typename fn, typename T, typename output_iterator>
-		output_iterator small_step_bisect(fn Fn, T minval, T maxval, std::size_t n, T error, output_iterator out) {
-			using ans_t = decltype(Fn(minval));
-			T val = minval;
-			auto fval = Fn(val);
-			if(fval == 0) {
-				*(out++) = val;
+		output_iterator root_bisect(fn Fn, T minval, T maxval, std::size_t n, T error, output_iterator out) {
+			auto FnVal = Fn(minval);
+			T step = (maxval - minval) / n;
+
+			if (FnVal == 0) {
+				*(out++) = minval;
 			}
 
-			for(std::size_t i = 1; i <= n; ++i) {
-				auto nval = minval + i*(maxval - minval) / n;
-				auto nfval = Fn(nval);
+			while (minval<maxval) {
+				Ans = root_step_bisect(Fn, minval, FnVal, maxval, step, error);
 
-				if(fval*nfval <= 0) {
-					if(nfval == 0) {
-						*(out++) = nval;
-					} else if(fval != 0) {
-						auto valpair = boost::math::tools::bisect(Fn, val, nval,[=](ans_t v1, ans_t v2) {return v2 - v1 < error; });
-						*(out++) = (valpair.first + valpair.second) / 2;
-					}
+				if (Ans.first < end) {
+					*(out++) = (Ans.first + Ans.second) / 2.0;
 				}
-				val = std::move(nval);
-				fval = std::move(nfval);
+			}
+
+			if (FnVal == 0) {
+				*(out++) = maxval;
 			}
 
 			return out;
