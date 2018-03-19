@@ -1,5 +1,5 @@
-#ifndef HMLIB_AXIS_INC
-#define HMLIB_AXIS_INC 100
+#ifndef HMLIB_MATH_AXIS_INC
+#define HMLIB_MATH_AXIS_INC 100
 #
 #include<utility>
 #include<iterator>
@@ -111,17 +111,17 @@ namespace hmLib {
 				return static_cast<index_type>(std::round(index_float(from)));
 			}
 			index_type ceil(index_type from)const {
-				return static_cast<index_type>(std::ceil(index_float()));
+				return static_cast<index_type>(std::ceil(index_float(from)));
 			}
 			index_type floor(index_type from)const {
-				return static_cast<index_type>(std::floor(index_float()));
+				return static_cast<index_type>(std::floor(index_float(from)));
 			}
 		};
 	public:
 		value_type min()const { return Min; }
 		value_type max()const { return Max; }
 		difference_type width()const { return Max - Min; }
-		difference_type grid_width()const { return width() / (size()-1); }
+		difference_type grid_width()const { return width() / (size() - 1); }
 		axis<T> subaxis(index_type MinIndex, index_type MaxIndex) {
 			return axis<T>(operator[](MinIndex), operator[](MaxIndex), MaxIndex - MinIndex + 1);
 		}
@@ -129,7 +129,7 @@ namespace hmLib {
 		index_type size()const { return Size; }
 		bool empty()const { return Size == 0; }
 		value_type operator[](index_type Index)const {
-			return (Min*(Size - 1 - Index) + Max*Index) / (Size - 1); 
+			return (Min*(Size - 1 - Index) + Max*Index) / (Size - 1);
 		}
 		value_type at(index_type Index)const {
 			hmLib_assert(Index < Size, hmLib::access_exceptions::out_of_range_access, "Out of axis range.");

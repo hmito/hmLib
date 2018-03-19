@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
-#include <hmLib/circular.hpp>
+#include "../../../circular.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{

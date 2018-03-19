@@ -5,15 +5,22 @@
 #include<string>
 #include<utility>
 #include<algorithm>
+
+#ifdef _MSC_VER
+# 	define HMLIB_FILEPATH_SEP '\\'
+#else
+# 	define HMLIB_FILEPATH_SEP '/'
+#endif				
+
 namespace hmLib {
 	inline bool is_exist_file(const std::string& Name_) {
 		std::ifstream fin(Name_);
 		return fin.is_open();
 	}
-	inline std::pair<std::string, std::string> divide_filepath(std::string FullPath){
+	inline std::pair<std::string, std::string> splite_filepath(std::string FullPath){
 		auto FileLength = std::distance(
 			FullPath.rbegin(), 
-			std::find(FullPath.rbegin(), FullPath.rend(), '\\')
+			std::find(FullPath.rbegin(), FullPath.rend(), HMLIB_FILEPATH_SEP)
 		);
 		auto SlashPos = FullPath.size() - FileLength - 1;
 		return std::pair<std::string, std::string>(

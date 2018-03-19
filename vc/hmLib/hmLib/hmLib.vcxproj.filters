@@ -389,12 +389,6 @@
     <ClInclude Include="..\..\..\static_buffer.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\geometry\position.hpp">
-      <Filter>hmLib\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\geometry\rectangle.hpp">
-      <Filter>hmLib\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\math\optimize.hpp">
       <Filter>hmLib\math</Filter>
     </ClInclude>
@@ -421,6 +415,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\gates.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\constants.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\root.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\segment.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\factorial.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\point.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\plane_root.hpp">
+      <Filter>hmLib\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
