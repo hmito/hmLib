@@ -799,6 +799,17 @@ public:
 			Assert::AreEqual<int>(i, Cir2[i]);
 		}
 	}
+	TEST_METHOD(trivial_type) {
+		circular<int, 3> Cir;
+		Cir.push_back(2);
+		Cir.push_back(3);
+		Cir.push_back(4);
+		Cir.pop_front();
+		Cir.push_back(5);
+		Assert::AreEqual(3, Cir[0], L"");
+		Assert::AreEqual(4, Cir[1], L"");
+		Assert::AreEqual(5, Cir[2], L"");
+	}
 	};
 	unsigned int test_circular::value_t::Cnt = 0;
 }

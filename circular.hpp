@@ -45,9 +45,9 @@ namespace hmLib{
 			using value_type = typename this_circular::value_type;
 			using difference_type = typename this_circular::difference_type;
 			using pointer = typename this_circular::pointer;
-			using const_pointer = const pointer;
+			using const_pointer = typename this_circular::const_pointer;
 			using reference = typename this_circular::reference;
-			using const_reference = const reference;
+			using const_reference = typename this_circular::const_reference;
 		private:
 			using base_iterator = typename this_circular::base_iterator ;
 			using base_const_iterator = typename this_circular::base_const_iterator ;
@@ -195,9 +195,9 @@ namespace hmLib{
 			using iterator_category = std::random_access_iterator_tag;
 			using value_type = typename this_circular::value_type;
 			using difference_type = typename this_circular::difference_type;
-			using pointer = typename std::add_const<typename this_circular::pointer>::type;
+			using pointer = typename this_circular::const_pointer;
 			using const_pointer = pointer;
-			using reference = typename std::add_const<typename this_circular::reference>::type;
+			using reference = typename this_circular::const_reference;
 			using const_reference = reference;
 		private:
 			using base_const_iterator = typename this_circular::base_const_iterator;
@@ -330,12 +330,13 @@ namespace hmLib{
 		using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
 		using pointer = typename std::add_pointer<T>::type;
 		using const_pointer = typename std::add_pointer<typename std::add_const<T>::type>::type;
-		using size_type =  unsigned int;
-		using difference_type = signed int;
+		using size_type =  std::size_t;
+		using difference_type = int;
 	public:
 		static constexpr size_type static_size() { return Size_; }
 	private:
 		using base_array =  detail::aligned_array<T, Size_ + 1> ;
+	public:
 		using base_iterator = typename base_array::iterator;
 		using base_const_iterator = typename base_array::const_iterator;
 	public:
@@ -347,8 +348,8 @@ namespace hmLib{
 		iterator End;
 		unsigned int Size;
 	public:
-		//base_const_iterator buffer_first()const{ return Array.begin(); }
-		//base_const_iterator buffer_last()const{ return Array.end() - 1; }
+		base_const_iterator buffer_first()const{ return Array.begin(); }
+		base_const_iterator buffer_last()const{ return Array.end() - 1; }
 	public:
 		circular()
 			: Beg(Array.begin(), *this)
@@ -395,6 +396,20 @@ namespace hmLib{
 			++Size;
 			return false;
 		}
+		bool rotete_back(const_reference Value) {
+			if(full()) {
+				(*Beg).~value_type();
+				++Beg;
+				::new(End.base()) value_type(Value);
+				++End;
+				return true;
+			} else {
+				::new(End.base()) value_type(Value);
+				++End;
+				++Size;
+				return false;
+			}
+		}
 		void pop_back(){
 			if(empty())return;
 			End[-1].~value_type();
@@ -408,9 +423,23 @@ namespace hmLib{
 			++Size;
 			return false;
 		}
+		bool rotete_front(const_reference Value) {
+			if(full()) {
+				End[-1].~value_type();
+				--End;
+				::new((Beg - 1).base()) value_type(Value);
+				--Beg;
+				return true;
+			} else {
+				::new((Beg - 1).base()) value_type(Value);
+				--Beg;
+				++Size;
+				return false;
+			}
+		}
 		void pop_front(){
 			if(empty())return;
-			(*End).~value_type();
+			(*Beg).~value_type();
 			++Beg;
 			--Size;
 		}
@@ -662,7 +691,7 @@ namespace hmLib{
 		bool empty()const{ return Size == 0; }
 		bool full()const{ return Size == max_size(); }
 		size_type size()const{ return Size; }
-		constexpr size_type max_size() { return Size_; }
+		constexpr size_type max_size()const { return Size_; }
 		size_type remain()const{ return max_size() - size(); }
 	};
 }
