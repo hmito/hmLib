@@ -14,23 +14,23 @@ namespace hmLib {
 		auto f = [](double x) {return (x - 0.3)*(x - 0.4549)*(x - 0.8991); };
 
 		std::vector<double> Ans;
-		hmLib::root::root_toms748(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
+		hmLib::math::convergent_root_toms748(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
 
-		Assert::AreEqual(3u, Ans.size(), L"Ans Num Error");
-		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
-		Assert::AreEqual(0.4549, Ans.at(1), 1e-5, L"Ans Num Error");
-		Assert::AreEqual(0.8991, Ans.at(2), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(1u, Ans.size(), L"Ans Num Error");
+//		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(0.4549, Ans.at(0), 1e-5, L"Ans Num Error");
+//		Assert::AreEqual(0.8991, Ans.at(2), 1e-5, L"Ans Num Error");
 		}
 		TEST_METHOD(root_finding_bisect) {
 		auto f = [](double x) {return (x - 0.3)*(x - 0.4549)*(x - 0.8991); };
 
 		std::vector<double> Ans;
-		hmLib::root::root_bisect(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
+		hmLib::math::convergent_root_bisect(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
 
-		Assert::AreEqual(3u, Ans.size(), L"Ans Num Error");
-		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
-		Assert::AreEqual(0.4549, Ans.at(1), 1e-5, L"Ans Num Error");
-		Assert::AreEqual(0.8991, Ans.at(2), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(1u, Ans.size(), L"Ans Num Error");
+//		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
+		Assert::AreEqual(0.4549, Ans.at(0), 1e-5, L"Ans Num Error");
+//		Assert::AreEqual(0.8991, Ans.at(2), 1e-5, L"Ans Num Error");
 		}
 	};
 }
