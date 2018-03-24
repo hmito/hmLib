@@ -38,19 +38,19 @@ namespace hmLib {
 	private:
 		iterator_type Cur;
 		iterator_type End;
-		bool Overflow;
+		unsigned int Overflow;
 	public:
-		overflow_iterator(): Cur(), End(), Overflow(false){}
+		overflow_iterator(): Cur(), End(), Overflow(0){}
 		overflow_iterator(const this_type&) = default;
 		this_type& operator=(const this_type&) = default;
-		overflow_iterator(iterator_type Cur_, iterator_type End_) : Cur(Cur_), End(End_), Overflow(false){}
+		overflow_iterator(iterator_type Cur_, iterator_type End_) : Cur(Cur_), End(End_), Overflow(0){}
 	public:
 		proxy operator*() { return proxy(this); }
 		this_type& operator++() {
 			if (Cur != End) {
 				++Cur;
 			}else {
-				Overflow = true;
+				++Overflow;
 			}
 			return *this;
 		}
@@ -59,11 +59,12 @@ namespace hmLib {
 			if (Cur != End) {
 				++Cur;
 			}else {
-				Overflow = true;
+				++Overflow;
 			}
 			return Prev;
 		}
-		bool overflow()const { return Overflow; }
+		bool overflow()const { return Overflow>0; }
+		unsigned int overflow_count()const { return Overflow; }
 		bool empty()const { return Cur == End; }
 		difference_type remain()const { return std::distance(Cur, End); }
 		iterator_type base()const { return Cur; }
