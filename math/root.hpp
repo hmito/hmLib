@@ -15,7 +15,7 @@ namespace hmLib {
 		public:
 			toms748_root_stepper(value_type step_, value_type error_):step(step_),error(error_){}
 			template<typename fn, typename ans_type>
-			std::pair<value_type, value_typeT> operator()(fn Fn, value_type& start, ans_type& startFnVal, value_type end)const {
+			std::pair<value_type, value_type> operator()(fn Fn, value_type& start, ans_type& startFnVal, value_type end)const {
 				value_type a = start;
 				ans_type fa = startFnVal;
 
@@ -29,7 +29,7 @@ namespace hmLib {
 						return std::make_pair(b, b);
 					} else if(fa * fb < 0.0) {
 						boost::uintmax_t max_iter = 128;
-						auto ans = boost::math::tools::toms748_solve(Fn, a, b, fa, fb, [error](ans_type v1, ans_type v2) {return v2 - v1 < error; }, max_iter);
+						auto ans = boost::math::tools::toms748_solve(Fn, a, b, fa, fb, [error=error](ans_type v1, ans_type v2) {return v2 - v1 < error; }, max_iter);
 						start = b;
 						startFnVal = fb;
 						return ans;
@@ -58,7 +58,7 @@ namespace hmLib {
 		public:
 			bisect_root_stepper(value_type step_, value_type error_):step(step_), error(error_) {}
 			template<typename fn, typename ans_type>
-			std::pair<value_type, value_typeT> operator()(fn Fn, value_type& start, ans_type& startFnVal, value_type end)const {
+			std::pair<value_type, value_type> operator()(fn Fn, value_type& start, ans_type& startFnVal, value_type end)const {
 				value_type a = start;
 				ans_type fa = startFnVal;
 
@@ -72,7 +72,7 @@ namespace hmLib {
 						return std::make_pair(b, b);
 					} else if(fa * fb < 0.0) {
 						boost::uintmax_t max_iter = 128;
-						auto ans = boost::math::tools::bisect(Fn, a, b, [error](ans_type v1, ans_type v2) {return v2 - v1 < error; });
+						auto ans = boost::math::tools::bisect(Fn, a, b, [error=error](ans_type v1, ans_type v2) {return v2 - v1 < error; });
 						start = b;
 						startFnVal = fb;
 						return ans;
@@ -119,10 +119,10 @@ namespace hmLib {
 			return out;
 		}
 		template<typename root_stepper, typename fn, typename T, typename output_iterator>
-		output_iterator convergent_root(root_stepper Stepper, fn Fn, T minval, T maxval, output_iterator out) {
+		output_iterator stable_root(root_stepper Stepper, fn Fn, T minval, T maxval, output_iterator out) {
 			auto FnVal = Fn(minval);
 			while(minval<maxval) {
-				auto Ans = Stepper(Fn, minval, FnVal);
+				auto Ans = Stepper(Fn, minval, FnVal, maxval);
 
 				if(Ans.first < maxval && FnVal<0) {
 					*(out++) = (Ans.first + Ans.second) / 2.0;
@@ -134,17 +134,17 @@ namespace hmLib {
 		template<typename fn, typename T, typename output_iterator>
 		output_iterator root_toms748(fn Fn, T minval, T maxval, T step, T error, output_iterator out) {
 			toms748_root_stepper<T> Stepper(step, error);
-			return root(Stepper, Fn, minval, maxval, out);
+			return root(Stepper, std::forward<fn>(Fn), minval, maxval, out);
 		}
-		template<typename root_stepper, typename fn, typename T, typename output_iterator>
+		template<typename fn, typename T, typename output_iterator>
 		output_iterator root_with_stability_toms748(fn Fn, T minval, T maxval, T step, T error, output_iterator out) {
 			toms748_root_stepper<T> Stepper(step, error);
-			return root_with_stability(Stepper, Fn, minval, maxval, out);
+			return root_with_stability(Stepper, std::forward<fn>(Fn), minval, maxval, out);
 		}
-		template<typename root_stepper, typename fn, typename T, typename output_iterator>
-		output_iterator convergent_root(fn Fn, T minval, T maxval, T step, T error, output_iterator out) {
+		template<typename fn, typename T, typename output_iterator>
+		output_iterator stable_root_toms748(fn Fn, T minval, T maxval, T step, T error, output_iterator out) {
 			toms748_root_stepper<T> Stepper(step, error);
-			return convergent_root(Stepper, Fn, minval, maxval, out);
+			return stable_root(Stepper, std::forward<fn>(Fn), minval, maxval, out);
 		}
 	}
 }
