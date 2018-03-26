@@ -35,13 +35,19 @@ namespace hmLib {
 		public:
 			value_type operator*()const { return (*pAxis)[Pos]; }
 			value_type operator[](difference_type Val)const { return (*pAxis)[Pos + Val]; }
-			iterator& operator++() { ++Pos; }
+			iterator& operator++() {
+				++Pos; 
+				return *this;
+			}
 			iterator operator++(int) {
 				iterator Itr = *this;
 				++(*this);
 				return Itr;
 			}
-			iterator& operator--() { --Pos; }
+			iterator& operator--() {
+				--Pos;
+				return *this;
+			}
 			iterator operator--(int) {
 				iterator Itr = *this;
 				--(*this);
