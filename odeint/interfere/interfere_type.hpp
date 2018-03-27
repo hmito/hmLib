@@ -8,9 +8,9 @@ namespace hmLib {
 		template<typename state_type,typename time_type>
 		struct interfere_system {
 			template<typename stepper>
-			interfere_type ready(stepper& Stepper, const state_type& x, time_type t, time_type dt, state_type& nx);
+			interfere_request ready(stepper& Stepper, const state_type& x, time_type t, time_type dt, state_type& nx);
 			bool valid_step(const state_type& x, time_type t);						//valid_step should return true for current state after ready function
-			bool validate(onst state_type& x, time_type t, state_type& vx);			//validate should return true when it change state
+			bool validate(const state_type& x, time_type t, state_type& vx);			//validate should return true when it change state
 		};
 		*/
 	}

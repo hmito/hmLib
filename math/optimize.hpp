@@ -1,10 +1,11 @@
-#ifndef HMLIB_OPTIMIZE_INC
-#define HMLIB_OPTIMIZE_INC 101
+#ifndef HMLIB_MATH_OPTIMIZE_INC
+#define HMLIB_MATH_OPTIMIZE_INC 101
 #
 #include<random>
 #include<utility>
+#include"constants.hpp"
 namespace hmLib{
-	namespace optimize{
+	namespace optimize {
 		namespace state_breakers{
 			template<typename state, typename eval_type>
 			struct none_breaker{
@@ -81,7 +82,6 @@ namespace hmLib{
 				}
 			};
 		}
-
 		/*!
 		@brief	golden section search method
 		Search the maximum value of Evaluate in the state [MinVal:MaxVal].
@@ -94,18 +94,16 @@ namespace hmLib{
 				If the searching of maximum value is failed, the return pair distance will be larger than Error.*/
 		template<typename evaluate, typename state>
 		std::pair<state, state> golden_section_search(evaluate&& Evaluate, state MinVal, state MaxVal, double Error) {
-			constexpr double gratio = 1.6180339887498948482045868343656;
-
 			auto MinEval = Evaluate(MinVal);
 			auto MaxEval = Evaluate(MaxVal);
 
 			//First division: MinSide
-			auto LowerVal = (gratio*MinVal + MaxVal) / (1 + gratio);
+			auto LowerVal = (math::golden_ratio*MinVal + MaxVal) / (1 + math::golden_ratio);
 			auto LowerEval = Evaluate(LowerVal);
 			if (LowerEval < MinEval && LowerEval < MaxEval)return std::make_pair(MinVal, MaxVal);
 
 			//Second division: MaxSide
-			state UpperVal = (gratio*LowerVal + MaxVal) / (1 + gratio);
+			state UpperVal = (math::golden_ratio*LowerVal + MaxVal) / (1 + math::golden_ratio);
 			auto UpperEval = Evaluate(UpperVal);
 
 			while (MaxVal - MinVal > Error) {
@@ -117,7 +115,7 @@ namespace hmLib{
 					LowerVal = std::move(UpperVal);
 					LowerEval = std::move(UpperEval);
 
-					UpperVal = (gratio*LowerVal + MaxVal) / (1 + gratio);
+					UpperVal = (math::golden_ratio*LowerVal + MaxVal) / (1 + math::golden_ratio);
 					UpperEval = Evaluate(UpperVal);
 				}
 				//Update Max
@@ -128,7 +126,7 @@ namespace hmLib{
 					UpperVal = std::move(LowerVal);
 					UpperEval = std::move(LowerEval);
 
-					LowerVal = (MinVal + gratio*UpperVal) / (1 + gratio);
+					LowerVal = (MinVal + math::golden_ratio*UpperVal) / (1 + math::golden_ratio);
 					LowerEval = Evaluate(LowerVal);
 				}
 			}
@@ -148,18 +146,16 @@ namespace hmLib{
 				If the searching of maximum value is failed, the return pair distance will be larger than Error.*/
 		template<typename evaluate, typename state>
 		std::pair<state, state> flatable_golden_section_search(evaluate&& Evaluate, state MinVal, state MaxVal, double Error) {
-			constexpr double gratio = 1.6180339887498948482045868343656;
-
 			auto MinEval = Evaluate(MinVal);
 			auto MaxEval = Evaluate(MaxVal);
 
 			//First division: MinSide
-			auto LowerVal = (gratio*MinVal + MaxVal) / (1 + gratio);
+			auto LowerVal = (math::golden_ratio*MinVal + MaxVal) / (1 + math::golden_ratio);
 			auto LowerEval = Evaluate(LowerVal);
 			if (LowerEval < MinEval && LowerEval < MaxEval)return std::make_pair(MinVal, MaxVal);
 
 			//Second division: MaxSide
-			state UpperVal = (gratio*LowerVal + MaxVal) / (1 + gratio);
+			state UpperVal = (math::golden_ratio*LowerVal + MaxVal) / (1 + math::golden_ratio);
 			auto UpperEval = Evaluate(UpperVal);
 
 			while (MaxVal - MinVal > Error) {
@@ -171,7 +167,7 @@ namespace hmLib{
 					LowerVal = std::move(UpperVal);
 					LowerEval = std::move(UpperEval);
 
-					UpperVal = (gratio*LowerVal + MaxVal) / (1 + gratio);
+					UpperVal = (math::golden_ratio*LowerVal + MaxVal) / (1 + math::golden_ratio);
 					UpperEval = Evaluate(UpperVal);
 				}
 				//Update Max
@@ -182,7 +178,7 @@ namespace hmLib{
 					UpperVal = std::move(LowerVal);
 					UpperEval = std::move(LowerEval);
 
-					LowerVal = (MinVal + gratio*UpperVal) / (1 + gratio);
+					LowerVal = (MinVal + math::golden_ratio*UpperVal) / (1 + math::golden_ratio);
 					LowerEval = Evaluate(LowerVal);
 				}
 				//Same Case
@@ -237,12 +233,12 @@ namespace hmLib{
 					MaxEval = Evaluate(MaxVal);
 
 					//First division: MinSide
-					auto LowerVal = (gratio*MinVal + MaxVal) / (1 + gratio);
+					auto LowerVal = (math::golden_ratio*MinVal + MaxVal) / (1 + math::golden_ratio);
 					auto LowerEval = Evaluate(LowerVal);
 					if (LowerEval < MinEval && LowerEval < MaxEval)return std::make_pair(MinVal, MaxVal);
 
 					//Second division: MaxSide
-					state UpperVal = (gratio*LowerVal + MaxVal) / (1 + gratio);
+					state UpperVal = (math::golden_ratio*LowerVal + MaxVal) / (1 + math::golden_ratio);
 					auto UpperEval = Evaluate(UpperVal);
 				}
 			}

@@ -2,8 +2,9 @@
 #define HMLIB_CIRCULAR_INC 100
 #
 #include<iterator>
+#include<type_traits>
 namespace hmLib{
-	namespace{
+	namespace detail{
 		template<typename T, unsigned int Size_>
 		struct aligned_array{
 			typedef T& reference;
@@ -34,15 +35,22 @@ namespace hmLib{
 		};
 		template<typename this_circular>
 		struct circular_const_iterator;
-
 		template<typename this_circular>
-		struct circular_iterator : public std::iterator<std::random_access_iterator_tag, typename this_circular::value_type, typename this_circular::difference_type, typename this_circular::pointer, typename this_circular::reference>{
+		struct circular_iterator{
 			friend struct circular_const_iterator<this_circular>;
+		private:
 			typedef circular_iterator<this_circular> this_type;
-			typedef typename this_circular::base_iterator base_iterator;
-			typedef typename this_circular::base_const_iterator base_const_iterator;
-			typedef const reference const_reference;
-			typedef const pointer const_pointer;
+		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = typename this_circular::value_type;
+			using difference_type = typename this_circular::difference_type;
+			using pointer = typename this_circular::pointer;
+			using const_pointer = typename this_circular::const_pointer;
+			using reference = typename this_circular::reference;
+			using const_reference = typename this_circular::const_reference;
+		private:
+			using base_iterator = typename this_circular::base_iterator ;
+			using base_const_iterator = typename this_circular::base_const_iterator ;
 		private:
 			base_iterator Cur;
 			const this_circular* Ptr;
@@ -131,18 +139,18 @@ namespace hmLib{
 					}
 				}
 			}
-			friend this_type operator+(this_type Itr, difference_type dif){
+			friend this_type operator+(const this_type& Itr, difference_type dif){
 				auto Ans = Itr;
 				Ans += dif;
 				return Ans;
 			}
-			friend this_type operator+(difference_type dif, this_type Itr){
+			friend this_type operator+(difference_type dif, const this_type& Itr){
 				return operator+(Itr, dif);
 			}
-			friend this_type operator-(this_type Itr, difference_type dif){
+			friend this_type operator-(const this_type& Itr, difference_type dif){
 				return operator+(Itr, -dif);
 			}
-			friend difference_type operator-(this_type Itr1, this_type Itr2){
+			friend difference_type operator-(const this_type& Itr1, this_type Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
 					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first())+1;
@@ -152,13 +160,13 @@ namespace hmLib{
 				}
 				return Itr1.Cur - Itr2.Cur;
 			}
-			friend bool operator==(this_type Itr1, this_type Itr2){
+			friend bool operator==(const this_type& Itr1, const this_type& Itr2){
 				return Itr1.Cur == Itr2.Cur;
 			}
-			friend bool operator!=(this_type Itr1, this_type Itr2){
+			friend bool operator!=(const this_type& Itr1, const this_type& Itr2){
 				return !(Itr1 == Itr2);
 			}
-			friend bool operator<(this_type Itr1, this_type Itr2){
+			friend bool operator<(const this_type& Itr1, const this_type& Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
 					return false;
@@ -168,21 +176,31 @@ namespace hmLib{
 				}
 				return Itr1.Cur < Itr2.Cur;
 			}
-			friend bool operator>(this_type Itr1, this_type Itr2){
+			friend bool operator>(const this_type& Itr1, const this_type& Itr2){
 				return Itr2 < Itr1;
 			}
-			friend bool operator<=(this_type Itr1, this_type Itr2){
+			friend bool operator<=(const this_type& Itr1, const this_type& Itr2){
 				return Itr1 == Itr2 || Itr1 < Itr2;
 			}
-			friend bool operator>=(this_type Itr1, this_type Itr2){
+			friend bool operator>=(const this_type& Itr1, const this_type& Itr2){
 				return Itr1 == Itr2 || Itr1 > Itr2;
 			}
 		};
 		template<typename this_circular>
 		struct circular_const_iterator : public std::iterator<std::random_access_iterator_tag, typename this_circular::value_type, typename this_circular::difference_type, typename this_circular::const_pointer, typename this_circular::const_reference>{
+			friend struct circular_const_iterator<this_circular>;
+		private:
 			typedef circular_const_iterator<this_circular> this_type;
-			typedef typename this_circular::base_iterator base_iterator;
-			typedef typename this_circular::base_const_iterator base_const_iterator;
+		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = typename this_circular::value_type;
+			using difference_type = typename this_circular::difference_type;
+			using pointer = typename this_circular::const_pointer;
+			using const_pointer = pointer;
+			using reference = typename this_circular::const_reference;
+			using const_reference = reference;
+		private:
+			using base_const_iterator = typename this_circular::base_const_iterator;
 		private:
 			base_const_iterator Cur;
 			const this_circular* Ptr;
@@ -254,18 +272,18 @@ namespace hmLib{
 					}
 				}
 			}
-			friend this_type operator+(this_type Itr, difference_type dif){
+			friend this_type operator+(const this_type& Itr, difference_type dif){
 				auto Ans = Itr;
 				Ans += dif;
 				return Ans;
 			}
-			friend this_type operator+(difference_type dif, this_type Itr){
+			friend this_type operator+(difference_type dif, const this_type& Itr){
 				return operator+(Itr, dif);
 			}
-			friend this_type operator-(this_type Itr, difference_type dif){
+			friend this_type operator-(const this_type& Itr, difference_type dif){
 				return operator+(Itr, -dif);
 			}
-			friend difference_type operator-(this_type Itr1, this_type Itr2){
+			friend difference_type operator-(const this_type& Itr1, const this_type& Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
 					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first()) + 1;
@@ -275,13 +293,13 @@ namespace hmLib{
 				}
 				return Itr1.Cur - Itr2.Cur;
 			}
-			friend bool operator==(this_type Itr1, this_type Itr2){
+			friend bool operator==(const this_type& Itr1, const this_type& Itr2){
 				return Itr1.Cur == Itr2.Cur;
 			}
-			friend bool operator!=(this_type Itr1, this_type Itr2){
+			friend bool operator!=(const this_type& Itr1, const this_type& Itr2){
 				return !(Itr1 == Itr2);
 			}
-			friend bool operator<(this_type Itr1, this_type Itr2){
+			friend bool operator<(const this_type& Itr1, const this_type& Itr2){
 				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
 					//1<=E<2
 					return false;
@@ -291,36 +309,39 @@ namespace hmLib{
 				}
 				return Itr1.Cur < Itr2.Cur;
 			}
-			friend bool operator>(this_type Itr1, this_type Itr2){
+			friend bool operator>(const this_type& Itr1, const this_type& Itr2){
 				return Itr2 < Itr1;
 			}
-			friend bool operator<=(this_type Itr1, this_type Itr2){
+			friend bool operator<=(const this_type& Itr1, const this_type& Itr2){
 				return Itr1 == Itr2 || Itr1 < Itr2;
 			}
-			friend bool operator>=(this_type Itr1, this_type Itr2){
+			friend bool operator>=(const this_type& Itr1, const this_type& Itr2){
 				return Itr1 == Itr2 || Itr1 > Itr2;
 			}
 		};
 	}
 	template<typename T, unsigned int Size_>
 	struct circular{
-		typedef circular<T, Size_> this_type;
-		typedef T value_type;
-		typedef T& reference;
-		typedef const T& const_reference;
-		typedef T* pointer;
-		typedef const T* const_pointer;
-		typedef unsigned int size_type;
-		typedef signed int difference_type;
-	public:
-		static size_type max_size(){ return Size_; }
 	private:
-		typedef aligned_array<T, Size_ + 1> base_array;
+		using this_type = circular<T, Size_> ;
 	public:
-		typedef typename base_array::iterator base_iterator;
-		typedef typename base_array::const_iterator base_const_iterator;
-		typedef circular_iterator<this_type> iterator;
-		typedef circular_const_iterator<this_type> const_iterator;
+		using value_type = T ;
+		using reference = typename std::add_lvalue_reference<T>::type;
+		using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
+		using pointer = typename std::add_pointer<T>::type;
+		using const_pointer = typename std::add_pointer<typename std::add_const<T>::type>::type;
+		using size_type =  std::size_t;
+		using difference_type = int;
+	public:
+		static constexpr size_type static_size() { return Size_; }
+	private:
+		using base_array =  detail::aligned_array<T, Size_ + 1> ;
+	public:
+		using base_iterator = typename base_array::iterator;
+		using base_const_iterator = typename base_array::const_iterator;
+	public:
+		using iterator = detail::circular_iterator<this_type>;
+		using const_iterator = detail::circular_const_iterator<this_type>;
 	private:
 		base_array Array;
 		iterator Beg;
@@ -375,6 +396,20 @@ namespace hmLib{
 			++Size;
 			return false;
 		}
+		bool rotete_back(const_reference Value) {
+			if(full()) {
+				(*Beg).~value_type();
+				++Beg;
+				::new(End.base()) value_type(Value);
+				++End;
+				return true;
+			} else {
+				::new(End.base()) value_type(Value);
+				++End;
+				++Size;
+				return false;
+			}
+		}
 		void pop_back(){
 			if(empty())return;
 			End[-1].~value_type();
@@ -388,9 +423,23 @@ namespace hmLib{
 			++Size;
 			return false;
 		}
+		bool rotete_front(const_reference Value) {
+			if(full()) {
+				End[-1].~value_type();
+				--End;
+				::new((Beg - 1).base()) value_type(Value);
+				--Beg;
+				return true;
+			} else {
+				::new((Beg - 1).base()) value_type(Value);
+				--Beg;
+				++Size;
+				return false;
+			}
+		}
 		void pop_front(){
 			if(empty())return;
-			(*End).~value_type();
+			(*Beg).~value_type();
 			++Beg;
 			--Size;
 		}
@@ -642,6 +691,7 @@ namespace hmLib{
 		bool empty()const{ return Size == 0; }
 		bool full()const{ return Size == max_size(); }
 		size_type size()const{ return Size; }
+		constexpr size_type max_size()const { return Size_; }
 		size_type remain()const{ return max_size() - size(); }
 	};
 }

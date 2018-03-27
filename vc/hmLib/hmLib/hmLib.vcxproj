@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\comgate.cpp" />
     <ClCompile Include="use_odeint.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -21,16 +20,12 @@
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />
-    <ClInclude Include="..\..\..\any_iterator.hpp" />
-    <ClInclude Include="..\..\..\array_queue.hpp" />
-    <ClInclude Include="..\..\..\bufgate.hpp" />
     <ClInclude Include="..\..\..\ccontainer\cdeque.h" />
     <ClInclude Include="..\..\..\ccontainer\cqueue.h" />
     <ClInclude Include="..\..\..\ccontainer\cstack.h" />
     <ClInclude Include="..\..\..\ccontainer\cstring.h" />
     <ClInclude Include="..\..\..\circular.hpp" />
     <ClInclude Include="..\..\..\color.hpp" />
-    <ClInclude Include="..\..\..\comgate.hpp" />
     <ClInclude Include="..\..\..\config_vc.h" />
     <ClInclude Include="..\..\..\coordinates.hpp" />
     <ClInclude Include="..\..\..\csv_iterator.hpp" />
@@ -46,7 +41,6 @@
     <ClInclude Include="..\..\..\enumerators\numeric_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\random_algorithm_ability.hpp" />
     <ClInclude Include="..\..\..\enumerators\traversal_ability.hpp" />
-    <ClInclude Include="..\..\..\euclidean.hpp" />
     <ClInclude Include="..\..\..\exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\access_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\application_exceptions.hpp" />
@@ -56,8 +50,18 @@
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
-    <ClInclude Include="..\..\..\gate.hpp" />
+    <ClInclude Include="..\..\..\gates.hpp" />
+    <ClInclude Include="..\..\..\gates\bufgate.hpp" />
+    <ClInclude Include="..\..\..\gates\comgate.hpp" />
+    <ClInclude Include="..\..\..\gates\comgate\ifline.h" />
+    <ClInclude Include="..\..\..\gates\comgate\winrs.hpp" />
+    <ClInclude Include="..\..\..\gates\exceptions.hpp" />
+    <ClInclude Include="..\..\..\gates\gate.hpp" />
+    <ClInclude Include="..\..\..\geometry.hpp" />
+    <ClInclude Include="..\..\..\geometry\segment.hpp" />
+    <ClInclude Include="..\..\..\geometry\point.hpp" />
     <ClInclude Include="..\..\..\gps.hpp" />
+    <ClInclude Include="..\..\..\hmLib_config.h" />
     <ClInclude Include="..\..\..\inquiries.hpp" />
     <ClInclude Include="..\..\..\inquiries\inquiry.hpp" />
     <ClInclude Include="..\..\..\inquiries\inquiry_abstruct.hpp" />
@@ -66,16 +70,28 @@
     <ClInclude Include="..\..\..\inquiries\signal_inquiry.hpp" />
     <ClInclude Include="..\..\..\inquiries\unique_connections.hpp" />
     <ClInclude Include="..\..\..\iocsv.hpp" />
+    <ClInclude Include="..\..\..\iterators.hpp" />
+    <ClInclude Include="..\..\..\iterators\any_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\inserter.hpp" />
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
+    <ClInclude Include="..\..\..\lattices\lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\locator.hpp" />
+    <ClInclude Include="..\..\..\lattices\torus_lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
+    <ClInclude Include="..\..\..\math\axis.hpp" />
+    <ClInclude Include="..\..\..\math\constants.hpp" />
+    <ClInclude Include="..\..\..\math\optimize.hpp" />
+    <ClInclude Include="..\..\..\math\plane_root.hpp" />
+    <ClInclude Include="..\..\..\math\root.hpp" />
+    <ClInclude Include="..\..\..\math\factorial.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
@@ -92,16 +108,11 @@
     <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\utility.hpp" />
     <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp" />
-    <ClInclude Include="..\..\..\optimize.hpp" />
-    <ClInclude Include="..\..\..\tuple.hpp" />
-    <ClInclude Include="..\..\..\varray.hpp" />
-    <ClInclude Include="..\..\..\position.hpp" />
     <ClInclude Include="..\..\..\random.hpp" />
     <ClInclude Include="..\..\..\random\pair_normal_distribution.hpp" />
     <ClInclude Include="..\..\..\random\random_bits.hpp" />
     <ClInclude Include="..\..\..\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\random\xorshift.hpp" />
-    <ClInclude Include="..\..\..\rectangle.hpp" />
     <ClInclude Include="..\..\..\resource.hpp" />
     <ClInclude Include="..\..\..\sequence.hpp" />
     <ClInclude Include="..\..\..\sequence\breakable_progress.hpp" />
@@ -113,7 +124,7 @@
     <ClInclude Include="..\..\..\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\stream_utility.hpp" />
     <ClInclude Include="..\..\..\table.hpp" />
-    <ClInclude Include="..\..\..\type.h" />
+    <ClInclude Include="..\..\..\tuple.hpp" />
     <ClInclude Include="..\..\..\typemanage.hpp" />
     <ClInclude Include="..\..\..\typemanage\listup_name.hpp" />
     <ClInclude Include="..\..\..\typemanage\listup_parameter.hpp" />
@@ -124,6 +135,7 @@
     <ClInclude Include="..\..\..\typemanage\type_name.hpp" />
     <ClInclude Include="..\..\..\type_traits.hpp" />
     <ClInclude Include="..\..\..\utility.hpp" />
+    <ClInclude Include="..\..\..\varray.hpp" />
     <ClInclude Include="..\..\..\version.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -141,7 +153,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>

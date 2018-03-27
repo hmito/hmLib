@@ -7,6 +7,7 @@
 #include"../../../odeint.hpp"
 #include"../../../varray.hpp"
 #include"../../../tuple.hpp"
+#include"../../../lattices.hpp"
 /*
 std::ostream& operator<<(std::ostream& out, const hmLib::varray<double, 2>& v) {
 	out<<"("<<v[0]<<", "<<v[1]<<")";

@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_GATE_INC
-#define HMLIB_GATE_INC 201
+﻿#ifndef HMLIB_GATES_GATE_INC
+#define HMLIB_GATES_GATE_INC 201
 #
 /*===gate===
 受信送信を簡易で行うクラス
@@ -29,22 +29,14 @@ v1_02/130324 hmIto
 	basic_gatestreambufの初期化にポインタではなく参照を渡していた致命的な問題を修正
 */
 #include<iostream>
-#ifndef HMLIB_STREAMBUINTERFACE_INC
-#	include "streambuf_interface.hpp"
-#endif
-#ifndef HMLIB_EXCEPTIONS_INC
-#	include "exceptions.hpp"
-#endif
-namespace hmLib{
-	struct gate_exception_identifier {};
-	typedef exceptions::exception_pattern<gate_exception_identifier> gate_exception;
-	typedef exceptions::io::not_opened<gate_exception> gate_not_opened_exception;
-	typedef exceptions::io::opened<gate_exception> gate_opened_exception;
+#include "../streambuf_interface.hpp"
+#include "exceptions.hpp"
 
+namespace hmLib{
 	template<typename _Elem, typename _Traits=std::char_traits<_Elem> >
 	class basic_gate{
 	public:
-		typedef std::streamsize size_type;
+		using size_type = std::streamsize;
 	public://gate
 		//gateが開いているかどうかの確認
 		virtual bool is_open() = 0;
@@ -82,7 +74,11 @@ namespace hmLib{
 	template<typename _Elem, typename _Traits=std::char_traits<_Elem> >
 	class basic_gatestreambuf:public basic_streambuf_interface<_Elem,_Traits>{
 	private:
-		typedef basic_gate<_Elem,_Traits> my_gate;
+		using my_gate = basic_gate<_Elem, _Traits>;
+	public:
+		using pos_type = int;
+		using off_type = int;
+		using size_type = typename my_gate::size_type;
 	protected:
 		my_gate* gate;
 		_Elem buf;
@@ -120,7 +116,7 @@ namespace hmLib{
 			while(!gate->can_getc());
 			return gate->getc();
 		}
-		streamsize ibuf_gets(_Elem* str,streamsize size)override{
+		size_type ibuf_gets(_Elem* str, size_type size)override{
 			if(size==0)return 0;
 
 			if(bufflag) {
@@ -147,7 +143,7 @@ namespace hmLib{
 			gate->putc(c);
 			return false;
 		}
-		streamsize obuf_puts(const _Elem* str,streamsize size)override{
+		size_type obuf_puts(const _Elem* str, size_type size)override{
 			return gate->puts(str, size);
 		}
 		bool obuf_flush()override { gate->flush(); return false; }
@@ -179,7 +175,7 @@ namespace hmLib{
 		bool is_open(){return streambuf->is_open();}
 		bool gfail(){return streambuf->gfail();}
 		bool empty(){return streambuf->empty();}
-		bool eof() { return flowing(); }
+		bool eof() { return streambuf->flowing(); }
 	};
 	template<typename _Elem, typename _Traits=std::char_traits<_Elem> >
 	class basic_ogatestream:public std::basic_ostream<_Elem,_Traits>{
@@ -226,7 +222,7 @@ namespace hmLib{
 		bool full(){return streambuf->full();}
 		bool gfail(){return streambuf->gfail();}
 		bool empty(){return streambuf->empty();}
-		bool eof() { return flowing(); }
+		bool eof() { return streambuf->flowing(); }
 	};
 #pragma warning(pop)
 	typedef basic_gate<char,std::char_traits<char> > gate;

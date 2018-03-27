@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_COMGATE_INC
-#define HMLIB_COMGATE_INC 201
+﻿#ifndef HMLIB_GATES_COMGATE_INC
+#define HMLIB_GATES_COMGATE_INC 201
 #
 /*===comgate===
 COMポートからのRS232c通信をサポート
@@ -25,25 +25,14 @@ comgate v1_06/130324 hmIto
 comgate v1_05/130310 hmIto
 	full関数を引数なしに修正
 */
-#ifndef HMLIB_CONFIG_INC
-#	include "hmLib_config.h"
-#endif
-#if !(defined(HMLIB_NOLIB) || defined(HMLIB_COMGATE_NOLIB))
-#	ifdef _DEBUG
-#		pragma comment(lib,"hmLib/lib/Debug/comgate.lib")
-#	else
-#		pragma comment(lib,"hmLib/lib/Release/comgate.lib")
-#	endif
-#endif
-#ifndef HMLIB_GATE_INC
-#	include "gate.hpp"
-#endif
-#include "comgate/winRS/winrs.h"
-
+#include"gate.hpp"
+#include"exceptions.hpp"
+#include"comgate/winrs.hpp"
 namespace hmLib{
 	class comgate:public virtual gate{
+		struct identifer{};
 	private:
-		WinRS* port;
+		WinRS<identifer>* port;
 		int portnum;
 		int bps;
 	public://gate
@@ -52,34 +41,34 @@ namespace hmLib{
 		
 		//受信可能状対かの確認
 		virtual bool can_getc()override{
-			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
+			hmLib_assert(is_open(), gates::not_opened_exception, "comgate have not been opened yet.");
 			return (port->loc() != 0 && is_open());
 		}
 		// 受信が継続しているかの確認
 		virtual bool flowing()override{
-			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
+			hmLib_assert(is_open(), gates::not_opened_exception, "comgate have not been opened yet.");
 			return (port->loc() != 0);
 		}
 		//1byte受信
 		virtual char getc()override{
-			hmLib_assert(is_open(), gate_not_opened_exception, "comgate have not been opened yet.");
+			hmLib_assert(is_open(), gates::not_opened_exception, "comgate have not been opened yet.");
 			return port->getc1();
 		}
 
 
 		//送信可能状態かの確認
 		virtual bool can_putc()override{
-			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
+			hmLib_assert(is_open(),gates::not_opened_exception,"comgate have not been opened yet.");
 			return is_open();
 		}
 		//送信を無理やりやる。。コマンドなし
 		virtual void flush()override{
-			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
+			hmLib_assert(is_open(),gates::not_opened_exception,"comgate have not been opened yet.");
 			return;
 		}
 		//1byte送信
 		virtual void  putc(char c)override{
-			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
+			hmLib_assert(is_open(),gates::not_opened_exception,"comgate have not been opened yet.");
 			port->putc1(c);
 			return;
 		}
@@ -92,10 +81,10 @@ namespace hmLib{
 	private:
 	public:
 		bool open(int _portnum,int _bps, bool use_flowControl_ = false){
-			hmLib_assert(!is_open(),gate_opened_exception,"comgate have already been opened.");
+			hmLib_assert(!is_open(),gates::opened_exception,"comgate have already been opened.");
 			portnum =_portnum;
 			bps=_bps;
-			port = new WinRS(portnum, bps, ifLine::crlf, "8N1", use_flowControl_);
+			port = new WinRS<identifer>(portnum, bps, ifLine::crlf, "8N1", use_flowControl_);
 
 			if(!(*port))close();
 
@@ -103,7 +92,7 @@ namespace hmLib{
 		}
 
 		bool close(){
-			hmLib_assert(is_open(),gate_not_opened_exception,"comgate have not been opened yet.");
+			hmLib_assert(is_open(),gates::not_opened_exception,"comgate have not been opened yet.");
 
 			delete port;
 			port=0;

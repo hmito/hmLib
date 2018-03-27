@@ -15,7 +15,7 @@ namespace hmLib{
 	namespace exceptions{
 		namespace details{
 			struct exception_identifier{};
-			using buffer = static_buffer<char, 1024, exception_identifier>;
+			using buffer = static_buffer<char, 4096, exception_identifier>;
 		}
 		struct exception : public std::exception{
 		private:

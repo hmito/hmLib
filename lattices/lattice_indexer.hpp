@@ -4,68 +4,94 @@
 //!@brief Definition of the lattice_indexer
 
 #include<numeric>
-#include "../euclidean.hpp"
+#include"../algorithm/compare.hpp"
 #include "exceptions.hpp"
 #include "utility.hpp"
 namespace hmLib {
 	namespace lattices {
-		/*!@brief Indexer of the given point on the lattice space with gaps
-
-		This class calculate the index (position) values from the point data on the lattice space including gaps.
-		Gap on a dimmension is the distance between the step for lower
-		Size on a dimmension is the maximum step num on this axis.
-
-		Tha calculated index is
-		(0,0,0) = 0
-		(1,0,0) = 1+gap<0>
-		(2,0,0) = 2*(1+gap<0>)
-		(0,1,0) = size<0>*(1+gap<0>) + gap<1>
-		(0,2,0) = 2*(size<0>*(1+gap<0>) + gap<1>)
-
-		@attention Because of the consideration of gaps, The performance of lattice_indexer is less than that of lattice_indexer.
-		@sa lattice_indexer
-		*/
 		template<unsigned int dim_>
 		struct lattice_indexer {
 			using this_type = lattice_indexer<dim_>;
-			using point_type = point<dim_>;
+			using point_type = lattices::point_type<dim_>;
+			using extent_type = lattices::extent_type<dim_>;
+			using index_type = lattices::index_type;
 		public:
 			static constexpr unsigned int dim() { return dim_; }
 		public:
-			lattice_indexer() : Size() {}
-			lattice_indexer(const point_type& Size_) : Size(Size_){}
+			lattice_indexer() : Extent(0) {}
+			lattice_indexer(const extent_type& Extent_) : Extent(Extent_){}
 			lattice_indexer(const this_type&) = default;
 			lattice_indexer(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
 			//!Get number of elements included in the lattice
-			size_type lattice_size()const { return std::accumulate(Size.begin(), Size.end(), 1, [](int v1, int v2)->int {return v1*v2; }); }
-			//!Get point_type Size
-			point_type size()const {return Size;}
-			//!Set point_type Size and Gap
-			void resize(const point_type& Size_) {
-				Size = Size_;
+			size_type lattice_size()const { return std::accumulate(Extent.begin(), Extent.end(), 1, [](int v1, int v2)->int {return v1*v2; }); }
+			//!Get point_type Extent
+			const extent_type& extent()const {return Extent;}
+			//!Set point_type Extent and Gap
+			void resize(const extent_type& Extent_) {
+				Extent = Extent_;
 			}
 		public:
 			//Get index value from point without checking over range.
-			index_type operator()(const point_type& Point_)const {
+			index_type calc_index(const point_type& Point_)const {
 				index_type Index = 0;
 				index_type Step = 1;
-				for(unsigned int i = 0; i < dim_; ++i){
+				for(unsigned int i = 0; i < dim_; ++i) {
 					Index += Point_[i] * Step;
-					Step *= Size[i];
+					Step *= Extent[i];
 				}
 
 				return Index;
 			}
-			//Get index value from point without checking over range.
-			index_type index(const point_type& Point_)const{
-				hmLib_assert((lattices::make_filled_point<dim_>(0) <<= Point_) && (Point_ << Size), lattices::out_of_range_access, "Requested point is out of lattice.");
+			//Get index value from point with checking over range.
+			index_type index(const point_type& Point_)const {
+				hmLib_assert((all_less_equal_than(point_type(0),Point_) && all_less_than(Point_, static_cast<point_type>(Extent))), lattices::out_of_range_access, "Requested point is out of lattice.");
 				return operator()(Point_);
 			}
+			//Get index value from point without checking over range.
+			index_type operator()(const point_type& Point_)const {
+				return calc_index(Point_);
+			}
+			//Get point from index value without checking over range
+			point_type calc_point(index_type Index)const {
+				point_type Pos;
+				for(unsigned int i = 0; i < dim_; ++i) {
+					Pos[i] = (Index%Extent[i]);
+					Index /= Extent[i];
+				}
+
+				return Pos;
+			}
+			//Get point from index value with checking over range
+			point_type point(index_type Index)const {
+				hmLib_assert(0 <= Index && static_cast<size_type>(Index) < lattice_size(), lattices::out_of_range_access, "Requested index is out of lattice.");
+				return calc_point(Index);
+			}
+			//Get point from index value without checking over range
+			point_type operator()(index_type Index)const{
+				return calc_point(Index);
+			}
+		public:
+			point_type translate_for_torus(const point_type& Point)const {
+				point_type Ans = Point;
+				for(unsigned int i = 0; i < dim_; ++i) {
+					Ans[i] = positive_mod<index_type>(Ans[i], Extent[i]);
+				}
+				return Ans;
+			}
+			void fit_for_torus(point_type& Point) {
+				for(unsigned int i = 0; i < dim_; ++i) {
+					Point[i] = positive_mod<index_type>(Point[i], Extent[i]);
+				}
+			}
+			//Get index value from torus point
+			index_type torus_index(const point_type& Point_)const {
+				return calc_index(translate_for_torus(Point_));
+			}
 		private:
-			point_type Size;
+			extent_type Extent;
 		};
 	}
 }
