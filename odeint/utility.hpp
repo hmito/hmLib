@@ -50,8 +50,39 @@ namespace hmLib{
 			};
 		}
 		template<typename stepper, typename sys, typename state_type, typename time_type>
-		void try_initialize(stepper& Stepper, sys&& Sys, state_type&& State, time_type Time, time_type dT) {
+		void try_initialize(stepper& Stepper, sys& Sys, state_type& State, time_type Time, time_type dT) {
 			detail::try_initialize_impl<typename std::decay<stepper>::type, typename std::decay<sys>::type, typename std::decay<state_type>::type, typename std::decay<time_type>::type>()(Stepper, std::forward<sys>(Sys), std::forward<state_type>(State), Time, dT);
+		}
+		namespace detail {
+			template<typename stepper_, typename state_type>
+			struct can_adjust_size {
+			private:
+				template<typename T>
+				static auto check(T)->decltype(
+					std::declval<T>().adjust_size(std::declval<state_type>()),
+					std::true_type{}
+				);
+				static auto check(...)->std::false_type;
+			public:
+				using type = decltype(check(std::declval<stepper_>()));
+				static constexpr bool value = type::value;
+			};
+			template<typename stepper_, typename state_type_, bool can_adjust_size = can_adjust_size<stepper_, state_type_>::value>
+			struct try_adjust_size_impl {
+				template<typename stepper, typename state_type>
+				void operator()(stepper& Stepper, state_type&& State) {
+					Stepper.adjust_size(std::forward<state_type>(State));
+				}
+			};
+			template<typename stepper_, typename state_type_>
+			struct try_adjust_size_impl <stepper_, state_type_, false> {
+				template<typename stepper, typename state_type>
+				void operator()(stepper& Stepper, state_type&& State) {}
+			};
+		}
+		template<typename stepper, typename sys, typename state_type, typename time_type>
+		void try_adjust_size(stepper& Stepper, state_type& State) {
+			detail::try_adjust_size_impl<typename std::decay<stepper>::type, typename std::decay<state_type>::type>()(Stepper, std::forward<state_type>(State));
 		}
 
 		namespace detail {
