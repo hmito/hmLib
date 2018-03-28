@@ -34,7 +34,7 @@ namespace hmLib {
 				interfere_request req;
 
 				Time pdt = 0;
-				if(interferes::detail::interfere_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+				if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
 					return start_time;
 				}
 				if(interferes::detail::is_restep_requested(req)) {
@@ -54,12 +54,12 @@ namespace hmLib {
 //					boost::numeric::odeint::controlled_step_result res;
 					//copy previous state & step
 					pdt = dt;
-					State pst = st;
+					typename boost::numeric::odeint::unwrap_reference< State >::type post_state = start_state;
 					do {
 						st.do_step(ifrsys, start_state, start_time, dt);
 
 						//interfere excute
-						if(interferes::detail::interfere_excute(req, st, ifrsys, start_state, start_time, dt, start_state)) {
+						if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, dt, start_state)) {
 							obs(start_state, start_time);
 							return start_time;
 						}
@@ -71,8 +71,8 @@ namespace hmLib {
 							dt /= 2;
 						}
 						//reset state
-						st = pst;
-					} while (dt > time_error/2);
+						start_state = post_state;
+					} while (std::abs(dt) > time_error/2);
 					start_time += dt;
 					//reset time step
 					dt = pdt;
@@ -101,7 +101,7 @@ namespace hmLib {
 
 				 //ready for next step.
 				Time pdt = 0;
-				if(interferes::detail::interfere_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+				if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
 					return start_time;
 				}
 				if(interferes::detail::is_restep_requested(req)) {
@@ -118,7 +118,7 @@ namespace hmLib {
 					boost::numeric::odeint::controlled_step_result res;
 					//copy previous state & step
 					Time ptime = start_time;
-					State pst = st;
+					typename boost::numeric::odeint::unwrap_reference< State >::type post_state = start_state;
 					do {
 						//Note: dt can be over-written by controlled stepper.
 						pdt = dt;
@@ -132,7 +132,7 @@ namespace hmLib {
 
 						//ready for next step.
 						//	use pdt becauese dt is just a suggestion from stepper regardless of the validity of the step.
-						if(interferes::detail::interfere_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+						if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
 							obs(start_state, start_time);
 							return start_time;
 						}
@@ -148,9 +148,9 @@ namespace hmLib {
 						}
 
 						//reset state & time
-						st = pst;
+						start_state = post_state;
 						start_time = ptime;
-					} while(pdt > time_error/2);
+					} while(std::abs(pdt) > time_error/2);
 					obs(start_state, start_time);
 					// if we reach here, the step was successful -> reset fail checker
 					fail_checker.reset();  
@@ -179,7 +179,7 @@ namespace hmLib {
 
 				//ready for next step.
 				Time pdt = 0;
-				if(interferes::detail::interfere_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+				if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
 					return start_time;
 				}
 				if(interferes::detail::is_restep_requested(req)) {
@@ -191,18 +191,18 @@ namespace hmLib {
 					//if current_time + current_dt < end_time
 					while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()), end_time,st.current_time_step())) {   
 //						obs(st.current_state(), st.current_time());
-						auto time_range = st.do_step(system);
+						auto time_range = st.do_step(ifrsys);
 
 						//ready for next step.
 						start_time = st.current_time();
 						pdt = time_range.second - time_range.first;
-						if(interferes::detail::interfere_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+						if(interferes::detail::interfere_and_excute(req, st, ifrsys, st.current_state(), start_time, pdt, start_state)) {
 							obs(st.current_state(), st.current_time());
 							return start_time;
 						}
 
 						//restep is requested
-						if(interferes::detail::is_restep_requested(req) && time_range.second-time_range.first > time_error) {
+						if(interferes::detail::is_restep_requested(req) && std::abs(time_range.second - time_range.first) > time_error) {
 							while(true) {
 								if(interferes::detail::should_use_dt_on_restep(req)) {
 									start_time = time_range.first + pdt;
@@ -212,7 +212,10 @@ namespace hmLib {
 								st.calc_state(start_time, start_state);
 								pdt = start_time - time_range.first;
 
-								req = ifrsys.interfere(start_state, start_time, pdt);
+								if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+									obs(start_state, start_time);
+									return start_time;
+								}
 								if(req==interfere_request::none) {
 									time_range.first = start_time;
 								} else if(interferes::detail::is_restep_requested(req)) {
@@ -222,7 +225,7 @@ namespace hmLib {
 								}
 
 								//end condition: use time_range.first for avoiding invalid state
-								if(time_range.second - time_range.first <= time_error) {
+								if(std::abs( time_range.second - time_range.first ) <= time_error) {
 									start_time = time_range.first;
 									st.calc_state(start_time, start_state);
 

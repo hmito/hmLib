@@ -27,8 +27,32 @@ namespace hmLib {
 					return req==interfere_request::restep_with_dt;
 				}
 				template<typename stepper, typename sys, typename state_type, typename time_type>
-				void interfere_excute(interfere_request& req, stepper& Stepper, sys& Sys, state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
+				bool excute(interfere_request req, stepper& Stepper, sys& Sys, const state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
+					switch(req) {
+					case interfere_request::none:
+						return false;
+					case interfere_request::terminate:
+						return true;
+					case interfere_request::initialize:
+						//State = NewState;
+						try_initialize(Stepper, Sys, NewState, Time, dT);
+						return false;
+					case interfere_request::resize_and_initialize:
+						//State = NewState;
+						try_adjust_size(Stepper, State);
+						try_initialize(Stepper, Sys, NewState, Time, dT);
+						return false;
+					default:
+						return false;
+					}
+				}
+				template<typename stepper, typename sys, typename state_type, typename time_type>
+				bool interfere_and_excute(interfere_request& req, stepper& Stepper, sys& Sys, const state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
 					req = Sys.interfere(State, Time, dT, NewState);
+					return excute(req, Stepper, Sys, State, Time, dT, NewState);
+				}
+				template<typename stepper, typename sys, typename state_type, typename time_type>
+				bool excute(interfere_request req, stepper& Stepper, sys& Sys, state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
 					switch(req) {
 					case interfere_request::none:
 						return false;
@@ -46,6 +70,11 @@ namespace hmLib {
 					default:
 						return false;
 					}
+				}
+				template<typename stepper, typename sys, typename state_type, typename time_type>
+				bool interfere_and_excute(interfere_request& req, stepper& Stepper, sys& Sys, state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
+					req = Sys.interfere(State, Time, dT, NewState);
+					return excute(req, Stepper, Sys, State, Time, dT, NewState);
 				}
 			}
 		}

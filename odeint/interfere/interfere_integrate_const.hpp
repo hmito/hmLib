@@ -1,6 +1,7 @@
 #ifndef HMLIB_ODEINT_INTERFERE_INTERFEREINTEGRATECONST_INC
 #define HMLIB_ODEINT_INTERFERE_INTERFEREINTEGRATECONST_INC 100
 #
+#include <cmath>
 #include <boost/numeric/odeint/util/unit_helper.hpp>
 #include <boost/numeric/odeint/stepper/stepper_categories.hpp>
 #include <boost/numeric/odeint/stepper/controlled_step_result.hpp>
@@ -9,6 +10,7 @@
 #include <boost/numeric/odeint/util/bind.hpp>
 #include <boost/numeric/odeint/util/unwrap_reference.hpp>
 #include <boost/numeric/odeint/util/copy.hpp>
+#include <boost/numeric/odeint/integrate/null_observer.hpp>
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 #include "interfere_type.hpp"
@@ -24,58 +26,109 @@ namespace hmLib {
 			) {
 				typename boost::numeric::odeint::unwrap_reference< Observer >::type &obs = observer;
 				typename boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
+				namespace interferes = hmLib::odeint::interferes;
 
-				Time time = start_time;
-				Time ostart_time = start_time;
+				interfere_request req;
+
+				Time pdt = 0;
+				if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+					return start_time;
+				}
+				if(interferes::detail::is_restep_requested(req)) {
+					return start_time;
+				}
+
+				const Time original_start_time = start_time;
 				const Time time_step = dt;
-				int step = 0;
+				unsigned int step_cnt = 0;
+				Time next_time = static_cast<Time>(start_time+ time_step);
 
-				while (boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time + time_step), end_time, dt)) {
-					ifrsys.validate(start_state, time, start_state);
-					obs(start_state, time);
+				while (boost::numeric::odeint::detail::less_eq_with_sign(next_time, end_time, dt)) {
+					//Until the start time reach to the end time.
+					//	i.e., start_time < next_time
+					//	dt is just used for checking sign.
+					while(boost::numeric::odeint::detail::less_with_sign(start_time, next_time, dt)) {
+						//if start_time + dt > next_time
+						if(boost::numeric::odeint::detail::less_with_sign(next_time, static_cast<Time>(start_time + dt), dt)) {
+							dt = next_time - start_time;
+						}
 
-					Time next_time = time + time_step;
+						//copy previous state & step
+						pdt = dt;
+						typename boost::numeric::odeint::unwrap_reference< State >::type post_state = start_state;
+						do {
+							st.do_step(ifrsys, start_state, start_time, dt);
 
-					//adaptive copy with no observation
-					{
-						while (boost::numeric::odeint::detail::less_with_sign(start_time, next_time, dt)) {
-							ifrsys.validate(start_state, start_time, start_state);
-
-							if (boost::numeric::odeint::detail::less_with_sign(next_time, static_cast<Time>(start_time + dt), dt)) {
-								dt = next_time - start_time;
-							}
-
-							auto ifr = ifrsys.ready(st, start_state, start_time, dt, start_state);
-							if (ifr == interfere_request::terminate) {
+							//interfere excute
+							if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, dt, start_state)) {
+								obs(start_state, start_time);
 								return start_time;
 							}
-							else if (ifr == interfere_request::initialize) {
-								try_initialize(st, ifrsys, start_state, start_time, dt);
+
+							//if itnerfere did not request restep
+							if(!interferes::detail::is_restep_requested(req))break;
+
+							if(!interferes::detail::should_use_dt_on_restep(req)) {
+								dt /= 2;
 							}
-
-//							boost::numeric::odeint::controlled_step_result res;
-							Time pdt = dt;
-							do {
-								st.do_step(ifrsys, start_state, start_time, dt);
-
-								if (ifrsys.valid_step(start_state, start_time + dt))break;
-
-								pdt /= 2;
-								dt = pdt;
-							} while (dt > time_error / 2);
-							start_time += dt;
-						}
+							//reset state
+							start_state = post_state;
+						} while(dt > time_error/2);
+						start_time += dt;
+						//reset time step
+						dt = pdt;
 					}
 
 					// direct computation of the time avoids error propagation happening when using time += dt
 					// we need clumsy type analysis to get boost units working here
-					step++;
-					time = ostart_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(step) * time_step;
+					start_time = original_start_time + time_step*(++step_cnt);
+					next_time = start_time + time_step;
+					obs(start_state, start_time);
 				}
-				ifrsys.validate(start_state, time, start_state);
-				obs(start_state, time);
 
-				return time;
+				next_time = end_time;
+
+				//Until the start time reach to the end time.
+				//	i.e., start_time < next_time
+				//	dt is just used for checking sign.
+				while(boost::numeric::odeint::detail::less_with_sign(start_time, next_time, dt)) {
+					//if start_time + dt > next_time
+					if(boost::numeric::odeint::detail::less_with_sign(next_time, static_cast<Time>(start_time + dt), dt)) {
+						dt = next_time - start_time;
+					}
+
+					//copy previous state & step
+					pdt = dt;
+					typename boost::numeric::odeint::unwrap_reference< State >::type post_state = start_state;
+					do {
+						st.do_step(ifrsys, start_state, start_time, dt);
+
+						//interfere excute
+						if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, dt, start_state)) {
+							obs(start_state, start_time);
+							return start_time;
+						}
+
+						//if itnerfere did not request restep
+						if(!interferes::detail::is_restep_requested(req))break;
+
+						if(!interferes::detail::should_use_dt_on_restep(req)) {
+							dt /= 2;
+						}
+						//reset state
+						start_state = post_state;
+					} while(std::abs(dt) > time_error/2);
+					start_time += dt;
+					//reset time step
+					dt = pdt;
+				}
+
+				// direct computation of the time avoids error propagation happening when using time += dt
+				// we need clumsy type analysis to get boost units working here
+				start_time = end_time;
+				obs(start_state, start_time);
+
+				return start_time;
 			}
 
 			template< class Stepper, class InterfereSystem, class State, class Time, class Observer >
@@ -87,67 +140,129 @@ namespace hmLib {
 				typename boost::numeric::odeint::unwrap_reference< Observer >::type &obs = observer;
 				typename boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
 
-				Time time = start_time;
+				interfere_request req;
+				boost::numeric::odeint::failed_step_checker fail_checker;  // to throw a runtime_error if step size adjustment fails
+
+				Time pdt = 0;
+				if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+					return start_time;
+				}
+				if(interferes::detail::is_restep_requested(req)) {
+					return start_time;
+				}
+
+				const Time original_start_time = start_time;
 				const Time time_step = dt;
-				int step = 0;
+				unsigned int step_cnt = 0;
+				Time next_time = static_cast<Time>(start_time+ time_step);
 
-				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+time_step), end_time, dt)) {
-					ifrsys.validate(start_state, time, start_state);
-					obs(start_state, time);
+				while(boost::numeric::odeint::detail::less_eq_with_sign(next_time, end_time, dt)) {
+					while(boost::numeric::odeint::detail::less_with_sign(start_time, next_time, dt)) {
+						//if start_time+dt > next_time, set dt as next_time-start_time
+						if(boost::numeric::odeint::detail::less_with_sign(next_time, static_cast<Time>(start_time + dt), dt)) {
+							dt = next_time - start_time;
+						}
 
-					Time next_time = time + time_step;
+						boost::numeric::odeint::controlled_step_result res;
+						//copy previous state & step
+						Time ptime = start_time;
+						typename boost::numeric::odeint::unwrap_reference< State >::type post_state = start_state;
+						do {
+							//Note: dt can be over-written by controlled stepper.
+							pdt = dt;
+							res = st.try_step(ifrsys, start_state, start_time, dt);
 
-					//adaptive copy with no observation
-					{
-						boost::numeric::odeint::failed_step_checker fail_checker;  // to throw a runtime_error if step size adjustment fails
-
-						while (boost::numeric::odeint::detail::less_with_sign(start_time, next_time, dt)) {
-							ifrsys.validate(start_state, start_time, start_state);
-
-							if (boost::numeric::odeint::detail::less_with_sign(next_time, static_cast<Time>(start_time + dt), dt)) {
-								dt = next_time - start_time;
+							if(res == boost::numeric::odeint::controlled_step_result::fail) {
+								// check number of failed steps
+								fail_checker();
+								continue;
 							}
 
-							auto ifr = ifrsys.ready(st, start_state, start_time, dt, start_state);
-							if (ifr == interfere_request::terminate) {
+							//ready for next step.
+							//	use pdt becauese dt is just a suggestion from stepper regardless of the validity of the step.
+							if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+								obs(start_state, start_time);
 								return start_time;
 							}
-							else if (ifr == interfere_request::initialize) {
-								try_initialize(st, ifrsys, start_state, start_time, dt);
-							}
 
-							boost::numeric::odeint::controlled_step_result res;
-							Time pdt = dt;
-							Time rstart_time = start_time;
-							do {
-								res = st.try_step(ifrsys, start_state, start_time, dt);
+							//if itnerfere did not request restep
+							if(!interferes::detail::is_restep_requested(req))break;
 
-								if (res == boost::numeric::odeint::controlled_step_result::fail) {
-									pdt = dt;
-									// check number of failed steps
-									fail_checker();
-									continue;
-								}
-								if (ifrsys.valid_step(start_state, start_time))break;
-
+							if(!interferes::detail::should_use_dt_on_restep(req)) {
 								pdt /= 2;
 								dt = pdt;
-								start_time = rstart_time;
-							} while (dt > time_error / 2);
+							} else {
+								dt = pdt;
+							}
 
-							fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
-						}
+							//reset state & time
+							start_state = post_state;
+							start_time = ptime;
+						} while(pdt > time_error/2);
+						// if we reach here, the step was successful -> reset fail checker
+						fail_checker.reset();
 					}
 
 					// direct computation of the time avoids error propagation happening when using time += dt
 					// we need clumsy type analysis to get boost units working here
-					step++;
-					time = start_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(step) * time_step;
+					start_time = original_start_time + time_step*(++step_cnt);
+					next_time = start_time + time_step;
+					obs(start_state, start_time);
 				}
-				ifrsys.validate(start_state, time, start_state);
-				obs(start_state, time);
 
-				return time;
+				next_time = end_time;
+				while(boost::numeric::odeint::detail::less_with_sign(start_time, next_time, dt)) {
+					//if start_time+dt > next_time, set dt as next_time-start_time
+					if(boost::numeric::odeint::detail::less_with_sign(next_time, static_cast<Time>(start_time + dt), dt)) {
+						dt = next_time - start_time;
+					}
+
+					boost::numeric::odeint::controlled_step_result res;
+					//copy previous state & step
+					Time ptime = start_time;
+					typename boost::numeric::odeint::unwrap_reference< Stepper >::type post_state = st;
+					do {
+						//Note: dt can be over-written by controlled stepper.
+						pdt = dt;
+						res = st.try_step(ifrsys, start_state, start_time, dt);
+
+						if(res == boost::numeric::odeint::controlled_step_result::fail) {
+							// check number of failed steps
+							fail_checker();
+							continue;
+						}
+
+						//ready for next step.
+						//	use pdt becauese dt is just a suggestion from stepper regardless of the validity of the step.
+						if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+							obs(start_state, start_time);
+							return start_time;
+						}
+
+						//if itnerfere did not request restep
+						if(!interferes::detail::is_restep_requested(req))break;
+
+						if(!interferes::detail::should_use_dt_on_restep(req)) {
+							pdt /= 2;
+							dt = pdt;
+						} else {
+							dt = pdt;
+						}
+
+						//reset state & time
+						st = post_state;
+						start_time = ptime;
+					} while(pdt > time_error/2);
+					// if we reach here, the step was successful -> reset fail checker
+					fail_checker.reset();
+				}
+
+				// direct computation of the time avoids error propagation happening when using time += dt
+				// we need clumsy type analysis to get boost units working here
+				start_time = end_time;
+				obs(start_state, start_time);
+
+				return start_time;
 			}
 
 			template< class Stepper, class InterfereSystem, class State, class Time, class Observer >
@@ -158,83 +273,111 @@ namespace hmLib {
 			) {
 				typename boost::numeric::odeint::unwrap_reference< Observer >::type &obs = observer;
 				typename boost::numeric::odeint::unwrap_reference< Stepper >::type &st = stepper;
+				interfere_request req;
 
-				Time time = start_time;
+				st.initialize(start_state, start_time, dt);
 
-				ifrsys.validate(start_state, start_time, start_state);
-				st.initialize(start_state, time, dt);
-				obs(start_state, time);
-
-				time += dt;
-				int obs_step(1);
-				
-				while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(time+dt), end_time, dt)) {
-					Time prev_time = st.current_time();
-
-					// we have not reached the end, do another real step
-					if (boost::numeric::odeint::detail::less_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()), end_time, st.current_time_step())) {
-						//make sure we don't go beyond the end_time
-						auto ifr = ifrsys.ready(st, st.current_state(), st.current_time(), st.current_time_step(), start_state);
-						if (ifr == interfere_request::terminate) {
-							return st.current_time();
-						}
-						else if (ifr == interfere_request::initialize) {
-							st.initialize(start_state, st.current_time(), st.current_time_step());
-						}
-						st.do_step(ifrsys);
-					}else{
-						// do the last step ending exactly on the end point
-						auto ifr = ifrsys.ready(st, st.current_state(), st.current_time(), end_time - st.current_time(), start_state);
-						if (ifr == interfere_request::terminate) {
-							return st.current_time();
-						}
-						else if (ifr == interfere_request::initialize) {
-							st.initialize(start_state, st.current_time(), end_time - st.current_time());
-						}
-						else {
-							st.initialize(st.current_state(), st.current_time(), end_time - st.current_time());
-						}
-						st.do_step(ifrsys);
-					}
-
-					if (!ifrsys.valid_step(st.current_state(), st.current_time())) {
-						auto AnsPair = boost::math::tools::bisect(
-							[&](Time t) {
-								st.calc_state(t, start_state);
-								return ifrsys.valid_step(start_state, t);
-							},
-							prev_time, st.current_time(), [=](Time a, Time b) {return b - a < time_error; }
-						);
-
-						prev_time = (AnsPair.first + AnsPair.second) / 2.;
-
-						while (boost::numeric::odeint::detail::less_eq_with_sign(time, prev_time, dt)) {
-							st.calc_state(time, start_state);
-							ifrsys.validate(start_state, time, start_state);
-							obs(start_state, time);
-							++obs_step;
-							// direct computation of the time avoids error propagation happening when using time += dt
-							// we need clumsy type analysis to get boost units working here
-							time = start_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(obs_step) * dt;
-						}
-
-						st.calc_state(prev_time, start_state);
-						st.initialize(start_state, prev_time, st.current_time_step());
-					}
-					else {
-						while (boost::numeric::odeint::detail::less_eq_with_sign(time, st.current_time(), dt)) {
-							st.calc_state(time, start_state);
-							ifrsys.validate(start_state, time, start_state);
-							obs(start_state, time);
-							++obs_step;
-							// direct computation of the time avoids error propagation happening when using time += dt
-							// we need clumsy type analysis to get boost units working here
-							time = start_time + static_cast< typename boost::numeric::odeint::unit_value_type<Time>::type >(obs_step) * dt;
-						}
-					}
+				//ready for next step.
+				Time pdt = 0;
+				if(interferes::detail::interfere_and_excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+					return start_time;
+				}
+				if(interferes::detail::is_restep_requested(req)) {
+					return start_time;
 				}
 
-				return time;
+				const Time observe_time_step = dt;
+				const Time original_start_time = start_time;
+				unsigned int observe_count = 0;
+				Time observe_time = start_time + observe_time_step*(++observe_count);
+				typename boost::numeric::odeint::unwrap_reference< State >::type observe_state = start_state;
+
+				//if current_time < end_time
+				while(boost::numeric::odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())) {
+					//if current_time + current_dt < end_time
+					while(boost::numeric::odeint::detail::less_eq_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()), end_time, st.current_time_step())) {
+						//step
+						auto time_range = st.do_step(ifrsys);
+
+						//ready for next step.
+						start_time = st.current_time();
+						pdt = time_range.second - time_range.first;
+
+						//get interfere request (not excute)
+						req = ifrsys.interfere(st.current_state(), start_time, pdt, start_state);
+
+						//restep is requested
+						if(interferes::detail::is_restep_requested(req) && std::abs(time_range.second - time_range.first) > time_error) {
+							while(true) {
+								if(interferes::detail::should_use_dt_on_restep(req)) {
+									start_time = time_range.first + pdt;
+								} else {
+									start_time = (time_range.first + time_range.second)/2;
+								}
+								st.calc_state(start_time, start_state);
+								pdt = start_time - time_range.first;
+
+								//get interfere request (not excute)
+								req = ifrsys.interfere(start_state, start_time, pdt, start_state);
+								if(req==interfere_request::none) {
+									time_range.first = start_time;
+								} else if(interferes::detail::is_restep_requested(req)) {
+									time_range.second = start_time;
+								} else {
+									//observe by using calc_state as long as observe_time < start_time
+									while(boost::numeric::odeint::detail::less_eq_with_sign(observe_time, start_time, observe_time_step)) {
+										st.calc_state(observe_time, observe_state);
+										obs(observe_state, observe_time);
+										observe_time = start_time + observe_time_step*(++observe_count);
+									}
+
+									//excute request
+									if(interferes::detail::excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+										obs(st.current_state(), st.current_time());
+										return start_time;
+									}
+									break;
+								}
+
+								//end condition: use time_range.first for avoiding invalid state
+								if(std::abs(time_range.second - time_range.first) <= time_error) {
+									start_time = time_range.first;
+
+									//observe by using calc_state as long as observe_time < start_time
+									while(boost::numeric::odeint::detail::less_eq_with_sign(observe_time, start_time, observe_time_step)) {
+										st.calc_state(observe_time, observe_state);
+										obs(observe_state, observe_time);
+										observe_time = start_time + observe_time_step*(++observe_count);
+									}
+
+									st.calc_state(start_time, start_state);
+									st.initialize(start_state, start_time, st.current_time_step());
+									break;
+								}
+							}
+						}
+						else{
+							//observe by using calc_state as long as observe_time < start_time
+							while(boost::numeric::odeint::detail::less_eq_with_sign(observe_time, start_time, observe_time_step)) {
+								st.calc_state(observe_time, observe_state);
+								obs(observe_state, observe_time);
+								observe_time = start_time + observe_time_step*(++observe_count);
+							}
+
+							//excute request
+							if(interferes::detail::excute(req, st, ifrsys, start_state, start_time, pdt, start_state)) {
+								obs(st.current_state(), st.current_time());
+								return start_time;
+							}
+						}
+					}
+					// calculate time step to arrive exactly at end time
+					st.initialize(st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()));
+				}
+
+				// overwrite start_state with the final point
+				start_state = st.current_state();
+				return st.current_time();
 			}
 		}
 

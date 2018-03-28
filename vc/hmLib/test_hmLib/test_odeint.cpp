@@ -2,15 +2,8 @@
 #include "CppUnitTest.h"
 #include <array>
 #include <cmath>
-#include <hmLib/odeint.hpp>
-#include <hmLib/odeint/breakable_integrate.hpp>
-#include <hmLib/odeint/container_observer.hpp>
-#include <hmLib/odeint/stream_observer.hpp>
-#include <hmLib/odeint/iterator_observer.hpp>
-#include <hmLib/odeint/break_observer.hpp>
-#include <hmLib/odeint/eqstate_break_observer.hpp>
-#include <hmLib/odeint/range_stepper.hpp>
-
+#include "../../../varray.hpp"
+#include "../../../odeint.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -86,15 +79,6 @@ public:
 		auto Observer = odeint::make_break_observer([](const test_system::state& State, double)->bool{return State[0] > 1.0; });
 
 		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, Observer);
-	}
-	TEST_METHOD(range_stepper){
-		auto Stepper = bodeint::make_dense_output(1.0e-10, 1.0e-6, bodeint::runge_kutta_dopri5<test_system::state>());
-		test_system System;
-		test_system::state State{0.0,1.0};
-
-		odeint::region_abridged_stepper<decltype(Stepper)> RStepper(0.001, std::move(Stepper));
-
-		RStepper.do_step(System);
 	}
 	};
 	TEST_CLASS(test_segment_cross){
@@ -242,6 +226,55 @@ public:
 			b2[1] = 0.59;
 			Assert::IsTrue(is_cross_segment(a1, a2, b1, b2), L"Same line");
 			Assert::IsTrue(is_cross_segment(b1, b2, a1, a2), L"Same line");
+		}
+	};
+	TEST_CLASS(test_odeint_interfere) {
+		using state_t = varray<double, 2>;
+		struct system_t {
+			void operator()(const state_t& x, state_t& dx, double t) {
+				dx[0] = -0.5*x[0]+0.8*x[1];
+				dx[1] = -0.4*x[1]+0.9*x[0];
+			}
+			hmLib::odeint::interfere_request interfere(const state_t& x, double& t, double& dt, state_t& newx) {
+				return hmLib::odeint::interfere_request::none;
+			}
+		};
+	public:
+		TEST_METHOD(try_interfere_integrate_adaptive_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = bodeint::runge_kutta_dopri5<state_t>();
+			odeint::interfere_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_adaptive_controlled_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = bodeint::make_controlled(1e-3,1e-3, bodeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_adaptive_dense_output_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = bodeint::make_dense_output(1e-3, 1e-3, bodeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_const_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = bodeint::runge_kutta_dopri5<state_t>();
+			odeint::interfere_integrate_const(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_const_controlled_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = bodeint::make_controlled(1e-3, 1e-3, bodeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_const(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_const_dense_output_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = bodeint::make_dense_output(1e-3, 1e-3, bodeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_const(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
 		}
 	};
 }
