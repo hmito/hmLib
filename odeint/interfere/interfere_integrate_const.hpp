@@ -73,7 +73,12 @@ namespace hmLib {
 							}
 							//reset state
 							start_state = post_state;
-						} while(dt > time_error/2);
+						} while(dt > time_error);
+						if(std::abs(dt)<=time_error) {
+							obs(start_state, start_time);
+							return start_time;
+						}
+
 						start_time += dt;
 						//reset time step
 						dt = pdt;
@@ -117,7 +122,12 @@ namespace hmLib {
 						}
 						//reset state
 						start_state = post_state;
-					} while(std::abs(dt) > time_error/2);
+					} while(std::abs(dt) > time_error);
+					if(std::abs(dt)<=time_error) {
+						obs(start_state, start_time);
+						return start_time;
+					}
+
 					start_time += dt;
 					//reset time step
 					dt = pdt;
@@ -198,7 +208,13 @@ namespace hmLib {
 							//reset state & time
 							start_state = post_state;
 							start_time = ptime;
-						} while(pdt > time_error/2);
+						} while(pdt > time_error);
+
+						if(std::abs(pdt)<=time_error) {
+							obs(start_state, start_time);
+							return start_time;
+						}
+
 						// if we reach here, the step was successful -> reset fail checker
 						fail_checker.reset();
 					}
@@ -252,7 +268,12 @@ namespace hmLib {
 						//reset state & time
 						st = post_state;
 						start_time = ptime;
-					} while(pdt > time_error/2);
+					} while(pdt > time_error);
+					if(std::abs(pdt)<=time_error) {
+						obs(start_state, start_time);
+						return start_time;
+					}
+
 					// if we reach here, the step was successful -> reset fail checker
 					fail_checker.reset();
 				}
@@ -341,6 +362,13 @@ namespace hmLib {
 
 								//end condition: use time_range.first for avoiding invalid state
 								if(std::abs(time_range.second - time_range.first) <= time_error) {
+									if(std::abs(time_range.first-start_time)<=time_error) {
+										st.calc_state(start_time, start_state);
+										st.initialize(start_state, start_time, st.current_time_step());
+										obs(st.current_state(), st.current_time());
+										return start_time;
+									}
+
 									start_time = time_range.first;
 
 									//observe by using calc_state as long as observe_time < start_time

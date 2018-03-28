@@ -72,7 +72,13 @@ namespace hmLib {
 						}
 						//reset state
 						start_state = post_state;
-					} while (std::abs(dt) > time_error/2);
+					} while (std::abs(dt) > time_error);
+
+					if(std::abs(dt)<=time_error) {
+						obs(start_state, start_time);
+						return start_time;
+					}
+
 					start_time += dt;
 					//reset time step
 					dt = pdt;
@@ -150,8 +156,13 @@ namespace hmLib {
 						//reset state & time
 						start_state = post_state;
 						start_time = ptime;
-					} while(std::abs(pdt) > time_error/2);
+					} while(std::abs(pdt) > time_error);
 					obs(start_state, start_time);
+
+					if(std::abs(start_time-ptime)<=time_error){
+						return start_time;
+					}
+
 					// if we reach here, the step was successful -> reset fail checker
 					fail_checker.reset();  
 				}
@@ -226,10 +237,15 @@ namespace hmLib {
 
 								//end condition: use time_range.first for avoiding invalid state
 								if(std::abs( time_range.second - time_range.first ) <= time_error) {
+									pdt = time_range.first - start_time;
+									if(pdt <= time_error) {
+										obs(start_state, start_time);
+										return start_time;
+									}
 									start_time = time_range.first;
 									st.calc_state(start_time, start_state);
 
-									st.initialize(start_state, start_time, st.current_time_step());
+									st.initialize(start_state, start_time, pdt);
 									break;
 								}
 							}
