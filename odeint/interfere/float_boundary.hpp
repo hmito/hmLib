@@ -4,6 +4,105 @@
 #include<functional>
 namespace hmLib {
 	namespace odeint {
+		template<typename value_type_ = double, typename time_type_ = double>
+		struct lower_condition {
+			using value_type = value_type_;
+			using time_type = time_type_;
+		public:
+			template<typename fn>
+			void operator()(const value_type& x, value_type& dx, time_type t, const fn& dxfn) {
+				dx = dxfn()
+			}
+		};
+		template<typename value_type_ = double, typename time_type_ = double>
+		struct lower_condition {
+			using value_type = value_type_;
+			using time_type = time_type_;
+		public:
+			template<typename fn>
+			void operator()(const value_type& x, value_type& dx, time_type t, const fn& dxfn) {
+				dx = dxfn()
+			}
+			void operator()(const state_type& f, state_type& df, time_type t)const {
+				auto dff = Sys.df(x, f[0], f[1]);
+				df[0] = dff[1];
+				df[1] = dff[2];
+
+				if(xzero) {
+					df[0] = std::max(df[0], 0.0);
+				}
+				if(yzero) {
+					df[1] = std::max(df[1], 0.0);
+				}
+				if(xyone) {
+					double d = std::sqrt(2.0)/2*df[0] - std::sqrt(2.0)/2*df[1];
+					df[0] = d*std::sqrt(2.0)/2;
+					df[1] = -d*std::sqrt(2.0)/2;
+				}
+
+			}
+			interfere_request interfere(const state_type& f, time_type& t, time_type& dt, state_type& nf) {
+				if(f[0] < -0.1) {
+					return interfere_request::restep;
+				}
+				if(f[1] < -0.1) {
+					return interfere_request::restep;
+				}
+				if(f[0] + f[1] > 1.1) {
+					return interfere_request::restep;
+				}
+
+				bool nxzero = false;
+				bool nyzero = false;
+				bool nxyone = false;
+				bool Initialize = false;
+				nf = f;
+				if(nf[0] <= 0.0) {
+					nf[0] = 0.0;
+
+					nxzero = true;
+					Initialize = true;
+				}
+				if(nf[1] <= 0.0) {
+					nf[1] = 0.0;
+
+					nyzero = true;
+					Initialize = true;
+				}
+				if(nf[0] + nf[1] >= 1.0) {
+					double sum = nf[0] + nf[1];
+					nf[0] = nf[0]/sum;
+					nf[1] = nf[1]/sum;
+
+					nxyone = true;
+					Initialize = true;
+				}
+
+				//zero-zero
+				if(xzero&nxzero&yzero&nyzero) {
+					return interfere_request::terminate;
+				}
+
+				//zero-one
+				if(xyone&nxyone&yzero&nyzero) {
+					return interfere_request::terminate;
+				}
+
+				//one-zero
+				if(xzero&nxzero&xyone&nxyone) {
+					return interfere_request::terminate;
+				}
+				xzero = nxzero;
+				yzero = nyzero;
+				xyone = nxyone;
+
+				return Initialize ? interfere_request::initialize : interfere_request::none;
+			}
+
+		private:
+			double error;
+		};
+
 		template<typename condition_, typename state_type_ = double>
 		struct float_boundary {
 			using state_type = state_type_;
@@ -32,8 +131,8 @@ namespace hmLib {
 			static constexpr double sign = (condition()(0.0, 1.0) ? 1.0 : -1.0);
 			bool is_violated(const state_type& x) const { return condition()(x, val); }
 		};
-		using float_upper_boundary = float_boundary< std::greater_equal<double>, double> ;
-		using float_lower_boundary = float_boundary< std::less_equal<double>, double>;
+//		using float_upper_boundary = float_boundary< std::greater_equal<double>, double> ;
+//		using float_lower_boundary = float_boundary< std::less_equal<double>, double>;
 
 		//This boundary requires that the differential equation dx can return mathematically valid value for both inside and outside of range.
 		//	i.e., the function return any value of [numeric_limits<state_type>::lowest(), numeric_limits<state_type>::max()] or inf, -inf.
