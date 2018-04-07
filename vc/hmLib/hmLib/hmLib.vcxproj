@@ -17,6 +17,7 @@
     <ClInclude Include="..\..\..\algorithm.hpp" />
     <ClInclude Include="..\..\..\algorithm\algorithm.hpp" />
     <ClInclude Include="..\..\..\algorithm\compare.hpp" />
+    <ClInclude Include="..\..\..\algorithm\keep_if.hpp" />
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />

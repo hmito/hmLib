@@ -437,5 +437,8 @@
     <ClInclude Include="..\..\..\math\plane_root.hpp">
       <Filter>hmLib\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
+      <Filter>hmLib\algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ namespace hmLib {
 		auto f = [](double x) {return (x - 0.3)*(x - 0.4549)*(x - 0.8991); };
 
 		std::vector<double> Ans;
-		hmLib::math::convergent_root_toms748(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
+		hmLib::math::stable_root_toms748(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
 
 		Assert::AreEqual(1u, Ans.size(), L"Ans Num Error");
 //		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
@@ -25,7 +25,8 @@ namespace hmLib {
 		auto f = [](double x) {return (x - 0.3)*(x - 0.4549)*(x - 0.8991); };
 
 		std::vector<double> Ans;
-		hmLib::math::convergent_root_bisect(f, 0.0, 1.0, 0.001, 1e-5, hmLib::back_inserter(Ans));
+		hmLib::math::bisect_root_stepper<double> Stepper(0.001, 1e-5);
+		hmLib::math::stable_root(Stepper, f, 0.0, 1.0, hmLib::back_inserter(Ans));
 
 		Assert::AreEqual(1u, Ans.size(), L"Ans Num Error");
 //		Assert::AreEqual(0.3, Ans.at(0), 1e-5, L"Ans Num Error");
