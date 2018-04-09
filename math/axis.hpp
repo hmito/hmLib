@@ -20,6 +20,7 @@ namespace hmLib {
 			namespace detail {
 				template<typename grid_policy>
 				struct grid_adjuster {};
+				template<>
 				struct grid_adjuster<detail::round_index_tag> {
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::round(index_)); }
@@ -27,6 +28,24 @@ namespace hmLib {
 					static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index-0.5, Index+0.5); }
 					template<typename value_type, typename difference_type>
 					static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value-Interval/2.0, Value+Interval/2.0); }
+				};
+				template<>
+				struct grid_adjuster<detail::floor_index_tag> {
+					template<typename index_type>
+					static index_type index_cast(double index_) { return static_cast<index_type>(std::floor(index_)); }
+					template<typename index_type>
+					static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index+0.0, Index+1.0); }
+					template<typename value_type, typename difference_type>
+					static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value, Value+Interval); }
+				};
+				template<>
+				struct grid_adjuster<detail::ceil_index_tag> {
+					template<typename index_type>
+					static index_type index_cast(double index_) { return static_cast<index_type>(std::ceil(index_)); }
+					template<typename index_type>
+					static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index-1.0, Index+0.0); }
+					template<typename value_type, typename difference_type>
+					static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value-Interval, Value); }
 				};
 			}
 		}
@@ -89,7 +108,7 @@ namespace hmLib {
 				} else if(LowerIndex+Index==UpperIndex) {
 					return weighted_index(UpperIndex, UpperProb);
 				}
-				return index_and_proportion(Index+LowerIndex, 1.0);
+				return weighted_index(Index+LowerIndex, 1.0);
 			}
 			weighted_index at(index_type Index)const {
 				hmLib_assert(0<=Index && Index < size(), hmLib::access_exceptions::out_of_range_access, "Out of range access.");
@@ -111,7 +130,7 @@ namespace hmLib {
 	template<typename T, typename grid_policy_, typename index_type_ = unsigned int, typename calc_type_ = double>
 	struct axis {
 	private:
-		using this_type = axis<T, grid_policy_, calc_type_, index_type_>;
+		using this_type = axis<T, grid_policy_, index_type_, calc_type_>;
 	public:
 		using value_type = T;
 		using calc_type = calc_type_;
@@ -213,6 +232,11 @@ namespace hmLib {
 		axis(this_type&&) = default;
 		axis& operator=(this_type&&) = default;
 	public:
+		//Val == a*Index + b
+		value_type float_at(double FIndex)const { return a*FIndex+b; }
+		//Index == (Val-b)/a
+		double float_index(value_type Val)const { return static_cast<double>((Val-b)/a);}
+	public:
 		void assign(value_type Lower_, value_type Upper_, index_type Size_) {
 			//a == (Upper-Lower)/(Size - 1)
 			//b == Lower
@@ -223,18 +247,13 @@ namespace hmLib {
 		void clear() { Size = 0; }
 		index_type size()const { return Size; }
 		bool empty()const { return Size == 0; }
-		value_type operator[](index_type Index)const {
-			return a*Index + b;
-			//a == (Upper-Lower)/(Size - 1)
-			//b == Lower
-			//return (Lower*(Size - 1 - Index) + Upper*Index) / (Size - 1);
-		}
+		value_type operator[](index_type Index)const {return float_at(Index);}
 		value_type at(index_type Index)const {
 			hmLib_assert(0<=Index && Index < Size, hmLib::access_exceptions::out_of_range_access, "Out of axis range access.");
 			return operator[](Index);
 		}
-		value_type frond()const { return static_cast<value_type>(b); }
-		value_type back()const { return static_cast<value_type>(a*(size()-1)+b); }
+		value_type lower()const { return static_cast<value_type>(b); }
+		value_type upper()const { return static_cast<value_type>(a*(size()-1)+b); }
 		iterator begin()const { return iterator(*this, 0); }
 		iterator end()const { return iterator(*this, Size); }
 		iterator cbegin()const { return begin(); }
@@ -242,25 +261,20 @@ namespace hmLib {
 	public:
 		difference_type interval()const { return static_cast<difference_type>(a); }
 		difference_type width()const { return static_cast<difference_type>(a*(size()-1)); }
-		value_type grid_lower(index_type Index)const { return grid_range(Index).first; }
-		value_type grid_upper(index_type Index)const { return grid_range(Index).second; }
-		value_type lower()const { return grid_lower(0); }
-		value_type upper()const { return grid_upper(size()-1); }
-		bool inside(value_type Value)const { return lower() <= Value && Value < upper(); }
-		bool inside(value_type LowerVal, value_type UpperVal)const { return lower() <= LowerVal && UpperVal < upper(); }
+		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
+		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
+		value_type grid_lower()const { return grid_lower_at(0); }
+		value_type grid_upper()const { return grid_upper_at(size()-1); }
+		bool inside(value_type Value)const { return grid_lower() <= Value && Value < grid_upper(); }
+		bool inside(value_type LowerVal, value_type UpperVal)const { return grid_lower() <= LowerVal && UpperVal < grid_upper(); }
 	public:
-		double float_index(value_type Val)const {
-			return static_cast<double>((Val-b)/a);
-			//Val == a*Index + b
-			//			return static_cast<double>(Size - 1)*((Val - Lower) / (Upper - Lower));
-		}
 		index_type index(value_type Val)const {
-			hmLib_assert(inside(Val), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [lower, upper).");
+			hmLib_assert(inside(Val), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
 			return grid_adjuster::index_cast<index_type>(float_index(Val));
 		}
 		weighted_index_range weighted_index(value_type LowerVal, value_type UpperVal)const {
 			if(LowerVal > UpperVal)std::swap(LowerVal, UpperVal);
-			hmLib_assert(inside(LowerVal, UpperVal), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [lower, upper).");
+			hmLib_assert(inside(LowerVal, UpperVal), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [grid_lower, grid_upper).");
 
 			double LowerFIndex = float_index(LowerVal);
 			double UpperFIndex = float_index(UpperVal);
@@ -271,7 +285,12 @@ namespace hmLib {
 				return weighted_index_range(LowerIndex,UpperFIndex-LowerFIndex);
 			}
 
-			return weighted_index_range(LowerIndex, UpperIndex, grid_adjuster::index_range(LowerIndex).second - LowerFIndex, UpperFIndex - grid_adjuster::index_range(UpperFIndex).first, UpperFIndex-LowerFIndex);
+			return weighted_index_range(
+				LowerIndex, UpperIndex, 
+				grid_adjuster::index_range(LowerIndex).second - LowerFIndex, 
+				UpperFIndex - grid_adjuster::index_range(UpperIndex).first,
+				UpperFIndex-LowerFIndex
+			);
 		}
 	public:
 		this_type subaxis(index_type LowerIndex, index_type UpperIndex) {
@@ -306,8 +325,8 @@ namespace hmLib {
 		axis_mapper& operator=(const axis_mapper&) = default;
 		template<typename from_axis_type, typename to_axis_type>
 		axis_mapper(const from_axis_type& from, const to_axis_type& to) {
-			a = static_cast<double>(from.back() - from.front()) / (to.back() - to.front()) * (to.size() - 1) / (from.size() - 1);
-			b = static_cast<double>(from.front() - to.front()) / (to.back() - to.front())* (to.size() - 1);
+			a = static_cast<double>(from.upper() - from.lower()) / (to.upper() - to.lower()) * (to.size() - 1) / (from.size() - 1);
+			b = static_cast<double>(from.lower() - to.lower()) / (to.upper() - to.lower())* (to.size() - 1);
 
 			double LowerToFIndex = to_grid_adjuster::index_range(0).first;
 			double UpperToFIndex = to_grid_adjuster::index_range(to.size()-1).second;
@@ -315,80 +334,87 @@ namespace hmLib {
 			double UpperFromFIndex = (UpperToFIndex-b)/a;
 
 			//condition for no violation of the out of range access
-			LowerFromIndex = static_cast<index_type>(std::ceil(LowerFromFIndex - from_grid_adjuster::index_range(0).first));
-			UpperFromIndex = static_cast<index_type>(std::floor(UpperFromFIndex- from_grid_adjuster::index_range(0).second));
+			LowerFromIndex = static_cast<index_type>(std::max(0.0,std::ceil(LowerFromFIndex - from_grid_adjuster::index_range(0).first)));
+			UpperFromIndex = static_cast<index_type>(std::min(from.size()-1.0,std::floor(UpperFromFIndex- from_grid_adjuster::index_range(0).second)));
 		}
 	public:
+		index_type lower()const { return LowerFromIndex; }
+		index_type upper()const { return UpperFromIndex; }
 		bool inside(index_type FromIndex)const { return LowerFromIndex<=FromIndex && FromIndex<=UpperFromIndex; }
 		double float_index(double FromFIndex)const {
 			return a*FromFIndex + b;
 		}
 		weighted_index_range weighted_index(index_type FromIndex)const {
-			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [lower, upper).");
+			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [grid_lower, grid_upper).");
 
-			auto FIndexRange = math::grid_policy::detail::grid_adjuster<to_grid_policy>::index_range(FromIndex);
+			auto FIndexRange = from_grid_adjuster::index_range(FromIndex);
 			double LowerFIndex = float_index(FIndexRange.first);
 			double UpperFIndex = float_index(FIndexRange.second);
 
-			index_type LowerIndex = grid_adjuster::index_cast<index_type>(LowerFIndex);
-			index_type UpperIndex = grid_adjuster::index_cast<index_type>(UpperFIndex);
+			index_type LowerIndex = to_grid_adjuster::index_cast<index_type>(LowerFIndex);
+			index_type UpperIndex = to_grid_adjuster::index_cast<index_type>(UpperFIndex);
 			if(LowerIndex == UpperIndex) {
 				return weighted_index_range(LowerIndex, UpperFIndex-LowerFIndex);
 			}
 
-			return weighted_index_range(LowerIndex, UpperIndex, grid_adjuster::index_range(LowerIndex).second - LowerFIndex, UpperFIndex - grid_adjuster::index_range(UpperFIndex).first, UpperFIndex-LowerFIndex);
+			return weighted_index_range(LowerIndex, UpperIndex, 
+				to_grid_adjuster::index_range(LowerIndex).second - LowerFIndex, 
+				UpperFIndex - to_grid_adjuster::index_range(UpperIndex).first,
+				UpperFIndex-LowerFIndex
+			);
 		}
 	};
-
 	
 	template<typename from_axis, typename to_axis>
-	auto map_axis(const from_axis& from, const to_axis& to)const {
+	auto map_axis(const from_axis& from, const to_axis& to) {
 		using from_grid_policy = typename from_axis::grid_policy;
 		using to_grid_policy = typename to_axis::grid_policy;
 		using index_type = typename from_axis::index_type;
 
 		return axis_mapper<from_grid_policy, to_grid_policy, index_type>(from, to);
 	}
-
+	namespace math {
+		enum  class make_axis_option { none, gridfit, exclude_upper_boundary, exclude_lower_boundary, exclude_boundary };
+	}
 	template<typename T,typename grid_policy>
-	auto make_axis(T Lower, T Upper, std::size_t Size, grid_policy GridPolicy, bool ExcludeUpper = false, bool ExcludeLower = false) {
+	auto make_axis(T Lower, T Upper, std::size_t Size, grid_policy GridPolicy, math::make_axis_option Opt = math::make_axis_option::none) {
 		using value_type = typename std::decay<T>::type;
-		if(ExcludeUpper) {
-			if(ExcludeLower) {
-				return axis<value_type, grid_policy>(
-					axis<value_type, grid_policy>(Lower, Upper, Size+2)[1], 
-					axis<value_type, grid_policy>(Lower, Upper, Size+2)[Size], 
-					Size
-				);
-			} else {
-				return axis<value_type, grid_policy>(
-					Lower,
-					axis<value_type, grid_policy>(Lower, Upper, Size+1)[Size-1],
-					Size
-				);
-			}
-		} else {
-			if(ExcludeLower) {
-				return axis<value_type, grid_policy>(
-					axis<value_type, grid_policy>(Lower, Upper, Size+1)[1],
-					Upper,
-					Size
-				);
-			} else {
-				return axis<value_type, grid_policy>(Lower, Upper, Size);
-			}
+
+		switch(Opt) {
+		case math::make_axis_option::none:
+			return axis<value_type, grid_policy>(Lower, Upper, Size);
+		case math::make_axis_option::exclude_upper_boundary:
+			return axis<value_type, grid_policy>(
+				Lower,
+				axis<value_type, grid_policy>(Lower, Upper, Size+1)[Size-1],
+				Size
+			);
+		case math::make_axis_option::exclude_lower_boundary:
+			return axis<value_type, grid_policy>(
+				axis<value_type, grid_policy>(Lower, Upper, Size+1)[1],
+				Upper,
+				Size
+			);
+		case math::make_axis_option::exclude_boundary:
+			return axis<value_type, grid_policy>(
+				axis<value_type, grid_policy>(Lower, Upper, Size+2)[1],
+				axis<value_type, grid_policy>(Lower, Upper, Size+2)[Size],
+				Size
+			);
+		case math::make_axis_option::gridfit:
+			using grid_adjuster = math::grid_policy::detail::grid_adjuster<grid_policy>;
+
+			Lower -= (Upper-Lower)*grid_adjuster::index_range(0).first / Size;
+			Upper += (Upper-Lower)*grid_adjuster::index_range(0).second / Size;
+
+			return make_axis(Lower, Upper, Size, GridPolicy);
+		default:
+			return axis<value_type, grid_policy>(Lower, Upper, Size);
 		}
 	}
-	template<typename T, typename grid_policy>
-	auto make_gridfit_axis(T Lower, T Upper, std::size_t Size, grid_policy GridPolicy) {
-		using grid_adjuster = math::grid_policy::detail::grid_adjuster<grid_policy>;
-	
-		T Interval = (Upper-Lower) / Size;
-
-		Lower -= Interval*grid_adjuster::index_range(0).first;
-		Upper += Interval*grid_adjuster::index_range(0).second;
-
-		return make_axis(Lower, Upper, Size, GridPolicy);
+	template<typename T>
+	auto make_axis(T Lower, T Upper, std::size_t Size, math::make_axis_option Opt = math::make_axis_option::none) {
+		return make_axis(Lower, Upper, Size, math::grid_policy::round_grid, Opt);
 	}
 }
 #
