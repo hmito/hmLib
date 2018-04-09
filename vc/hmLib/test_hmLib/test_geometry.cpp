@@ -23,7 +23,9 @@ public:
 		pdouble p2(0u, 0u);
 		pdouble p3(1.0,1.0);
 
-		const pint& p4 = p3;
+//		pint p6 = p2;
+
+//		const pint& p4 = p3;
 
 		const pint& p5 = static_cast<pint>(p3);
 

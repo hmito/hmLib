@@ -22,8 +22,10 @@ namespace hmLib{
 		public:
 			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
 			point(U x_, U y_) : x(x_), y(y_) {}
+			//template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+			//point(const point<U>& Other): x(Other.x), y(Other.y) {}
 			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			point(const point<U>& Other) : x(Other.x), y(Other.y) {}
+			explicit point(const point<U>& Other) : x(static_cast<T>(Other.x)), y(static_cast<T>(Other.y)) {}
 			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
 			this_type& operator=(const point<U>& Other) {
 				if(this != static_cast<const void*>(&Other)) {
@@ -82,8 +84,8 @@ namespace hmLib{
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<T, U>::value>::type*& = hmLib::utility::enabler>
-			explicit operator point<U>()const {
-				return point<U>(static_cast<U>(x),static_cast<U>(y));
+			operator point<U>()const {
+				return point<U>(x,y);
 			}
 		};
 		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() + std::declval<U>())>

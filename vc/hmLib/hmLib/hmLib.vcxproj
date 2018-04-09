@@ -123,7 +123,6 @@
     <ClInclude Include="..\..\..\signals\unique_connections.hpp" />
     <ClInclude Include="..\..\..\static_buffer.hpp" />
     <ClInclude Include="..\..\..\streambuf_interface.hpp" />
-    <ClInclude Include="..\..\..\stream_utility.hpp" />
     <ClInclude Include="..\..\..\table.hpp" />
     <ClInclude Include="..\..\..\tuple.hpp" />
     <ClInclude Include="..\..\..\typemanage.hpp" />

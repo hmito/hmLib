@@ -281,9 +281,6 @@
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\stream_utility.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\streambuf_interface.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
