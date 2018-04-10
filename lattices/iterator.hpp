@@ -18,12 +18,13 @@ namespace hmLib{
 			using pointer = typename lattice::pointer;
 			using const_pointer = typename lattice::const_pointer;
 			using point_type = typename lattice::point_type;
+			using extent_type = typename lattice::extent_type;
 			using locator = typename lattice::locator;
 			using difference_type = diff_type;
 			using iterator_category = std::random_access_iterator_tag;
 		private:
 			lattice* pLattice;
-			diff_type SeqNo;
+			index_type SeqNo;
 		public:
 			basic_iterator() :pLattice(nullptr), SeqNo(0){}
 			basic_iterator(const this_type&) = default;
@@ -72,9 +73,12 @@ namespace hmLib{
 				return Loc1.SeqNo - Loc2.SeqNo;
 			}
 		public:
-			lattice& get_lattice(){ return *pLattice; }
+//			lattice& get_lattice(){ return *pLattice; }
 			const lattice& get_lattice()const { return *pLattice; }
-			diff_type get_index()const { return SeqNo; }
+			index_type get_index_on_lattice()const { return SeqNo; }
+			index_type base_index()const { return locate().base_index(); }
+			point_type base_point()const { return locate().base_point(); }
+			extent_type base_extent()const { return locate().base_extent(); }
 		public:
 			friend bool operator==(const this_type& val1, const this_type& val2){
 				return val1.SeqNo == val2.SeqNo;
@@ -104,6 +108,7 @@ namespace hmLib{
 			using reference = typename lattice::const_reference;
 			using pointer = typename lattice::const_pointer;
 			using point_type = typename lattice::point_type;
+			using extent_type = typename lattice::extent_type;
 			using locator = typename lattice::const_locator;
 			using difference_type = diff_type;
 			using iterator_category = std::random_access_iterator_tag;
@@ -176,7 +181,10 @@ namespace hmLib{
 			}
 		public:
 			const lattice& get_lattice()const { return *pLattice; }
-			index_type get_index()const { return SeqNo; }
+			index_type get_index_on_lattice()const { return SeqNo; }
+			index_type base_index()const { return locate().base_index(); }
+			point_type base_point()const { return locate().base_point(); }
+			extent_type base_extent()const { return locate().base_extent(); }
 		};
 	}
 }

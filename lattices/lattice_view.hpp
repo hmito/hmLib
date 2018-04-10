@@ -10,9 +10,10 @@
 #include"lattice_indexer.hpp"
 #include"iterator.hpp"
 #include"locator.hpp"
+#include"../type_traits.hpp"
 
 namespace hmLib{
-	template<typename iterator_, unsigned int dim_, bool is_const = std::is_const<typename iterator_::value_type>::value>
+	template<typename iterator_, unsigned int dim_, bool is_const = is_const_iterator<iterator_>::value>
 	struct lattice_view {
 	private:
 		using this_type = lattice_view<iterator_, dim_, is_const>;
@@ -252,13 +253,13 @@ namespace hmLib{
 	template<typename iterator, typename indexer>
 	auto subview(const lattices::basic_locator<iterator, indexer>& Lat1, const lattices::basic_locator<iterator, indexer>& Lat2){
 		return lattice_view<iterator, indexer::dim(), std::is_const<typename iterator::value_type>::value>(
-			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), typename indexer::extent_type(Lat2.raw_point() - Lat1.raw_point() + typename indexer::point_type(1))
+			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.base_point(), typename indexer::extent_type(Lat2.base_point() - Lat1.base_point() + typename indexer::point_type(1))
 		);
 	}
 	template<typename iterator, typename indexer>
 	auto subview(const lattices::basic_const_locator<iterator, indexer>& Lat1, const lattices::basic_const_locator<iterator, indexer>& Lat2) {
 		return lattice_view<iterator, indexer::dim(), true>(
-			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.raw_point(), typename indexer::extent_type(Lat2.raw_point() - Lat1.raw_point() + typename indexer::point_type(1))
+			Lat1.get_base_iterator(), Lat1.get_indexer(), Lat1.base_point(), typename indexer::extent_type(Lat2.base_point() - Lat1.base_point() + typename indexer::point_type(1))
 		);
 	}
 }
