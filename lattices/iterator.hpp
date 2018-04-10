@@ -41,8 +41,8 @@ namespace hmLib{
 			reference operator[](index_type Dif_){ return pLattice->at(pLattice->index_to_point(SeqNo + Dif_)); }
 			const_reference operator[](index_type Dif_)const{ return pLattice->at(pLattice->index_to_point(SeqNo+ Dif_)); }
 		public:
-			locator locate(){ return pLattice->locate(pLattice->index_to_point(SeqNo)); }
-			operator locator(){ return locate(); }
+			locator locate()const { return pLattice->locate(pLattice->index_to_point(SeqNo)); }
+			operator locator()const { return locate(); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }
 			this_type operator++(int){
@@ -129,8 +129,8 @@ namespace hmLib{
 			pointer operator->()const{ return &(pLattice->at(pLattice->index_to_point(SeqNo))); }
 			reference operator[](index_type Dif_)const{ return pLattice->at(pLattice->index_to_point(SeqNo+Dif_)); }
 		public:
-			locator locate(){ return pLattice->locate(pLattice->index_to_point(SeqNo)); }
-			operator locator(){ return locate(); }
+			locator locate()const{ return pLattice->locate(pLattice->index_to_point(SeqNo)); }
+			operator locator()const { return locate(); }
 		public:
 			this_type& operator++(){ ++SeqNo; return *this; }
 			this_type operator++(int){

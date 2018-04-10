@@ -1,5 +1,5 @@
 #ifndef HMLIB_ALGORITHM_KEEPIF_INC
-#define HMLIB_ALGORITHM_KEEPFI_INC 100
+#define HMLIB_ALGORITHM_KEEPIF_INC 100
 #
 #include<iterator>
 #include<utility>
@@ -39,10 +39,10 @@ namespace hmLib {
 				explicit iterator(element_iterator EItr_)
 					: EItr(EItr_){
 				}
-				reference operator*()const {
+				reference operator*() {
 					return (*EItr).operator*();
 				}
-				pointer operator->()const {
+				pointer operator->() {
 					return (*EItr).operator->();
 				}
 				iterator& operator++() {
@@ -228,10 +228,10 @@ namespace hmLib {
 					: BItr(BlockBeg_)
 					, Itr(Itr_){
 					}
-				reference operator*()const {
+				reference operator*() {
 					return Itr.operator*();
 				}
-				pointer operator->()const {
+				pointer operator->() {
 					return Itr.operator->();
 				}
 				iterator& operator++() {

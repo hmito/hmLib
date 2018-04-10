@@ -110,7 +110,7 @@ namespace hmLib {
 				return operator[](Index);
 			}
 			bool empty()const { return LowerIndex>UpperIndex; }
-			std::size_t size()const { return UpperIndex-LowerIndex+1; }
+			unsigned int size()const { return UpperIndex-LowerIndex+1; }
 			double weidth()const { return Weidth; }
 			iterator begin()const {
 				return iterator(0, *this);
@@ -372,7 +372,7 @@ namespace hmLib {
 		enum  class make_axis_option { none, gridfit, exclude_upper_boundary, exclude_lower_boundary, exclude_boundary };
 	}
 	template<typename T,typename grid_policy>
-	auto make_axis(T Lower, T Upper, std::size_t Size, grid_policy GridPolicy, math::make_axis_option Opt = math::make_axis_option::none) {
+	auto make_axis(T Lower, T Upper, unsigned int Size, grid_policy GridPolicy, math::make_axis_option Opt = math::make_axis_option::none) {
 		using value_type = typename std::decay<T>::type;
 
 		switch(Opt) {
@@ -408,7 +408,7 @@ namespace hmLib {
 		}
 	}
 	template<typename T>
-	auto make_axis(T Lower, T Upper, std::size_t Size, math::make_axis_option Opt = math::make_axis_option::none) {
+	auto make_axis(T Lower, T Upper, unsigned int Size, math::make_axis_option Opt = math::make_axis_option::none) {
 		return make_axis(Lower, Upper, Size, math::grid_policy::round_grid, Opt);
 	}
 }

@@ -59,9 +59,7 @@ namespace hmLib{
 
 	template<typename iterator>
 	using is_const_iterator = typename std::is_const<
-		std::remove_reference_t<
-			typename std::iterator_traits<iterator>::reference
-		>
+		typename std::remove_reference<typename std::iterator_traits<iterator>::reference>::type
 	>::type;
 }
 #
