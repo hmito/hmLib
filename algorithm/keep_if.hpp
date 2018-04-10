@@ -340,9 +340,10 @@ namespace hmLib {
 				Size = 0;
 			}
 			std::size_t size()const { return Size; }
+			bool empty()const { return Size==0; }
 			iterator begin() { return iterator(JumpBlock.begin(), Itr); }
 			iterator end() { 
-				if(JumpBlock.empty())return iterator(JumpBlock.end(), Itr);
+				if(empty())return iterator(JumpBlock.end(), Itr);
 				return iterator(JumpBlock.begin(), JumpBlock.back().second);
 			}
 			const_iterator begin()const{ return cbegin(); }

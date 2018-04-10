@@ -31,7 +31,7 @@ namespace hmLib {
 	private:
 		container Arr;
 	public:
-		varray() :Arr() {}
+		varray() = default;
 		varray(std::initializer_list<T> il)noexcept {
 			auto out = Arr.begin();
 
@@ -45,10 +45,10 @@ namespace hmLib {
 
 		}
 		explicit varray(const T& val) { Arr.fill(val); }
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
 		explicit varray(const varray<U,N>& other){
 			auto oitr = Arr.begin();
-			for(auto itr = other.begin(); itr!= other.end(); ++itr) {
+			for(auto itr = other.begin(); itr!= other.end(); ++itr, ++oitr) {
 				*oitr = static_cast<T>(*itr);
 			}
 		}
@@ -147,7 +147,7 @@ namespace hmLib {
 			auto oitr = Ans.begin();
 			auto itr = begin();
 			auto end = end();
-			for(; itr!=end; ++itr) {
+			for(; itr!=end; ++itr, ++oitr) {
 				*(oitr) = *itr;
 			}
 		}

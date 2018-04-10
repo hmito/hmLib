@@ -26,7 +26,7 @@ namespace hmLib{
 			lattice* pLattice;
 			index_type SeqNo;
 		public:
-			basic_iterator() :pLattice(nullptr), SeqNo(0){}
+			basic_iterator() noexcept:pLattice(nullptr), SeqNo(0){}
 			basic_iterator(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
 			basic_iterator(this_type&&) = default;
@@ -116,7 +116,7 @@ namespace hmLib{
 			const lattice* pLattice;
 			index_type SeqNo;
 		public:
-			basic_const_iterator() :pLattice(nullptr), SeqNo(0){}
+			basic_const_iterator() noexcept :pLattice(nullptr), SeqNo(0){}
 			basic_const_iterator(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
 			basic_const_iterator(this_type&&) = default;
