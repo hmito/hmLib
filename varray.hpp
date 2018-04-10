@@ -46,27 +46,19 @@ namespace hmLib {
 		}
 		explicit varray(const T& val) { Arr.fill(val); }
 		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		varray(const varray<U,N>& other){
-			std::copy(other.begin(), other.end(), Arr.begin());
+		explicit varray(const varray<U,N>& other){
+			auto oitr = Arr.begin();
+			for(auto itr = other.begin(); itr!= other.end(); ++itr) {
+				*oitr = static_cast<T>(*itr);
+			}
 		}
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+/*		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
 		this_type& operator=(const varray<U, N>& other) {
 			if(&other!=this) {
 				std::copy(other.begin(), other.end(), Arr.begin());
 			}
 			return *this;
-		}
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		varray(varray<U, N>&& other) {
-			std::copy(other.begin(), other.end(), Arr.begin());
-		}
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		this_type& operator=(varray<U, N>&& other) {
-			if(&other!=this) {
-				std::copy(other.begin(), other.end(), Arr.begin());
-			}
-			return *this;
-		}
+		}*/
 	public:
 		reference at(size_type n) { return Arr.at(n); }
 		constexpr const_reference at(size_type n)const{ return Arr.at(n); }
@@ -148,6 +140,16 @@ namespace hmLib {
 		this_type& operator/=(U val) {
 			for(auto& v:*this) v /= val;
 			return *this;
+		}
+		template<typename U>
+		operator varray<U, N>() {
+			varray<U, N> Ans;
+			auto oitr = Ans.begin();
+			auto itr = begin();
+			auto end = end();
+			for(; itr!=end; ++itr) {
+				*(oitr) = *itr;
+			}
 		}
 	public:
 		T sum()const{
