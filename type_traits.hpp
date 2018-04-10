@@ -2,6 +2,7 @@
 #define HMLIB_TYPETRAITS_INC 100
 #
 #include<type_traits>
+#include<iterator>
 namespace hmLib{
 	template<typename type1, typename type2>
 	struct select_derived{
@@ -55,6 +56,13 @@ namespace hmLib{
 	}
 	template <class T>
 	class has_begin_and_end :public decltype(detail::has_begin_and_end_impl::check<T>(std::declval<T>())) {};
+
+	template<typename iterator>
+	using is_const_iterator = typename std::is_const<
+		std::remove_reference_t<
+			typename std::iterator_traits<iterator>::reference
+		>
+	>::type;
 }
 #
 #endif

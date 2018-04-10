@@ -9,19 +9,14 @@
 namespace hmLib {
 	namespace math {
 		namespace grid_policy {
-			namespace detail {
-				struct floor_index_tag {};
-				struct ceil_index_tag {};
-				struct round_index_tag {};
-			}
-			constexpr detail::floor_index_tag floor_grid;
-			constexpr detail::ceil_index_tag ceil_grid;
-			constexpr detail::round_index_tag round_grid;
+			constexpr struct round_grid_tag {} round_grid;
+			constexpr struct floor_grid_tag {} floor_grid;
+			constexpr struct ceil_grid_tag {} ceil_grid;
 			namespace detail {
 				template<typename grid_policy>
 				struct grid_adjuster {};
 				template<>
-				struct grid_adjuster<detail::round_index_tag> {
+				struct grid_adjuster<round_grid_tag> {
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::round(index_)); }
 					template<typename index_type>
@@ -30,7 +25,7 @@ namespace hmLib {
 					static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value-Interval/2.0, Value+Interval/2.0); }
 				};
 				template<>
-				struct grid_adjuster<detail::floor_index_tag> {
+				struct grid_adjuster<floor_grid_tag> {
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::floor(index_)); }
 					template<typename index_type>
@@ -39,7 +34,7 @@ namespace hmLib {
 					static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value, Value+Interval); }
 				};
 				template<>
-				struct grid_adjuster<detail::ceil_index_tag> {
+				struct grid_adjuster<ceil_grid_tag> {
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::ceil(index_)); }
 					template<typename index_type>
@@ -127,7 +122,7 @@ namespace hmLib {
 			iterator cend()const { return end(); }
 		};
 	}
-	template<typename T, typename grid_policy_, typename index_type_ = unsigned int, typename calc_type_ = double>
+	template<typename T, typename grid_policy_ = math::grid_policy::round_grid_tag, typename index_type_ = unsigned int, typename calc_type_ = double>
 	struct axis {
 	private:
 		using this_type = axis<T, grid_policy_, index_type_, calc_type_>;
