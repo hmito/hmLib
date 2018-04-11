@@ -22,7 +22,6 @@ namespace hmLib {
 			using pointer = typename std::iterator_traits<base_iterator>::pointer;
 			using const_reference = typename std::add_const<reference>::type;
 			using const_pointer = typename std::add_const<pointer>::type;
-			using iterator_category = typename std::iterator_traits<base_iterator>::iterator_category;
 		public:
 			struct const_iterator;
 			struct iterator {
@@ -133,7 +132,6 @@ namespace hmLib {
 			using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 			using reference = typename std::iterator_traits<base_iterator>::reference;
 			using pointer = typename std::iterator_traits<base_iterator>::pointer;
-			using iterator_category = typename std::iterator_traits<base_iterator>::iterator_category;
 		public:
 			struct const_iterator {
 				using value_type = typename this_type::value_type;
@@ -199,7 +197,6 @@ namespace hmLib {
 		private:
 			using this_type = block_keeper <forward_iterator_>;
 			using base_iterator = forward_iterator_;
-			using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 			using block_container = std::vector<std::pair<base_iterator, base_iterator>>;
 			using block_iterator = typename block_container::const_iterator;
 		public:
@@ -209,7 +206,6 @@ namespace hmLib {
 			using pointer = typename std::iterator_traits<base_iterator>::pointer;
 			using const_reference = typename std::add_const<reference>::type;
 			using const_pointer = typename std::add_const<pointer>::type;
-			using iterator_category = typename std::iterator_traits<base_iterator>::iterator_category;
 		public:
 			struct const_iterator;
 			struct iterator{
@@ -364,7 +360,6 @@ namespace hmLib {
 		private:
 			using this_type = block_keeper <forward_iterator_>;
 			using base_iterator = forward_iterator_;
-			using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 			using block_container = std::vector<std::pair<base_iterator, base_iterator>>;
 			using block_iterator = typename block_container::const_iterator;
 		public:
@@ -372,7 +367,6 @@ namespace hmLib {
 			using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 			using reference = typename std::iterator_traits<base_iterator>::reference;
 			using pointer = typename std::iterator_traits<base_iterator>::pointer;
-			using iterator_category = typename std::iterator_traits<base_iterator>::iterator_category;
 		public:
 			struct const_iterator {
 				using value_type = typename this_type::value_type;
@@ -464,7 +458,7 @@ namespace hmLib {
 			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Itr); }
 			const_iterator cend()const {
 				if(JumpBlock.empty())return const_iterator(JumpBlock.end(), Itr);
-				return const_iterator(JumpBlock.begin(), JumpBlock.back().second);
+				return const_iterator(JumpBlock.end(), JumpBlock.back().second);
 			}
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
@@ -475,20 +469,188 @@ namespace hmLib {
 			block_container JumpBlock;
 		};
 
-		struct element_base_keep_tag {};
-		struct block_base_keep_tag {};
+		template<typename index_type_ = int>
+		struct element_index_keeper {
+		private:
+			using this_type = element_index_keeper <index_type_>;
+			using index_type = index_type_;
+			using element_container = std::vector<index_type>;
+			using const_iterator = typename element_container::const_iterator;
+		public:
+			using value_type = index_type;
+			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
+			using reference = void;
+			using pointer = void;
+			using const_reference = void;
+			using const_pointer = void;
+		public:
+			element_index_keeper() = default;
+			template<typename forward_iterator, typename condition>
+			element_index_keeper(forward_iterator Beg_, forward_iterator End_, condition ShouldKeep) {
+				reset(Beg_, End_, std::forward<condition>(ShouldKeep));
+			}
+			template<typename forward_iterator, typename condition>
+			void reset(forward_iterator Beg_, forward_iterator End_, condition ShouldKeep) {
+				reset();
+
+				index_type Index = 0;
+				for(; Beg_!=End_; ++Beg_, ++Index) {
+					if(ShouldKeep(*Beg_)) {
+						KeptBlock.push_back(Index);
+					}
+				}
+			}
+			void reset() { KeptBlock.clear(); }
+			std::size_t size()const { return KeptBlock.size(); }
+			const_iterator cbegin()const { return KeptBlock.cbegin(); }
+			const_iterator cend()const { return KeptBlock.cend(); }
+			const_iterator begin()const { return cbegin(); }
+			const_iterator end() const { return cend(); }
+		private:
+			element_container KeptBlock;
+		};
+		template<typename index_type_ = int>
+		struct block_index_keeper {
+		private:
+			using this_type = block_index_keeper <index_type_>;
+			using index_type = index_type_;
+			using block_container = std::vector<std::pair<index_type, index_type>>;
+			using block_iterator = typename block_container::const_iterator;
+		public:
+			using value_type = index_type;
+			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
+			using reference = void;
+			using pointer = void;
+			using const_reference = void;
+			using const_pointer = void;
+		public:
+			struct const_iterator {
+				using value_type = typename this_type::value_type;
+				using difference_type = typename this_type::difference_type;
+				using reference = typename this_type::reference;
+				using pointer = typename this_type::pointer;
+				using iterator_category = std::input_iterator_tag;
+			private:
+				block_iterator BItr;
+				index_type Index;
+			public:
+				const_iterator() = default;
+				const_iterator(block_iterator BlockBeg_, index_type Index_)
+					: BItr(BlockBeg_)
+					, Index(Index_) {
+				}
+				value_type operator*()const {
+					return Index;
+				}
+				const_iterator& operator++() {
+					++Index;
+					if(Index == BItr->first) {
+						Index = BItr->second;
+						++BItr;
+					}
+					return *this;
+				}
+				const_iterator operator++(int) {
+					const_iterator Prev = *this;
+					++(*this);
+					return Prev;
+				}
+				friend bool operator==(const const_iterator& itr1, const const_iterator& itr2) { return itr1.Index ==itr2.Index; }
+				friend bool operator!=(const const_iterator& itr1, const const_iterator& itr2) { return itr1.Index !=itr2.Index; }
+			};
+		public:
+			block_index_keeper() = default;
+			template<typename forward_iterator, typename condition>
+			block_index_keeper(forward_iterator Beg_, forward_iterator End_, condition ShouldKeep) {
+				reset(Beg_, End_, std::forward<condition>(ShouldKeep));
+			}
+			template<typename forward_iterator, typename condition>
+			void reset(forward_iterator Beg_, forward_iterator End_, condition ShouldKeep) {
+				reset();
+
+				index_type Cnt=0;
+				for(; Beg_!=End_; ++Beg_) {
+					if(ShouldKeep(*Beg_)) {
+						Index = Cnt;
+						++Size;
+						++Cnt;
+						++Beg_;
+						break;
+					} else {
+						++Cnt;
+					}
+				}
+
+				index_type From = 0;
+				bool InKeepBlock = true;
+
+				for(; Beg_!=End_; ++Beg_) {
+					if(ShouldKeep(*Beg_)) {
+						if(!InKeepBlock) {
+							JumpBlock.emplace_back(From, Cnt);
+							InKeepBlock = true;
+						}
+						++Size;
+					} else {
+						if(InKeepBlock) {
+							From = Cnt;
+							InKeepBlock = false;
+						}
+					}
+					++Cnt;
+				}
+				if(InKeepBlock) {
+					JumpBlock.emplace_back(Cnt, Cnt);
+				} else {
+					JumpBlock.emplace_back(From, Cnt);
+				}
+			}
+			void reset() {
+				JumpBlock.clear();
+				Size = 0;
+				Index = 0;
+			}
+			std::size_t size()const { return Size; }
+			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Index); }
+			const_iterator cend()const {
+				if(JumpBlock.empty())return const_iterator(JumpBlock.end(), Index);
+				return const_iterator(JumpBlock.end(), JumpBlock.back().second);
+			}
+			const_iterator begin()const { return cbegin(); }
+			const_iterator end() const { return cend(); }
+		private:
+			index_type Index;
+			std::size_t Size;
+		private:
+			block_container JumpBlock;
+		};
+
+		static constexpr struct element_keep_tag {}element_keep;
+		static constexpr struct block_keep_tag {}block_keep;
 	}
 	template<typename iterator, typename condition>
-	auto keep_if(algorithm::element_base_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
+	auto keep_if(algorithm::element_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
 		return algorithm::element_keeper<iterator>(Beg, End, std::forward<condition>(ShouldKeep));
 	}
 	template<typename iterator, typename condition>
-	auto keep_if(algorithm::block_base_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
+	auto keep_if(algorithm::block_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
 		return algorithm::block_keeper<iterator>(Beg, End, std::forward<condition>(ShouldKeep));
 	}
 	template<typename iterator, typename condition>
 	auto keep_if(iterator Beg, iterator End, condition ShouldKeep) {
-		return keep_if(algorithm::block_base_keep_tag(),Beg, End, std::forward<condition>(ShouldKeep));
+		return keep_if(algorithm::block_keep,Beg, End, std::forward<condition>(ShouldKeep));
+	}
+	template<typename iterator, typename condition>
+	auto keep_index_if(algorithm::element_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
+		return algorithm::element_index_keeper<iterator>(Beg, End, std::forward<condition>(ShouldKeep));
+	}
+	template<typename iterator, typename condition>
+	auto keep_index_if(algorithm::block_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
+		return algorithm::block_index_keeper<iterator>(Beg, End, std::forward<condition>(ShouldKeep));
+	}
+	template<typename iterator, typename condition>
+	auto keep_index_if(iterator Beg, iterator End, condition ShouldKeep) {
+		return keep_index_if(algorithm::block_keep, Beg, End, std::forward<condition>(ShouldKeep));
 	}
 }
 #
