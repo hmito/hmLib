@@ -17,6 +17,7 @@ namespace hmLib {
 				struct grid_adjuster {};
 				template<int log10_index_threshold>
 				struct grid_adjuster<round_grid_tag, log10_index_threshold> {
+					inline static double index_threshold() { return std::pow(10, log10_index_threshold); }
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::round(index_)); }
 					template<typename index_type>
@@ -26,7 +27,7 @@ namespace hmLib {
 				};
 				template<int log10_index_threshold>
 				struct grid_adjuster<floor_grid_tag, log10_index_threshold> {
-					inline double index_threshold() { return std::pow(10, log10_index_threshold); }
+					inline static double index_threshold() { return std::pow(10, log10_index_threshold); }
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::floor(index_+index_threshold())); }
 					template<typename index_type>
@@ -36,7 +37,7 @@ namespace hmLib {
 				};
 				template<int log10_index_threshold>
 				struct grid_adjuster<ceil_grid_tag, log10_index_threshold> {
-					inline double index_threshold() { return std::pow(10, log10_index_threshold); }
+					inline static double index_threshold() { return std::pow(10, log10_index_threshold); }
 					template<typename index_type>
 					static index_type index_cast(double index_) { return static_cast<index_type>(std::ceil(index_-index_threshold())); }
 					template<typename index_type>
@@ -382,8 +383,8 @@ namespace hmLib {
 			double UpperFromFIndex = (UpperToFIndex-b)/a;
 
 			//condition for no violation of the out of range access
-			LowerFromIndex = static_cast<index_type>(std::max(0.0,std::ceil(LowerFromFIndex - from_grid_adjuster::index_range(0).first)));
-			UpperFromIndex = static_cast<index_type>(std::min(from.size()-1.0,std::floor(UpperFromFIndex- from_grid_adjuster::index_range(0).second)));
+			LowerFromIndex = static_cast<index_type>(std::round(std::max(0.0,std::ceil(LowerFromFIndex - from_grid_adjuster::index_range(0).first))));
+			UpperFromIndex = static_cast<index_type>(std::round(std::min(from.size()-1.0,std::floor(UpperFromFIndex- from_grid_adjuster::index_range(0).second))));
 		}
 	public:
 		index_type lower()const { return LowerFromIndex; }
@@ -399,8 +400,8 @@ namespace hmLib {
 			double LowerFIndex = float_index(FIndexRange.first);
 			double UpperFIndex = float_index(FIndexRange.second);
 
-			index_type LowerIndex = to_grid_adjuster::index_cast<index_type>(LowerFIndex);
-			index_type UpperIndex = to_grid_adjuster::index_cast<index_type>(UpperFIndex);
+			index_type LowerIndex = to_grid_adjuster::index_cast<index_type>(LowerFIndex+to_grid_adjuster::index_threshold());
+			index_type UpperIndex = to_grid_adjuster::index_cast<index_type>(UpperFIndex-to_grid_adjuster::index_threshold());
 			if(LowerIndex == UpperIndex) {
 				return weighted_index_range(LowerIndex, UpperFIndex-LowerFIndex);
 			}
