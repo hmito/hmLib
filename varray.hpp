@@ -439,5 +439,13 @@ namespace hmLib {
 		return Ans;
 	}
 }
+
+//std namespace:: only for swap
+namespace std {
+	template<typename T, std::size_t N>
+	void swap(hmLib::varray<T, N>& v1, hmLib::varray<T, N>& v2) {
+		v1.swap(v2);
+	}
+}
 #
 #endif
