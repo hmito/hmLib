@@ -72,7 +72,7 @@ namespace hmLib{
 		public:
 			iterator get_base_iterator()const { return Begin; }
 			const indexer& get_indexer()const { return Indexer; }
-			index_type base_index()const{ return Indexer(Pos) }
+			index_type base_index()const{ return Indexer(Pos); }
 			point_type base_point()const{ return Pos; }
 			extent_type base_extent()const{ return Indexer.extent(); }
 		private:

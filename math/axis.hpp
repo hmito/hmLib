@@ -326,7 +326,7 @@ namespace hmLib {
 	public:
 		index_type index(value_type Val)const {
 			hmLib_assert(inside(Val), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
-			return grid_adjuster::index_cast<index_type>(float_index(Val));
+			return grid_adjuster::template index_cast<index_type>(float_index(Val));
 		}
 		weighted_index_range weighted_index(value_type LowerVal, value_type UpperVal)const {
 			if(LowerVal > UpperVal)std::swap(LowerVal, UpperVal);
@@ -335,8 +335,8 @@ namespace hmLib {
 			double LowerFIndex = float_index(LowerVal);
 			double UpperFIndex = float_index(UpperVal);
 
-			index_type LowerIndex = grid_adjuster::index_cast<index_type>(LowerFIndex);
-			index_type UpperIndex = grid_adjuster::index_cast<index_type>(UpperFIndex);
+			index_type LowerIndex = grid_adjuster::template index_cast<index_type>(LowerFIndex);
+			index_type UpperIndex = grid_adjuster::template index_cast<index_type>(UpperFIndex);
 			if(LowerIndex == UpperIndex) {
 				return weighted_index_range(LowerIndex,UpperFIndex-LowerFIndex);
 			}
@@ -407,8 +407,8 @@ namespace hmLib {
 			double LowerFIndex = float_index(FIndexRange.first);
 			double UpperFIndex = float_index(FIndexRange.second);
 
-			index_type LowerIndex = to_grid_adjuster::index_cast<index_type>(LowerFIndex+to_grid_adjuster::index_threshold());
-			index_type UpperIndex = to_grid_adjuster::index_cast<index_type>(UpperFIndex-to_grid_adjuster::index_threshold());
+			index_type LowerIndex = to_grid_adjuster::template index_cast<index_type>(LowerFIndex+to_grid_adjuster::index_threshold());
+			index_type UpperIndex = to_grid_adjuster::template index_cast<index_type>(UpperFIndex-to_grid_adjuster::index_threshold());
 			if(LowerIndex == UpperIndex) {
 				return weighted_index_range(LowerIndex, UpperFIndex-LowerFIndex);
 			}

@@ -144,11 +144,11 @@ namespace hmLib {
 		template<typename U>
 		operator varray<U, N>() {
 			varray<U, N> Ans;
-			auto oitr = Ans.begin();
-			auto itr = begin();
-			auto end = end();
-			for(; itr!=end; ++itr, ++oitr) {
-				*(oitr) = *itr;
+			auto oItr = Ans.begin();
+			auto Itr = begin();
+			auto End = end();
+			for(; Itr!=End; ++Itr, ++oItr) {
+				*(oItr) = *Itr;
 			}
 		}
 	public:
