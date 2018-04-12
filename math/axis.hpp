@@ -317,6 +317,13 @@ namespace hmLib {
 		bool inside(value_type Value)const { return grid_lower() <= Value && Value < grid_upper(); }
 		bool inside(value_type LowerVal, value_type UpperVal)const { return grid_lower() <= LowerVal && UpperVal < grid_upper(); }
 	public:
+		friend bool operator==(const this_type& axis1, const this_type& axis2) {
+			return axis1.Size==axis2.Size && hmLib::are_equal(axis1.a, axis2.a) && hmLib::are_equal(axis1.b, axis2.b);
+		}
+		friend bool operator!=(const this_type& axis1, const this_type& axis2) {
+			return !(axis1==axis2);
+		}
+	public:
 		index_type index(value_type Val)const {
 			hmLib_assert(inside(Val), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
 			return grid_adjuster::index_cast<index_type>(float_index(Val));
