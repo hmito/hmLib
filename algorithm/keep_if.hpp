@@ -110,6 +110,9 @@ namespace hmLib {
 				}
 			}
 			void reset() { KeptBlock.clear(); }
+			void push_back(base_iterator Itr_) {
+				KeptBlock.push_back(Itr_);
+			}
 			std::size_t size()const { return KeptBlock.size(); }
 			iterator begin() { return iterator(KeptBlock.begin()); }
 			iterator end() { return iterator(KeptBlock.end()); }
@@ -184,6 +187,9 @@ namespace hmLib {
 				}
 			}
 			void reset() { KeptBlock.clear(); }
+			void push_back(base_iterator Itr_) {
+				KeptBlock.push_back(Itr_);
+			}
 			std::size_t size()const { return KeptBlock.size(); }
 			const_iterator cbegin()const { return const_iterator(KeptBlock.begin()); }
 			const_iterator cend()const { return const_iterator(KeptBlock.end()); }
@@ -303,14 +309,16 @@ namespace hmLib {
 					if(ShouldKeep(*Beg_)) {
 						Itr = Beg_;
 						++Size;
-						++Beg_;
 						break;
 					}
 				}
 
+				if(Beg_==End_) { return; }
+
 				base_iterator From = End_;
 				bool InKeepBlock = true;
 
+				++Beg_;
 				for(; Beg_!=End_; ++Beg_) {
 					if(ShouldKeep(*Beg_)) {
 						if(!InKeepBlock) {
@@ -422,14 +430,16 @@ namespace hmLib {
 					if(ShouldKeep(*Beg_)) {
 						Itr = Beg_;
 						++Size;
-						++Beg_;
 						break;
 					}
 				}
 
+				if(Beg_==End_)return;
+
 				base_iterator From = End_;
 				bool InKeepBlock = true;
 
+				++Beg_;
 				for(; Beg_!=End_; ++Beg_) {
 					if(ShouldKeep(*Beg_)) {
 						if(!InKeepBlock) {
@@ -454,6 +464,7 @@ namespace hmLib {
 				JumpBlock.clear();
 				Size = 0;
 			}
+			bool empty()const { return Size==0; }
 			std::size_t size()const { return Size; }
 			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Itr); }
 			const_iterator cend()const {
@@ -501,6 +512,9 @@ namespace hmLib {
 				}
 			}
 			void reset() { KeptBlock.clear(); }
+			void push_back(index_type Index_) {
+				KeptBlock.push_back(Index_);
+			}
 			std::size_t size()const { return KeptBlock.size(); }
 			const_iterator cbegin()const { return KeptBlock.cbegin(); }
 			const_iterator cend()const { return KeptBlock.cend(); }
@@ -569,22 +583,24 @@ namespace hmLib {
 				reset();
 
 				index_type Cnt=0;
-				for(; Beg_!=End_; ++Beg_) {
+				for(; Beg_!=End_; ++Beg_, ++Cnt) {
 					if(ShouldKeep(*Beg_)) {
 						Index = Cnt;
 						++Size;
-						++Cnt;
-						++Beg_;
 						break;
-					} else {
-						++Cnt;
 					}
+				}
+
+				if(Beg_==End_) {
+					return;
 				}
 
 				index_type From = 0;
 				bool InKeepBlock = true;
 
-				for(; Beg_!=End_; ++Beg_) {
+				++Cnt;
+				++Beg_;
+				for(; Beg_!=End_; ++Beg_, ++Cnt) {
 					if(ShouldKeep(*Beg_)) {
 						if(!InKeepBlock) {
 							JumpBlock.emplace_back(From, Cnt);
@@ -597,7 +613,6 @@ namespace hmLib {
 							InKeepBlock = false;
 						}
 					}
-					++Cnt;
 				}
 				if(InKeepBlock) {
 					JumpBlock.emplace_back(Cnt, Cnt);
@@ -610,6 +625,7 @@ namespace hmLib {
 				Size = 0;
 				Index = 0;
 			}
+			bool empty()const { return Size==0; }
 			std::size_t size()const { return Size; }
 			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Index); }
 			const_iterator cend()const {
