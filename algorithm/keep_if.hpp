@@ -6,6 +6,7 @@
 #include<vector>
 #include"../utility.hpp"
 #include"../type_traits.hpp"
+
 namespace hmLib {
 	namespace algorithm {
 		template<typename forward_iterator_, bool is_const = is_const_iterator<forward_iterator_>::value>
@@ -490,7 +491,7 @@ namespace hmLib {
 		public:
 			using value_type = index_type;
 			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
-			using reference = void;
+			using reference = value_type;
 			using pointer = void;
 			using const_reference = void;
 			using const_pointer = void;
@@ -533,7 +534,7 @@ namespace hmLib {
 		public:
 			using value_type = index_type;
 			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
-			using reference = void;
+			using reference = value_type;
 			using pointer = void;
 			using const_reference = void;
 			using const_pointer = void;
@@ -543,7 +544,7 @@ namespace hmLib {
 				using difference_type = typename this_type::difference_type;
 				using reference = typename this_type::reference;
 				using pointer = typename this_type::pointer;
-				using iterator_category = std::input_iterator_tag;
+				using iterator_category = std::forward_iterator_tag;
 			private:
 				block_iterator BItr;
 				index_type Index;
@@ -553,7 +554,7 @@ namespace hmLib {
 					: BItr(BlockBeg_)
 					, Index(Index_) {
 				}
-				value_type operator*()const {
+				reference operator*()const {
 					return Index;
 				}
 				const_iterator& operator++() {
@@ -573,7 +574,7 @@ namespace hmLib {
 				friend bool operator!=(const const_iterator& itr1, const const_iterator& itr2) { return itr1.Index !=itr2.Index; }
 			};
 		public:
-			block_index_keeper() = default;
+			block_index_keeper()noexcept : JumpBlock(), Size(0), Index(0) {}
 			template<typename forward_iterator, typename condition>
 			block_index_keeper(forward_iterator Beg_, forward_iterator End_, condition ShouldKeep) {
 				reset(Beg_, End_, std::forward<condition>(ShouldKeep));
@@ -634,10 +635,26 @@ namespace hmLib {
 			}
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
+			void push_back(value_type Index_){
+				if(Size==0) {
+					Index = Index_;
+					JumpBlock.emplace_back(Index_+1, Index_+1);
+				} else {
+					hmLib_assert(Index_>=JumpBlock.back().second, hmLib::numeric_exceptions::incorrect_arithmetic_request, "block_index_keeper::push_back require the increasing-order");
+					//next of the current end
+					if(JumpBlock.back().first == Index_) {
+						JumpBlock.back().first = Index_+1;
+						JumpBlock.back().second = Index_+1;
+					} else {
+						JumpBlock.back().second = Index_;
+						JumpBlock.emplace_back(Index_+1, Index_+1);
+					}
+				}
+				++Size;
+			}
 		private:
 			index_type Index;
 			std::size_t Size;
-		private:
 			block_container JumpBlock;
 		};
 
@@ -662,7 +679,7 @@ namespace hmLib {
 	}
 	template<typename iterator, typename condition>
 	auto keep_index_if(algorithm::block_keep_tag, iterator Beg, iterator End, condition ShouldKeep) {
-		return algorithm::block_index_keeper<iterator>(Beg, End, std::forward<condition>(ShouldKeep));
+		return algorithm::block_index_keeper<typename std::iterator_traits<iterator>::difference_type>(Beg, End, std::forward<condition>(ShouldKeep));
 	}
 	template<typename iterator, typename condition>
 	auto keep_index_if(iterator Beg, iterator End, condition ShouldKeep) {

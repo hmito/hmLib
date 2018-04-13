@@ -150,6 +150,7 @@ namespace hmLib {
 			for(; Itr!=End; ++Itr, ++oItr) {
 				*(oItr) = *Itr;
 			}
+			return Ans;
 		}
 	public:
 		T sum()const{

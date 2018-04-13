@@ -11,7 +11,7 @@ namespace hmLib {
 	public:
 		using value_type = T;
 		using difference_type = decltype(std::declval<value_type>() - std::declval<value_type>());
-		using pointer = value_type;
+		using pointer = void;
 		using reference = value_type;
 		using iterator_category = std::random_access_iterator_tag;
 	private:
