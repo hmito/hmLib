@@ -437,5 +437,11 @@
     <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
