@@ -71,7 +71,7 @@ public:
 		auto End = Lattice.end();
 		for (int i = 0; i < 90; ++i) {
 			Assert::AreEqual(i, Con[i]);
-			Assert::AreEqual(i, Begin.get_index());
+			Assert::AreEqual<int>(i, std::distance(Lattice.begin(),Begin));
 			Assert::IsTrue(Begin != End);
 			Assert::AreEqual(i, *Begin);
 			Assert::AreEqual<int>(90-i, std::distance(Begin,End));
@@ -95,7 +95,7 @@ public:
 		auto End = Lattice.end();
 		for (int i = 0; i < 90; ++i) {
 			Assert::AreEqual(i, Con[i]);
-			Assert::AreEqual(i, Begin.get_index());
+			Assert::AreEqual<int>(i, std::distance(Lattice.begin(), Begin));
 			Assert::IsTrue(Begin != End);
 			Assert::AreEqual(i, *Begin);
 			Assert::AreEqual<int>(90 - i, std::distance(Begin, End));
@@ -318,7 +318,7 @@ public:
 		auto Lat = make_lattice_view(Con.begin(), Con.end(), 10, 7, 4);
 
 		auto SubLot = hmLib::subview(Lat.locate(3, 2, 1), Lat.locate(3, 2, 1).plus(4, 0, 2));
-		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(3, 2, 1).plus(4, 0, 2).raw_extent());
+		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(3, 2, 1).plus(4, 0, 2).base_extent());
 
 		typename decltype(SubLot)::indexer Indxer1(lattices::point(3, 4, 4));
 		typename decltype(SubLot)::indexer Indxer2 = Indxer1;
@@ -330,16 +330,16 @@ public:
 		Assert::AreEqual(3u, Size[2]);
 		Assert::AreEqual(15u, SubLot.lattice_size());
 
-		Assert::AreEqual(3, SubLot.front_locate().raw_point()[0]);
-		Assert::AreEqual(2, SubLot.front_locate().raw_point()[1]);
-		Assert::AreEqual(1, SubLot.front_locate().raw_point()[2]);
+		Assert::AreEqual(3, SubLot.front_locate().base_point()[0]);
+		Assert::AreEqual(2, SubLot.front_locate().base_point()[1]);
+		Assert::AreEqual(1, SubLot.front_locate().base_point()[2]);
 
 		auto Itr = SubLot.begin();
 		for(int z = 0; z < 3; ++z){
 			for(int x = 0; x < 5; ++x){
 				Assert::IsFalse(Itr == SubLot.end());
-				Assert::AreEqual(x + 5 * z, Itr.get_index());
-				auto Pos = SubLot.index_to_point(Itr.get_index());
+				Assert::AreEqual(x + 5 * z, std::distance(SubLot.begin(),Itr));
+				auto Pos = SubLot.index_to_point(std::distance(SubLot.begin(), Itr));
 				Assert::AreEqual(x, Pos[0]);
 				Assert::AreEqual(0, Pos[1]);
 				Assert::AreEqual(z, Pos[2]);
@@ -433,7 +433,7 @@ public:
 		const lattice_view<iterator, 3, false>& Lat(Lat2);
 
 		auto SubLot = hmLib::subview(Lat.locate(3, 2, 1), Lat.locate(3, 2, 1).plus(4, 0, 2));
-		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(3, 2, 1).plus(4, 0, 2).raw_extent());
+		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(3, 2, 1).plus(4, 0, 2).base_extent());
 
 		typename decltype(SubLot)::indexer Indxer1(lattices::extent(3, 4, 4));
 		typename decltype(SubLot)::indexer Indxer2 = Indxer1;
@@ -445,16 +445,16 @@ public:
 		Assert::AreEqual(3u, Size[2]);
 		Assert::AreEqual(15u, SubLot.lattice_size());
 
-		Assert::AreEqual(3, SubLot.front_locate().raw_point()[0]);
-		Assert::AreEqual(2, SubLot.front_locate().raw_point()[1]);
-		Assert::AreEqual(1, SubLot.front_locate().raw_point()[2]);
+		Assert::AreEqual(3, SubLot.front_locate().base_point()[0]);
+		Assert::AreEqual(2, SubLot.front_locate().base_point()[1]);
+		Assert::AreEqual(1, SubLot.front_locate().base_point()[2]);
 
 		auto Itr = SubLot.begin();
 		for(int z = 0; z < 3; ++z){
 			for(int x = 0; x < 5; ++x){
 				Assert::IsFalse(Itr == SubLot.end());
-				Assert::AreEqual(x + 5 * z, Itr.get_index());
-				auto Pos = SubLot.index_to_point(Itr.get_index());
+				Assert::AreEqual(x + 5 * z, std::distance(SubLot.begin(),Itr));
+				auto Pos = SubLot.index_to_point(std::distance(SubLot.begin(), Itr));
 				Assert::AreEqual(x, Pos[0]);
 				Assert::AreEqual(0, Pos[1]);
 				Assert::AreEqual(z, Pos[2]);
@@ -512,7 +512,7 @@ public:
 		auto End = Lattice.end();
 		for(int i = 0; i < 90; ++i){
 			Assert::AreEqual(i, Con[i]);
-			Assert::AreEqual(i, Begin.get_index());
+			Assert::AreEqual(i, Begin.get_index_on_lattice());
 			Assert::IsTrue(Begin != End);
 			Assert::AreEqual(i, *Begin);
 			Assert::AreEqual<int>(90 - i, std::distance(Begin, End));
@@ -536,7 +536,7 @@ public:
 		auto End = Lattice.end();
 		for(int i = 0; i < 90; ++i){
 			Assert::AreEqual(i, Con[i]);
-			Assert::AreEqual(i, Begin.get_index());
+			Assert::AreEqual(i, Begin.get_index_on_lattice());
 			Assert::IsTrue(Begin != End);
 			Assert::AreEqual(i, *Begin);
 			Assert::AreEqual<int>(90 - i, std::distance(Begin, End));

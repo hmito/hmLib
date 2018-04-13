@@ -127,6 +127,7 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,6 +160,7 @@
     <ClInclude Include="hmLib_config.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="test_type_traits.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -167,7 +169,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="test_euclidean.cpp" />
+    <ClCompile Include="test_algorithm.cpp" />
+    <ClCompile Include="test_circular.cpp" />
+    <ClCompile Include="test_geometry.cpp" />
+    <ClCompile Include="test_iterators.cpp" />
+    <ClCompile Include="test_math.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
     <ClCompile Include="test_varray.cpp" />
   </ItemGroup>

@@ -29,15 +29,15 @@ namespace hmLib{
 		using diff_type = lattices::diff_type;
 		using index_type = lattices::index_type;
 	public:
-		using value_type = T;
-		using reference = typename std::add_lvalue_reference<T>::type;
-		using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
-		using pointer = typename std::add_pointer<T>::type;
-		using const_pointer = typename std::add_const<pointer>::type;
+		using value_type = typename std::decay<T>::type;
+		using reference = value_type&;
+		using const_reference = const value_type&;
+		using pointer = value_type*;
+		using const_pointer = const value_type*;
 	public:
 		using indexer = lattices::lattice_indexer<dim_>;
 		using locator = lattices::basic_locator<iterator_base, indexer>;
-		using const_locator = lattices::basic_const_locator<iterator_base, indexer>;
+		using const_locator = lattices::basic_const_locator<const_iterator_base, indexer>;
 		using iterator = lattices::basic_iterator<this_type>;
 		using const_iterator = lattices::basic_const_iterator<this_type>;
 	public:
@@ -105,7 +105,7 @@ namespace hmLib{
 		//!Return begin iterator fot the lattice
 		iterator begin() { return iterator(*this, 0); }
 		//!Return end iterator fot the lattice
-		iterator end() { return iterator(*this, lattice_size()); }
+		iterator end() { return iterator(*this, static_cast<index_type>(lattice_size())); }
 		//!Return begin const_iterator fot the lattice
 		const_iterator begin()const { return cbegin(); }
 		//!Return end const_iterator fot the lattice
@@ -113,7 +113,8 @@ namespace hmLib{
 		//!Return begin const_iterator fot the lattice
 		const_iterator cbegin()const { return const_iterator(*this, 0); }
 		//!Return end const_iterator fot the lattice
-		const_iterator cend()const { return const_iterator(*this, lattice_size()); }
+		const_iterator cend()const { return const_iterator(*this, static_cast<index_type>(lattice_size()));
+		}
 	public:
 		//!Return locator of given point
 		locator locate(const point_type& Point_) { return locator(Data.begin(), Indexer, Point_); }

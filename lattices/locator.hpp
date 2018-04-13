@@ -56,7 +56,7 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.raw_point() - Loc2.raw_point();
+				return Loc1.base_point() - Loc2.base_point();
 			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
@@ -72,9 +72,9 @@ namespace hmLib{
 		public:
 			iterator get_base_iterator()const { return Begin; }
 			const indexer& get_indexer()const { return Indexer; }
-			point_type& raw_point(){ return Pos; }
-			const point_type& raw_point()const{ return Pos; }
-			const extent_type& raw_extent()const{ return Indexer.extent(); }
+			index_type base_index()const{ return Indexer(Pos); }
+			point_type base_point()const{ return Pos; }
+			extent_type base_extent()const{ return Indexer.extent(); }
 		private:
 			iterator Begin;
 			indexer Indexer;
@@ -121,7 +121,7 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.raw_point() - Loc2.raw_point();
+				return Loc1.base_point() - Loc2.base_point();
 			}
 		public:
 			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
@@ -137,9 +137,9 @@ namespace hmLib{
 		public:
 			iterator get_base_iterator()const { return Begin; }
 			const indexer& get_indexer()const { return Indexer; }
-			point_type& raw_point(){ return Pos; }
-			const point_type& raw_point()const{ return Pos; }
-			const extent_type& raw_extent()const{ return Indexer.extent(); }
+			index_type base_index()const { return Indexer(Pos); }
+			point_type base_point()const{ return Pos; }
+			extent_type base_extent()const{ return Indexer.extent(); }
 		private:
 			iterator Begin;
 			indexer Indexer;

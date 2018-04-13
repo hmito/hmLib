@@ -13,7 +13,7 @@
 #include"torus_locator.hpp"
 
 namespace hmLib{
-	template<typename iterator_, unsigned int dim_, bool is_const = std::is_const<typename iterator_::value_type>::value>
+	template<typename iterator_, unsigned int dim_, bool is_const = is_const_iterator<iterator_>::value>
 	struct torus_lattice_view {
 		using this_type = torus_lattice_view<iterator_, dim_, is_const>;
 	public:

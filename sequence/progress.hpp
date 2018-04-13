@@ -3,19 +3,18 @@
 #
 namespace hmLib{
 	namespace sequence{
-		template<typename system,typename state>
-		void progress(system System, state& State, unsigned int BeginStep, unsigned int EndStep){
+		template<typename system_type,typename state_type, typename time_type>
+		void progress(system_type& System, state_type& State, time_type BeginStep, time_type EndStep){
 			for(; BeginStep != EndStep; ++BeginStep){
 				System(State, BeginStep);
 			}
 		}
-		template<typename system, typename state, typename observer>
-		void progress(system System, state& State, unsigned int BeginStep, unsigned int EndStep, observer Observer){
+		template<typename system_type, typename state_type, typename time_type, typename observer>
+		void progress(system_type& System, state_type& State, time_type BeginStep, time_type EndStep, observer Observer){
 			for(; BeginStep != EndStep; ++BeginStep){
-				Observer(State, BeginStep);
 				System(State, BeginStep);
+				Observer(State, BeginStep);
 			}
-			Observer(State, BeginStep);
 		}
 	}
 }

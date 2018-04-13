@@ -6,5 +6,6 @@
 #include "algorithm/nonrepeat_random_integrals.hpp"
 #include "algorithm/numeric.hpp"
 #include "algorithm/algorithm.hpp"
+#include "algorithm/keep_if.hpp"
 #
 #endif

@@ -46,139 +46,28 @@
     <Filter Include="hmLib\odeint\interfere">
       <UniqueIdentifier>{bfd5b6a4-9c20-462c-a96b-ae482a1d7bbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\iterators">
+      <UniqueIdentifier>{72210415-8987-4401-99c7-796733475510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\math">
+      <UniqueIdentifier>{22fcbf3b-01d8-4ae7-8cfa-606b8e1e2051}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\geometry">
+      <UniqueIdentifier>{00cbf0ca-f2a2-441b-8627-f0d1d2edaeec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\gates">
+      <UniqueIdentifier>{7bda1352-a906-4a6d-8b99-d0438023bf0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\gates\comgate">
+      <UniqueIdentifier>{8631be19-6e7d-430a-ba4e-4cb6372d84c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\comgate.cpp">
-      <Filter>hmLib</Filter>
-    </ClCompile>
     <ClCompile Include="use_odeint.cpp">
       <Filter>ソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\position.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\random.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\rectangle.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\resource.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\sequence.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\signals.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\static_buffer.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\stream_utility.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\streambuf_interface.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\table.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\type.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\type_traits.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\typemanage.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\utility.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\version.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\algorithm.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\any_iterator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\array_queue.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\bufgate.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\circular.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\color.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\comgate.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\config_vc.h">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\coordinates.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\csv_iterator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\date.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\debugstream.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\either.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\enumerators.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\exceptions.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\filterbuf.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\functional.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\gate.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\gps.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inquiries.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iocsv.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\lattices.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\math.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\mutex_proxy.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\optimize.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
@@ -335,9 +224,6 @@
     <ClInclude Include="..\..\..\typemanage\type_name.hpp">
       <Filter>hmLib\typemanage</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\varray.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\observer\eqstate_break_observer.hpp">
       <Filter>hmLib\odeint\observer</Filter>
     </ClInclude>
@@ -377,9 +263,6 @@
     <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\tuple.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
@@ -388,6 +271,177 @@
     </ClInclude>
     <ClInclude Include="..\..\..\lattices\torus_lattice.hpp">
       <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\inserter.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\streambuf_interface.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\table.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\tuple.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\type_traits.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\typemanage.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\utility.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\varray.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\version.h">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\algorithm.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\circular.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\color.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\config_vc.h">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coordinates.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv_iterator.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\date.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\debugstream.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\either.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\enumerators.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\exceptions.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\filterbuf.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\functional.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gps.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hmLib_config.h">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inquiries.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iocsv.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mutex_proxy.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\random.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\resource.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sequence.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\signals.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\static_buffer.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\optimize.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\axis.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates\comgate\winrs.hpp">
+      <Filter>hmLib\gates\comgate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates\comgate\ifline.h">
+      <Filter>hmLib\gates\comgate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates\comgate.hpp">
+      <Filter>hmLib\gates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates\gate.hpp">
+      <Filter>hmLib\gates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates\bufgate.hpp">
+      <Filter>hmLib\gates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates\exceptions.hpp">
+      <Filter>hmLib\gates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gates.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\constants.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\root.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\segment.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\factorial.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\point.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\plane_root.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
+      <Filter>hmLib\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
