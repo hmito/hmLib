@@ -7,19 +7,16 @@
 #include<numeric>
 #include"utility.hpp"
 #include"exceptions.hpp"
-#include"lattice_indexer.hpp"
+#include"indexer.hpp"
 #include"iterator.hpp"
 #include"locator.hpp"
-#include"lattice_view.hpp"
 
 namespace hmLib{
 	template<typename T, unsigned int dim_>
 	struct lattice {
 	private:
 		using this_type = lattice<T, dim_>;
-	public:
 		using data_type = std::vector<T>;
-	private:
 		using iterator_base = typename data_type::iterator;
 		using const_iterator_base = typename data_type::const_iterator;
 	public:
@@ -35,14 +32,11 @@ namespace hmLib{
 		using pointer = value_type*;
 		using const_pointer = const value_type*;
 	public:
-		using indexer = lattices::lattice_indexer<dim_>;
+		using indexer = lattices::indexer<dim_>;
 		using locator = lattices::basic_locator<iterator_base, indexer>;
-		using const_locator = lattices::basic_const_locator<const_iterator_base, indexer>;
-		using iterator = lattices::basic_iterator<this_type>;
-		using const_iterator = lattices::basic_const_iterator<this_type>;
-	public:
-		using view_type = lattice_view<iterator_base, dim_>;
-		using const_view_type = lattice_view<const_iterator_base, dim_>;
+		using const_locator = lattices::basic_locator<const_iterator_base, indexer>;
+		using iterator = lattices::basic_iterator<iterator_base,indexer>;
+		using const_iterator = lattices::basic_iterator<const_iterator_base, indexer>;
 	public:
 		static constexpr unsigned int dim() { return dim_; }
 	public:
@@ -103,18 +97,17 @@ namespace hmLib{
 		point_type index_to_point(index_type Index)const { return Indexer.point(Index); }
 	public:
 		//!Return begin iterator fot the lattice
-		iterator begin() { return iterator(*this, 0); }
+		iterator begin() { return iterator(Data.begin(), Indexer, 0); }
 		//!Return end iterator fot the lattice
-		iterator end() { return iterator(*this, static_cast<index_type>(lattice_size())); }
+		iterator end() { return iterator(Data.begin(), Indexer, Data.size());}
 		//!Return begin const_iterator fot the lattice
 		const_iterator begin()const { return cbegin(); }
 		//!Return end const_iterator fot the lattice
 		const_iterator end()const { return cend(); }
 		//!Return begin const_iterator fot the lattice
-		const_iterator cbegin()const { return const_iterator(*this, 0); }
+		const_iterator cbegin()const { return const_iterator(Data.cbegin(), Indexer, Data.size()); }
 		//!Return end const_iterator fot the lattice
-		const_iterator cend()const { return const_iterator(*this, static_cast<index_type>(lattice_size()));
-		}
+		const_iterator cend()const { return const_iterator(Data.cbegin(), Indexer, Data.size()); }
 	public:
 		//!Return locator of given point
 		locator locate(const point_type& Point_) { return locator(Data.begin(), Indexer, Point_); }
@@ -134,13 +127,6 @@ namespace hmLib{
 		locator back_locate() { return locate(extent() + point_type(-1)); }
 		//!Return const locator of (size-1)
 		const_locator back_locate()const { return locate(extent() + point_type(-1)); }
-	public:
-		view_type subview(const point_type& Point_, const extent_type& Extent_) {
-			return view_type(Data.begin(), Indexer, Point_, Extent_);
-		}
-		const_view_type subview(const point_type& Point_, const extent_type& Extent_)const {
-			return const_view_type(Data.begin(), Indexer, Point_, Extent_);
-		}
 	public:
 		bool empty()const { return Data.empty(); }
 		void resize() {

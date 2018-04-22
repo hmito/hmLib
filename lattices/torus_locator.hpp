@@ -2,46 +2,50 @@
 #define HMLIB_LATTICES_TORUSLOCATOR_INC 100
 #
 #include<type_traits>
+#include<iterator>
 #include"../algorithm/compare.hpp"
 #include"utility.hpp"
 namespace hmLib{
 	namespace lattices{
-		template<typename iterator_, typename indexer_>
-		struct basic_const_torus_locator;
-		template<typename iterator_, typename indexer_>
+		template<typename base_iterator_, typename indexer_>
 		struct basic_torus_locator{
-			friend struct basic_const_torus_locator<iterator_, indexer_>;
-		public:
-			using this_type = basic_torus_locator<iterator_, indexer_>;
-			using iterator = iterator_;
-			using reference = typename iterator::reference;
-			using const_reference = typename std::add_const<reference>::type;
-			using pointer = typename iterator::pointer;
-			using const_pointer = typename std::add_const<pointer>::type;
-		public:
+		private:
+			using this_type = basic_torus_locator<base_iterator_, indexer_>;
+			using base_iterator = base_iterator_;
 			using indexer = indexer_;
+		public:
+			using value_type = typename std::iterator_traits<base_iterator>::value_type;
+			using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
+			using reference = typename std::iterator_traits<base_iterator>::reference;
+			using pointer = typename std::iterator_traits<base_iterator>::pointer;
 			using point_type = typename indexer::point_type;
 			using extent_type = typename indexer::extent_type;
 		public:
 			basic_torus_locator() = default;
-			basic_torus_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_) {}
+			basic_torus_locator(base_iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_) {}
+			template<typename other_iterator,
+				typename std::enable_if<
+				std::is_convertible<other_iterator, base_iterator>::value
+				&& !std::is_same<other_iterator, base_iterator>::value, std::nullptr_t
+				>::type = nullptr
+			>
+			basic_torus_locator(const basic_torus_locator<other_iterator, indexer>& Other):Begin(Other.Beg), Indexer(Other.Indexer), Pos(Other.Pos) {}
 			basic_torus_locator(const this_type&) = default;
 			basic_torus_locator(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
-			reference operator*(){ return Begin[Indexer.torus_index(Pos)]; }
-			const_reference operator*()const{ return Begin[Indexer.torus_index(Pos)]; }
-			pointer operator->(){ return &(operator*()); }
-			const_pointer operator->()const{ return &(operator*()); }
-			reference operator[](const point_type& Pos_){ return Begin[Indexer.torus_index(Pos+Pos_)]; }
-			const_reference operator[](const point_type& Pos_)const{ return Begin[Indexer.torus_index(Pos + Pos_)]; }
-			reference at(const point_type& Pos_){ return Begin[Indexer.torus_index(Pos + Pos_)]; }
-			const_reference at(const point_type& Pos_)const{ return Begin[Indexer.torus_index(Pos + Pos_)]; }
+			point_type base_point()const { return Pos; }
+			point_type base_torus_point()const { return Indexer.translate_for_torus(Pos); }
+			index_type base_index()const { return Indexer.torus_index(Pos); }
+			extent_type base_extent()const { return Indexer.extent(); }
+			base_iterator base()const { return Beg+base_index(); }
+			reference operator*()const { return base.operator*(); }
+			pointer operator->()const { return base.operator->(); }
+			reference operator[](const point_type& Pos_)const { return Beg[Indexer.torus_index(Pos + Pos_)]; }
+			reference at(const point_type& Pos_)const { return Beg[Indexer.torus_index(Pos + Pos_)]; }
 			template<typename... args>
-			reference at(args... Args){ return at(lattices::point(Args...)); }
-			template<typename... args>
-			const_reference at(args... Args)const{ return at(lattices::point(Args...)); }
+			reference at(args... Args)const { return at(lattices::point(Args...)); }
 		public:
 			this_type& operator+=(const point_type& Dif){ Pos += Dif;  return *this; }
 			friend this_type operator+(const this_type& Loc, const point_type& Dif){
@@ -57,11 +61,11 @@ namespace hmLib{
 				return Ans;
 			}
 			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.raw_point() - Loc2.raw_point();
+				return Loc1.base_point() - Loc2.base_point();
 			}
 			friend point_type distance(const this_type& Loc1, const this_type& Loc2) {
-				point_type v1 = Loc1.raw_torus_point();
-				point_type v2 = Loc2.raw_torus_point();
+				point_type v1 = Loc1.base_torus_point();
+				point_type v2 = Loc2.base_torus_point();
 
 				point_type Ans;
 				for(unsigned int i = 0; i < v1.size(); ++i) {
@@ -76,117 +80,18 @@ namespace hmLib{
 				return Ans;
 			}
 		public:
-			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.raw_torus_point() == Loc2.raw_torus_point(); }
+			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.base_torus_point() == Loc2.base_torus_point(); }
 			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
 		public:
-			void set(const point_type& Pos_){ Pos = Pos_; }
-			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif)const { return *this + (Dif); }
+			void set(const point_type& Pos_) { Pos = Pos_; }
+			this_type& advance(const point_type& Dif) { return operator+=(Dif); }
 			template<typename... args>
-			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
+			this_type& advance(args... Args) { return operator+=(lattices::point(Args...)); }
+			this_type next(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
-			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
-		public:
-			iterator get_base_iterator()const { return Begin; }
-			const indexer& get_indexer()const { return Indexer; }
-			point_type& raw_point(){ return Pos; }
-			const point_type& raw_point()const{ return Pos; }
-			point_type raw_torus_point()const { return translate_for_torus(Pos); }
-			const extent_type& raw_extent()const{ return Indexer.extent(); }
+			this_type next(args... Args)const { return *this + lattices::point(Args...); }
 		private:
-			//!Return Point inside of the torus
-			point_type translate_for_torus(const point_type& Point)const {
-				return Indexer.translate_for_torus(Point);
-			}
-		private:
-			iterator Begin;
-			indexer Indexer;
-			point_type Pos;
-		};
-		template<typename iterator_, typename indexer_>
-		struct basic_const_torus_locator{
-		public:
-			using this_type = basic_const_torus_locator<iterator_, indexer_>;
-			using iterator = iterator_;
-			using pointer = typename iterator::pointer;
-			using reference = typename iterator::reference;
-		public:
-			using indexer = indexer_;
-			using point_type = typename indexer::point_type;
-			using extent_type = typename indexer::extent_type;
-		public:
-			basic_const_torus_locator() = default;
-			basic_const_torus_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_) {}
-			basic_const_torus_locator(const this_type&) = default;
-			basic_const_torus_locator(this_type&&) = default;
-			this_type& operator=(const this_type&) = default;
-			this_type& operator=(this_type&&) = default;
-			basic_const_torus_locator(basic_torus_locator<iterator_, indexer_> Locator) : Begin(Locator.Begin), Indexer(Locator.Indexer), Pos(Locator.Pos) {}
-		public:
-			reference operator*()const{ return Begin[Indexer.torus_index(Pos)]; }
-			pointer operator->()const{ return &(operator*()); }
-			reference operator[](const point_type& Pos_)const { return Begin[Indexer.torus_index(Pos+Pos_)]; }
-			reference at(const point_type& Pos_)const{ return Begin[Indexer.torus_index(Pos + Pos_)];}
-			template<typename... args>
-			reference at(args... Args)const{ return at(lattices::point(Args...)); }
-		public:
-			this_type& operator+=(const point_type& Dif){ Pos += Dif;  return *this; }
-			friend this_type operator+(const this_type& Loc, const point_type& Dif){
-				auto Ans(Loc);
-				Ans += Dif;
-				return Ans;
-			}
-			friend this_type operator+(const point_type& Dif, const this_type& Loc){ return operator+(Loc, Dif); }
-			this_type& operator-=(const point_type& Dif){ Pos -= Dif;  return *this; }
-			friend this_type operator-(const this_type& Loc, const point_type& Dif){
-				auto Ans(Loc);
-				Ans -= Dif;
-				return Ans;
-			}
-			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.raw_point() - Loc2.raw_point();
-			}
-			friend point_type distance(const this_type& Loc1, const this_type& Loc2){
-				point_type v1 = Loc1.raw_torus_point();
-				point_type v2 = Loc2.raw_torus_point();
-
-				point_type Ans;
-				for(unsigned int i = 0; i < v1.size(); ++i){
-					diff_type Dis = v2[i] - v1[i];
-					if(Dis > Loc1.Indexer.size()[i] / 2){
-						Dis -= Loc1.Indexer.size()[i];
-					} else if(Dis < -Loc1.Indexer.size()[i] / 2){
-						Dis += Loc1.Indexer.size()[i];
-					}
-					Ans[i] = Dis;
-				}
-				return Ans;
-			}
-		public:
-			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.torus_point() == Loc2.torus_point(); }
-			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
-		public:
-			void set(const point_type& Pos_){ Pos = Pos_; }
-			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif)const { return *this + (Dif); }
-			template<typename... args>
-			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
-			template<typename... args>
-			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
-		public:
-			iterator get_base_iterator()const { return Begin; }
-			const indexer& get_indexer()const { return Indexer; }
-			point_type& raw_point() { return Pos; }
-			const point_type& raw_point()const { return Pos; }
-			point_type raw_torus_point() { return translate_for_torus(Pos); }
-			const extent_type& raw_extent()const { return Indexer.extent(); }
-		private:
-			//!Return Point inside of the torus
-			point_type translate_for_torus(const point_type& Point)const {
-				return Indexer.translate_for_torus(Point);
-			}
-		private:
-			iterator Begin;
+			base_iterator Beg;
 			indexer Indexer;
 			point_type Pos;
 		};

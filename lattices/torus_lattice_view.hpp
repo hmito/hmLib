@@ -8,7 +8,7 @@
 #include"../algorithm/compare.hpp"
 #include"utility.hpp"
 #include"exceptions.hpp"
-#include"lattice_indexer.hpp"
+#include"indexer.hpp"
 #include"iterator.hpp"
 #include"torus_locator.hpp"
 
