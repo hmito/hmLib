@@ -161,9 +161,6 @@
     <ClInclude Include="..\..\..\lattices\iterator.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\lattices\lattice_indexer.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
@@ -442,6 +439,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\indexer.hpp">
+      <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
