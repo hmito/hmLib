@@ -443,5 +443,8 @@
     <ClInclude Include="..\..\..\lattices\indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\lattices\torus_iterator.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

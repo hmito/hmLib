@@ -10,6 +10,7 @@
 #include"indexer.hpp"
 #include"iterator.hpp"
 #include"locator.hpp"
+#include"lattice_view.hpp"
 
 namespace hmLib{
 	template<typename T, unsigned int dim_>
@@ -37,6 +38,8 @@ namespace hmLib{
 		using const_locator = lattices::basic_locator<const_iterator_base, indexer>;
 		using iterator = lattices::basic_iterator<iterator_base,indexer>;
 		using const_iterator = lattices::basic_iterator<const_iterator_base, indexer>;
+		using view = sublattice_view<iterator_base, dim_>;
+		using const_view = sublattice_view<const_iterator_base, dim_>;
 	public:
 		static constexpr unsigned int dim() { return dim_; }
 	public:
@@ -93,8 +96,10 @@ namespace hmLib{
 		size_type lattice_size()const { return Indexer.lattice_size(); }
 		//!Get point_type Size
 		const extent_type& extent()const { return Indexer.extent(); }
-		//!Return Point from Index value
-		point_type index_to_point(index_type Index)const { return Indexer.point(Index); }
+		//!Convert from index to point
+		point_type index_to_point(index_type Index_)const { return Indexer.point(Index_); }
+		//!Convert from point to index
+		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
 	public:
 		//!Return begin iterator fot the lattice
 		iterator begin() { return iterator(Data.begin(), Indexer, 0); }
@@ -127,6 +132,18 @@ namespace hmLib{
 		locator back_locate() { return locate(extent() + point_type(-1)); }
 		//!Return const locator of (size-1)
 		const_locator back_locate()const { return locate(extent() + point_type(-1)); }
+	public:
+		view subview(const point_type& Point_, const extent_type& Extent_) {
+			hmLib_assert(hmLib::all_less_equal_than(Extent_, Indexer.extent()), lattices::invalid_range, "The given range is smaller than the lattice size.");
+			return view(Begin, Indexer.extent(), Point_, Extent_);
+		}
+		const_view subview(const point_type& Point_, const extent_type& Extent_) const{
+			return csubview(Point_, Extent_);
+		}
+		const_view csubview(const point_type& Point_, const extent_type& Extent_) const{
+			hmLib_assert(hmLib::all_less_equal_than(Extent_, Indexer.extent()), lattices::invalid_range, "The given range is smaller than the lattice size.");
+			return view(Begin, Indexer.extent(), Point_, Extent_);
+		}
 	public:
 		bool empty()const { return Data.empty(); }
 		void resize() {
@@ -176,9 +193,9 @@ namespace hmLib{
 	auto make_lattice(const T& inival, lattices::size_type Size, others... Others) {
 		return lattice<typename std::decay<T>::type, sizeof...(others)>(inival, lattices::extent(Size, Others...));
 	}
-	template<typename T, unsigned int dim>
-	auto make_lattice(const T& inival, const lattices::extent_type<dim>& Extent) {
-		return lattice<typename std::decay<T>::type, dim>(inival, Extent);
+	template<typename T, typename element_type, unsigned int dim>
+	auto make_lattice(const T& inival, const lattices::point_array_type<element_type, dim>& Extent) {
+		return lattice<typename std::decay<T>::type, dim>(inival, static_cast<lattices::extent_type<dim>>(Extent));
 	}
 }
 #

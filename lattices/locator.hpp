@@ -37,9 +37,10 @@ namespace hmLib{
 			point_type base_point()const { return Pos; }
 			index_type base_index()const { return Indexer(base_point()); }
 			extent_type base_extent()const { return Indexer.extent(); }
+			base_iterator base_begin()const { return Beg; }
 			base_iterator base()const { return Beg+base_index(); }
-			reference operator*()const{ return base.operator*(); }
-			pointer operator->()const { return base.operator->(); }
+			reference operator*()const { return base().operator*(); }
+			pointer operator->()const { return base().operator->(); }
 			reference operator[](const point_type& Pos_)const { return Beg[Indexer(Pos + Pos_)]; }
 			reference at(const point_type& Pos_)const { return Beg[Indexer.index(Pos + Pos_)]; }
 			template<typename... args>
@@ -66,12 +67,12 @@ namespace hmLib{
 			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
-			this_type& advance(const point_type& Dif){ return operator+=(Dif); }
+			this_type& add(const point_type& Dif){ return operator+=(Dif); }
 			template<typename... args>
-			this_type& advance(args... Args) { return operator+=(lattices::point(Args...)); }
-			this_type next(const point_type& Dif)const { return *this + (Dif); }
+			this_type& add(args... Args) { return operator+=(lattices::point(Args...)); }
+			this_type plus(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
-			this_type next(args... Args)const { return *this + lattices::point(Args...); }
+			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
 		private:
 			base_iterator Beg;
 			indexer Indexer;

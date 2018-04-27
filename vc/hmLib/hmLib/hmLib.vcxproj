@@ -84,6 +84,7 @@
     <ClInclude Include="..\..\..\lattices\indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\locator.hpp" />
+    <ClInclude Include="..\..\..\lattices\torus_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
