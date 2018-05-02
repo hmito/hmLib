@@ -446,5 +446,11 @@
     <ClInclude Include="..\..\..\lattices\torus_iterator.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\freqsim.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\multiaxis.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

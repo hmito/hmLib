@@ -50,6 +50,7 @@
     <ClInclude Include="..\..\..\exceptions\memory_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
+    <ClInclude Include="..\..\..\freqsim.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
     <ClInclude Include="..\..\..\gates.hpp" />
     <ClInclude Include="..\..\..\gates\bufgate.hpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
     <ClInclude Include="..\..\..\math\constants.hpp" />
+    <ClInclude Include="..\..\..\math\multiaxis.hpp" />
     <ClInclude Include="..\..\..\math\optimize.hpp" />
     <ClInclude Include="..\..\..\math\plane_root.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
