@@ -6,6 +6,7 @@
 #include "../../../iterators.hpp"
 #include "../../../math/root.hpp"
 #include "../../../math/axis.hpp"
+#include "../../../math/multiaxis.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {
@@ -413,6 +414,12 @@ namespace hmLib {
 			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
 			Assert::AreEqual(3u, WI.at(2).first);
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
+		}
+	};
+	TEST_CLASS(test_math_multiaxis) {
+		TEST_METHOD(make_multiaxis) {
+			multiaxis<double, 3> Axes;
+			Axes.assign_axis(0, 0.5, 5.0, 10);
 		}
 	};
 }

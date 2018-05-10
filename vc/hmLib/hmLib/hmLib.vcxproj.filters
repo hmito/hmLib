@@ -452,5 +452,8 @@
     <ClInclude Include="..\..\..\math\multiaxis.hpp">
       <Filter>hmLib\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\clone_ptrproxy.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
