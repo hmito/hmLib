@@ -57,14 +57,14 @@ namespace hmLib {
 			index_type EndIndex;
 			double LowerProb;
 			double UpperProb;
-			double Weidth;
+			double Weight;
 		public:
 			struct iterator {
 			public:
 				using value_type = weighted_index;
 				using difference_type = signed int;
-				using reference = void;
-				using pointer = void;
+				using reference = value_type;
+				using pointer = hmLib::clone_ptrproxy<value_type>;
 				using iterator_category = std::input_iterator_tag;
 			private:
 				index_type Index;
@@ -81,7 +81,7 @@ namespace hmLib {
 					, LowerProb(LowerProb_)
 					, UpperProb(UpperProb_){
 				}
-				value_type operator*()const {
+				reference operator*()const {
 					if(Index==0) {
 						return weighted_index(LowerIndex, LowerProb);
 					} else if(LowerIndex+Index==EndIndex-1) {
@@ -89,6 +89,7 @@ namespace hmLib {
 					}
 					return weighted_index(Index+LowerIndex, 1.0);
 				}
+				pointer operator->()const { return pointer(operator*()); }
 				iterator& operator++() { ++Index; return *this; }
 				iterator operator++(int) {
 					iterator Prev = *this;
@@ -115,7 +116,7 @@ namespace hmLib {
 				, EndIndex(Index_+1)
 				, LowerProb(1.0)
 				, UpperProb(0.0)
-				, Weidth(Weidth_) {
+				, Weight(Weidth_) {
 			}
 			weighted_index_range(index_type LowerIndex_, index_type UpperIndex_, double LowerProb_, double UpperProb_, double Weidth_)noexcept
 				: LowerIndex(LowerIndex_)
@@ -163,7 +164,7 @@ namespace hmLib {
 			}
 			bool empty()const { return LowerIndex==EndIndex; }
 			unsigned int size()const { return EndIndex-LowerIndex; }
-			double weidth()const { return Weidth; }
+			double weight()const { return Weight; }
 			iterator begin()const {
 				return iterator(0, LowerIndex, EndIndex, LowerProb, UpperProb);
 			}
@@ -396,7 +397,14 @@ namespace hmLib {
 	public:
 		index_type lower()const { return LowerFromIndex; }
 		index_type upper()const { return UpperFromIndex; }
-		bool inside(index_type FromIndex)const { return LowerFromIndex<=FromIndex && FromIndex<=UpperFromIndex; }
+		bool inside(double FromFIndex)const { return LowerFromIndex<=FromFIndex && FromFIndex<=UpperFromIndex; }
+		index_type operator[](double FromFIndex)const {
+			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
+		}
+		index_type index(double FromFIndex)const {
+			hmLib_assert(inside(FromFIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
+			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
+		}
 		double float_index(double FromFIndex)const {
 			return a*FromFIndex + b;
 		}
