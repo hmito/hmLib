@@ -11,17 +11,122 @@
 #include"../lattices/indexer.hpp"
 #include"../exceptions.hpp"
 namespace hmLib {
-	template<typename T, unsigned int dim_, typename grid_policy_ = math::grid_policy::round_grid_tag, typename index_type_ = unsigned int, typename calc_type_ = double, int log10_index_threshold_ = -8>
+	namespace math {
+		template<typename index_type_, unsigned int dim_>
+		struct weighted_point_range {
+			using index_type = index_type_;
+			using size_type = std::size_t;
+		private:
+			using indexer_type = lattices::indexer<dim_>;
+		public:
+			using point_type = typename indexer_type::point_type;
+			using extent_type = typename indexer_type::extent_type;
+			using weighted_point_type = std::pair<point_type, double>;
+			using waighted_range_container = std::vector<math::weighted_index_range>;
+			using waighted_range_iterator = typename waighted_range_container::iterator;
+		public:
+			struct iterator {
+			public:
+				using value_type = weighted_point;
+				using difference_type = signed int;
+				using reference = value_type;
+				using pointer = hmLib::clone_ptrproxy<value_type>;
+				using iterator_category = std::input_iterator_tag;
+			private:
+				index_type Index;
+				indexer_type Indexer;
+				range_iterator Beg;
+			public:
+				iterator() = default;
+				iterator(index_type Index_, range_iterator Beg_)
+					: Index(Index_)
+					, Beg(Beg_) {
+					extent_type Extent;
+					for(unsigned int i = 0; i<dim(); ++i) {
+						Extent[i] = Beg_[i].size();
+					}
+					Indexer.resize(Extent);
+				}
+				reference operator*()const {
+					point_type p = Indexer.point(Index);
+					weighted_point q;
+					q.second = 1.0;
+					for(unsigned int i = 0; i<dim(); ++i) {
+						auto pair = Beg[i].at(p[i]);
+						q.first[i] = pair.first;
+						q.second *= pair.second;
+					}
+					return q;
+				}
+				pointer operator->()const { return pointer(operator*()); }
+				iterator& operator++() { ++Index; return *this; }
+				iterator operator++(int) {
+					iterator Prev = *this;
+					operator++();
+					return Prev;
+				}
+				friend bool operator==(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index==itr2.Index;
+				}
+				friend bool operator!=(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index!=itr2.Index;
+				}
+			};
+		private:
+			waighted_range_container Range;
+			indexer_type Indexer;
+			unsigned int Size;
+			double Weight;
+		public:
+			weighted_point_range()noexcept {}
+			explicit weighted_point_range(waighted_range_container Range_):Range(std::move(Range_)) {
+				hmLib_assert(Range_.size()==dim_, hmLib::numeric_exceptions::incorrect_arithmetic_request, "weighted range cannot create from wieghted range container whose size is not equal to dim.");
+				extent_type Extent;
+				Size = 1;
+				Weight = 1.0;
+				for(unsigned int i = 0; i<dim(); ++i) {
+					Extent[i] = Range.at(i).size();
+					Size *= Extent[i];
+					Weight *= Range.at(i).weight();
+				}
+			}
+			weighted_point_type operator[](index_type Index)const {
+				point_type p = Indexer.point(Index);
+				weighted_point q;
+				q.second = 1.0;
+				for(unsigned int i = 0; i<dim(); ++i) {
+					auto pair = Range.at(p[i]);
+					q.first[i] = pair.first;
+					q.second *= pair.second;
+				}
+				return q;
+			}
+			weighted_point_type at(index_type Index)const {
+				hmLib_assert(0<=Index && Index < size(), hmLib::access_exceptions::out_of_range_access, "Out of range access.");
+				return operator[](Index);
+			}
+			bool empty()const { return Range.empty(); }
+			unsigned int size()const { return Size; }
+			double weight()const { return Weight; }
+			iterator begin()const {
+				return iterator(0, Range.begin());
+			}
+			iterator end()const {
+				return iterator(size(), Range.begin());
+			}
+			iterator cbegin()const { return begin(); }
+			iterator cend()const { return end(); }
+		};
+	}
+	template<typename T, unsigned int dim_, typename grid_adjuster_ = math::default_grid_adjuster, typename index_type_ = unsigned int, typename calc_type_ = double>
 	struct multiaxis {
 	private:
-		using this_type = multiaxis<T, dim_, grid_policy_, index_type_, calc_type_, log10_index_threshold_>;
+		using this_type = multiaxis<T, dim_, grid_adjuster_, index_type_, calc_type_>;
 	public:
 		using value_type = T;
 		using index_type = index_type_;
 		using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
-		using axis_type = hmLib::axis<T, grid_policy_, index_type_, calc_type_, log10_index_threshold_>;
-		using value_point_type = varray<element_type, dim_>;
-		using float_point_type = varray<double, dim_>;
+		using axis_type = hmLib::axis<T, grid_adjuster_, index_type_, calc_type_>;
 	private:
 		using axis_container = std::vector<axis_type>;
 		using indexer_type = lattices::indexer<dim_>;
@@ -29,6 +134,9 @@ namespace hmLib {
 		using point_type = typename indexer_type::point_type;
 		using extent_type = typename indexer_type::extent_type;
 		using size_type = typename indexer_type::size_type;
+		using value_point_type = varray<value_type, dim_>;
+		using float_point_type = varray<double, dim_>;
+		using weighted_point_range = math::weighted_point_range<index_type, dim_>;
 	public:
 		static constexpr unsigned int dim() { return dim_; }
 	public:
@@ -155,102 +263,6 @@ namespace hmLib {
 			template<typename... others>
 			this_type plus(index_type Pos_, others... Others_)const { return *this + point_type{ Pos_, static_cast<index_type>(Others_)... }; }
 		};
-		struct weighted_point_range {
-			using weighted_point = std::pair<point_type, double>;
-			using range_container = std::vector<typename axis_type::weighted_index_range>;
-			using range_iterator = typename range_container::iterator;
-		public:
-			struct iterator {
-			public:
-				using value_type = weighted_point;
-				using difference_type = signed int;
-				using reference = value_type;
-				using pointer = hmLib::clone_ptrproxy<value_type>;
-				using iterator_category = std::input_iterator_tag;
-			private:
-				index_type Index;
-				indexer_type Indexer;
-				range_iterator Beg;
-			public:
-				iterator() = default;
-				iterator(index_type Index_, range_iterator Beg_)
-					: Index(Index_)
-					, Beg(Beg_) {
-					extent_type Extent;
-					for(unsigned int i = 0; i<dim(); ++i) {
-						Extent[i] = Beg_[i].size();
-					}
-					Indexer.resize(Extent);
-				}
-				reference operator*()const {
-					point_type p = Indexer.point(Index);
-					weighted_point q;
-					q.second = 1.0;
-					for(unsigned int i = 0; i<dim(); ++i) {
-						auto pair = Beg[i].at(p[i]);
-						q.first[i] = pair.first;
-						q.second *= pair.second;
-					}
-					return q;
-				}
-				pointer operator->()const { return pointer(operator*()); }
-				iterator& operator++() { ++Index; return *this; }
-				iterator operator++(int) {
-					iterator Prev = *this;
-					operator++();
-					return Prev;
-				}
-				friend bool operator==(const iterator& itr1, const iterator& itr2) {
-					return itr1.Index==itr2.Index;
-				}
-				friend bool operator!=(const iterator& itr1, const iterator& itr2) {
-					return itr1.Index!=itr2.Index;
-				}
-			};
-		private:
-			range_container Range;
-			indexer_type Indexer;
-			unsigned int Size;
-			double Weight;
-		public:
-			weighted_point_range()noexcept {}
-			explicit weighted_point_range(range_container Range_):Range(std::move(Range_)){
-				extent_type Extent;
-				Size = 1;
-				Weight = 1.0;
-				for(unsigned int i = 0; i<dim(); ++i) {
-					Extent[i] = Range.at(i).size();
-					Size *= Extent[i];
-					Weight *= Range.at(i).weight();
-				}
-			}
-			weighted_point operator[](index_type Index)const {
-				point_type p = Indexer.point(Index);
-				weighted_point q;
-				q.second = 1.0;
-				for(unsigned int i = 0; i<dim(); ++i) {
-					auto pair = Range.at(p[i]);
-					q.first[i] = pair.first;
-					q.second *= pair.second;
-				}
-				return q;
-			}
-			weighted_point at(index_type Index)const {
-				hmLib_assert(0<=Index && Index < size(), hmLib::access_exceptions::out_of_range_access, "Out of range access.");
-				return operator[](Index);
-			}
-			bool empty()const { return Range.empty(); }
-			unsigned int size()const { return Size; }
-			double weight()const { return Weight; }
-			iterator begin()const {
-				return iterator(0, Range.begin());
-			}
-			iterator end()const {
-				return iterator(size(), Range.begin());
-			}
-			iterator cbegin()const { return begin(); }
-			iterator cend()const { return end(); }
-		};
 	public:
 		multiaxis() = default;
 		template<typename... other_axes>
@@ -261,6 +273,9 @@ namespace hmLib {
 		multiaxis(input_iterator Beg, input_iterator End) {
 			assign(Beg, End);
 		}	
+		explicit multiaxis(axis_container AxisSet_) {
+			assign(AxisSet_);
+		}
 	public:
 		void clear() {
 			AxisSet.clear();
@@ -282,6 +297,16 @@ namespace hmLib {
 		void assign(input_iteratro Beg, input_iteratro End) {
 			hmLib_assert(std::distance(Beg, End)==dim_,hmLib::numeric_exceptions::incorrect_arithmetic_request,"number of axis is different from dim.");
 			AxisSet.assign(Beg, End);
+
+			extent_type Extent;
+			for(unsigned int i = 0; i<dim(); ++i) {
+				Extent[i] = AxisSet[i].size();
+			}
+			Indexer.resize(Extent);
+		}
+		void assign(axis_container AxisSet_) {
+			hmLib_assert(AxisSet_.size()==dim_, hmLib::numeric_exceptions::incorrect_arithmetic_request, "multiaxis require the axis container with size dim.");
+			AxisSet = std::move(AxisSet_);
 
 			extent_type Extent;
 			for(unsigned int i = 0; i<dim(); ++i) {
@@ -359,6 +384,13 @@ namespace hmLib {
 			}
 			return Val;
 		}
+		weighted_point_range weighted_point(value_point_type LowerVal, value_point_type UpperVal)const {
+			typename weighted_point_range::waighted_range_container Container;
+			for(unsigned int i = 0; i<dim(); ++i) {
+				Container.push_back(AxisSet[i].weighted_index(LowerVal[i], UpperVal[i]));;
+			}
+			return weighted_point_range(std::move(Container));
+		}
 		value_point_type lower()const {
 			value_point_type Val;
 			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
@@ -422,19 +454,107 @@ namespace hmLib {
 		std::vector<axis_type> AxisSet;
 		indexer_type Indexer;
 	};
-	template<unsigned int dim_, typename from_grid_policy_ = math::grid_policy::round_grid_tag, typename to_grid_policy_ = math::grid_policy::round_grid_tag, typename index_type_ = unsigned int, typename calc_type_ = double, int log10_index_threshold_ = -8>
+	template<typename T, unsigned int dim_, typename grid_adjuster>
+	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, grid_adjuster GridAdjuster, math::make_axis_option Opt = math::make_axis_option::none) {
+		using multiaxis_type = multiaxis<typename std::decay<T>::type, dim_, grid_adjuster>;
+		using axis_type = typename multiaxis_type::axis_type;
+		using axis_container = typename multiaxis_type::axis_container;
+
+		axis_container Container;
+		for(unsigned int i = 0; i<dim_; ++i) {
+			Container.push_back(make_axis(Lower[i], Upper[i], Size[i], GridAdjuster, Opt));
+		}
+		return multiaxis_type(std::move(Container));
+	}
+	template<typename T>
+	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, math::make_axis_option Opt = math::make_axis_option::none) {
+		return make_multiaxis(Lower, Upper, Size, math::default_grid_adjuster(), Opt);
+	}
+
+	template<unsigned int dim_, typename from_grid_adjuster_, typename to_grid_adjuster_, typename index_type_>
 	struct multiaxis_mapper {
 	private:
-		using from_grid_policy = from_grid_policy_;
-		using to_grid_policy = to_grid_policy_;
+		using this_type = multiaxis_mapper<dim_, from_grid_adjuster_, to_grid_adjuster_, index_type_>;
+		using from_grid_adjuster = from_grid_adjuster_;
+		using to_grid_adjuster = to_grid_adjuster_;
 		using index_type = index_type_;
-		using weighted_index_range = math::weighted_index_range<index_type, log10_index_threshold_>;
-		using axis_mapper = axis_mapper<from_grid_policy, to_grid_policy, index_type, log10_index_threshold>;
+		using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
+		using weighted_point_range = math::weighted_point_range<index_type, dim_>;
+		using axis_mapper = axis_mapper<from_grid_adjuster_, to_grid_adjuster_, index_type>;
 	public:
-
+		using point_type = varray<index_type, dim_>;
+		using float_point_type = varray<double, dim_>;
+	public:
+		static constexpr unsigned int dim() { return dim_; }
+	public:
+		multiaxis_mapper() = delete;
+		template<typename from_multiaxis_type, typename to_multiaxis_type>
+		multiaxis_mapper(const from_multiaxis_type& from, const to_multiaxis_type& to) {
+			static_assert(from_multiaxis_type::dim() == dim() && to_multiaxis_type::dim() == dim(), "dim of given axis is different.");
+			for(unsigned int i = 0; i<dim(); ++i) {
+				MapperSet.emplace_back(from.axis(i), to.axis(i));
+			}
+		}
+	public:
+		point_type lower()const {
+			point_type Pos;
+			for(unsigned int i = 0; i<dim_; ++i) {
+				Pos[i] = MapperSet[i].lower();
+			}
+			return Pos;
+		}
+		point_type upper()const {
+			point_type Pos;
+			for(unsigned int i = 0; i<dim_; ++i) {
+				Pos[i] = MapperSet[i].upper();
+			}
+			return Pos;
+		}
+		bool inside(float_point_type FromIndex)const {
+			for(unsigned int i = 0; i<dim_; ++i) {
+				if(!MapperSet[i].inside(FromIndex[i]))return false;
+			}
+			return true;
+		}
+		point_type operator[](float_point_type FromIndex)const {
+			point_type Pos;
+			for(unsigned int i = 0; i<dim_; ++i) {
+				Pos[i] = MapperSet[i][FromIndex[i];
+			}
+			return Pos;
+		}
+		point_type point(float_point_type FromIndex)const {
+			point_type Pos;
+			for(unsigned int i = 0; i<dim_; ++i) {
+				Pos[i] = MapperSet[i].index(FromIndex[i]);
+			}
+			return Pos;
+		}
+		float_point_type float_point(float_point_type FromIndex)const {
+			float_point_type Pos;
+			for(unsigned int i = 0; i<dim_; ++i) {
+				Pos[i] = MapperSet[i].float_index(FromIndex[i]);
+			}
+			return Pos;
+		}
+		weighted_point_range weighted_point(point_type FromIndex)const {
+			typename weighted_point_range::waighted_range_container Container;
+			for(unsigned int i = 0; i<dim_; ++i) {
+				Container.push_back(MapperSet[i].weighted_index(FromIndex[i]));;
+			}
+			return weighted_point_range(std::move(Container));
+		}
 	private:
 		std::vector<axis_mapper> MapperSet;
 	};
+	template<typename from_multiaxis, typename to_multiaxis>
+	auto map_axis(const from_multiaxis& from, const to_multiaxis& to) {
+		using from_grid_adjuster = typename from_multiaxis::grid_adjuster;
+		using to_grid_adjuster = typename to_multiaxis::grid_adjuster;
+		using index_type = typename from_multiaxis::index_type;
+
+		return multiaxis_mapper<from_grid_adjuster, to_grid_adjuster, index_type>(from, to);
+	}
 }
 #
 #endif

@@ -358,84 +358,6 @@ namespace hmLib {
 		size_type Size;
 	};
 
-	template<typename from_grid_adjuster_, typename to_grid_adjuster_, typename index_type_>
-	struct axis_mapper {
-	public:
-		using index_type = index_type_;
-		using weighted_index_range = math::weighted_index_range<index_type>;
-	private:
-		using from_grid_adjuster = from_grid_adjuster_;
-		using to_grid_adjuster = to_grid_adjuster_;
-	private:
-		//to = a*from + b
-		//from = (to - b)/a
-		double a;
-		double b;
-		index_type LowerFromIndex;
-		index_type UpperFromIndex;
-	public:
-		axis_mapper() = delete;
-		axis_mapper(const axis_mapper&) = default;
-		axis_mapper& operator=(const axis_mapper&) = default;
-		template<typename from_axis_type, typename to_axis_type>
-		axis_mapper(const from_axis_type& from, const to_axis_type& to) {
-			a = static_cast<double>(from.upper() - from.lower()) / (to.upper() - to.lower()) * (to.size() - 1) / (from.size() - 1);
-			b = static_cast<double>(from.lower() - to.lower()) / (to.upper() - to.lower())* (to.size() - 1);
-
-			double LowerToFIndex = to_grid_adjuster::index_range(0).first;
-			double UpperToFIndex = to_grid_adjuster::index_range(to.size()-1).second;
-			double LowerFromFIndex = (LowerToFIndex-b)/a;
-			double UpperFromFIndex = (UpperToFIndex-b)/a;
-
-			//condition for no violation of the out of range access
-			LowerFromIndex = static_cast<index_type>(std::round(std::max(0.0,std::ceil(LowerFromFIndex - from_grid_adjuster::index_range(0).first))));
-			UpperFromIndex = static_cast<index_type>(std::round(std::min(from.size()-1.0,std::floor(UpperFromFIndex- from_grid_adjuster::index_range(0).second))));
-		}
-	public:
-		index_type lower()const { return LowerFromIndex; }
-		index_type upper()const { return UpperFromIndex; }
-		bool inside(double FromFIndex)const { return LowerFromIndex<=FromFIndex && FromFIndex<=UpperFromIndex; }
-		index_type operator[](double FromFIndex)const {
-			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
-		}
-		index_type index(double FromFIndex)const {
-			hmLib_assert(inside(FromFIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
-			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
-		}
-		double float_index(double FromFIndex)const {
-			return a*FromFIndex + b;
-		}
-		weighted_index_range weighted_index(index_type FromIndex)const {
-			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [grid_lower, grid_upper).");
-
-			auto FIndexRange = from_grid_adjuster::index_range(FromIndex);
-			double LowerFIndex = float_index(FIndexRange.first);
-			double UpperFIndex = float_index(FIndexRange.second);
-
-			index_type LowerIndex = to_grid_adjuster::template index_cast<index_type>(LowerFIndex+to_grid_adjuster::index_threshold());
-			index_type UpperIndex = to_grid_adjuster::template index_cast<index_type>(UpperFIndex-to_grid_adjuster::index_threshold());
-			if(LowerIndex == UpperIndex) {
-				return weighted_index_range(LowerIndex, UpperFIndex-LowerFIndex);
-			}
-
-			return weighted_index_range(LowerIndex, UpperIndex, 
-				to_grid_adjuster::index_range(LowerIndex).second - LowerFIndex, 
-				UpperFIndex - to_grid_adjuster::index_range(UpperIndex).first,
-				UpperFIndex-LowerFIndex,
-				to_grid_adjuster::index_threshold()
-			);
-		}
-	};
-	
-	template<typename from_axis, typename to_axis>
-	auto map_axis(const from_axis& from, const to_axis& to) {
-		using from_grid_adjuster = typename from_axis::grid_adjuster;
-		using to_grid_adjuster = typename to_axis::grid_adjuster;
-		using index_type = typename from_axis::index_type;
-
-		return axis_mapper<from_grid_adjuster, to_grid_adjuster, index_type>(from, to);
-	}
-
 	namespace math {
 		enum  class make_axis_option { none, gridfit, exclude_upper_boundary, exclude_lower_boundary, exclude_boundary };
 	}
@@ -477,6 +399,82 @@ namespace hmLib {
 	auto make_axis(T Lower, T Upper, std::size_t Size, math::make_axis_option Opt = math::make_axis_option::none) {
 		return make_axis(Lower, Upper, Size, math::default_grid_adjuster(), Opt);
 	}
+
+	template<typename from_grid_adjuster_, typename to_grid_adjuster_, typename index_type_>
+	struct axis_mapper {
+	public:
+		using index_type = index_type_;
+		using weighted_index_range = math::weighted_index_range<index_type>;
+	private:
+		using from_grid_adjuster = from_grid_adjuster_;
+		using to_grid_adjuster = to_grid_adjuster_;
+	private:
+		//to = a*from + b
+		//from = (to - b)/a
+		double a;
+		double b;
+		index_type LowerFromIndex;
+		index_type UpperFromIndex;
+	public:
+		axis_mapper() = delete;
+		template<typename from_axis_type, typename to_axis_type>
+		axis_mapper(const from_axis_type& from, const to_axis_type& to) {
+			a = static_cast<double>(from.upper() - from.lower()) / (to.upper() - to.lower()) * (to.size() - 1) / (from.size() - 1);
+			b = static_cast<double>(from.lower() - to.lower()) / (to.upper() - to.lower())* (to.size() - 1);
+
+			double LowerToFIndex = to_grid_adjuster::index_range(0).first;
+			double UpperToFIndex = to_grid_adjuster::index_range(to.size()-1).second;
+			double LowerFromFIndex = (LowerToFIndex-b)/a;
+			double UpperFromFIndex = (UpperToFIndex-b)/a;
+
+			//condition for no violation of the out of range access
+			LowerFromIndex = static_cast<index_type>(std::round(std::max(0.0, std::ceil(LowerFromFIndex - from_grid_adjuster::index_range(0).first))));
+			UpperFromIndex = static_cast<index_type>(std::round(std::min(from.size()-1.0, std::floor(UpperFromFIndex- from_grid_adjuster::index_range(0).second))));
+		}
+	public:
+		index_type lower()const { return LowerFromIndex; }
+		index_type upper()const { return UpperFromIndex; }
+		bool inside(double FromFIndex)const { return LowerFromIndex<=FromFIndex && FromFIndex<=UpperFromIndex; }
+		index_type operator[](double FromFIndex)const {
+			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
+		}
+		index_type index(double FromFIndex)const {
+			hmLib_assert(inside(FromFIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
+			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
+		}
+		double float_index(double FromFIndex)const {
+			return a*FromFIndex + b;
+		}
+		weighted_index_range weighted_index(index_type FromIndex)const {
+			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [grid_lower, grid_upper).");
+
+			auto FIndexRange = from_grid_adjuster::index_range(FromIndex);
+			double LowerFIndex = float_index(FIndexRange.first);
+			double UpperFIndex = float_index(FIndexRange.second);
+
+			index_type LowerIndex = to_grid_adjuster::template index_cast<index_type>(LowerFIndex+to_grid_adjuster::index_threshold());
+			index_type UpperIndex = to_grid_adjuster::template index_cast<index_type>(UpperFIndex-to_grid_adjuster::index_threshold());
+			if(LowerIndex == UpperIndex) {
+				return weighted_index_range(LowerIndex, UpperFIndex-LowerFIndex);
+			}
+
+			return weighted_index_range(LowerIndex, UpperIndex,
+				to_grid_adjuster::index_range(LowerIndex).second - LowerFIndex,
+				UpperFIndex - to_grid_adjuster::index_range(UpperIndex).first,
+				UpperFIndex-LowerFIndex,
+				to_grid_adjuster::index_threshold()
+			);
+		}
+	};
+	template<typename from_axis, typename to_axis>
+	auto map_axis(const from_axis& from, const to_axis& to) {
+		using from_grid_adjuster = typename from_axis::grid_adjuster;
+		using to_grid_adjuster = typename to_axis::grid_adjuster;
+		using index_type = typename from_axis::index_type;
+
+		return axis_mapper<from_grid_adjuster, to_grid_adjuster, index_type>(from, to);
+	}
+
 }
 #
 #endif
