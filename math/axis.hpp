@@ -6,12 +6,13 @@
 #include<type_traits>
 #include<cmath>
 #include"../exceptions.hpp"
+#include"../clone_ptrproxy.hpp"
 namespace hmLib {
 	namespace math {
 		namespace grid_policy {
-			constexpr struct round_grid_tag {} round_grid;
-			constexpr struct floor_grid_tag {} floor_grid;
-			constexpr struct ceil_grid_tag {} ceil_grid;
+			constexpr struct round_grid_tag {};
+			constexpr struct floor_grid_tag {};
+			constexpr struct ceil_grid_tag {};
 		}
 		template<typename grid_policy, int log10_index_threshold>
 		struct grid_adjuster {};
@@ -46,7 +47,13 @@ namespace hmLib {
 			static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value-Interval, Value); }
 		};
 
+		namespace grid_policy {
+			constexpr grid_adjuster<round_grid_tag,-8> round_grid;
+			constexpr grid_adjuster<floor_grid_tag, -8> floor_grid;
+			constexpr grid_adjuster<ceil_grid_tag, -8> ceil_grid;
+		}
 		using default_grid_adjuster = grid_adjuster<math::grid_policy::round_grid_tag, -8>;
+
 		template<typename index_type_>
 		struct weighted_index_range {
 			using index_type = index_type_;
@@ -130,7 +137,7 @@ namespace hmLib {
 							EndIndex = 0;
 							LowerProb = 0.0;
 							UpperProb = 0.0;
-							Weidth = 0.0;
+							Weight = 0.0;
 						}
 						LowerProb = UpperProb;
 						UpperProb = 0.0;
@@ -158,7 +165,7 @@ namespace hmLib {
 				return weighted_index(Index+LowerIndex, 1.0);
 			}
 			weighted_index at(index_type Index)const {
-				hmLib_assert(0<=Index && Index < size(), hmLib::access_exceptions::out_of_range_access, "Out of range access.");
+				hmLib_assert(0<=Index && Index < static_cast<int>(size()), hmLib::access_exceptions::out_of_range_access, "Out of range access.");
 				return operator[](Index);
 			}
 			bool empty()const { return LowerIndex==EndIndex; }
@@ -297,7 +304,7 @@ namespace hmLib {
 		bool empty()const { return Size == 0; }
 		value_type operator[](index_type Index)const {return float_at(Index);}
 		value_type at(index_type Index)const {
-			hmLib_assert(0<=Index && Index < Size, hmLib::access_exceptions::out_of_range_access, "Out of axis range access.");
+			hmLib_assert(0<=Index && Index < static_cast<int>(Size), hmLib::access_exceptions::out_of_range_access, "Out of axis range access.");
 			return operator[](Index);
 		}
 		value_type lower()const { return static_cast<value_type>(b); }
