@@ -6,6 +6,7 @@
 #include<vector>
 #include<utility>
 #include<algorithm>
+#include<initializer_list>
 #include"axis.hpp"
 #include"../lattices/indexer.hpp"
 #include"../exceptions.hpp"
@@ -16,6 +17,7 @@ namespace hmLib {
 		struct weighted_point_range {
 			using index_type = index_type_;
 			using size_type = std::size_t;
+			constexpr static unsigned int dim() { return dim_; }
 		private:
 			using indexer_type = lattices::indexer<dim_>;
 		public:
@@ -23,7 +25,7 @@ namespace hmLib {
 			using extent_type = typename indexer_type::extent_type;
 			using weighted_point_type = std::pair<point_type, double>;
 			using waighted_range_container = std::vector<math::weighted_index_range<index_type>>;
-			using waighted_range_iterator = typename waighted_range_container::iterator;
+			using waighted_range_iterator = typename waighted_range_container::const_iterator;
 		public:
 			struct iterator {
 			public:
@@ -49,7 +51,7 @@ namespace hmLib {
 				}
 				reference operator*()const {
 					point_type p = Indexer.point(Index);
-					weighted_point q;
+					weighted_point_type q;
 					q.second = 1.0;
 					for(unsigned int i = 0; i<dim(); ++i) {
 						auto pair = Beg[i].at(p[i]);
@@ -79,8 +81,9 @@ namespace hmLib {
 			double Weight;
 		public:
 			weighted_point_range()noexcept {}
-			explicit weighted_point_range(waighted_range_container Range_):Range(std::move(Range_)) {
+			explicit weighted_point_range(waighted_range_container Range_){
 				hmLib_assert(Range_.size()==dim_, hmLib::numeric_exceptions::incorrect_arithmetic_request, "weighted range cannot create from wieghted range container whose size is not equal to dim.");
+				Range = std::move(Range_);
 				extent_type Extent;
 				Size = 1;
 				Weight = 1.0;
@@ -118,7 +121,7 @@ namespace hmLib {
 			iterator cend()const { return end(); }
 		};
 	}
-	template<typename T, unsigned int dim_, typename grid_adjuster_ = math::default_grid_adjuster, typename index_type_ = unsigned int, typename calc_type_ = double>
+	template<typename T, unsigned int dim_, typename grid_adjuster_ = math::default_grid_adjuster, typename index_type_ = int, typename calc_type_ = double>
 	struct multiaxis {
 	private:
 		using this_type = multiaxis<T, dim_, grid_adjuster_, index_type_, calc_type_>;
@@ -127,8 +130,8 @@ namespace hmLib {
 		using index_type = index_type_;
 		using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
 		using axis_type = hmLib::axis<T, grid_adjuster_, index_type_, calc_type_>;
-	private:
 		using axis_container = std::vector<axis_type>;
+	private:
 		using indexer_type = lattices::indexer<dim_>;
 	public:
 		using point_type = typename indexer_type::point_type;
@@ -143,25 +146,25 @@ namespace hmLib {
 		struct iterator {
 			using value_type = value_point_type;
 			using reference = const value_type;
-			using pointer = clone_ptrproxy<value_type>;
+			using pointer = clone_ptrproxy<const value_type>;
 			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
 			using iterator_category = std::random_access_iterator_tag;
 		private:
-			this_type* Ptr;
+			const this_type* Ptr;
 			index_type Index;
 		public:
 			iterator()noexcept: Ptr(nullptr), Index(0){}
-			iterator(this_type& Ref_, index_type Index_)noexcept : Ptr(&Ref_), Index(Index_) {}
-			reference operator*()const { return Ptr->at(calc_point(Index)); }
-			reference operator[](index_type n)const { return Ptr->at(calc_point(Index+n)); }
+			iterator(const this_type& Ref_, index_type Index_)noexcept : Ptr(&Ref_), Index(Index_) {}
+			reference operator*()const { return Ptr->at(Ptr->index_to_point(Index)); }
+			reference operator[](index_type n)const { return Ptr->at(Ptr->index_to_point(Index+n)); }
 			pointer operator->()const {return pointer(operator*());}
-			iterator& operator++() { ++Index; }
+			iterator& operator++() { ++Index; return *this; }
 			iterator operator++(int) { 
 				iterator Itr = *this;
 				operator++();
 				return Itr;
 			}
-			iterator& operator--() { --Index; }
+			iterator& operator--() { --Index; return *this;}
 			iterator operator--(int) {
 				iterator Itr = *this;
 				operator--();
@@ -215,7 +218,7 @@ namespace hmLib {
 		struct locator {
 			using value_type = value_point_type;
 			using reference = const value_type;
-			using pointer = clone_ptrproxy<value_type>;
+			using pointer = clone_ptrproxy<const value_type>;
 			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
 			using point_type = typename indexer_type::point_type;
 			using extent_type = typename indexer_type::extent_type;
@@ -265,10 +268,7 @@ namespace hmLib {
 		};
 	public:
 		multiaxis():AxisSet(dim(), axis_type()), Indexer(extent_type(0)) {}
-		template<typename... other_axes>
-		multiaxis(axis_type ax, other_axes... others){
-			assign(ax, others...);
-		}
+		multiaxis(std::initializer_list<axis_type> axlist){assign(std::move(axlist));}
 		template<typename input_iterator>
 		multiaxis(input_iterator Beg, input_iterator End) {
 			assign(Beg, End);
@@ -282,16 +282,8 @@ namespace hmLib {
 			Indexer.resize(extent_type(0));
 		}
 		bool empty()const { return Indexer.lattice_size()==0; }
-		template<typename... other_axes>
-		void assign(axis_type ax, other_axes... others) {
-			static_assert(sizeof...(others)==dim_-1, "argument number is different from dim.");
-			AxisSet = axis_container{ ax, others... };
-
-			extent_type Extent;
-			for(unsigned int i = 0; i<dim(); ++i) {
-				Extent[i] = AxisSet[i].size();
-			}
-			Indexer.resize(Extent);
+		void assign(std::initializer_list<axis_type> axlist) {
+			assign(axlist.begin(), axlist.end());
 		}
 		template<typename input_iteratro>
 		void assign(input_iteratro Beg, input_iteratro End) {
@@ -351,6 +343,9 @@ namespace hmLib {
 				Val[i] = AxisSet[i][p[i]];
 			}
 			return Val;
+		}
+		value_point_type ref(const point_type& p) const {
+			return operator[](p);
 		}
 		template<typename... others>
 		value_point_type ref(index_type Pos_, others... Others_) const {
@@ -470,7 +465,12 @@ namespace hmLib {
 	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, math::make_axis_option Opt = math::make_axis_option::none) {
 		return make_multiaxis(Lower, Upper, Size, math::default_grid_adjuster(), Opt);
 	}
-
+	template<typename T, typename grid_adjuster_, typename index_type_, typename calc_type_, typename... others>
+	auto bind_axis(axis<T, grid_adjuster_, index_type_, calc_type_> Axis, others... Others) {
+		return multiaxis<T, 1+sizeof...(others), grid_adjuster_, index_type_, calc_type_>{
+			Axis, Others...
+		};
+	}
 	template<unsigned int dim_, typename from_grid_adjuster_, typename to_grid_adjuster_, typename index_type_>
 	struct multiaxis_mapper {
 	private:

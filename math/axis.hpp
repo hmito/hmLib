@@ -394,8 +394,8 @@ namespace hmLib {
 				Size
 			);
 		case math::make_axis_option::gridfit:
-			Lower -= (Upper-Lower)*grid_adjuster::index_range(0).first / Size;
-			Upper += (Upper-Lower)*grid_adjuster::index_range(0).second / Size;
+			Lower -= static_cast<T>((Upper-Lower)*grid_adjuster::index_range(0).first / Size);
+			Upper += static_cast<T>((Upper-Lower)*grid_adjuster::index_range(0).second / Size);
 
 			return make_axis(Lower, Upper, Size, GridAdjuster);
 		default:
