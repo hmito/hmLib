@@ -70,6 +70,16 @@ public:
 		auto eeff = ei+ef;
 		Assert::IsTrue(std::is_same_v<decltype(eeff), varray<double, 3>>, L"add double+double= double");
 	}
+	TEST_METHOD(divmod) {
+		//varray<double, 3> e1{ 1.2,2.4,3.6 };
+		//auto e1a = e1%3;
+		//compile error
 
+		varray<int, 3> e2{ 5,6,7 };
+		auto e2a = e2%3;
+		Assert::AreEqual(2, e2a[0]);
+		Assert::AreEqual(0, e2a[1]);
+		Assert::AreEqual(1, e2a[2]);
+	}
 	};
 }
