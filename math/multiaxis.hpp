@@ -154,18 +154,18 @@ namespace hmLib {
 			const this_type* Ptr;
 			index_type Index;
 		public:
-			iterator()noexcept: Ptr(nullptr), Index(0){}
+			iterator()noexcept : Ptr(nullptr), Index(0) {}
 			iterator(const this_type& Ref_, index_type Index_)noexcept : Ptr(&Ref_), Index(Index_) {}
 			reference operator*()const { return Ptr->at(Ptr->index_to_point(Index)); }
 			reference operator[](index_type n)const { return Ptr->at(Ptr->index_to_point(Index+n)); }
-			pointer operator->()const {return pointer(operator*());}
+			pointer operator->()const { return pointer(operator*()); }
 			iterator& operator++() { ++Index; return *this; }
-			iterator operator++(int) { 
+			iterator operator++(int) {
 				iterator Itr = *this;
 				operator++();
 				return Itr;
 			}
-			iterator& operator--() { --Index; return *this;}
+			iterator& operator--() { --Index; return *this; }
 			iterator operator--(int) {
 				iterator Itr = *this;
 				operator--();
@@ -197,10 +197,10 @@ namespace hmLib {
 			friend difference_type operator-(const iterator& itr1, const iterator& itr2) {
 				return itr1.Index - itr2.Index;
 			}
-			friend bool operator==(const iterator& itr1, const iterator& itr2){
+			friend bool operator==(const iterator& itr1, const iterator& itr2) {
 				return itr1.Index == itr2.Index;
 			}
-			friend bool operator!=(const iterator& itr1, const iterator& itr2){
+			friend bool operator!=(const iterator& itr1, const iterator& itr2) {
 				return itr1.Index != itr2.Index;
 			}
 			friend bool operator<(const iterator& itr1, const iterator& itr2) {
@@ -269,11 +269,11 @@ namespace hmLib {
 		};
 	public:
 		multiaxis():AxisSet(dim(), axis_type()), Indexer(extent_type(0)) {}
-		multiaxis(std::initializer_list<axis_type> axlist){assign(std::move(axlist));}
+		multiaxis(std::initializer_list<axis_type> axlist) { assign(std::move(axlist)); }
 		template<typename input_iterator>
 		multiaxis(input_iterator Beg, input_iterator End) {
 			assign(Beg, End);
-		}	
+		}
 		explicit multiaxis(axis_container AxisSet_) {
 			assign(AxisSet_);
 		}
@@ -288,7 +288,7 @@ namespace hmLib {
 		}
 		template<typename input_iteratro>
 		void assign(input_iteratro Beg, input_iteratro End) {
-			hmLib_assert(std::distance(Beg, End)==dim_,hmLib::numeric_exceptions::incorrect_arithmetic_request,"number of axis is different from dim.");
+			hmLib_assert(std::distance(Beg, End)==dim_, hmLib::numeric_exceptions::incorrect_arithmetic_request, "number of axis is different from dim.");
 			AxisSet.assign(Beg, End);
 
 			extent_type Extent;
@@ -309,9 +309,9 @@ namespace hmLib {
 		}
 	public:
 		const axis_type& axis(index_type n)const { return AxisSet[n]; }
-		void assign_axis(index_type n, axis_type Axis) { 
+		void assign_axis(index_type n, axis_type Axis) {
 			hmLib_assert(n<dim_, hmLib::access_exceptions::out_of_range_access, "out of axis range.");
-			AxisSet[n] = Axis; 
+			AxisSet[n] = Axis;
 
 			extent_type Extent = extent();
 			Extent[n] = Axis.size();
@@ -326,6 +326,20 @@ namespace hmLib {
 			Indexer.resize(Extent);
 		}
 	public:
+		value_point_type lower()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].lower();
+			}
+			return Val;
+		}
+		value_point_type upper()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].upper();
+			}
+			return Val;
+		}
 		value_point_type at(const point_type& p)const {
 			value_point_type Val;
 			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
@@ -373,6 +387,11 @@ namespace hmLib {
 			}
 			return Val;
 		}
+		template<typename... others>
+		point_type point(value_type pv, others... Others_) const {
+			static_assert(sizeof...(others)==dim_-1, "argument number for at is different from dim.");
+			return point(value_point_type{ pv, static_cast<value_type>(Others_)... });
+		}
 		float_point_type float_point(value_point_type p)const {
 			float_point_type Val;
 			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
@@ -380,26 +399,17 @@ namespace hmLib {
 			}
 			return Val;
 		}
+		template<typename... others>
+		float_point_type float_point(value_type pv, others... Others_) const {
+			static_assert(sizeof...(others)==dim_-1, "argument number for at is different from dim.");
+			return float_point(value_point_type{ pv, static_cast<value_type>(Others_)... });
+		}
 		weighted_point_range weighted_point(value_point_type LowerVal, value_point_type UpperVal)const {
 			typename weighted_point_range::waighted_range_container Container;
 			for(unsigned int i = 0; i<dim(); ++i) {
 				Container.push_back(AxisSet[i].weighted_index(LowerVal[i], UpperVal[i]));;
 			}
 			return weighted_point_range(std::move(Container));
-		}
-		value_point_type lower()const {
-			value_point_type Val;
-			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
-				Val[i] = AxisSet[i].lower();
-			}
-			return Val;
-		}
-		value_point_type upper()const {
-			value_point_type Val;
-			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
-				Val[i] = AxisSet[i].upper();
-			}
-			return Val;
 		}
 	public:
 		iterator begin()const { return iterator(*this, 0); }
@@ -522,19 +532,17 @@ namespace hmLib {
 			}
 			return true;
 		}
-		point_type operator[](float_point_type FromIndex)const {
-			point_type Pos;
-			for(unsigned int i = 0; i<dim_; ++i) {
-				Pos[i] = MapperSet[i][FromIndex[i]];
-			}
-			return Pos;
-		}
 		point_type point(float_point_type FromIndex)const {
 			point_type Pos;
 			for(unsigned int i = 0; i<dim_; ++i) {
 				Pos[i] = MapperSet[i].index(FromIndex[i]);
 			}
 			return Pos;
+		}
+		template<typename... others>
+		point_type point(double FromIndex, others... Others)const {
+			static_assert(sizeof...(others)==dim_-1, "argument number for at is different from dim.");
+			return point(float_point_type{ FromIndex , static_cast<double>(Others)... });
 		}
 		float_point_type float_point(float_point_type FromIndex)const {
 			float_point_type Pos;
@@ -543,12 +551,22 @@ namespace hmLib {
 			}
 			return Pos;
 		}
+		template<typename... others>
+		float_point_type float_point(double FromIndex, others... Others)const {
+			static_assert(sizeof...(others)==dim_-1, "argument number for at is different from dim.");
+			return float_point(float_point_type{ FromIndex , static_cast<double>(Others)... });
+		}
 		weighted_point_range weighted_point(point_type FromIndex)const {
 			typename weighted_point_range::waighted_range_container Container;
 			for(unsigned int i = 0; i<dim_; ++i) {
 				Container.push_back(MapperSet[i].weighted_index(FromIndex[i]));;
 			}
 			return weighted_point_range(std::move(Container));
+		}
+		template<typename... others>
+		weighted_point_range weighted_point(index_type FromIndex, others... Others)const {
+			static_assert(sizeof...(others)==dim_-1, "argument number for at is different from dim.");
+			return weighted_point(point_type{ FromIndex , static_cast<index_type>(Others)... });
 		}
 	private:
 		std::vector<axis_mapper> MapperSet;
