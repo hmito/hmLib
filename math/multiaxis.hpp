@@ -127,8 +127,9 @@ namespace hmLib {
 		using this_type = multiaxis<T, dim_, grid_adjuster_, index_type_, calc_type_>;
 	public:
 		using value_type = T;
+		using difference_type = decltype(std::declval<value_type>()-std::declval<value_type>());
 		using index_type = index_type_;
-		using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
+		using grid_adjuster = grid_adjuster_;
 		using axis_type = hmLib::axis<T, grid_adjuster_, index_type_, calc_type_>;
 		using axis_container = std::vector<axis_type>;
 	private:
@@ -427,6 +428,11 @@ namespace hmLib {
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
 	public:
+		template<typename to_multiaxis>
+		auto map_to(const to_multiaxis& to) {
+			return map_multiaxis(*this, to);
+		}
+	public:
 		friend bool operator==(const this_type& axis1, const this_type& axis2) {
 			if(axis1.empty()) {
 				if(axis2.empty()) {
@@ -553,7 +559,7 @@ namespace hmLib {
 		using to_grid_adjuster = typename to_multiaxis::grid_adjuster;
 		using index_type = typename from_multiaxis::index_type;
 
-		return multiaxis_mapper<from_grid_adjuster, to_grid_adjuster, index_type>(from, to);
+		return multiaxis_mapper<from_multiaxis::dim(), from_grid_adjuster, to_grid_adjuster, index_type>(from, to);
 	}
 }
 #

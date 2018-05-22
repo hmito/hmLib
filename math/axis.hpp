@@ -359,6 +359,10 @@ namespace hmLib {
 		this_type subaxis(index_type LowerIndex, index_type UpperIndex) {
 			return this_type(operator[](LowerIndex), operator[](UpperIndex), UpperIndex - LowerIndex + 1);
 		}
+		template<typename to_axis>
+		auto map_to(const to_axis& to) {
+			return map_axis(*this, to);
+		}
 	private:
 		calc_type a;
 		calc_type b;

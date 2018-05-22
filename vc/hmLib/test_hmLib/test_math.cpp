@@ -701,5 +701,18 @@ namespace hmLib {
 				++Itr;
 			}
 		}
+		TEST_METHOD(self_mapper_check) {
+			multiaxis<double, 2> Axes1{
+				make_axis<double>(0,1.0,11),
+				make_axis<double>(0,2.0,21)
+			};
+			multiaxis<double, 2> Axes2{
+				make_axis<double>(-0.5,1.5,21),
+				make_axis<double>(-1.0,2.0,21)
+			};
+			//x: 5:15
+			//y: 
+			auto Mapper = Axes1.map_to(Axes2);
+		}
 	};
 }
