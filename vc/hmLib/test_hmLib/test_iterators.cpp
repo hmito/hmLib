@@ -38,7 +38,7 @@ namespace hmLib {
 			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
 			std::list<int> Index{ 2,3,5 };
 
-			auto Range = make_index_access_range(Val, Index);
+			auto Range = make_index_access_range(Val.begin(), Index.begin(),Index.end());
 
 			auto itr = Index.begin();
 			for(auto v:Range) {
@@ -50,7 +50,7 @@ namespace hmLib {
 			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
 			std::vector<int> Index{ 2,3,5 };
 
-			auto Range = make_index_access_range(Val, Index);
+			auto Range = make_index_access_range(Val.begin(), Index.begin(),Index.end());
 
 			auto itr = Index.begin();
 			for(auto v:Range) {

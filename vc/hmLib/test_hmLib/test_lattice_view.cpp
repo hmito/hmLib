@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include"../../../random.hpp"
 #include "../../../lattices.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -987,6 +988,86 @@ public:
 		Assert::AreEqual(2, Lat.at(-1, 0), L"Ini Value error.");
 		Assert::AreEqual(2, Lat.at(-1, -8), L"Ini Value error.");
 		Assert::AreEqual(2, Lat.at(-4, 8), L"Ini Value error.");
+	}
+};
+
+TEST_CLASS(test_lattice_keep_if) {
+	TEST_METHOD(block_point_keep) {
+		lattice<int, 3> Lat(lattices::extent(3u,4u,5u),0);
+		{
+			auto Itr = Lat.begin();
+			for(int i = 0; i<60; ++i) {
+				*(Itr++) = i;
+			}
+		}
+
+		lattices::block_point_keeper<3> Keeper(Lat, [](int v) {return (v>=6 && v<10) || (17<=v && v<25)|| (34<=v && v<41); });
+		//4,8,7
+		auto Range = Keeper.range(Lat);
+		Assert::AreEqual(19u, Range.size());
+
+		auto Itr = Range.begin();
+		auto End = Range.end();
+
+		for(int i = 6; i<10; ++i) {
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++Itr;
+		}
+		for(int i = 17; i<25; ++i) {
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++Itr;
+		}
+		for(int i = 34; i<41; ++i) {
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+	}
+	TEST_METHOD(element_point_keep) {
+		lattice<int, 3> Lat(lattices::extent(3u, 4u, 5u), 0);
+		{
+			auto Itr = Lat.begin();
+			for(int i = 0; i<60; ++i) {
+				*(Itr++) = i;
+			}
+		}
+
+		lattices::element_point_keeper<3> Keeper(Lat, [](int v) {return (v>=6 && v<10) || (17<=v && v<25)|| (34<=v && v<41); });
+		//4,8,7
+		auto Range = Keeper.range(Lat);
+		Assert::AreEqual(19u, Range.size());
+
+		auto KItr = Keeper.begin();
+		auto KEnd = Keeper.end();
+		auto Itr = Range.begin();
+		auto End = Range.end();
+
+		for(int i = 6; i<10; ++i) {
+			Assert::IsFalse(KItr==KEnd);
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++KItr;
+			++Itr;
+		}
+		for(int i = 17; i<25; ++i) {
+			Assert::IsFalse(KItr==KEnd);
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++KItr;
+			++Itr;
+		}
+		for(int i = 34; i<41; ++i) {
+			Assert::IsFalse(KItr==KEnd);
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++KItr;
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+		Assert::IsTrue(KItr==KEnd);
 	}
 };
 }

@@ -82,6 +82,7 @@
     <ClInclude Include="..\..\..\lattices.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
+    <ClInclude Include="..\..\..\lattices\keep_if.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
