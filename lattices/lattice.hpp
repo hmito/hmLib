@@ -4,6 +4,7 @@
 #include<vector>
 #include<utility>
 #include<iterator>
+#include<initializer_list>
 #include<numeric>
 #include"utility.hpp"
 #include"exceptions.hpp"
@@ -51,6 +52,9 @@ namespace hmLib{
 		lattice(const extent_type& Extent_, const_reference IniVal)
 			: Indexer(Extent_){
 			Data.assign(Indexer.lattice_size(), IniVal);
+		}
+		lattice(const extent_type& Extent_, std::initializer_list<value_type> Ini_) {
+			resize(Extent_, std::move(Ini_));
 		}
 		lattice(const extent_type& Extent_, const data_type& Data_){
 			resize(Extent_, Data_);
@@ -157,6 +161,12 @@ namespace hmLib{
 		void resize(const extent_type& Extent_, const_reference IniVal) {
 			Indexer.resize(Extent_);
 			Data.assign(Indexer.lattice_size(), IniVal);
+		}
+		void resize(const extent_type& Extent_, std::initializer_list<value_type> Ini_) {
+			indexer NewIndexer(Extent_);
+			hmLib_assert(Ini_.size() >= NewIndexer.lattice_size(), lattices::invalid_range, "The given Data is smaller than the lattice size.");
+			Indexer = NewIndexer;
+			Data.assign(std::move(Ini_));
 		}
 		void resize(const extent_type& Extent_, const data_type& Data_) {
 			indexer NewIndexer(Extent_);
