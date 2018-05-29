@@ -87,12 +87,12 @@ namespace hmLib {
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
 		reference ref(index_type Pos_, others... Others_) {
-			return operator[](lattices::point(Pos_, Others_...));
+			return ref(lattices::point(Pos_, Others_...));
 		}
 		//!Return const_reference of the elemtn at the given elements point
 		template<typename... others>
 		const_reference ref(index_type Pos_, others... Others_)const {
-			return operator[](lattices::point(Pos_, Others_...));
+			return ref(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
 		reference operator[](const point_type& Point_) { return ref(Point_); }

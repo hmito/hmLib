@@ -56,7 +56,7 @@ namespace hmLib{
 		reference ref(const point_type& Point_)const { return Begin[OriginalIndexer.torus_index(Point_+Pos)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		reference ref(index_type Pos_, others... Others_)const { return operator[](lattices::point(Pos_, Others_...)); }
+		reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
 		//!Return reference of the elemtn at the given point
 		reference operator[](const point_type& Point_)const { return ref(Point_); }
 	public:
@@ -141,7 +141,7 @@ namespace hmLib{
 		reference ref(const point_type& Point_)const { return Begin[Indexer.torus_index(Point_)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		reference ref(index_type Pos_, others... Others_)const { return operator[](lattices::point(Pos_, Others_...)); }
+		reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
 		//!Return reference of the elemtn at the given point
 		reference operator[](const point_type& Point_)const { return ref(Point_); }
 	public:
