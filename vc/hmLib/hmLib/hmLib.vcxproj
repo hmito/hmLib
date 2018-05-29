@@ -80,6 +80,7 @@
     <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
     <ClInclude Include="..\..\..\lattices\keep_if.hpp" />

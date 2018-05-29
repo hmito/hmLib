@@ -458,5 +458,8 @@
     <ClInclude Include="..\..\..\lattices\keep_if.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
