@@ -81,9 +81,9 @@ namespace hmLib {
 			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
-		reference operator[](const point_type& Point_) { return Data[Indexer.torus_index(Point_)]; }
+		reference ref(const point_type& Point_) { return Data[Indexer.torus_index(Point_)]; }
 		//!Return const_reference of the elemtn at the given point
-		const_reference operator[](const point_type& Point_)const { return Data[Indexer.torus_index(Point_)]; }
+		const_reference ref(const point_type& Point_)const { return Data[Indexer.torus_index(Point_)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
 		reference ref(index_type Pos_, others... Others_) {
@@ -94,6 +94,10 @@ namespace hmLib {
 		const_reference ref(index_type Pos_, others... Others_)const {
 			return operator[](lattices::point(Pos_, Others_...));
 		}
+		//!Return reference of the elemtn at the given point
+		reference operator[](const point_type& Point_) { return ref(Point_); }
+		//!Return const_reference of the elemtn at the given point
+		const_reference operator[](const point_type& Point_)const { return ref(Point_); }
 	public:
 		//!Get number of elements included in the lattice
 		size_type lattice_size()const { return Indexer.lattice_size(); }
@@ -103,6 +107,14 @@ namespace hmLib {
 		point_type index_to_point(index_type Index_)const { return Indexer.point(Index_); }
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
+		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
+		reference index_at(index_type Index_) { return Data.at(Index_); }
+		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
+		const_reference index_at(index_type Index_)const { return Data.at(Index_); }
+		//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
+		reference index_ref(index_type Index_) { return Data[Index_]; }
+		//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
+		const_reference index_ref(index_type Index_)const { return Data[Index_]; }
 	public:
 		//!Return begin iterator fot the lattice
 		iterator begin() { return iterator(Data.begin(), Indexer, 0);}
