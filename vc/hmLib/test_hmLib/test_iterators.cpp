@@ -3,6 +3,7 @@
 #include <array>
 #include <algorithm>
 #include <vector>
+#include <string>
 #include <list>
 #include "../../../iterators.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -93,6 +94,36 @@ namespace hmLib {
 			Assert::AreEqual(4, std::distance(Itr.get<0>(), End.get<0>()));
 			Assert::AreEqual(4, std::distance(Itr.get<1>(), End.get<1>()));
 			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+		}
+		TEST_METHOD(test_zip_container) {
+			std::string List{ '0','1','2','3','4','5' };
+			std::vector<int> Vec{ 10,11,12,13,14,15,16,17 };
+			std::array<double, 4> Arr{ 20,21,22,23 };
+
+			auto Zip = make_zip_container<int>(List, Vec, Arr);
+			Assert::AreEqual('0', std::get<0>(Zip.at(0)));
+			Assert::AreEqual(10, std::get<1>(Zip.at(0)));
+			Assert::AreEqual(20.0, std::get<2>(Zip.at(0)),1e-10);
+			Assert::AreEqual('3', std::get<0>(Zip.at(3)));
+			Assert::AreEqual(13, std::get<1>(Zip.at(3)));
+			Assert::AreEqual(23.0, std::get<2>(Zip.at(3)), 1e-10);
+		}
+		TEST_METHOD(test_zip_container_w) {
+			std::string List{ '0','1','2','3','4','5' };
+			std::vector<int> Vec{ 10,11,12,13,14,15,16,17 };
+			std::array<double, 4> Arr{ 20,21,22,23 };
+
+			auto Zip = make_zip_container<int>(List, Vec, Arr);
+			std::get<0>(Zip.at(0)) = 'A';
+			std::get<1>(Zip.at(0)) = 100;
+			std::get<2>(Zip.at(0)) = 5.5;
+
+			Assert::AreEqual('A', std::get<0>(Zip.at(0)));
+			Assert::AreEqual(100, std::get<1>(Zip.at(0)));
+			Assert::AreEqual(5.5, std::get<2>(Zip.at(0)), 1e-10);
+			Assert::AreEqual('3', std::get<0>(Zip.at(3)));
+			Assert::AreEqual(13, std::get<1>(Zip.at(3)));
+			Assert::AreEqual(23.0, std::get<2>(Zip.at(3)), 1e-10);
 		}
 	};
 }

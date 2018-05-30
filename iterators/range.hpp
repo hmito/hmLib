@@ -56,6 +56,10 @@ namespace hmLib {
 		iterator begin() { return Beg; }
 		iterator end() { return End; }
 		reference operator[](difference_type n) { return Beg[n]; }
+		reference at(difference_type n) {
+			hmLib_assert(n<size()&& 0<=n, hmLib::access_exceptions::out_of_range_access, "out of range.");
+			return Beg[n];
+		}
 		difference_type size() { return std::distance(Beg,End); }
 	private:
 		iterator Beg;
