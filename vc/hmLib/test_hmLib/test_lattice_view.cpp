@@ -1070,4 +1070,107 @@ TEST_CLASS(test_lattice_keep_if) {
 		Assert::IsTrue(KItr==KEnd);
 	}
 };
+
+TEST_CLASS(test_block_lattice) {
+	TEST_METHOD(block_construct) {
+		block_lattice<int, 2> Lat(4,4);
+
+		Assert::AreEqual(0u, Lat.block_num());
+		Assert::AreEqual(0u, Lat.lattice_size());
+
+		Lat.assign(6, 7);
+		Assert::AreEqual(0u, Lat.block_num());
+		Assert::AreEqual(0u, Lat.lattice_size());
+
+		Lat = block_lattice<int, 2>(2, 2);
+	}
+	TEST_METHOD(block_ref) {
+		block_lattice<int, 2> Lat(4, 4);
+
+		Lat.ref(0, 0) = 10;
+		Assert::AreEqual(1u, Lat.block_num());
+		Assert::AreEqual(16u, Lat.lattice_size());
+
+		Lat.ref(3, 1) = 20;
+		Assert::AreEqual(1u, Lat.block_num());
+		Assert::AreEqual(16u, Lat.lattice_size());
+
+		Lat.ref(7, 9) = 30;
+		Assert::AreEqual(2u, Lat.block_num());
+		Assert::AreEqual(32u, Lat.lattice_size());
+
+		Assert::AreEqual(10, Lat.ref(0, 0));
+		Assert::AreEqual(20, Lat.ref(3, 1));
+		Assert::AreEqual(30, Lat.ref(7, 9));
+
+		auto Itr = Lat.begin();
+		auto End = Lat.end();
+
+		Assert::AreEqual<int>(10, Itr->second);
+		++Itr;
+		for(unsigned int i = 1; i<7; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			++Itr;
+		}
+		Assert::AreEqual<int>(20, Itr->second);
+		++Itr;
+		for(unsigned int i = 8; i<16; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			++Itr;
+		}
+
+		for(unsigned int i = 0; i<7; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			++Itr;
+		}
+		Assert::AreEqual<int>(30, Itr->second);
+		++Itr;
+		for(unsigned int i = 8; i<16; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			++Itr;
+		}
+	}
+	TEST_METHOD(block_itr) {
+		block_lattice<int, 2> Lat(4, 4);
+
+		Lat.ref(0, 0) = 10;
+		Lat.ref(3, 1) = 20;
+		Lat.ref(7, 9) = 30;
+
+		auto Itr = Lat.begin();
+		auto End = Lat.end();
+
+		Assert::AreEqual<int>(10, Itr->second);
+		Assert::IsFalse(Itr==End);
+		++Itr;
+		for(unsigned int i = 1; i<7; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+		Assert::AreEqual<int>(20, Itr->second);
+		Assert::IsFalse(Itr==End);
+		++Itr;
+		for(unsigned int i = 8; i<16; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+
+		for(unsigned int i = 0; i<7; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+		Assert::AreEqual<int>(30, Itr->second);
+		Assert::IsFalse(Itr==End);
+		++Itr;
+		for(unsigned int i = 8; i<16; ++i) {
+			Assert::AreEqual<int>(0, Itr->second);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+	}
+};
 }
