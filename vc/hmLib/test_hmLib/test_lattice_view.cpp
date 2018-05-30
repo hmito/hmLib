@@ -1087,48 +1087,59 @@ TEST_CLASS(test_block_lattice) {
 	TEST_METHOD(block_ref) {
 		block_lattice<int, 2> Lat(4, 4);
 
-		Lat.ref(0, 0) = 10;
+		Lat.ref(0, 0) = 1;
 		Assert::AreEqual(1u, Lat.block_num());
 		Assert::AreEqual(16u, Lat.lattice_size());
 
-		Lat.ref(3, 1) = 20;
+		Lat.ref(3, 1) = 2;
 		Assert::AreEqual(1u, Lat.block_num());
 		Assert::AreEqual(16u, Lat.lattice_size());
 
-		Lat.ref(7, 9) = 30;
+		Lat.ref(7, 9) = 3;
 		Assert::AreEqual(2u, Lat.block_num());
 		Assert::AreEqual(32u, Lat.lattice_size());
 
-		Assert::AreEqual(10, Lat.ref(0, 0));
-		Assert::AreEqual(20, Lat.ref(3, 1));
-		Assert::AreEqual(30, Lat.ref(7, 9));
+		Assert::AreEqual(1, Lat.ref(0, 0));
+		Assert::AreEqual(2, Lat.ref(3, 1));
+		Assert::AreEqual(3, Lat.ref(7, 9));
+	}
+	TEST_METHOD(block_ref2) {
+		block_lattice<int, 2> Lat(5, 5);
+
+		Lat.ref(22, 18) = 1;	//[4,3] [2,3]
+		Lat.ref(19, 0) = 2; 	//[3,0] [4,0]
+		Lat.ref(5, 10) = 3; 	//[1,2] [0,0]
+		Lat.ref(45, 1) = 4;		//[9,0] [0,1]
+		Lat.ref(23, 16) = 5;	//[4,3] [3,1]
+		Lat.ref(49, 4) = 6; 	//[9,0] [4,4]
+
+		auto BItr = Lat.block_begin();
+		auto BEnd = Lat.block_end();
+		Assert::AreEqual(4, std::distance(BItr, BEnd));
+
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(15,0));
+		Assert::IsTrue(BItr->at(4, 0)== 2);
+		++BItr;
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(45, 0));
+		Assert::IsTrue(BItr->at(0, 1)== 4);
+		Assert::IsTrue(BItr->at(4, 4)== 6);
+		++BItr;
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(5, 10));
+		Assert::IsTrue(BItr->at(0, 0)== 3);
+		++BItr;
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(20, 15));
+		Assert::IsTrue(BItr->at(2, 3)== 1);
+		Assert::IsTrue(BItr->at(3, 1)== 5);
+		++BItr;
+		Assert::IsTrue(BItr==BEnd);
 
 		auto Itr = Lat.begin();
 		auto End = Lat.end();
-
-		Assert::AreEqual<int>(10, Itr->second);
-		++Itr;
-		for(unsigned int i = 1; i<7; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
-			++Itr;
-		}
-		Assert::AreEqual<int>(20, Itr->second);
-		++Itr;
-		for(unsigned int i = 8; i<16; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
-			++Itr;
-		}
-
-		for(unsigned int i = 0; i<7; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
-			++Itr;
-		}
-		Assert::AreEqual<int>(30, Itr->second);
-		++Itr;
-		for(unsigned int i = 8; i<16; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
-			++Itr;
-		}
+		Assert::AreEqual(4*5*5, std::distance(Itr, End));
 	}
 	TEST_METHOD(block_itr) {
 		block_lattice<int, 2> Lat(4, 4);

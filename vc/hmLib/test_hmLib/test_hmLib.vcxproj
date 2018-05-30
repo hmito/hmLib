@@ -160,7 +160,6 @@
     <ClInclude Include="hmLib_config.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="test_type_traits.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -176,6 +175,7 @@
     <ClCompile Include="test_math.cpp" />
     <ClCompile Include="test_lattice_view.cpp" />
     <ClCompile Include="test_resource.cpp" />
+    <ClCompile Include="test_type_traits.cpp" />
     <ClCompile Include="test_varray.cpp" />
   </ItemGroup>
   <ItemGroup>

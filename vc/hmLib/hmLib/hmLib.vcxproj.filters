@@ -461,5 +461,11 @@
     <ClInclude Include="..\..\..\lattices\block_lattice.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\iterators\zip_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\range.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

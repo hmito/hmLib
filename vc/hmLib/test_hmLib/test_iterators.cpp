@@ -60,4 +60,39 @@ namespace hmLib {
 			Assert::AreEqual(Index.size(), Range.size());
 		}
 	};
+	TEST_CLASS(test_zip_iterator) {
+		TEST_METHOD(test_make_zip) {
+			std::list<int> List{ 0,1,2,3,4,5 };
+			std::vector<int> Vec{ 10,11,12,13,14,15,16,17 };
+			std::array<int, 4> Arr{ 20,21,22,23 };
+
+			auto Itr = make_zip_iterator(List.begin(), Vec.begin(), Arr.begin());
+
+			Assert::AreEqual(0, std::get<0>(*Itr));
+			Assert::AreEqual(10, std::get<1>(*Itr));
+			Assert::AreEqual(20, std::get<2>(*Itr));
+
+			auto End = make_zip_iterator(List.end(), Vec.end(), Arr.end());
+			Assert::AreEqual(6, std::distance(Itr.get<0>(), End.get<0>()));
+			Assert::AreEqual(8, std::distance(Itr.get<1>(), End.get<1>()));
+			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+
+			End = zip_iterator_shorten(Itr, End);
+			Assert::AreEqual(4, std::distance(Itr.get<0>(), End.get<0>()));
+			Assert::AreEqual(4, std::distance(Itr.get<1>(), End.get<1>()));
+			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+		}
+		TEST_METHOD(test_zip_range) {
+			std::list<int> List{ 0,1,2,3,4,5 };
+			std::vector<int> Vec{ 10,11,12,13,14,15,16,17 };
+			std::array<int, 4> Arr{ 20,21,22,23 };
+
+			auto Range = make_zip_range(List, Vec, Arr);
+			auto Itr = Range.begin();
+			auto End = Range.end();
+			Assert::AreEqual(4, std::distance(Itr.get<0>(), End.get<0>()));
+			Assert::AreEqual(4, std::distance(Itr.get<1>(), End.get<1>()));
+			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+		}
+	};
 }
