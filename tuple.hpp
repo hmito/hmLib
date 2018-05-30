@@ -11,7 +11,7 @@ namespace hmLib {
 			template<typename Fn, typename... Tuple>
 			auto operator()(Fn&& f, Tuple&&... t) {
 				return std::tuple_cat(
-					std::make_tuple(f(std::get<n>(t)...)),
+					std::tuple<decltype((f(std::get<n>(t)...)))>(f(std::get<n>(t)...)),
 					tuple_for_each_impl<n+1,r-1>()(f, t...)
 				);
 			}
@@ -20,9 +20,7 @@ namespace hmLib {
 		struct tuple_for_each_impl<n,1>{
 			template<typename Fn, typename... Tuple>
 			auto operator()(Fn&& f, Tuple&&... t) {
-				return std::make_tuple(
-					f(std::get<n>(t)...)
-				);
+				return std::tuple<decltype((f(std::get<n>(t)...)))>(f(std::get<n>(t)...));
 			}
 		};
 	}
@@ -34,6 +32,7 @@ namespace hmLib {
 			std::forward<OtherTuples>(ot)...
 		);
 	}
+
 	namespace detail {
 		template<typename ans_type, unsigned int n, unsigned int r>
 		struct tuple_apply_at_impl {
@@ -64,6 +63,31 @@ namespace hmLib {
 	template<std::size_t n, typename Fn, typename... Tuple>
 	auto tuple_apply_at(Fn f, Tuple... t) {
 		return f(std::get<n>(t)...);
+	}
+
+	namespace detail {
+		template<unsigned int n, unsigned int r>
+		struct tuple_reduce_impl {
+			template<typename Fn, typename Tuple, typename T>
+			auto operator()(Fn&& f, Tuple&& t, T Ini) {
+				return tuple_reduce_impl<n+1, r-1>()(f, t, f(Ini, std::get<n>(t)));
+			}
+		};
+		template<unsigned int n>
+		struct tuple_reduce_impl<n, 1> {
+			template<typename Fn, typename Tuple, typename T>
+			auto operator()(Fn&& f, Tuple&& t, T Ini) {
+				return f(Ini, std::get<n>(t));
+			}
+		};
+	}
+	template<typename Fn, typename Tuple,typename T>
+	auto tuple_reduce(Fn&& f, Tuple&& t, T Ini) {
+		return detail::tuple_reduce_impl<0, std::tuple_size<typename std::decay<Tuple>::type>::value>()(
+			std::forward<Fn>(f),
+			std::forward<Tuple>(t),
+			Ini
+		);
 	}
 
 }
