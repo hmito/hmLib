@@ -3,11 +3,35 @@
 #
 #include<vector>
 #include<utility>
+#include<limits>
+#include<tuple>
+#include"../iterators/index_at_access_iterator.hpp"
+#include"../tuple.hpp"
 #include"utility.hpp"
 #include"indexer.hpp"
-#include"../iterators/index_access_iterator.hpp"
 namespace hmLib {
 	namespace lattices {
+		template<typename... lattices_>
+		struct zip_lattice {
+			using pack = std::tuple<lattices_&...>;
+			using reference = std::tuple<decltype(std::declval<typename std::decay<lattices_>::type>().at(std::declval<point_type>()))...>;
+		public:
+			template<typename... other_lattices>
+			zip_lattice(other_lattices&... Lattices_):Ranges(Lattices_...) {
+			}
+			reference operator[](point_type Pos) { return tuple_for_each([Pos](auto& v)->decltype((v[Pos])) {return v[Pos]; }, Ranges); }
+			reference at(point_type Pos) {
+				return tuple_for_each([Pos](auto& v)->decltype((v.at(Pos))) {return v.at(Pos); }, Ranges);
+			}
+			size_type size() { return Size; }
+		private:
+			pack Ranges;
+		};
+		template<typename... lattices_>
+		auto make_zip_lattice(lattices_&... Lattices_) {
+			return zip_lattice<typename std::decay<lattices_>::type...>(Lattices_...);
+		}
+
 		template<unsigned int dim_, typename keep_point_type_ = lattices::point_type<dim_>>
 		struct element_point_keeper {
 		public:
@@ -54,7 +78,13 @@ namespace hmLib {
 			const_iterator end() const { return cend(); }
 			template<typename lattice_type>
 			auto range(lattice_type& Lat)const {
-				return make_container_index_access_range(Lat, begin(), end());
+				return make_index_at_access_range(Lat, begin(), end());
+			}
+			template<typename lattice_type1, typename lattice_type2, typename... others>
+			auto range(lattice_type1& Lat1, lattice_type2& Lat2, others&... Others)const {
+				//index_at_access capture the reference of argument
+				//	make_zip_lattice is captured although it is temporal variable.
+				//return make_index_at_access_range(make_zip_lattice(Lat1,Lat2,Others...), begin(), end());
 			}
 		private:
 			element_container KeptBlock;
@@ -198,7 +228,7 @@ namespace hmLib {
 			const_iterator end() const { return cend(); }
 			template<typename lattice_type>
 			auto range(lattice_type& Lat)const {
-				return make_container_index_access_range(Lat, begin(), end());
+				return make_index_at_access_range(Lat, begin(), end());
 			}
 		private:
 			index_type Index;
