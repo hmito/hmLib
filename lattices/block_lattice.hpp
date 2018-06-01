@@ -1,7 +1,6 @@
 #ifndef HMLIB_LATICES_BLOCKLATTICE_INC
 #define HMLIB_LATICES_BLOCKLATTICE_INC 100
 #include<vector>
-#include"../clone_ptrproxy.hpp"
 #include"utility.hpp"
 #include"exceptions.hpp"
 #include"indexer.hpp"
@@ -22,20 +21,15 @@ namespace hmLib {
 		using index_type = lattices::index_type;
 		using indexer = lattices::indexer<dim_>;
 	public:
-		using element_type = typename std::decay<T>::type;
-		using element_reference = element_type&;
-		using element_const_reference = const element_type&;
-		using element_pointer = element_type*;
-		using element_const_pointer = const element_type*;
-		using value_type = std::pair<point_type, element_type>;
-		using reference = std::pair<point_type, element_reference>;
-		using const_reference = std::pair<point_type, element_const_reference>;
-		using pointer = std::pair<point_type, element_pointer>;
-		using const_pointer = std::pair<point_type, element_const_pointer>;
+		using value_type = typename std::decay<T>::type;
+		using reference = value_type&;
+		using const_reference = const value_type&;
+		using pointer = value_type*;
+		using const_pointer = const value_type*;
 	public:
 		struct block {
 			friend struct block_lattice<T, dim_>;
-			using container = std::vector<element_type>;
+			using container = std::vector<value_type>;
 			using iterator = typename container::iterator;
 			using const_iterator = typename container::const_iterator;
 		public:
@@ -49,28 +43,28 @@ namespace hmLib {
 			point_type point()const { return Pos; }
 			point_type point(const_iterator Itr)const { return Pos + Indexer.calc_point(std::distance(begin(),Itr)); }
 		public:
-			element_reference at(point_type Pos_) {
+			reference at(point_type Pos_) {
 				return Data[Indexer.torus_index(Pos_)];
 			}
-			element_const_reference at(point_type Pos_)const {
+			const_reference at(point_type Pos_)const {
 				return Data[Indexer.torus_index(Pos_)];
 			}
 			template<typename... others>
-			element_reference at(index_type Pos_, others... Others_) {return at(lattices::point(Pos_, Others_...));}
+			reference at(index_type Pos_, others... Others_) {return at(lattices::point(Pos_, Others_...));}
 			template<typename... others>
-			element_const_reference at(index_type Pos_, others... Others_)const { return at(lattices::point(Pos_, Others_...)); }
-			element_reference ref(point_type Pos_) {
+			const_reference at(index_type Pos_, others... Others_)const { return at(lattices::point(Pos_, Others_...)); }
+			reference ref(point_type Pos_) {
 				return at(Pos_);
 			}
-			element_const_reference ref(point_type Pos_)const {
+			const_reference ref(point_type Pos_)const {
 				return at(Pos_Pos);
 			}
 			template<typename... others>
-			element_reference ref(index_type Pos_, others... Others_) { return ref(lattices::point(Pos_, Others_...)); }
+			reference ref(index_type Pos_, others... Others_) { return ref(lattices::point(Pos_, Others_...)); }
 			template<typename... others>
-			element_const_reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
-			element_reference operator[](point_type Pos_) {return ref(Pos_);}
-			element_const_reference operator[](point_type Pos_)const {return ref(Pos_);}
+			const_reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
+			reference operator[](point_type Pos_) {return ref(Pos_);}
+			const_reference operator[](point_type Pos_)const {return ref(Pos_);}
 		public:
 			//!Get number of elements included in the lattice
 			size_type lattice_size()const { return Indexer.lattice_size(); }
@@ -118,17 +112,17 @@ namespace hmLib {
 			using value_type = typename this_type::value_type;
 			using difference_type = int;
 			using reference = typename this_type::const_reference;
-			using pointer = clone_ptrproxy<reference>;
+			using pointer = typename this_type::const_pointer;
 			using iterator_category = std::bidirectional_iterator_tag;
 		public:
 			const_iterator() = default;
 			const_iterator(block_const_iterator BItr_, element_const_iterator Itr_):BItr(BItr_), Itr(Itr_) {}
 		public:
 			reference operator*() {
-				return reference(BItr->point(Itr), *Itr);
+				return Itr.operator*();
 			}
 			pointer operator->() {
-				return pointer(operator*());
+				return Itr.operator->();
 			}
 			const_iterator& operator++() {
 				++Itr;
@@ -163,7 +157,10 @@ namespace hmLib {
 				return v1.BItr != v2.BItr || v1.Itr != v2.Itr;
 			}
 		public:
+			point_type point()const { return BItr->point(Itr); }
+		public:
 			block_iterator block_itr() { return BItr; }
+			element_iterator element_itr() { return Itr; }
 		private:
 			block_const_iterator BItr;
 			element_const_iterator Itr;
@@ -173,17 +170,17 @@ namespace hmLib {
 			using value_type = typename this_type::value_type;
 			using difference_type = int;
 			using reference = typename this_type::reference;
-			using pointer = clone_ptrproxy<reference>;
+			using pointer = typename this_type::pointer;
 			using iterator_category = std::bidirectional_iterator_tag;
 		public:
 			iterator() = default;
 			iterator(block_iterator BItr_, element_iterator Itr_):BItr(BItr_),Itr(Itr_){}
 		public:
-			reference operator*() { 
-				return reference(BItr->point(Itr),*Itr); 
+			reference operator*() {
+				return Itr.operator*();
 			}
 			pointer operator->() {
-				return pointer(operator*());
+				return Itr.operator->();
 			}
 			iterator& operator++() {
 				++Itr;
@@ -219,7 +216,10 @@ namespace hmLib {
 				return v1.BItr != v2.BItr || v1.Itr != v2.Itr;
 			}
 		public:
+			point_type point()const { return BItr->point(Itr); }
+		public:
 			block_iterator block_itr() { return BItr; }
+			element_iterator element_itr() { return Itr; }
 		private:
 			block_iterator BItr;
 			element_iterator Itr;
@@ -245,70 +245,70 @@ namespace hmLib {
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
-		element_reference at(point_type Point_) {
+		reference at(point_type Point_) {
 			auto Itr = block_find(Point_);
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
 		//!Return const_reference of the elemtn at the given point with range check
-		element_const_reference at(point_type Point_)const {
+		const_reference at(point_type Point_)const {
 			auto Itr = block_find(Point_);
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
 		//!Return reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		element_reference at(index_type Pos_, others... Others_) {
+		reference at(index_type Pos_, others... Others_) {
 			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return const_reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		element_const_reference at(index_type Pos_, others... Others_)const {
+		const_reference at(index_type Pos_, others... Others_)const {
 			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point with range check
-		element_reference at(iterator Hint_, point_type Point_) {
+		reference at(iterator Hint_, point_type Point_) {
 			auto Itr = block_find(Point_, Hint_);
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
 		//!Return const_reference of the elemtn at the given point with range check
-		element_const_reference at(const_iterator Hint_, point_type Point_)const {
+		const_reference at(const_iterator Hint_, point_type Point_)const {
 			auto Itr = block_find(Point_, Hint_);
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
 		//!Return reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		element_reference at(iterator Hint_, index_type Pos_, others... Others_) {
+		reference at(iterator Hint_, index_type Pos_, others... Others_) {
 			return at(Hint_, lattices::point(Pos_, Others_...));
 		}
 		//!Return const_reference of the elemtn at the given elements point with range check
 		template<typename... others>
-		element_const_reference at(const_iterator Hint_, index_type Pos_, others... Others_)const {
+		const_reference at(const_iterator Hint_, index_type Pos_, others... Others_)const {
 			return at(Hint_, lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
-		element_reference ref(point_type Point_) {
+		reference ref(point_type Point_) {
 			auto Itr = block_get(Point_);
 			return Itr->at(Point_);
 		}
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		element_reference ref(index_type Pos_, others... Others_) {
+		reference ref(index_type Pos_, others... Others_) {
 			return ref(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
-		element_reference ref(iterator Hint_, point_type Point_) {
+		reference ref(iterator Hint_, point_type Point_) {
 			auto Itr = block_get(Point_, Hint_);
 			return Itr->at(Point_);
 		}
 		template<typename... others>
-		element_reference ref(iterator Hint_, index_type Pos_, others... Others_) {
+		reference ref(iterator Hint_, index_type Pos_, others... Others_) {
 			return ref(Hint_, lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
-		element_reference operator[](point_type Point_) {
+		reference operator[](point_type Point_) {
 			return ref(Point_);
 		}
 	public:
@@ -325,15 +325,15 @@ namespace hmLib {
 			return std::distance(block_begin(), Itr)*BlockSize + Indexer.torus_index(Point_);
 		}
 		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
-		element_reference index_at(index_type Index_) {
+		reference index_at(index_type Index_) {
 			return Blocks.at(static_cast<index_type>(Index_/BlockSize)).index_ref(Index_%BlockSize);
 		}
 		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
-		element_const_reference index_at(index_type Index_)const {
+		const_reference index_at(index_type Index_)const {
 			return Blocks.at(static_cast<index_type>(Index_/BlockSize)).index_ref(Index_%BlockSize);
 		}
 		//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
-		element_reference index_ref(index_type Index_) {
+		reference index_ref(index_type Index_) {
 			return Blocks[static_cast<index_type>(Index_/BlockSize)].index_ref(Index_%BlockSize);
 		}
 	public:

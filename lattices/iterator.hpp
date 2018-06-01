@@ -45,6 +45,10 @@ namespace hmLib{
 				, Index(Other.Index) {
 			}
 		public:
+			point_type point()const { return base_point(); }
+			extent_type extent()const { return base_extent(); }
+			index_type index()const { return base_index(); }
+		public:
 			point_type base_point()const { return Indexer.calc_point(Index); }
 			extent_type base_extent()const { return Indexer.extent(); }
 			index_type base_index()const { return Index; }
@@ -139,6 +143,10 @@ namespace hmLib{
 				, SubIndexer(Other.SubIndexer)
 				, SubIndex(Other.SubIndex){
 			}
+		public:
+			point_type point()const{return SubIndexer.calc_point(SubIndex);}
+			extent_type extent()const { return SubIndexer.extent(); }
+			index_type index()const { return SubIndex; }
 		public:
 			point_type base_point()const { return Pos+SubIndexer.calc_point(SubIndex); }
 			extent_type base_extent()const { return OriginalIndexer.extent(); }

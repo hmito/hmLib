@@ -49,6 +49,15 @@ namespace hmLib {
 					}
 					Indexer.resize(Extent);
 				}
+			public:
+				point_type point()const { return base_point(); }
+				extent_type extent()const { return base_extent(); }
+				index_type index()const { return base_index(); }
+			public:
+				point_type base_point()const { return Indexer.calc_point(Index); }
+				extent_type base_extent()const { return Indexer.extent(); }
+				index_type base_index()const { return Index; }
+			public:
 				reference operator*()const {
 					point_type p = Indexer.point(Index);
 					weighted_point_type q;

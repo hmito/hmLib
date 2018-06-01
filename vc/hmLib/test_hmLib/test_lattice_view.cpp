@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include<boost/iterator/iterator_facade.hpp>
 #include"../../../random.hpp"
 #include "../../../lattices.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -1151,37 +1152,43 @@ TEST_CLASS(test_block_lattice) {
 		auto Itr = Lat.begin();
 		auto End = Lat.end();
 
-		Assert::AreEqual<int>(10, Itr->second);
+		Assert::AreEqual<int>(10, *Itr);
 		Assert::IsFalse(Itr==End);
 		++Itr;
 		for(unsigned int i = 1; i<7; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
+			Assert::AreEqual<int>(0, *Itr);
 			Assert::IsFalse(Itr==End);
 			++Itr;
 		}
-		Assert::AreEqual<int>(20, Itr->second);
+		Assert::AreEqual<int>(20, *Itr);
 		Assert::IsFalse(Itr==End);
 		++Itr;
 		for(unsigned int i = 8; i<16; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
+			Assert::AreEqual<int>(0, *Itr);
 			Assert::IsFalse(Itr==End);
 			++Itr;
 		}
 
 		for(unsigned int i = 0; i<7; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
+			Assert::AreEqual<int>(0, *Itr);
 			Assert::IsFalse(Itr==End);
 			++Itr;
 		}
-		Assert::AreEqual<int>(30, Itr->second);
+		Assert::AreEqual<int>(30, *Itr);
 		Assert::IsFalse(Itr==End);
 		++Itr;
 		for(unsigned int i = 8; i<16; ++i) {
-			Assert::AreEqual<int>(0, Itr->second);
+			Assert::AreEqual<int>(0, *Itr);
 			Assert::IsFalse(Itr==End);
 			++Itr;
 		}
 		Assert::IsTrue(Itr==End);
+	}
+};
+
+TEST_CLASS(test_zip_lattice) {
+	TEST_METHOD(zip) {
+//		block_lattice<double, 
 	}
 };
 }

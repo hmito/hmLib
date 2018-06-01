@@ -97,6 +97,7 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
     <ClInclude Include="..\..\..\math\constants.hpp" />

@@ -10,6 +10,7 @@ namespace hmLib {
 		template<typename... lattices_>
 		struct zip_lattice {
 			using pack = std::tuple<lattices_&...>;
+			using point_type = typename std::common_type<typename lattices_::point_type...>::type;
 			using reference = std::tuple<decltype(std::declval<typename std::decay<lattices_>::type>().at(std::declval<point_type>()))...>;
 		public:
 			template<typename... other_lattices>

@@ -34,14 +34,12 @@ namespace hmLib {
 			}
 			template<typename lattice_type, typename condition>
 			void reset(lattice_type& Lattice, condition ShouldKeep) {
-				indexer<dim_> Indexer(Lattice.extent());
-
 				reset();
 
 				index_type Index = 0;
 				for(auto Itr = Lattice.begin(), End = Lattice.end(); Itr!=End; ++Itr, ++Index) {
 					if(ShouldKeep(*Itr)) {
-						KeptBlock.push_back(Indexer.point(Index));
+						KeptBlock.push_back(Itr.point());
 					}
 				}
 			}

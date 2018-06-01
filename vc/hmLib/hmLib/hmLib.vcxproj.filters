@@ -473,5 +473,8 @@
     <ClInclude Include="..\..\..\iterators\zip_container.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
