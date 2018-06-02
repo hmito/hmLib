@@ -1188,7 +1188,7 @@ TEST_CLASS(test_block_lattice) {
 
 TEST_CLASS(test_zip_lattice) {
 	TEST_METHOD(zip) {
-//		block_lattice<double, 
+		block_lattice<double, 2> Block;
 	}
 };
 }
