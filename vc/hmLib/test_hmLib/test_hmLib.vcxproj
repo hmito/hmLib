@@ -173,7 +173,7 @@
     <ClCompile Include="test_geometry.cpp" />
     <ClCompile Include="test_iterators.cpp" />
     <ClCompile Include="test_math.cpp" />
-    <ClCompile Include="test_lattice_view.cpp" />
+    <ClCompile Include="test_lattices.cpp" />
     <ClCompile Include="test_resource.cpp" />
     <ClCompile Include="test_type_traits.cpp" />
     <ClCompile Include="test_varray.cpp" />

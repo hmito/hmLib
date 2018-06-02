@@ -6,6 +6,7 @@
 #include<boost/iterator/iterator_facade.hpp>
 #include"../../../random.hpp"
 #include "../../../lattices.hpp"
+#include"../../../math/multiaxis.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -1187,8 +1188,46 @@ TEST_CLASS(test_block_lattice) {
 };
 
 TEST_CLASS(test_zip_lattice) {
-	TEST_METHOD(zip) {
-		block_lattice<double, 2> Block;
+	TEST_METHOD(zip_access) {
+		multiaxis<double, 2> Axes({hmLib::make_axis(0.0,1.0,5),hmLib::make_axis(0.0,1.0,6) });
+		lattice<double, 2> Lat(lattices::extent(4,5),0.0);
+
+		auto Zip = lattices::make_zip_lattice(Axes, Lat);
+
+		auto Elm = Zip.at(lattices::point(2,3));
+		Assert::AreEqual(0.50, std::get<0>(Elm).at(0), 1e-5);
+		Assert::AreEqual(0.60, std::get<0>(Elm).at(1), 1e-5);
+		Assert::AreEqual(0.00, std::get<1>(Elm), 1e-5);
+
+		std::get<1>(Elm) = 5.0;
+		Assert::AreEqual(5.00, std::get<1>(Elm), 1e-5);
+	}
+	TEST_METHOD(zip_access_block) {
+		multiaxis<double, 2> Axes({ hmLib::make_axis(0.0,10.0,41),hmLib::make_axis(0.0,10.0,51) });
+		block_lattice<double, 2> Lat(10,10);
+
+		auto Zip = lattices::make_zip_lattice(Axes, Lat);
+
+		auto Elm = Zip.ref(lattices::point(2, 3));
+		Assert::AreEqual(0.50, std::get<0>(Elm).at(0), 1e-5);
+		Assert::AreEqual(0.60, std::get<0>(Elm).at(1), 1e-5);
+		Assert::AreEqual(0.00, std::get<1>(Elm), 1e-5);
+
+		std::get<1>(Elm) = 5.0;
+		Assert::AreEqual(5.00, std::get<1>(Elm), 1e-5);
+
+
+		Elm = Zip.ref(lattices::point(20, 30));
+		Assert::AreEqual(5.0, std::get<0>(Elm).at(0), 1e-5);
+		Assert::AreEqual(6.0, std::get<0>(Elm).at(1), 1e-5);
+		Assert::AreEqual(0.0, std::get<1>(Elm), 1e-5);
+	}
+	TEST_METHOD(freq_use_case) {
+		multiaxis<double, 2> Axes({ hmLib::make_axis(0.0,100.0,10000),hmLib::make_axis(0.0,100.0,10000) });
+		block_lattice<double, 2> Lat(10, 10);
+
+		lattices::block_point_keeper<2> Keeper;
+		Keeper.reset(Lat.begin(),Lat.end(),)
 	}
 };
 }

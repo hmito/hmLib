@@ -467,14 +467,14 @@
     <ClInclude Include="..\..\..\iterators\range.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\index_at_access_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\iterators\zip_container.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\lattices\zip_lattice.hpp">
       <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_accessor_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

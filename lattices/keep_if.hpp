@@ -5,7 +5,7 @@
 #include<utility>
 #include<limits>
 #include<tuple>
-#include"../iterators/index_at_access_iterator.hpp"
+#include"../iterators/index_accessor_iterator.hpp"
 #include"utility.hpp"
 #include"indexer.hpp"
 namespace hmLib {
@@ -28,18 +28,17 @@ namespace hmLib {
 			using const_pointer = void;
 		public:
 			element_point_keeper() = default;
-			template<typename lattice_type, typename condition>
-			element_point_keeper(lattice_type& Lattice, condition ShouldKeep) {
-				reset(Lattice, std::forward<condition>(ShouldKeep));
+			template<typename lattice_iterator, typename condition>
+			element_point_keeper(lattice_iterator Beg, lattice_iterator End, condition ShouldKeep) {
+				reset(Beg, End, std::forward<condition>(ShouldKeep));
 			}
-			template<typename lattice_type, typename condition>
-			void reset(lattice_type& Lattice, condition ShouldKeep) {
+			template<typename lattice_iterator, typename condition>
+			void reset(lattice_iterator Beg, lattice_iterator End, condition ShouldKeep) {
 				reset();
 
-				index_type Index = 0;
-				for(auto Itr = Lattice.begin(), End = Lattice.end(); Itr!=End; ++Itr, ++Index) {
-					if(ShouldKeep(*Itr)) {
-						KeptBlock.push_back(Itr.point());
+				for(; Beg!=End; ++Beg) {
+					if(ShouldKeep(*Beg)) {
+						KeptBlock.push_back(Beg.point());
 					}
 				}
 			}
@@ -116,12 +115,12 @@ namespace hmLib {
 			};
 		public:
 			block_point_keeper()noexcept : JumpBlock(), Size(0), Index(0) {}
-			template<typename lattice_type, typename condition>
-			block_point_keeper(lattice_type& Lat, condition ShouldKeep) {
+			template<typename lattice_iterator, typename condition>
+			block_point_keeper(lattice_iterator Beg, lattice_iterator End, condition ShouldKeep) {
 				reset(Lat, std::forward<condition>(ShouldKeep));
 			}
-			template<typename lattice_type, typename condition>
-			void reset(lattice_type& Lat, condition ShouldKeep) {
+			template<typename lattice_iterator, typename condition>
+			void reset(lattice_iterator Beg, lattice_iterator End, condition ShouldKeep) {
 				reset();
 
 				Indexer.resize(Lat.extent());

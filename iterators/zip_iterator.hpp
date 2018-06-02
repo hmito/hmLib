@@ -241,6 +241,11 @@ namespace hmLib {
 		return zip_iterator<typename std::decay<iterators_>::type...>(std::forward<iterators_>(Itrs)...);
 	}
 	template<typename... iterators_>
+	auto make_zip_iterator(std::tuple<iterators_...> Itrs) {
+		return zip_iterator<typename std::decay<iterators_>::type...>(std::move(Itrs));
+	}
+
+	template<typename... iterators_>
 	auto zip_iterator_shorten(
 		const zip_iterator<iterators_...>& Beg,
 		const zip_iterator<iterators_...>& End) {
@@ -260,6 +265,9 @@ namespace hmLib {
 		iterator End;
 	public:
 		zip_range() = default;
+		zip_range(iterator Beg_, iterator End_):Beg(Beg_), End(End_) {
+			End = zip_iterator_shorten(Beg, End);
+		}
 		template<typename... ranges>
 		zip_range(ranges&&... Ranges){
 			Beg = iterator(std::begin(Ranges)...);
@@ -272,6 +280,10 @@ namespace hmLib {
 	template<typename... ranges>
 	auto make_zip_range(ranges&&... Ranges) {
 		return zip_range<decltype(std::begin(Ranges))...>(std::forward<ranges>(Ranges)...);
+	}
+	template<typename... iterators_>
+	auto make_zip_range(zip_iterator<iterators_...> Beg, zip_iterator<iterators_...> End) {
+		return zip_range<iterators_...>(std::move(Beg), std::move(End));
 	}
 }
 #

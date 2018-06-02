@@ -225,8 +225,8 @@ namespace hmLib {
 			element_iterator Itr;
 		};
 	public:
-		block_lattice() = default;
-		explicit block_lattice(extent_type BlockExtent){
+		block_lattice() = delete;
+		explicit block_lattice(extent_type BlockExtent) {
 			assign(BlockExtent);
 		}
 		template<typename... others>
