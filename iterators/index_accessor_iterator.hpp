@@ -12,24 +12,26 @@ namespace hmLib {
 			public:
 				using container_type = container_type_;
 				using index_type = index_type_;
+				using reference = decltype((std::declval<container_type>().at(std::declval<index_type>())));
 			private:
 				container_type* pContainer;
 			public:
 				container_at_accessor()noexcept : pContainer(nullptr) {}
 				container_at_accessor(container_type* pContainer_)noexcept : pContainer(pContainer_) {}
-				auto& operator()(index_type Index){ return pContainer->at(Index); }
+				reference operator()(index_type Index){ return pContainer->at(Index); }
 			};
 			template<typename container_type_, typename index_type_>
 			struct container_op_accessor {
 			public:
 				using container_type = container_type_;
 				using index_type = index_type_;
+				using reference = decltype((std::declval<container_type>().at(std::declval<index_type>())));
 			private:
 				container_type* pContainer;
 			public:
 				container_op_accessor()noexcept : pContainer(nullptr) {}
 				container_op_accessor(container_type* pContainer_)noexcept : pContainer(pContainer_) {}
-				auto& operator()(index_type Index){ return pContainer->operator[](Index); }
+				reference operator()(index_type Index){ return pContainer->operator[](Index); }
 			};
 
 			template<typename this_type_, typename accessor_, typename index_iterator_, typename index_iterator_category = typename std::iterator_traits<index_iterator_>::iterator_category>

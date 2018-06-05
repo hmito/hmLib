@@ -17,8 +17,7 @@ namespace hmLib {
 			using reference = std::tuple<decltype(std::declval<typename std::decay<lattices_>::type>().at(std::declval<point_type>()))...>;
 		public:
 			template<typename... other_lattices>
-			zip_lattice(other_lattices&... Lattices_):Ranges(Lattices_...) {
-			}
+			zip_lattice(other_lattices&... Lattices_):Ranges(Lattices_...) {}
 			reference at(point_type Pos) {
 				return tuple_for_each([Pos](auto& v)->decltype((v.at(Pos))) {return v.at(Pos); }, Ranges);
 			}
