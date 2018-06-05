@@ -21,7 +21,7 @@ namespace hmLib {
 			using const_iterator = typename element_container::const_iterator;
 		public:
 			using value_type = keep_point_type;
-			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
+			using difference_type = int;
 			using reference = value_type;
 			using pointer = void;
 			using const_reference = void;
@@ -53,157 +53,154 @@ namespace hmLib {
 			const_iterator end() const { return cend(); }
 			template<typename lattice_type>
 			auto range(lattice_type& Lat)const {
-				return make_index_at_access_range(Lat, begin(), end());
+				return make_index_op_access_range(Lat, begin(), end());
 			}
 		private:
 			element_container KeptBlock;
 		};
-		template<unsigned int dim_, typename keep_point_type_ = lattices::point_type<dim_>>
+		template<unsigned int dim_, typename point_type_ = lattices::point_type<dim_>>
 		struct block_point_keeper {
 		public:
 			constexpr static unsigned int dim() { return dim_; }
 		private:
-			using this_type = block_point_keeper <dim_, keep_point_type_>;
-			using keep_point_type = keep_point_type_;
-			using index_type = int;
-			using block_container = std::vector<std::pair<index_type, index_type>>;
+			using this_type = block_point_keeper <dim_, point_type_>;
+			using point_type = point_type_;
+			using point_element = int;
+			using block_element = std::pair<point_type, point_element>;
+			using block_container = std::vector<block_element>;
 			using block_iterator = typename block_container::const_iterator;
-			using indexer = lattices::indexer<dim_>;
 		public:
-			using value_type = keep_point_type;
-			using difference_type = decltype(std::declval<index_type>()-std::declval<index_type>());
-			using reference = value_type;
-			using pointer = void;
-			using const_reference = void;
-			using const_pointer = void;
-		public:
-			struct const_iterator {
-				using value_type = typename this_type::value_type;
-				using difference_type = typename this_type::difference_type;
-				using reference = typename this_type::reference;
-				using pointer = typename this_type::pointer;
-				using iterator_category = std::forward_iterator_tag;
+			struct iterator {
+				using value_type = point_type;
+				using difference_type = int;
+				using reference = value_type;
+				using pointer = void;
+				using iterator_category = std::bidirectional_iterator_tag;
 			private:
 				block_iterator BItr;
-				indexer Indexer;
-				index_type Index;
+				point_element Point0;
 			public:
-				const_iterator() = default;
-				const_iterator(block_iterator BlockBeg_, indexer Indexer_, index_type Index_)
-					: BItr(BlockBeg_)
-					, Indexer(Indexer_)
-					, Index(Index_) {
+				iterator() = default;
+				iterator(block_iterator BItr_, point_element Point0_)
+					: BItr(BItr_)
+					, Point0(Point0_) {
 				}
 				reference operator*()const {
-					return Indexer.calc_point(Index);
+					auto Point = BItr->first;
+					Point[0] = Point0;
+					return Point;
 				}
-				const_iterator& operator++() {
-					++Index;
-					if(Index == BItr->first) {
-						Index = BItr->second;
+				iterator& operator++() {
+					++Point0;
+					if(Point0 == BItr->second) {
 						++BItr;
+						Point0 = (BItr->first)[0];
 					}
 					return *this;
 				}
-				const_iterator operator++(int) {
-					const_iterator Prev = *this;
+				iterator operator++(int) {
+					iterator Prev = *this;
 					++(*this);
 					return Prev;
 				}
-				friend bool operator==(const const_iterator& itr1, const const_iterator& itr2) { return itr1.Index ==itr2.Index; }
-				friend bool operator!=(const const_iterator& itr1, const const_iterator& itr2) { return itr1.Index !=itr2.Index; }
+				iterator& operator--() {
+					if(Point0 == (BItr->first)[0]) {
+						--BItr;
+						Point0 = BItr->second;
+					}
+					--Point0;
+					return *this;
+				}
+				iterator operator--(int) {
+					iterator Prev = *this;
+					--(*this);
+					return Prev;
+				}
+				friend bool operator==(const iterator& itr1, const iterator& itr2) { return itr1.BItr ==itr2.BItr && itr1.Point0 ==itr2.Point0; }
+				friend bool operator!=(const iterator& itr1, const iterator& itr2) { return !(itr1==itr2); }
 			};
 		public:
-			block_point_keeper()noexcept : JumpBlock(), Size(0), Index(0) {}
+			block_point_keeper() { reset(); }
 			template<typename lattice_iterator, typename condition>
 			block_point_keeper(lattice_iterator Beg, lattice_iterator End, condition ShouldKeep) {
-				reset(Lat, std::forward<condition>(ShouldKeep));
+				reset(Beg, End, std::forward<condition>(ShouldKeep));
 			}
 			template<typename lattice_iterator, typename condition>
 			void reset(lattice_iterator Beg, lattice_iterator End, condition ShouldKeep) {
-				reset();
+				KeepBlock.clear();
+				Size = 0;
 
-				Indexer.resize(Lat.extent());
-				auto Beg_ = Lat.begin();
-				auto End_ = Lat.end();
-				index_type Cnt = 0;
-				for(; Beg_!=End_; ++Beg_, ++Cnt) {
-					if(ShouldKeep(*Beg_)) {
-						Index = Cnt;
-						++Size;
+				for(; Beg!=End; ++Beg) {
+					if(ShouldKeep(*Beg)) {
 						break;
 					}
 				}
+				if(Beg==End)return;
 
-				if(Beg_==End_) {
-					return;
-				}
-
-				index_type From = 0;
+				point_type Pos = Beg.point();
+				point_element Cnt = Pos[0]+1;
 				bool InKeepBlock = true;
+				++Size;
+				++Beg;
 
-				++Cnt;
-				++Beg_;
-				for(; Beg_!=End_; ++Beg_, ++Cnt) {
-					if(ShouldKeep(*Beg_)) {
+				for(; Beg!=End; ++Beg) {
+					if(ShouldKeep(*Beg)) {
 						if(!InKeepBlock) {
-							JumpBlock.emplace_back(From, Cnt);
+							Pos = Beg.point();
 							InKeepBlock = true;
+							Cnt = Pos[0]+1;
+						} else {
+							if(is_same(Beg.point(), Cnt, Pos)) {
+								++Cnt;
+							} else {
+								KeepBlock.emplace_back(Pos, Cnt);
+								Pos = Beg.point();
+								Cnt = Pos[0]+1;
+							}
 						}
 						++Size;
 					} else {
 						if(InKeepBlock) {
-							From = Cnt;
+							KeepBlock.emplace_back(Pos, Cnt);
 							InKeepBlock = false;
 						}
 					}
 				}
 				if(InKeepBlock) {
-					JumpBlock.emplace_back(Cnt, Cnt);
-				} else {
-					JumpBlock.emplace_back(From, Cnt);
+					KeepBlock.emplace_back(Pos, Cnt);
 				}
+
+				//sebinel element
+				KeepBlock.emplace_back(point_type{ 0 }, 0);
 			}
 			void reset() {
-				JumpBlock.clear();
 				Size = 0;
-				Index = 0;
-			}
-			void push_back(value_type Index_) {
-				if(Size==0) {
-					Index = Index_;
-					JumpBlock.emplace_back(Index_+1, Index_+1);
-				} else {
-					hmLib_assert(Index_>=JumpBlock.back().second, hmLib::numeric_exceptions::incorrect_arithmetic_request, "block_index_keeper::push_back require the increasing-order");
-					//next of the current end
-					if(JumpBlock.back().first == Index_) {
-						JumpBlock.back().first = Index_+1;
-						JumpBlock.back().second = Index_+1;
-					} else {
-						JumpBlock.back().second = Index_;
-						JumpBlock.emplace_back(Index_+1, Index_+1);
-					}
-				}
-				++Size;
+				KeepBlock.clear();
+
+				//sebinel element
+				KeepBlock.emplace_back(point_type{ 0 }, 0);
 			}
 			bool empty()const { return Size==0; }
 			std::size_t size()const { return Size; }
-			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Indexer, Index); }
-			const_iterator cend()const {
-				if(JumpBlock.empty())return const_iterator(JumpBlock.end(), Indexer, Index);
-				return const_iterator(JumpBlock.end(), Indexer, JumpBlock.back().second);
-			}
-			const_iterator begin()const { return cbegin(); }
-			const_iterator end() const { return cend(); }
+			iterator cbegin()const {return iterator(KeepBlock.begin(), (KeepBlock.front().first)[0]); }
+			iterator cend()const { return iterator(KeepBlock.end()-1, KeepBlock.back().second); }
+			iterator begin()const { return cbegin(); }
+			iterator end() const { return cend(); }
 			template<typename lattice_type>
 			auto range(lattice_type& Lat)const {
-				return make_index_at_access_range(Lat, begin(), end());
+				return make_index_op_access_range(Lat, begin(), end());
 			}
 		private:
-			index_type Index;
+			static bool is_same(point_type p1, unsigned int p2_0, point_type p2) {
+				if(p1[0] != p2_0)return false;
+				for(unsigned int i=1; i<dim(); ++i) {
+					if(p1[i]!=p2[i])return false;
+				}
+				return true;
+			}
+		private:
 			std::size_t Size;
-			block_container JumpBlock;
-			indexer Indexer;
+			block_container KeepBlock;
 		};
 	}
 }

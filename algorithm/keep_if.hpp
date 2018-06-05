@@ -7,6 +7,7 @@
 #include"../utility.hpp"
 #include"../type_traits.hpp"
 #include"../iterators/index_access_iterator.hpp"
+#include"../iterators/index_accessor_iterator.hpp"
 namespace hmLib {
 	namespace algorithm {
 		template<typename forward_iterator_, bool is_const = is_const_iterator<forward_iterator_>::value>
@@ -522,8 +523,12 @@ namespace hmLib {
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
 			template<typename random_access_iterator, typename std::enable_if<std::is_constructible<typename std::iterator_traits<random_access_iterator>::iterator_category, typename std::random_access_iterator_tag>::value,std::nullptr_t>::type = nullptr>
-			auto range(random_access_iterator Beg)const{
+			auto itr_range(random_access_iterator Beg)const{
 				return make_index_access_range(Beg, begin(),end());
+			}
+			template<typename container>
+			auto range(container& Container)const {
+				return make_index_op_access_range(Container, begin(), end());
 			}
 		private:
 			element_container KeptBlock;
@@ -657,8 +662,12 @@ namespace hmLib {
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
 			template<typename random_access_iterator, typename std::enable_if<std::is_constructible<typename std::iterator_traits<random_access_iterator>::iterator_category, typename std::random_access_iterator_tag>::value, std::nullptr_t>::type = nullptr>
-			auto range(random_access_iterator Beg)const {
+			auto itr_range(random_access_iterator Beg)const {
 				return make_index_access_range(Beg, begin(), end());
+			}
+			template<typename container>
+			auto range(container& Container)const {
+				return make_index_op_access_range(Container, begin(), end());
 			}
 		private:
 			index_type Index;
