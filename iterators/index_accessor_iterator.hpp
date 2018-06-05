@@ -56,22 +56,22 @@ namespace hmLib {
 			private:
 				using base_type = index_accessor_iterator_mixin<this_type_, accessor_, index_iterator_, void>;
 			public:
-				index_accessor_iterator_mixin(accessor Acs_, index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
+				index_accessor_iterator_mixin(typename base_type::accessor Acs_, typename base_type::index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
 			public:
-				reference operator*() { return Acs(*IItr); }
-				this_type& operator++() {
-					++IItr;
-					return static_cast<this_type&>(*this);
+				typename base_type::reference operator*() { return base_type::Acs(*base_type::IItr); }
+				typename base_type::this_type& operator++() {
+					++base_type::IItr;
+					return static_cast<typename base_type::this_type&>(*this);
 				}
-				this_type operator++(int) {
-					this_type Prev = static_cast<this_type&>(*this);
+				typename base_type::this_type operator++(int) {
+					typename base_type::this_type Prev = static_cast<typename base_type::this_type&>(*this);
 					operator++();
 					return Prev;
 				}
-				friend bool operator==(const this_type& v1, const this_type& v2) {
+				friend bool operator==(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr == v2.IItr;
 				}
-				friend bool operator!=(const this_type& v1, const this_type& v2) {
+				friend bool operator!=(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr != v2.IItr;
 				}
 			};
@@ -81,7 +81,7 @@ namespace hmLib {
 			private:
 				using base_type = index_accessor_iterator_mixin<this_type_, accessor_, index_iterator_, std::input_iterator_tag>;
 			public:
-				index_accessor_iterator_mixin(accessor Acs_, index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
+				index_accessor_iterator_mixin(typename base_type::accessor Acs_, typename base_type::index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
 			};
 			template<typename this_type_, typename accessor_, typename index_iterator_>
 			struct index_accessor_iterator_mixin<this_type_, accessor_, index_iterator_, std::bidirectional_iterator_tag>
@@ -89,14 +89,14 @@ namespace hmLib {
 			private:
 				using base_type = index_accessor_iterator_mixin<this_type_, accessor_, index_iterator_, std::forward_iterator_tag>;
 			public:
-				index_accessor_iterator_mixin(accessor Acs_, index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
+				index_accessor_iterator_mixin(typename base_type::accessor Acs_, typename base_type::index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
 			public:
-				this_type& operator--() {
-					--IItr;
-					return static_cast<this_type&>(*this);
+				typename base_type::this_type& operator--() {
+					--base_type::IItr;
+					return static_cast<typename base_type::this_type&>(*this);
 				}
-				this_type operator--(int) {
-					this_type Prev = static_cast<this_type&>(*this);
+				typename base_type::this_type operator--(int) {
+					typename base_type::this_type Prev = static_cast<typename base_type::this_type&>(*this);
 					operator--();
 					return Prev;
 				}
@@ -107,43 +107,43 @@ namespace hmLib {
 			private:
 				using base_type = index_accessor_iterator_mixin<this_type_, accessor_, index_iterator_, std::bidirectional_iterator_tag>;
 			public:
-				index_accessor_iterator_mixin(accessor Acs_, index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
+				index_accessor_iterator_mixin(typename base_type::accessor Acs_, typename base_type::index_iterator IItr_):base_type(std::move(Acs_), std::move(IItr_)) {}
 			public:
-				reference operator[](difference_type d) { return Acs(IItr[d]); }
-				this_type& operator+=(difference_type d) {
-					IItr = +d;
+				typename base_type::reference operator[](typename base_type::difference_type d) { return base_type::Acs(base_type::IItr[d]); }
+				typename base_type::this_type& operator+=(typename base_type::difference_type d) {
+					base_type::IItr = +d;
 					return *this;
 				}
-				this_type& operator-=(difference_type d) {
-					IItr = -d;
+				typename base_type::this_type& operator-=(typename base_type::difference_type d) {
+					base_type::IItr = -d;
 					return *this;
 				}
-				friend this_type operator+(const this_type& itr, difference_type d) {
-					this_type ans = itr;
+				friend typename base_type::this_type operator+(const typename base_type::this_type& itr, typename base_type::difference_type d) {
+					typename base_type::this_type ans = itr;
 					ans += d;
 					return ans;
 				}
-				friend this_type operator+(difference_type d, const this_type& itr) {
+				friend typename base_type::this_type operator+(typename base_type::difference_type d, const typename base_type::this_type& itr) {
 					return operator+(itr, d);
 				}
-				friend this_type operator-(const this_type& itr, difference_type d) {
-					this_type ans = itr;
+				friend typename base_type::this_type operator-(const typename base_type::this_type& itr, typename base_type::difference_type d) {
+					typename base_type::this_type ans = itr;
 					ans -= d;
 					return ans;
 				}
-				friend difference_type operator-(const this_type& v1, const this_type& v2) {
+				friend typename base_type::difference_type operator-(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr - v2.IItr;
 				}
-				friend bool operator>(const this_type& v1, const this_type& v2) {
+				friend bool operator>(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr > v2.IItr;
 				}
-				friend bool operator<(const this_type& v1, const this_type& v2) {
+				friend bool operator<(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr < v2.IItr;
 				}
-				friend bool operator>=(const this_type& v1, const this_type& v2) {
+				friend bool operator>=(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr >= v2.IItr;
 				}
-				friend bool operator<=(const this_type& v1, const this_type& v2) {
+				friend bool operator<=(const typename base_type::this_type& v1, const typename base_type::this_type& v2) {
 					return v1.IItr <= v2.IItr;
 				}
 			};
@@ -162,6 +162,10 @@ namespace hmLib {
 			using index_iterator = index_iterator_;
 			using base_type = detail::index_accessor_iterator_mixin<this_type, accessor, index_iterator>;
 		public:
+			using value_type = typename base_type::value_type;
+			using difference_type = typename base_type::difference_type;
+			using reference = typename base_type::reference;
+			using pointer = typename base_type::pointer;
 			using iterator_category = typename std::iterator_traits<index_iterator>::iterator_category;
 		public://constructer
 			index_container_access_iterator()noexcept : base_type() {}

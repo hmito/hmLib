@@ -10,9 +10,9 @@
 namespace hmLib {
 	namespace math {
 		namespace grid_policy {
-			constexpr struct round_grid_tag {};
-			constexpr struct floor_grid_tag {};
-			constexpr struct ceil_grid_tag {};
+			struct round_grid_tag {};
+			struct floor_grid_tag {};
+			struct ceil_grid_tag {};
 		}
 		template<typename grid_policy, int log10_index_threshold>
 		struct grid_adjuster {};

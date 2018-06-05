@@ -150,14 +150,14 @@ namespace hmLib {
 	public:
 		view subview(const point_type& Point_, const extent_type& Extent_) {
 			hmLib_assert(hmLib::all_less_equal_than(Extent_, Indexer.extent()), lattices::invalid_range, "The given range is smaller than the lattice size.");
-			return view(Begin, Indexer.extent(), Point_, Extent_);
+			return view(Data.begin(), Indexer.extent(), Point_, Extent_);
 		}
 		const_view subview(const point_type& Point_, const extent_type& Extent_) const {
 			return csubview(Point_, Extent_);
 		}
 		const_view csubview(const point_type& Point_, const extent_type& Extent_) const {
 			hmLib_assert(hmLib::all_less_equal_than(Extent_, Indexer.extent()), lattices::invalid_range, "The given range is smaller than the lattice size.");
-			return view(Begin, Indexer.extent(), Point_, Extent_);
+			return view(Data.begin(), Indexer.extent(), Point_, Extent_);
 		}
 	public:
 		bool empty()const { return Data.empty(); }

@@ -104,7 +104,7 @@ namespace hmLib {
 			}
 			weighted_point_type operator[](index_type Index)const {
 				point_type p = Indexer.point(Index);
-				weighted_point q;
+				weighted_point_type q;
 				q.second = 1.0;
 				for(unsigned int i = 0; i<dim(); ++i) {
 					auto pair = Range.at(p[i]);
@@ -462,7 +462,7 @@ namespace hmLib {
 			} else if(axis2.empty()) {
 				return false;
 			}
-			for(unsigned int i==0; i<dim(); ++i) {
+			for(unsigned int i=0; i<dim(); ++i) {
 				if(axis1.AxisSet[i]!=axis2.AxisSet[i])return false;
 			}
 			return true;

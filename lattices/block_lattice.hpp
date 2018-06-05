@@ -57,7 +57,7 @@ namespace hmLib {
 				return at(Pos_);
 			}
 			const_reference ref(point_type Pos_)const {
-				return at(Pos_Pos);
+				return at(Pos_);
 			}
 			template<typename... others>
 			reference ref(index_type Pos_, others... Others_) { return ref(lattices::point(Pos_, Others_...)); }
