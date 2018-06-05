@@ -149,7 +149,7 @@ namespace hmLib {
 			};
 		}
 
-		template<template<typename, typename> typename accessor_, typename container_type_, typename index_iterator_>
+		template<template<typename, typename> class accessor_, typename container_type_, typename index_iterator_>
 		struct index_container_access_iterator
 			: public detail::index_accessor_iterator_mixin<
 			index_container_access_iterator<accessor_, container_type_, index_iterator_>,
@@ -171,7 +171,7 @@ namespace hmLib {
 			index_container_access_iterator()noexcept : base_type() {}
 			index_container_access_iterator(container_type_& Container_, index_iterator_ IItr_):base_type(accessor(&Container_), IItr_) {}
 		};
-		template<template<typename, typename> typename accessor_, typename container_type_, typename index_iterator_>
+		template<template<typename, typename> class accessor_, typename container_type_, typename index_iterator_>
 		struct index_container_access_range {
 			using container_type = container_type_;
 			using index_iterator = index_iterator_;

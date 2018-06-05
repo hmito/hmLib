@@ -37,8 +37,6 @@ namespace hmLib {
 			explicit zip_iterator(iterator_pack Itrs_):Itrs(Itrs_) {}
 			template<typename... other_iterators_>
 			zip_iterator(other_iterators_... Itrs_):Itrs(Itrs_...){}
-			template<unsigned int n>
-			const auto& get()const { return std::get<n>(Itrs); }
 			reference operator*() { return hmLib::tuple_for_each([](auto& itr) {return *itr; }, Itrs); }
 			pointer operator->() { return pointer(operator*()); }
 			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
@@ -47,6 +45,7 @@ namespace hmLib {
 				operator++();
 				return Prev;
 			}
+			const iterator_pack& pack()const { return Itrs; }
 			friend bool operator==(const this_type& itr1, const this_type& itr2) {
 				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
 			}
@@ -74,8 +73,6 @@ namespace hmLib {
 			explicit zip_iterator(iterator_pack Itrs_):Itrs(Itrs_) {}
 			template<typename... other_iterators_>
 			zip_iterator(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			template<unsigned int n>
-			const auto& get()const { return std::get<n>(Itrs); }
 			reference operator*() { return hmLib::tuple_for_each([](auto& itr) {return *itr; }, Itrs); }
 			pointer operator->() { return pointer(operator*()); }
 			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
@@ -84,6 +81,7 @@ namespace hmLib {
 				operator++();
 				return Prev;
 			}
+			const iterator_pack& pack()const { return Itrs; }
 			friend bool operator==(const this_type& itr1, const this_type& itr2) {
 				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
 			}
@@ -111,8 +109,6 @@ namespace hmLib {
 			explicit zip_iterator(iterator_pack Itrs_):Itrs(Itrs_) {}
 			template<typename... other_iterators_>
 			zip_iterator(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			template<unsigned int n>
-			const auto& get()const { return std::get<n>(Itrs); }
 			reference operator*() { return hmLib::tuple_for_each([](auto& itr) {return *itr; }, Itrs); }
 			pointer operator->() { return pointer(operator*()); }
 			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
@@ -127,6 +123,7 @@ namespace hmLib {
 				operator--();
 				return Prev;
 			}
+			const iterator_pack& pack()const { return Itrs; }
 			friend bool operator==(const this_type& itr1, const this_type& itr2) {
 				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
 			}
@@ -154,8 +151,6 @@ namespace hmLib {
 			explicit zip_iterator(iterator_pack Itrs_):Itrs(Itrs_) {}
 			template<typename... other_iterators_>
 			zip_iterator(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			template<unsigned int n>
-			const auto& get()const { return std::get<n>(Itrs); }
 			reference operator*() { return hmLib::tuple_for_each([](auto& itr) {return *itr; }, Itrs); }
 			reference operator[](difference_type n) { return hmLib::tuple_for_each([n](auto& itr) {return itr[n]; }, Itrs); }
 			pointer operator->() { return pointer(operator*()); }
@@ -173,6 +168,7 @@ namespace hmLib {
 			}
 			this_type& operator+=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr += n; }, Itrs); return *this; }
 			this_type& operator-=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr -= n; }, Itrs); return *this; }
+			const iterator_pack& pack()const { return Itrs; }
 			friend this_type operator+(const this_type& itr, difference_type n) {
 				auto ans = itr;
 				ans += n;
@@ -218,7 +214,7 @@ namespace hmLib {
 				template<typename iterator>
 				int operator()(const iterator& itr1, const iterator& itr2) {
 					return std::min<int>(
-						std::distance(itr1.get<n-1>(), itr2.get<n-1>()), 
+						std::distance(std::get<n-1>(itr1.pack()), std::get<n-1>(itr2.pack())),
 						zip_iterator_shorten_distance<n-1>()(itr1, itr2)
 					);
 				}

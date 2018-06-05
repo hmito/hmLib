@@ -112,14 +112,14 @@ namespace hmLib {
 			Assert::AreEqual(20, std::get<2>(*Itr));
 
 			auto End = make_zip_iterator(List.end(), Vec.end(), Arr.end());
-			Assert::AreEqual(6, std::distance(Itr.get<0>(), End.get<0>()));
-			Assert::AreEqual(8, std::distance(Itr.get<1>(), End.get<1>()));
-			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+			Assert::AreEqual(6, std::distance(std::get<0>(Itr.pack()), std::get<0>(End.pack())));
+			Assert::AreEqual(8, std::distance(std::get<1>(Itr.pack()), std::get<1>(End.pack())));
+			Assert::AreEqual(4, std::distance(std::get<2>(Itr.pack()), std::get<2>(End.pack())));
 
 			End = zip_iterator_shorten(Itr, End);
-			Assert::AreEqual(4, std::distance(Itr.get<0>(), End.get<0>()));
-			Assert::AreEqual(4, std::distance(Itr.get<1>(), End.get<1>()));
-			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+			Assert::AreEqual(4, std::distance(std::get<0>(Itr.pack()), std::get<0>(End.pack())));
+			Assert::AreEqual(4, std::distance(std::get<1>(Itr.pack()), std::get<1>(End.pack())));
+			Assert::AreEqual(4, std::distance(std::get<2>(Itr.pack()), std::get<2>(End.pack())));
 		}
 		TEST_METHOD(test_zip_range) {
 			std::list<int> List{ 0,1,2,3,4,5 };
@@ -129,9 +129,9 @@ namespace hmLib {
 			auto Range = make_zip_range(List, Vec, Arr);
 			auto Itr = Range.begin();
 			auto End = Range.end();
-			Assert::AreEqual(4, std::distance(Itr.get<0>(), End.get<0>()));
-			Assert::AreEqual(4, std::distance(Itr.get<1>(), End.get<1>()));
-			Assert::AreEqual(4, std::distance(Itr.get<2>(), End.get<2>()));
+			Assert::AreEqual(4, std::distance(std::get<0>(Itr.pack()), std::get<0>(End.pack())));
+			Assert::AreEqual(4, std::distance(std::get<1>(Itr.pack()), std::get<1>(End.pack())));
+			Assert::AreEqual(4, std::distance(std::get<2>(Itr.pack()), std::get<2>(End.pack())));
 		}
 		TEST_METHOD(test_zip_container) {
 			std::string List{ '0','1','2','3','4','5' };
