@@ -4,6 +4,7 @@
 #include<iterator>
 #include<utility>
 #include<vector>
+#include"../exceptions.hpp"
 #include"../utility.hpp"
 #include"../type_traits.hpp"
 #include"../iterators/index_access_iterator.hpp"
