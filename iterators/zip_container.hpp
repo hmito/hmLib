@@ -10,7 +10,7 @@ namespace hmLib {
 		using pack = std::tuple<ranges&...>;
 		using index_type = index_type_;
 		using size_type = unsigned int;
-		using reference = std::tuple<decltype(std::declval<typename std::decay<ranges>::type>().at(std::declval<index_type>()))...>;
+		using reference = std::tuple<decltype((std::declval<typename std::decay<ranges>::type>().at(std::declval<index_type>())))...>;
 	public:
 		template<typename... other_ranges>
 		zip_container(other_ranges&... Ranges_):Ranges(Ranges_...) {

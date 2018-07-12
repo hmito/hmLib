@@ -25,6 +25,7 @@ namespace hmLib {
 			static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index-0.5, Index+0.5); }
 			template<typename value_type, typename difference_type>
 			static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value-Interval/2.0, Value+Interval/2.0); }
+			grid_adjuster() = default;
 		};
 		template<int log10_index_threshold>
 		struct grid_adjuster<grid_policy::floor_grid_tag, log10_index_threshold> {
@@ -35,6 +36,7 @@ namespace hmLib {
 			static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index+0.0, Index+1.0); }
 			template<typename value_type, typename difference_type>
 			static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value, Value+Interval); }
+			grid_adjuster() = default;
 		};
 		template<int log10_index_threshold>
 		struct grid_adjuster<grid_policy::ceil_grid_tag, log10_index_threshold> {
@@ -45,6 +47,7 @@ namespace hmLib {
 			static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index-1.0, Index+0.0); }
 			template<typename value_type, typename difference_type>
 			static std::pair<value_type, value_type> value_range(value_type Value, difference_type Interval) { return std::pair<value_type, value_type>(Value-Interval, Value); }
+			grid_adjuster() = default;
 		};
 
 		namespace grid_policy {
@@ -175,7 +178,7 @@ namespace hmLib {
 				return iterator(0, LowerIndex, EndIndex, LowerProb, UpperProb);
 			}
 			iterator end()const {
-				return iterator(size(), LowerIndex, EndIndex, LowerProb, UpperProb);
+				return iterator(static_cast<int>(size()), LowerIndex, EndIndex, LowerProb, UpperProb);
 			}
 			iterator cbegin()const { return begin(); }
 			iterator cend()const { return end(); }
@@ -319,7 +322,7 @@ namespace hmLib {
 		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
 		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
 		value_type grid_lower()const { return grid_lower_at(0); }
-		value_type grid_upper()const { return grid_upper_at(size()-1); }
+		value_type grid_upper()const { return grid_upper_at(static_cast<int>(size())-1); }
 		bool inside(value_type Value)const { return grid_lower() <= Value && Value < grid_upper(); }
 		bool inside(value_type LowerVal, value_type UpperVal)const { return grid_lower() <= LowerVal && UpperVal < grid_upper(); }
 	public:
@@ -382,7 +385,7 @@ namespace hmLib {
 		case math::make_axis_option::exclude_upper_boundary:
 			return axis<value_type, grid_adjuster>(
 				Lower,
-				axis<value_type, grid_adjuster>(Lower, Upper, Size+1)[Size-1],
+				axis<value_type, grid_adjuster>(Lower, Upper, Size+1)[static_cast<int>(Size)-1],
 				Size
 			);
 		case math::make_axis_option::exclude_lower_boundary:
@@ -394,7 +397,7 @@ namespace hmLib {
 		case math::make_axis_option::exclude_boundary:
 			return axis<value_type, grid_adjuster>(
 				axis<value_type, grid_adjuster>(Lower, Upper, Size+2)[1],
-				axis<value_type, grid_adjuster>(Lower, Upper, Size+2)[Size],
+				axis<value_type, grid_adjuster>(Lower, Upper, Size+2)[static_cast<int>(Size)],
 				Size
 			);
 		case math::make_axis_option::gridfit:
@@ -485,7 +488,6 @@ namespace hmLib {
 
 		return axis_mapper<from_grid_adjuster, to_grid_adjuster, index_type>(from, to);
 	}
-
 }
 #
 #endif
