@@ -313,7 +313,7 @@ namespace hmLib {
 		value_type lower()const { return static_cast<value_type>(b); }
 		value_type upper()const { return static_cast<value_type>(a*(size()-1)+b); }
 		iterator begin()const { return iterator(0, a, b); }
-		iterator end()const { return iterator(Size,a,b); }
+		iterator end()const { return iterator(static_cast<int>(Size),a,b); }
 		iterator cbegin()const { return begin(); }
 		iterator cend()const { return end(); }
 	public:
