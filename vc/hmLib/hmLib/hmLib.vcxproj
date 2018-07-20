@@ -17,6 +17,7 @@
     <ClInclude Include="..\..\..\algorithm.hpp" />
     <ClInclude Include="..\..\..\algorithm\algorithm.hpp" />
     <ClInclude Include="..\..\..\algorithm\compare.hpp" />
+    <ClInclude Include="..\..\..\algorithm\keep_if.hpp" />
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />
@@ -72,15 +73,18 @@
     <ClInclude Include="..\..\..\iocsv.hpp" />
     <ClInclude Include="..\..\..\iterators.hpp" />
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\inserter.hpp" />
     <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice.hpp" />
-    <ClInclude Include="..\..\..\lattices\lattice_indexer.hpp" />
+    <ClInclude Include="..\..\..\lattices\indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\locator.hpp" />
+    <ClInclude Include="..\..\..\lattices\torus_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
@@ -122,7 +126,6 @@
     <ClInclude Include="..\..\..\signals\unique_connections.hpp" />
     <ClInclude Include="..\..\..\static_buffer.hpp" />
     <ClInclude Include="..\..\..\streambuf_interface.hpp" />
-    <ClInclude Include="..\..\..\stream_utility.hpp" />
     <ClInclude Include="..\..\..\table.hpp" />
     <ClInclude Include="..\..\..\tuple.hpp" />
     <ClInclude Include="..\..\..\typemanage.hpp" />

@@ -36,6 +36,10 @@ namespace hmLib{
 	constexpr std::size_t static_size(){
 		return detail::static_size_impl<container>::static_size();
 	}
+
+	inline bool are_equal(double v1, double v2, double tolerance = 1e-8) {
+		return v1+tolerance >= v2 && v2+tolerance >= v1;
+	}
 }
 #
 #endif

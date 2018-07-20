@@ -47,7 +47,7 @@ namespace hmLib{
 	}
 	//3要素のmedian
 	template<class T>
-	inline T clamp(T val1,T val2,T val3){
+	inline T median(T val1,T val2,T val3){
 		if(val1>val2){
 			if(val2>val3)return val2;
 			else if(val1>val3)return val3;
@@ -58,6 +58,13 @@ namespace hmLib{
 			else return val2;
 		}
 	}
+
+	//3要素のmedian
+	template<class T>
+	inline T clamp(T val, T lower, T upper) {
+		return std::min(std::max(lower, val), upper);
+	}
+
 	template<typename T, typename... Others>
 	inline T min_value(T val1,T val2,Others... vals){return std::min(val1,min_value(val2,vals...));}
 	template<typename T>

@@ -31,7 +31,7 @@ namespace hmLib {
 	private:
 		container Arr;
 	public:
-		varray() :Arr() {}
+		varray() = default;
 		varray(std::initializer_list<T> il)noexcept {
 			auto out = Arr.begin();
 
@@ -45,28 +45,20 @@ namespace hmLib {
 
 		}
 		explicit varray(const T& val) { Arr.fill(val); }
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		varray(const varray<U,N>& other){
-			std::copy(other.begin(), other.end(), Arr.begin());
+		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+		explicit varray(const varray<U,N>& other){
+			auto oitr = Arr.begin();
+			for(auto itr = other.begin(); itr!= other.end(); ++itr, ++oitr) {
+				*oitr = static_cast<T>(*itr);
+			}
 		}
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
+/*		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
 		this_type& operator=(const varray<U, N>& other) {
 			if(&other!=this) {
 				std::copy(other.begin(), other.end(), Arr.begin());
 			}
 			return *this;
-		}
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		varray(varray<U, N>&& other) {
-			std::copy(other.begin(), other.end(), Arr.begin());
-		}
-		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		this_type& operator=(varray<U, N>&& other) {
-			if(&other!=this) {
-				std::copy(other.begin(), other.end(), Arr.begin());
-			}
-			return *this;
-		}
+		}*/
 	public:
 		reference at(size_type n) { return Arr.at(n); }
 		constexpr const_reference at(size_type n)const{ return Arr.at(n); }
@@ -129,6 +121,12 @@ namespace hmLib {
 			for(auto& v:*this) v /= *(Beg++);
 			return *this;
 		}
+		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() % std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+		this_type& operator%=(const varray<U, N>& other) {
+			auto Beg = other.begin();
+			for(auto& v:*this) v %= *(Beg++);
+			return *this;
+		}
 		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() + std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
 		this_type& operator+=(U val) {
 			for(auto& v:*this) v += val;
@@ -148,6 +146,22 @@ namespace hmLib {
 		this_type& operator/=(U val) {
 			for(auto& v:*this) v /= val;
 			return *this;
+		}
+		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() % std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+		this_type& operator%=(U val) {
+			for(auto& v:*this) v %= val;
+			return *this;
+		}
+		template<typename U>
+		operator varray<U, N>() {
+			varray<U, N> Ans;
+			auto oItr = Ans.begin();
+			auto Itr = begin();
+			auto End = end();
+			for(; Itr!=End; ++Itr, ++oItr) {
+				*(oItr) = *Itr;
+			}
+			return Ans;
 		}
 	public:
 		T sum()const{
@@ -195,6 +209,15 @@ namespace hmLib {
 		varray<ans_type, N> Ans;
 		for(std::size_t i = 0; i < N; ++i) {
 			Ans[i] = v1[i] / v2[i];
+		}
+		return Ans;
+
+	}
+	template<typename T, typename U, std::size_t N, typename ans_type = decltype(std::declval<T>() % std::declval<U>())>
+	varray<ans_type, N> operator%(const varray<T, N>& v1, const varray<U, N>& v2) {
+		varray<ans_type, N> Ans;
+		for(std::size_t i = 0; i < N; ++i) {
+			Ans[i] = v1[i] % v2[i];
 		}
 		return Ans;
 
@@ -252,6 +275,14 @@ namespace hmLib {
 		varray<ans_type, N> Ans;
 		for(std::size_t i = 0; i < N; ++i) {
 			Ans[i] = v1[i] / v2;
+		}
+		return Ans;
+	}
+	template<typename T, typename U, std::size_t N, typename ans_type = decltype(std::declval<T>() % std::declval<U>())>
+	varray<ans_type, N> operator%(const varray<T, N>& v1, U v2) {
+		varray<ans_type, N> Ans;
+		for(std::size_t i = 0; i < N; ++i) {
+			Ans[i] = v1[i] % v2;
 		}
 		return Ans;
 	}
@@ -435,6 +466,14 @@ namespace hmLib {
 		auto Ans = v.front()* v.front();
 		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
 		return Ans;
+	}
+}
+
+//std namespace:: only for swap
+namespace std {
+	template<typename T, std::size_t N>
+	void swap(hmLib::varray<T, N>& v1, hmLib::varray<T, N>& v2) {
+		v1.swap(v2);
 	}
 }
 #

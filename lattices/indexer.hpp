@@ -1,7 +1,7 @@
-#ifndef HMLIB_LATTICES_LATTICEINDEXER_INC
-#define HMLIB_LATTICES_LATTICEINDEXER_INC 100
+#ifndef HMLIB_LATTICES_INDEXER_INC
+#define HMLIB_LATTICES_INDEXER_INC 100
 #
-//!@brief Definition of the lattice_indexer
+//!@brief Definition of the indexer
 
 #include<numeric>
 #include"../algorithm/compare.hpp"
@@ -10,23 +10,23 @@
 namespace hmLib {
 	namespace lattices {
 		template<unsigned int dim_>
-		struct lattice_indexer {
-			using this_type = lattice_indexer<dim_>;
+		struct indexer {
+			using this_type = indexer<dim_>;
 			using point_type = lattices::point_type<dim_>;
 			using extent_type = lattices::extent_type<dim_>;
 			using index_type = lattices::index_type;
 		public:
 			static constexpr unsigned int dim() { return dim_; }
 		public:
-			lattice_indexer() : Extent(0) {}
-			lattice_indexer(const extent_type& Extent_) : Extent(Extent_){}
-			lattice_indexer(const this_type&) = default;
-			lattice_indexer(this_type&&) = default;
+			indexer() : Extent(0) {}
+			explicit indexer(const extent_type& Extent_) : Extent(Extent_){}
+			indexer(const this_type&) = default;
+			indexer(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
 			//!Get number of elements included in the lattice
-			size_type lattice_size()const { return std::accumulate(Extent.begin(), Extent.end(), 1, [](int v1, int v2)->int {return v1*v2; }); }
+			size_type lattice_size()const { return std::accumulate(Extent.begin(), Extent.end(), size_type(1), [](size_type v1, size_type v2)->size_type {return v1*v2; }); }
 			//!Get point_type Extent
 			const extent_type& extent()const {return Extent;}
 			//!Set point_type Extent and Gap
@@ -40,7 +40,7 @@ namespace hmLib {
 				index_type Step = 1;
 				for(unsigned int i = 0; i < dim_; ++i) {
 					Index += Point_[i] * Step;
-					Step *= Extent[i];
+					Step *= static_cast<index_type>(Extent[i]);
 				}
 
 				return Index;
@@ -59,7 +59,7 @@ namespace hmLib {
 				point_type Pos;
 				for(unsigned int i = 0; i < dim_; ++i) {
 					Pos[i] = (Index%Extent[i]);
-					Index /= Extent[i];
+					Index /= static_cast<index_type>(Extent[i]);
 				}
 
 				return Pos;

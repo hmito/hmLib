@@ -7,19 +7,18 @@ namespace hmLib{
             none, terminate
         };
         template<typename interfere_system_t, typename state_t, typename time_t>
-        time_t interfere_progress(interfere_system_t System, state_t& State, time_t BeginStep, time_t EndStep){
+        time_t interfere_progress(interfere_system_t& System, state_t& State, time_t BeginStep, time_t EndStep){
 			while(BeginStep != EndStep){
 				if(System(State, BeginStep++) == interfere_request::terminate)break;
 			}
             return BeginStep;
         }
         template<typename interfere_system_t, typename state_t, typename time_t, typename observer>
-        time_t interfere_progress(interfere_system_t System, state_t& State, time_t BeginStep, time_t EndStep, observer Observer){
+        time_t interfere_progress(interfere_system_t& System, state_t& State, time_t BeginStep, time_t EndStep, observer Observer){
 			while(BeginStep != EndStep){
-                Observer(State, BeginStep);
 				if(System(State, BeginStep++) == interfere_request::terminate)break;
+				Observer(State, BeginStep);
 			}
-            Observer(State, BeginStep);
             return BeginStep;
         }
     }

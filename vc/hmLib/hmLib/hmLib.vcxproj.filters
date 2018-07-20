@@ -161,9 +161,6 @@
     <ClInclude Include="..\..\..\lattices\iterator.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\lattices\lattice_indexer.hpp">
-      <Filter>hmLib\lattices</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
@@ -280,9 +277,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\stream_utility.hpp">
-      <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\streambuf_interface.hpp">
       <Filter>hmLib</Filter>
@@ -436,6 +430,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\math\plane_root.hpp">
       <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
+      <Filter>hmLib\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\indexer.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\torus_iterator.hpp">
+      <Filter>hmLib\lattices</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
