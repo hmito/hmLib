@@ -1,45 +1,17 @@
 #ifndef HMLIB_ALGORITHM_SAMPLING_INC
 #define HMLIB_ALGORITHM_SAMPLING_INC 300
 #
-/*
-===algorithm::sampling===
-ある範囲の中から値を選択するアルゴリズムを提供する
-algorithm::sampling:v3_00/180724 hmIto
-	samplerのインターフェースをreset, pushの形に統一
-	shuffle_samplerが意味不明だったので、samplingで取り除くrandom_removal_samplerに変更
-	roulette_removal_samplerを追加
-algorithm::sampling:v2_00/160426 hmIto
-	build系関数をmakeに変更
-	distance/next等のiteratorへの特殊されている関数を利用するよう変更
-	hmLib::randomへの依存性を削除
-algorithm::sampling:v1_04/140731 hmIto
-	可能なsamplerに、add/clear関数を追加
-		手動で一個ずつデータを追加 / すべてクリアする関数
-algorithm::sampling:v1_03/140708 hmIto
-	shuffle_samplerを追加
-		イテレータでレンジを受け取り、シャッフルして順に返す
-		枯渇すると、endを返す
-algorithm::sampling:v1_02/130917 hmIto
-	例外処理のヘッダが不足していた問題を修正
-algorithm::sampling:v1_01/130711 hmIto
-	random_sampler追加
-		イテレータでレンジを受け取り、その中からoperator()でランダムに返す
-algorithm::sampling:v1_00/130328 hmIto
-	algorithmから分離
-*/
 #include<algorithm>
 #include<numeric>
 #include<vector>
 #include<random>
 #include"../exceptions.hpp"
 namespace hmLib{
-	//ランダム選択
 	template<typename InputIterator, typename RandEngine>
 	InputIterator random_sample(InputIterator Begin,InputIterator End, RandEngine&& Engine){
 		if(Begin == End)return End;
 		return std::next(Begin, std::uniform_int_distribution<int>(0,std::distance(Begin,End)-1)(Engine));
 	}
-	//ランダム選択 OutputIteratorの範囲を埋めるまで
 	template<typename InputIterator, typename OutputIterator, typename RandEngine>
 	void random_sample(InputIterator Begin,InputIterator End,OutputIterator OutBegin,OutputIterator OutEnd, RandEngine&& Engine){
 		if(Begin == End)return;
@@ -49,7 +21,6 @@ namespace hmLib{
 			*OutBegin++ = *std::next(Begin, Dist(Engine));
 		}
 	}
-	//ランダム選択 n個分
 	template<typename InputIterator, typename OutputIterator, typename RandEngine>
 	OutputIterator random_sample(InputIterator Begin,InputIterator End, OutputIterator Out, unsigned int n, RandEngine&& Engine){
 		if(Begin == End)return Out;
@@ -61,7 +32,6 @@ namespace hmLib{
 		return Out;
 	}
 
-	//ランダム選択クラス
 	template<typename InputIterator>
 	class random_sampler{
 		using dist_type = std::uniform_int_distribution<int>;
@@ -83,13 +53,11 @@ namespace hmLib{
 			Dist.param(prm);
 		}
 	};
-	//ランダム選択クラスのビルダー
 	template<typename InputIterator>
 	random_sampler<InputIterator> make_random_sampler(InputIterator Begin_,InputIterator End_){
 		return random_sampler<InputIterator>(Begin_,End_);
 	}
 
-	//ルーレット選択
 	template<typename InputIterator, typename fnAssess, typename RandEngine>
 	InputIterator roulette_sample(InputIterator Begin,InputIterator End, fnAssess&& FnAssess, RandEngine&& Engine){
 		if(Begin == End)return End;
@@ -104,7 +72,6 @@ namespace hmLib{
 		}
 		return Begin;
 	}
-	//ルーレット選択 OutputIteratorの範囲を埋めるまで
 	template<typename InputIterator, typename OutputIterator, typename fnAssess, typename RandEngine>
 	void roulette_sample(InputIterator Begin,InputIterator End, fnAssess&& FnAssess,OutputIterator OutBegin,OutputIterator OutEnd, RandEngine&& Engine){
 		if(Begin == End)return;
@@ -124,7 +91,6 @@ namespace hmLib{
 			*OutBegin++ = *Itr;
 		}
 	}
-	//ルーレット選択 n個分
 	template<typename InputIterator, typename OutputIterator, typename fnAssess, typename RandEngine>
 	OutputIterator roulette_sample(InputIterator Begin,InputIterator End, fnAssess&& FnAssess, OutputIterator Out, unsigned int n, RandEngine&& Engine){
 		if(Begin == End)return Out;
@@ -147,7 +113,6 @@ namespace hmLib{
 		return Out;
 	}
 
-	//ルーレット選択
 	template<typename InputIterator, typename assess_iterator, typename RandEngine>
 	InputIterator roulette_sample(InputIterator Begin, InputIterator End, assess_iterator ABegin, assess_iterator AEnd, RandEngine&& Engine) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(ABegin, AEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
@@ -161,7 +126,6 @@ namespace hmLib{
 		}
 		return End;
 	}
-	//ルーレット選択 OutputIteratorの範囲を埋めるまで
 	template<typename InputIterator, typename OutputIterator, typename assess_iterator, typename RandEngine>
 	void roulette_sample(InputIterator Begin, InputIterator End, assess_iterator ABegin, assess_iterator AEnd, OutputIterator OutBegin, OutputIterator OutEnd, RandEngine&& Engine) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(ABegin, AEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
@@ -181,7 +145,6 @@ namespace hmLib{
 			}		
 		}
 	}
-	//ルーレット選択 n個分
 	template<typename InputIterator, typename OutputIterator, typename assess_iterator, typename RandEngine>
 	OutputIterator roulette_sample(InputIterator Begin, InputIterator End, assess_iterator ABegin, assess_iterator AEnd, OutputIterator Out, unsigned int n, RandEngine&& Engine) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(ABegin, AEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
@@ -204,7 +167,6 @@ namespace hmLib{
 		return Out;
 	}
 
-	//ルーレット選択クラス
 	template<typename InputIterator>
 	class roulette_sampler{
 		struct assess_itr{
@@ -280,18 +242,15 @@ namespace hmLib{
 	private:
 		double assess_total() { if(empty())return 0.0; return AssessVec.back().Val; }
 	};
-	//ルーレット選択クラスのビルダー
 	template<typename InputIterator,typename fnAssess>
 	roulette_sampler<InputIterator> make_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess&& FnAssess_){
 		return roulette_sampler<InputIterator>(Begin_,End_,std::forward<fnAssess>(FnAssess_));
 	}
-	//ルーレット選択クラスのビルダー
 	template<typename InputIterator, typename assess_iterator>
 	roulette_sampler<InputIterator> make_roulette_sampler(InputIterator Begin_, InputIterator End_, assess_iterator ABeg_, assess_iterator AEnd_) {
 		return roulette_sampler<InputIterator>(Begin_, End_, ABeg_, AEnd_);
 	}
 
-	//一度選んだら選ばれないランダム選択クラス
 	template<typename InputIterator>
 	class random_removal_sampler {
 		typedef typename std::vector<InputIterator>::iterator iterator;
@@ -328,13 +287,11 @@ namespace hmLib{
 		bool empty()const { return Vec.empty(); }
 		unsigned int size()const{return Vec.size();}
 	};
-	//一度選んだら選ばれないランダム選択クラスのビルダー
 	template<typename InputIterator, typename RandEngine>
 	random_removal_sampler<InputIterator> make_random_removal_sampler(InputIterator Begin_, InputIterator End_) {
 		return random_removal_sampler<InputIterator>(Begin_, End_);
 	}
 
-	//一度選んだら選ばれないルーレット選択クラス
 	template<typename InputIterator>
 	class roulette_removal_sampler {
 		struct assess_itr {
@@ -426,12 +383,10 @@ namespace hmLib{
 	private:
 		double assess_total() { return AssessTotal; }
 	};
-	//一度選んだら選ばれないルーレット選択クラスのビルダー
 	template<typename InputIterator, typename fnAssess>
 	roulette_removal_sampler<InputIterator> make_roulette_removal_sampler(InputIterator Begin_, InputIterator End_, fnAssess&& FnAssess_) {
 		return roulette_removal_sampler<InputIterator>(Begin_, End_, std::forward<fnAssess>(FnAssess_));
 	}
-	//一度選んだら選ばれないルーレット選択クラスのビルダー
 	template<typename InputIterator, typename assess_iterator>
 	roulette_removal_sampler<InputIterator> make_roulette_removal_sampler(InputIterator Begin_, InputIterator End_, assess_iterator ABeg_, assess_iterator AEnd_) {
 		return roulette_removal_sampler<InputIterator>(Begin_, End_,  ABeg_, AEnd_);
