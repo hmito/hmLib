@@ -134,7 +134,6 @@ namespace hmLib{
 		double TotalWeight = std::accumulate(ABegin, AEnd, 0.0);
 
 		for(; OutBegin!=OutEnd; ++OutBegin) {
-			double TotalWeight = std::accumulate(ABegin, AEnd, 0.0);
 			double Selected = std::uniform_real_distribution<double>(0., TotalWeight)(Engine);
 			for(auto AItr = ABegin; AItr!=AEnd; ++AItr) {
 				Selected -= *AItr;
@@ -151,9 +150,8 @@ namespace hmLib{
 		if(Begin == End)return End;
 
 		double TotalWeight = std::accumulate(ABegin, AEnd, 0.0);
-
+		
 		for(unsigned int i = 0; i<n; ++i) {
-			double TotalWeight = std::accumulate(ABegin, AEnd, 0.0);
 			double Selected = std::uniform_real_distribution<double>(0., TotalWeight)(Engine);
 			for(auto AItr = ABegin; AItr!=AEnd; ++AItr) {
 				Selected -= *AItr;
