@@ -449,5 +449,17 @@
     <ClInclude Include="..\..\..\clone_ptrproxy.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\math\multiaxis.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\keep_if.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

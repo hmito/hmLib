@@ -79,8 +79,10 @@
     <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
+    <ClInclude Include="..\..\..\lattices\keep_if.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
@@ -90,9 +92,11 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
     <ClInclude Include="..\..\..\math\constants.hpp" />
+    <ClInclude Include="..\..\..\math\multiaxis.hpp" />
     <ClInclude Include="..\..\..\math\optimize.hpp" />
     <ClInclude Include="..\..\..\math\plane_root.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
