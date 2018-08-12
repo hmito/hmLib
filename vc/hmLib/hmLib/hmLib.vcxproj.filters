@@ -440,9 +440,6 @@
     <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\index_accessor_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\iterators\inserter.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>

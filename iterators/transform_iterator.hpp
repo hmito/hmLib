@@ -45,10 +45,13 @@ namespace hmLib {
 	public:
 		transform_iterator() = default;
 		transform_iterator(base_iterator Itr_, transform Transform_):Itr(Itr_), Transform(Transform_) {}
+		//template<typename... transform_args_>
+		//transform_iterator(base_iterator Itr_, transform_args_... TransformArgs_):Itr(Itr_), Transform(TransformArgs_...) {}
 		this_type& operator++() { ++Itr; return *this; }
 		this_type operator++(int) { this_type Prev = *this; operator++(); return Prev; }
 		reference operator*() { return Transform(*Itr); }
 		pointer operator->() { return pointer(&Transform(*Itr)); }
+		base_iterator base() { return Itr; }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 	};
@@ -74,6 +77,7 @@ namespace hmLib {
 		this_type& operator++() { ++Itr; return *this; }
 		this_type operator++(int) { this_type Prev = *this; operator++(); return Prev; }
 		reference operator*() { return Transform(*Itr); }
+		base_iterator base() { return Itr; }
 	};
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::forward_iterator_tag>{
@@ -100,6 +104,7 @@ namespace hmLib {
 		pointer operator->() { return pointer(&Transform(*Itr)); }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
+		base_iterator base() { return Itr; }
 	};
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::bidirectional_iterator_tag> {
@@ -126,6 +131,7 @@ namespace hmLib {
 		this_type operator--(int) { this_type Prev = *this; operator--(); return Prev; }
 		reference operator*() { return Transform(*Itr); }
 		pointer operator->() { return pointer(&Transform(*Itr)); }
+		base_iterator base() { return Itr; }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 	};
@@ -160,6 +166,7 @@ namespace hmLib {
 		friend difference_type operator-(this_type itr1, const this_type& itr2) {return itr1.Itr - itr2.Itr; }
 		reference operator*() { return Transform(*Itr); }
 		pointer operator->() { return pointer(&Transform(*Itr)); }
+		base_iterator base() { return Itr; }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 		friend bool operator>(const this_type& itr1, const this_type& itr2) { return itr1.Itr>itr2.Itr; }

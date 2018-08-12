@@ -58,7 +58,7 @@ namespace hmLib {
 				Assert::AreEqual(v, Val[*itr++]);
 			}
 			Assert::IsTrue(itr==Index.end());
-			Assert::AreEqual(Index.size(), Range.size());
+			Assert::AreEqual<int>(Index.size(), std::distance(Range.begin(), Range.end()));
 		}
 		TEST_METHOD(use_index_at_access_iterator_list) {
 			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
@@ -83,7 +83,7 @@ namespace hmLib {
 				Assert::AreEqual(v, Val[*itr++]);
 			}
 			Assert::IsTrue(itr==Index.end());
-			Assert::AreEqual(Index.size(), Range.size());
+			Assert::AreEqual<int>(Index.size(), std::distance(Range.begin(), Range.end()));
 		}
 		TEST_METHOD(use_index_op_access_iterator_vector) {
 			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
@@ -96,7 +96,52 @@ namespace hmLib {
 				Assert::AreEqual(v, Val[*itr++]);
 			}
 			Assert::IsTrue(itr==Index.end());
-			Assert::AreEqual(Index.size(), Range.size());
+			Assert::AreEqual<int>(Index.size(), std::distance(Range.begin(), Range.end()));
+		}
+		TEST_METHOD(write_index_access_iterator) {
+			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
+			std::vector<int> Index{ 2,3,5 };
+
+			auto Range = make_index_access_range(Val.begin(), Index.begin(), Index.end());
+
+			auto itr = Index.begin();
+			for(auto& v:Range) {
+				v = 0.0;
+			}
+
+			for(auto i:Index) {
+				Assert::AreEqual(0.0, Val[i], 1e-10);
+			}
+		}
+		TEST_METHOD(write_index_at_access_iterator) {
+			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
+			std::vector<int> Index{ 2,3,5 };
+
+			auto Range = make_index_at_access_range(Val, Index.begin(), Index.end());
+
+			auto itr = Index.begin();
+			for(auto& v:Range) {
+				v = 0.0;
+			}
+
+			for(auto i:Index) {
+				Assert::AreEqual(0.0, Val[i], 1e-10);
+			}
+		}
+		TEST_METHOD(write_index_op_access_iterator) {
+			std::vector<double> Val{ 0.5,1.2,2.3,3.2,4.5,7.3 };
+			std::vector<int> Index{ 2,3,5 };
+
+			auto Range = make_index_op_access_range(Val, Index.begin(), Index.end());
+
+			auto itr = Index.begin();
+			for(auto& v:Range) {
+				v = 0.0;
+			}
+
+			for(auto i:Index) {
+				Assert::AreEqual(0.0, Val[i], 1e-10);
+			}
 		}
 	};
 	TEST_CLASS(test_zip_iterator) {
@@ -138,7 +183,7 @@ namespace hmLib {
 			std::vector<int> Vec{ 10,11,12,13,14,15,16,17 };
 			std::array<double, 4> Arr{ 20,21,22,23 };
 
-			auto Zip = make_zip_container<int>(List, Vec, Arr);
+			auto Zip = make_zip_range(List, Vec, Arr);
 			Assert::AreEqual('0', std::get<0>(Zip.at(0)));
 			Assert::AreEqual(10, std::get<1>(Zip.at(0)));
 			Assert::AreEqual(20.0, std::get<2>(Zip.at(0)),1e-10);
@@ -151,7 +196,7 @@ namespace hmLib {
 			std::vector<int> Vec{ 10,11,12,13,14,15,16,17 };
 			std::array<double, 4> Arr{ 20,21,22,23 };
 
-			auto Zip = make_zip_container<int>(List, Vec, Arr);
+			auto Zip = make_zip_range(List, Vec, Arr);
 			std::get<0>(Zip.at(0)) = 'A';
 			std::get<1>(Zip.at(0)) = 100;
 			std::get<2>(Zip.at(0)) = 5.5;
