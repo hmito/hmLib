@@ -455,9 +455,6 @@
     <ClInclude Include="..\..\..\iterators\transform_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\zip_container.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\iterators\zip_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
