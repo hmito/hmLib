@@ -8,6 +8,11 @@ namespace hmLib {
 		template<typename iterator_, bool is_random_access_iterator_ = std::is_same<typename std::iterator_traits<iterator_>::iterator_category, std::random_access_iterator_tag>::value>
 		struct range_impl {
 			using iterator = iterator_;
+			using range_category = typename std::iterator_traits<iterator>::iterator_category;
+			using value_type = typename std::iterator_traits<iterator>::value_type;
+			using reference = typename std::iterator_traits<iterator>::reference;
+			using pointer = typename std::iterator_traits<iterator>::pointer;
+			using difference_type = typename std::iterator_traits<iterator>::difference_type;
 		public:
 			range_impl() = default;
 			range_impl(const iterator& Beg_, const iterator& End_):Beg(Beg_), End(End_) {}
@@ -21,7 +26,10 @@ namespace hmLib {
 		template<typename iterator_>
 		struct range_impl<iterator_, true> {
 			using iterator = iterator_;
+			using range_category = typename std::iterator_traits<iterator>::iterator_category;
+			using value_type = typename std::iterator_traits<iterator>::value_type;
 			using reference = typename std::iterator_traits<iterator>::reference;
+			using pointer = typename std::iterator_traits<iterator>::pointer;
 			using difference_type = typename std::iterator_traits<iterator>::difference_type;
 		public:
 			range_impl() = default;

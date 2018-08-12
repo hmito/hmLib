@@ -180,6 +180,11 @@ namespace hmLib {
 		using base_iterator = base_iterator_;
 		using transform = transform_;
 		using iterator = transform_iterator<base_iterator_, transform_, iterator_category_>;
+		using range_category = typename std::iterator_traits<iterator>::iterator_category;
+		using value_type = typename std::iterator_traits<iterator>::value_type;
+		using reference = typename std::iterator_traits<iterator>::reference;
+		using pointer = typename std::iterator_traits<iterator>::pointer;
+		using difference_type = typename std::iterator_traits<iterator>::difference_type;
 	private:
 		base_iterator Beg;
 		base_iterator End;
@@ -189,6 +194,33 @@ namespace hmLib {
 		transform_range(base_iterator Beg_, base_iterator End_, transform Transform_):Beg(std::move(Beg_)), End(std::move(End_)), Transform(std::move(Transform_)) {}
 		iterator begin() { return iterator(Beg, Transform); }
 		iterator end() { return iterator(End, Transform); }
+	};
+	template<typename base_iterator_, typename transform_>
+	struct transform_range<base_iterator_,transform_, std::random_access_iterator_tag> {
+		using base_iterator = base_iterator_;
+		using transform = transform_;
+		using iterator = transform_iterator<base_iterator_, transform_, std::random_access_iterator_tag>;
+		using range_category = typename std::iterator_traits<iterator>::iterator_category;
+		using value_type = typename std::iterator_traits<iterator>::value_type;
+		using reference = typename std::iterator_traits<iterator>::reference;
+		using pointer = typename std::iterator_traits<iterator>::pointer;
+		using difference_type = typename std::iterator_traits<iterator>::difference_type;
+		using size_type = std::size_t;
+	private:
+		base_iterator Beg;
+		base_iterator End;
+		transform Transform;
+	public:
+		transform_range() = default;
+		transform_range(base_iterator Beg_, base_iterator End_, transform Transform_):Beg(std::move(Beg_)), End(std::move(End_)), Transform(std::move(Transform_)) {}
+		iterator begin() { return iterator(Beg, Transform); }
+		iterator end() { return iterator(End, Transform); }
+		size_type size()const { return static_cast<size_type>(End-Beg); }
+		reference operator[](difference_type n)const { return Beg[n]; }
+		reference at(difference_type n)const {
+			hmLib_assert(0<=n && static_cast<size_type>(n)<size(), hmLib::access_exceptions::out_of_range_access, "out of range access to trasnfrom_range.");
+			return Beg[n];
+		}
 	};
 	template<typename base_iterator_, typename transform_>
 	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type> make_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {

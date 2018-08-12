@@ -258,6 +258,11 @@ namespace hmLib {
 			struct zip_range_impl {
 			public:
 				using iterator = zip_iterator<iterators_...>;
+				using range_category = typename std::iterator_traits<iterator>::iterator_category;
+				using value_type = typename std::iterator_traits<iterator>::value_type;
+				using reference = typename std::iterator_traits<iterator>::reference;
+				using pointer = typename std::iterator_traits<iterator>::pointer;
+				using difference_type = typename std::iterator_traits<iterator>::difference_type;
 			private:
 				iterator Beg;
 				iterator End;
@@ -279,8 +284,11 @@ namespace hmLib {
 			struct zip_range_impl<true, iterators_...>{
 			public:
 				using iterator = zip_iterator<iterators_...>;
+				using range_category = typename std::iterator_traits<iterator>::iterator_category;
+				using value_type = typename std::iterator_traits<iterator>::value_type;
 				using reference = typename std::iterator_traits<iterator>::reference;
-				using index_type = typename std::iterator_traits<iterator>::difference_type;
+				using pointer = typename std::iterator_traits<iterator>::pointer;
+				using difference_type = typename std::iterator_traits<iterator>::difference_type;
 				using size_type = std::size_t;
 			private:
 				iterator Beg;
@@ -298,8 +306,8 @@ namespace hmLib {
 				}
 				iterator begin()const { return Beg; }
 				iterator end()const { return End; }
-				reference operator[](index_type Index) { return Beg[Index]; }
-				reference at(index_type Index) {
+				reference operator[](difference_type Index) { return Beg[Index]; }
+				reference at(difference_type Index) {
 					hmLib_assert(0 <= Index && static_cast<size_type>(Index)<size(), hmLib::access_exceptions::out_of_range_access, "out of range access for zip_container.");
 					return Beg[Index];
 				}
