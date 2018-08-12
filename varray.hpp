@@ -52,13 +52,6 @@ namespace hmLib {
 				*oitr = static_cast<T>(*itr);
 			}
 		}
-/*		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		this_type& operator=(const varray<U, N>& other) {
-			if(&other!=this) {
-				std::copy(other.begin(), other.end(), Arr.begin());
-			}
-			return *this;
-		}*/
 	public:
 		reference at(size_type n) { return Arr.at(n); }
 		constexpr const_reference at(size_type n)const{ return Arr.at(n); }
@@ -121,6 +114,12 @@ namespace hmLib {
 			for(auto& v:*this) v /= *(Beg++);
 			return *this;
 		}
+		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() % std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+		this_type& operator%=(const varray<U, N>& other) {
+			auto Beg = other.begin();
+			for(auto& v:*this) v %= *(Beg++);
+			return *this;
+		}
 		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() + std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
 		this_type& operator+=(U val) {
 			for(auto& v:*this) v += val;
@@ -139,6 +138,11 @@ namespace hmLib {
 		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() / std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
 		this_type& operator/=(U val) {
 			for(auto& v:*this) v /= val;
+			return *this;
+		}
+		template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() % std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
+		this_type& operator%=(U val) {
+			for(auto& v:*this) v %= val;
 			return *this;
 		}
 		template<typename U>
@@ -202,6 +206,15 @@ namespace hmLib {
 		return Ans;
 
 	}
+	template<typename T, typename U, std::size_t N, typename ans_type = decltype(std::declval<T>() % std::declval<U>())>
+	varray<ans_type, N> operator%(const varray<T, N>& v1, const varray<U, N>& v2) {
+		varray<ans_type, N> Ans;
+		for(std::size_t i = 0; i < N; ++i) {
+			Ans[i] = v1[i] % v2[i];
+		}
+		return Ans;
+
+	}
 	template<typename T, typename U, std::size_t N, typename ans_type = decltype(std::declval<T>() + std::declval<U>())>
 	varray<ans_type, N> operator+(const varray<T, N>& v1, U v2) {
 		varray<ans_type, N> Ans;
@@ -258,6 +271,14 @@ namespace hmLib {
 		}
 		return Ans;
 	}
+	template<typename T, typename U, std::size_t N, typename ans_type = decltype(std::declval<T>() % std::declval<U>())>
+	varray<ans_type, N> operator%(const varray<T, N>& v1, U v2) {
+		varray<ans_type, N> Ans;
+		for(std::size_t i = 0; i < N; ++i) {
+			Ans[i] = v1[i] % v2;
+		}
+		return Ans;
+	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() == std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator==(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
@@ -270,28 +291,28 @@ namespace hmLib {
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator<(const varray<T, N>& v1, const varray<U, N>& v2) { 
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[i] == v2[i]))return v1[i]<v2[i];
+			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]<v2[N-1-i];
 		}
 		return false;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator<=(const varray<T, N>& v1, const varray<U, N>& v2) { 
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[i] == v2[i]))return v1[i]<v2[i];
+			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]<v2[N-1-i];
 		}
 		return true;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator>(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[i] == v2[i]))return v1[i]>v2[i];
+			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]>v2[N-1-i];
 		}
 		return false;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator>=(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[i] == v2[i]))return v1[i]>v2[i];
+			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]>v2[N-1-i];
 		}
 		return true;
 	}

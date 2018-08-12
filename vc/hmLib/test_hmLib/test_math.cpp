@@ -67,24 +67,24 @@ namespace hmLib {
 				auto Axis = make_axis(0.0, 1.0, 11);
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
-					Assert::AreEqual(i, Axis.index(0.1*i-0.04));
-					Assert::AreEqual(i, Axis.index(0.1*i+0.04));
+					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
+					Assert::AreEqual<int>(i, Axis.index(0.1*i+0.04));
 				}
 			}
 			{
-				auto Axis = make_axis(0.0, 1.0, 11, math::grid_policy::floor_grid);
+				auto Axis = make_axis(0.0, 1.0, 11, math::grid_adjuster<math::grid_policy::floor_grid_tag,-8>());
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
-					Assert::AreEqual(i, Axis.index(0.1*i+0.04));
-					Assert::AreEqual(i, Axis.index(0.1*i+0.08));
+					Assert::AreEqual<int>(i, Axis.index(0.1*i+0.04));
+					Assert::AreEqual<int>(i, Axis.index(0.1*i+0.08));
 				}
 			}
 			{
 				auto Axis = make_axis(0.0, 1.0, 11, math::grid_policy::ceil_grid);
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
-					Assert::AreEqual(i, Axis.index(0.1*i-0.04));
-					Assert::AreEqual(i, Axis.index(0.1*i-0.08));
+					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
+					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.08));
 				}
 			}
 		}
@@ -106,14 +106,14 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30-0.04, 0.30+0.04);
 				Assert::AreEqual(1u, Ans.size());
-				Assert::AreEqual(0.8, Ans.weidth(),1e-5);
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(0.8, Ans.weight(),1e-5);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(1.0, Ans.at(0).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -122,19 +122,19 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30-0.04, 0.30+0.06);
 				Assert::AreEqual(2u, Ans.size());
-				Assert::AreEqual(1.0, Ans.weidth(),1e-5);
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(1.0, Ans.weight(),1e-5);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9 , Ans.at(0).second, 1e-5);
-				Assert::AreEqual(4u, Ans.at(1).first);
+				Assert::AreEqual(4, Ans.at(1).first);
 				Assert::AreEqual(0.1, Ans.at(1).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(4u, (*Itr).first);
+				Assert::AreEqual(4, (*Itr).first);
 				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -143,29 +143,29 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30-0.04, 0.30+0.26);
 				Assert::AreEqual(4u, Ans.size());
-				Assert::AreEqual(3.0, Ans.weidth(), 1e-5);
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(3.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
-				Assert::AreEqual(4u, Ans.at(1).first);
+				Assert::AreEqual(4, Ans.at(1).first);
 				Assert::AreEqual(1.0, Ans.at(1).second, 1e-5);
-				Assert::AreEqual(5u, Ans.at(2).first);
+				Assert::AreEqual(5, Ans.at(2).first);
 				Assert::AreEqual(1.0, Ans.at(2).second, 1e-5);
-				Assert::AreEqual(6u, Ans.at(3).first);
+				Assert::AreEqual(6, Ans.at(3).first);
 				Assert::AreEqual(0.1, Ans.at(3).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(4u, (*Itr).first);
+				Assert::AreEqual(4, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(5u, (*Itr).first);
+				Assert::AreEqual(5, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(6u, (*Itr).first);
+				Assert::AreEqual(6, (*Itr).first);
 				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -179,13 +179,13 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30+0.04, 0.30+0.08);
 				Assert::AreEqual(1u, Ans.size());
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(1.0, Ans.at(0).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -194,19 +194,19 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30+0.01, 0.30+0.11);
 				Assert::AreEqual(2u, Ans.size());
-				Assert::AreEqual(1.0, Ans.weidth(), 1e-5);
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(1.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
-				Assert::AreEqual(4u, Ans.at(1).first);
+				Assert::AreEqual(4, Ans.at(1).first);
 				Assert::AreEqual(0.1, Ans.at(1).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(4u, (*Itr).first);
+				Assert::AreEqual(4, (*Itr).first);
 				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -215,29 +215,29 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30+0.01, 0.30+0.31);
 				Assert::AreEqual(4u, Ans.size());
-				Assert::AreEqual(3.0, Ans.weidth(), 1e-5);
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(3.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
-				Assert::AreEqual(4u, Ans.at(1).first);
+				Assert::AreEqual(4, Ans.at(1).first);
 				Assert::AreEqual(1.0, Ans.at(1).second, 1e-5);
-				Assert::AreEqual(5u, Ans.at(2).first);
+				Assert::AreEqual(5, Ans.at(2).first);
 				Assert::AreEqual(1.0, Ans.at(2).second, 1e-5);
-				Assert::AreEqual(6u, Ans.at(3).first);
+				Assert::AreEqual(6, Ans.at(3).first);
 				Assert::AreEqual(0.1, Ans.at(3).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(4u, (*Itr).first);
+				Assert::AreEqual(4, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(5u, (*Itr).first);
+				Assert::AreEqual(5, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(6u, (*Itr).first);
+				Assert::AreEqual(6, (*Itr).first);
 				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -251,13 +251,13 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.20+0.04, 0.20+0.08);
 				Assert::AreEqual(1u, Ans.size());
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(1.0, Ans.at(0).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -266,18 +266,18 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.20+0.01, 0.20+0.11);
 				Assert::AreEqual(2u, Ans.size());
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
-				Assert::AreEqual(4u, Ans.at(1).first);
+				Assert::AreEqual(4, Ans.at(1).first);
 				Assert::AreEqual(0.1, Ans.at(1).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(4u, (*Itr).first);
+				Assert::AreEqual(4, (*Itr).first);
 				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -286,29 +286,29 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.20+0.01, 0.20+0.31);
 				Assert::AreEqual(4u, Ans.size());
-				Assert::AreEqual(3.0, Ans.weidth(), 1e-5);
-				Assert::AreEqual(3u, Ans.at(0).first);
+				Assert::AreEqual(3.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
-				Assert::AreEqual(4u, Ans.at(1).first);
+				Assert::AreEqual(4, Ans.at(1).first);
 				Assert::AreEqual(1.0, Ans.at(1).second, 1e-5);
-				Assert::AreEqual(5u, Ans.at(2).first);
+				Assert::AreEqual(5, Ans.at(2).first);
 				Assert::AreEqual(1.0, Ans.at(2).second, 1e-5);
-				Assert::AreEqual(6u, Ans.at(3).first);
+				Assert::AreEqual(6, Ans.at(3).first);
 				Assert::AreEqual(0.1, Ans.at(3).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
-				Assert::AreEqual(3u, (*Itr).first);
+				Assert::AreEqual(3, (*Itr).first);
 				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(4u, (*Itr).first);
+				Assert::AreEqual(4, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(5u, (*Itr).first);
+				Assert::AreEqual(5, (*Itr).first);
 				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
 				++Itr;
-				Assert::AreEqual(6u, (*Itr).first);
+				Assert::AreEqual(6, (*Itr).first);
 				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
@@ -321,8 +321,8 @@ namespace hmLib {
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
 			//lower & upper
-			Assert::AreEqual(0u, Mapper.lower());
-			Assert::AreEqual(1u, Mapper.upper());
+			Assert::AreEqual(0, Mapper.lower());
+			Assert::AreEqual(1, Mapper.upper());
 
 			//inside
 			Assert::IsTrue(Mapper.inside(0));
@@ -332,11 +332,11 @@ namespace hmLib {
 
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
-			Assert::AreEqual(1u, WI.at(0).first);
+			Assert::AreEqual(1, WI.at(0).first);
 			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
-			Assert::AreEqual(2u, WI.at(1).first);
+			Assert::AreEqual(2, WI.at(1).first);
 			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
-			Assert::AreEqual(3u, WI.at(2).first);
+			Assert::AreEqual(3, WI.at(2).first);
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_round) {
@@ -346,8 +346,8 @@ namespace hmLib {
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
 			//lower & upper
-			Assert::AreEqual(0u, Mapper.lower());
-			Assert::AreEqual(1u, Mapper.upper());
+			Assert::AreEqual(0, Mapper.lower());
+			Assert::AreEqual(1, Mapper.upper());
 
 			//inside
 			Assert::IsTrue(Mapper.inside(0));
@@ -357,11 +357,11 @@ namespace hmLib {
 
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
-			Assert::AreEqual(1u, WI.at(0).first);
+			Assert::AreEqual(1, WI.at(0).first);
 			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
-			Assert::AreEqual(2u, WI.at(1).first);
+			Assert::AreEqual(2, WI.at(1).first);
 			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
-			Assert::AreEqual(3u, WI.at(2).first);
+			Assert::AreEqual(3, WI.at(2).first);
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_ceil_round) {
@@ -371,8 +371,8 @@ namespace hmLib {
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
 			//lower & upper
-			Assert::AreEqual(0u, Mapper.lower());
-			Assert::AreEqual(1u, Mapper.upper());
+			Assert::AreEqual(0, Mapper.lower());
+			Assert::AreEqual(1, Mapper.upper());
 
 			//inside
 			Assert::IsTrue(Mapper.inside(0));
@@ -382,11 +382,11 @@ namespace hmLib {
 
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
-			Assert::AreEqual(1u, WI.at(0).first);
+			Assert::AreEqual(1, WI.at(0).first);
 			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
-			Assert::AreEqual(2u, WI.at(1).first);
+			Assert::AreEqual(2, WI.at(1).first);
 			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
-			Assert::AreEqual(3u, WI.at(2).first);
+			Assert::AreEqual(3, WI.at(2).first);
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_ceil) {
@@ -396,8 +396,8 @@ namespace hmLib {
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
 			//lower & upper
-			Assert::AreEqual(0u, Mapper.lower());
-			Assert::AreEqual(1u, Mapper.upper());
+			Assert::AreEqual(0, Mapper.lower());
+			Assert::AreEqual(1, Mapper.upper());
 
 			//inside
 			Assert::IsTrue(Mapper.inside(0));
@@ -407,11 +407,11 @@ namespace hmLib {
 
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
-			Assert::AreEqual(1u, WI.at(0).first);
+			Assert::AreEqual(1, WI.at(0).first);
 			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
-			Assert::AreEqual(2u, WI.at(1).first);
+			Assert::AreEqual(2, WI.at(1).first);
 			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
-			Assert::AreEqual(3u, WI.at(2).first);
+			Assert::AreEqual(3, WI.at(2).first);
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 	};

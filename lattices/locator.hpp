@@ -2,45 +2,49 @@
 #define HMLIB_LATTICES_LOCATOR_INC 100
 #
 #include<type_traits>
+#include<iterator>
 #include"utility.hpp"
 namespace hmLib{
 	namespace lattices{
-		template<typename iterator_, typename indexer_>
-		struct basic_const_locator;
-		template<typename iterator_, typename indexer_>
+		template<typename base_iterator_, typename indexer_>
 		struct basic_locator{
-			friend struct basic_const_locator<iterator_, indexer_>;
-		public:
-			using this_type = basic_locator<iterator_, indexer_>;
-			using iterator = iterator_;
-			using reference = typename iterator::reference;
-			using const_reference = typename std::add_const<reference>::type;
-			using pointer = typename iterator::pointer;
-			using const_pointer = typename std::add_const<pointer>::type;
-		public:
+		private:
+			using this_type = basic_locator<base_iterator_, indexer_>;
+			using base_iterator = base_iterator_;
 			using indexer = indexer_;
+		public:
+			using value_type = typename std::iterator_traits<base_iterator>::value_type;
+			using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
+			using reference = typename std::iterator_traits<base_iterator>::reference;
+			using pointer = typename std::iterator_traits<base_iterator>::pointer;
 			using point_type = typename indexer::point_type;
 			using extent_type = typename indexer::extent_type;
 		public:
 			basic_locator() = default;
-			basic_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_){}
+			basic_locator(base_iterator Begin_, indexer Indexer_, point_type Pos_):Beg(Begin_), Indexer(Indexer_), Pos(Pos_) {}
+			template<typename other_iterator, 
+				typename std::enable_if<
+					std::is_convertible<other_iterator, base_iterator>::value 
+					&& !std::is_same<other_iterator, base_iterator>::value,std::nullptr_t
+				>::type=nullptr
+			>
+			basic_locator(const basic_locator<other_iterator,indexer>& Other):Beg(Other.Beg), Indexer(Other.Indexer), Pos(Other.Pos) {}
 			basic_locator(const this_type&) = default;
 			basic_locator(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
-			reference operator*(){ return Begin[Indexer(Pos)]; }
-			const_reference operator*()const{ return Begin[Indexer(Pos)]; }
-			pointer operator->(){ return &(operator*()); }
-			const_pointer operator->()const{ return &(operator*()); }
-			reference operator[](const point_type& Pos_){ return Begin[Indexer(Pos + Pos_)]; }
-			const_reference operator[](const point_type& Pos_)const{ return Begin[Indexer(Pos + Pos_)]; }
-			reference at(const point_type& Pos_){ return Begin[Indexer.index(Pos + Pos_)]; }
-			const_reference at(const point_type& Pos_)const{ return Begin[Indexer.index(Pos + Pos_)]; }
+			point_type base_point()const { return Pos; }
+			index_type base_index()const { return Indexer(base_point()); }
+			extent_type base_extent()const { return Indexer.extent(); }
+			base_iterator base_begin()const { return Beg; }
+			base_iterator base()const { return Beg+base_index(); }
+			reference operator*()const { return base().operator*(); }
+			pointer operator->()const { return base().operator->(); }
+			reference operator[](const point_type& Pos_)const { return Beg[Indexer(Pos + Pos_)]; }
+			reference at(const point_type& Pos_)const { return Beg[Indexer.index(Pos + Pos_)]; }
 			template<typename... args>
-			reference at(args... Args){ return at(lattices::point(Args...)); }
-			template<typename... args>
-			const_reference at(args... Args)const{ return at(lattices::point(Args...)); }
+			reference at(args... Args)const { return at(lattices::point(Args...)); }
 		public:
 			this_type& operator+=(const point_type& Dif){ Pos += Dif;  return *this; }
 			friend this_type operator+(const this_type& Loc, const point_type& Dif){
@@ -59,89 +63,18 @@ namespace hmLib{
 				return Loc1.base_point() - Loc2.base_point();
 			}
 		public:
-			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
+			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Pos == Loc2.Pos; }
 			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
 		public:
 			void set(const point_type& Pos_){ Pos = Pos_; }
 			this_type& add(const point_type& Dif){ return operator+=(Dif); }
+			template<typename... args>
+			this_type& add(args... Args) { return operator+=(lattices::point(Args...)); }
 			this_type plus(const point_type& Dif)const { return *this + (Dif); }
 			template<typename... args>
-			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
-			template<typename... args>
 			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
-		public:
-			iterator get_base_iterator()const { return Begin; }
-			const indexer& get_indexer()const { return Indexer; }
-			index_type base_index()const{ return Indexer(Pos); }
-			point_type base_point()const{ return Pos; }
-			extent_type base_extent()const{ return Indexer.extent(); }
 		private:
-			iterator Begin;
-			indexer Indexer;
-			point_type Pos;
-		};
-		template<typename iterator_, typename indexer_>
-		struct basic_const_locator{
-		public:
-			using this_type = basic_const_locator<iterator_, indexer_>;
-			using iterator = iterator_;
-			using pointer = typename iterator::pointer;
-			using reference = typename iterator::reference;
-		public:
-			using indexer = indexer_;
-			using point_type = typename indexer::point_type;
-			using extent_type = typename indexer::extent_type;
-		public:
-			basic_const_locator() = default;
-			basic_const_locator(iterator Begin_, indexer Indexer_, point_type Pos_) :Begin(Begin_), Indexer(Indexer_), Pos(Pos_) {}
-			basic_const_locator(const this_type&) = default;
-			basic_const_locator(this_type&&) = default;
-			this_type& operator=(const this_type&) = default;
-			this_type& operator=(this_type&&) = default;
-			basic_const_locator(basic_locator<iterator_, indexer_> Locator) : Begin(Locator.Begin), Indexer(Locator.Indexer), Pos(Locator.Pos) {}
-		public:
-			reference operator*()const{ return Begin[Indexer(Pos)]; }
-			pointer operator->()const{ return &(operator*()); }
-			reference operator[](const point_type& Pos_)const{ return Begin[Indexer(Pos + Pos_)]; }
-			reference at(const point_type& Pos_)const{ return Begin[Indexer.index(Pos + Pos_)]; }
-			template<typename... args>
-			reference at(args... Args)const{ return at(lattices::point(Args...)); }
-		public:
-			this_type& operator+=(const point_type& Dif){ Pos += Dif;  return *this; }
-			friend this_type operator+(const this_type& Loc, const point_type& Dif){
-				auto Ans(Loc);
-				Ans += Dif;
-				return Ans;
-			}
-			friend this_type operator+(const point_type& Dif, const this_type& Loc){ return Loc+Dif; }
-			this_type& operator-=(const point_type& Dif){ Pos -= Dif;  return *this; }
-			friend this_type operator-(const this_type& Loc, const point_type& Dif){
-				auto Ans(Loc);
-				Ans -= Dif;
-				return Ans;
-			}
-			friend point_type operator-(const this_type& Loc1, const this_type& Loc2){
-				return Loc1.base_point() - Loc2.base_point();
-			}
-		public:
-			friend bool operator==(const this_type& Loc1, const this_type& Loc2){ return Loc1.Begin == Loc2.Begin && Loc1.Pos == Loc2.Pos; }
-			friend bool operator!=(const this_type& Loc1, const this_type& Loc2){ return !(Loc1 == Loc2); }
-		public:
-			void set(const point_type& Pos_){ Pos = Pos_; }
-			this_type& add(const point_type& Dif){ return operator+=(Dif); }
-			this_type plus(const point_type& Dif)const { return *this + (Dif); }
-			template<typename... args>
-			this_type& add(args... Args){ return operator+=(lattices::point(Args...)); }
-			template<typename... args>
-			this_type plus(args... Args)const { return *this + lattices::point(Args...); }
-		public:
-			iterator get_base_iterator()const { return Begin; }
-			const indexer& get_indexer()const { return Indexer; }
-			index_type base_index()const { return Indexer(Pos); }
-			point_type base_point()const{ return Pos; }
-			extent_type base_extent()const{ return Indexer.extent(); }
-		private:
-			iterator Begin;
+			base_iterator Beg;
 			indexer Indexer;
 			point_type Pos;
 		};

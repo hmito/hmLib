@@ -3,6 +3,8 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include<boost/iterator/iterator_facade.hpp>
+#include"../../../random.hpp"
 #include "../../../lattices.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -35,7 +37,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]() {return ++Val; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(),Con.end(), lattices::extent(4, 5));
+		lattice_view<iterator, 2>  Lattice(Con.begin(),lattices::extent(4, 5));
 
 		auto Size = Lattice.extent();
 		Assert::AreEqual<int>(4, Size[0], L"Size Error");
@@ -48,10 +50,11 @@ public:
 		container Con(1000);
 
 		auto UsedSize = lattices::point(4, 5);
+		static_assert(decltype(UsedSize)::static_size()==2,"");
 		Assert::AreEqual(4, UsedSize[0], L"Axis Size Error");
 		Assert::AreEqual(5, UsedSize[1], L"Axis Size Error");
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), UsedSize);
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), 4,5);
 
 		auto Size = Lattice.extent();
 		Assert::AreEqual<int>(4, Size[0], L"Size Error");
@@ -65,7 +68,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int{return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Begin = Lattice.begin();
 		auto End = Lattice.end();
@@ -88,7 +91,7 @@ public:
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
 
-		lattice_view<iterator, 2>  Lattice2(Con.begin(), Con.end(), lattices::extent(9, 10));
+		auto  Lattice2 = make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		const lattice_view<iterator, 2>& Lattice = Lattice2;
 
 		auto Begin = Lattice.begin();
@@ -111,7 +114,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		auto lotr = Lattice.front_locate();
 
 		for (int i = 0; i < 9; ++i) {
@@ -137,7 +140,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		auto lotr = Lattice.front_locate();
 		auto blotr = Lattice.locate(7, 5);
 
@@ -156,7 +159,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::point(4, 5));
 
@@ -175,7 +178,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::point(4, 5));
 
@@ -197,7 +200,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::point(4, 5));
 
@@ -221,7 +224,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		lattice_view<iterator, 2>  Lattice=make_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::point(4, 5));
 
@@ -358,7 +361,7 @@ public:
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
 		auto Lat2 = make_lattice_view(Con.begin(), Con.end(), 10, 7, 3);
-		const lattice_view<iterator, 3, false>& Lat(Lat2);
+		const lattice_view<iterator, 3>& Lat(Lat2);
 
 		for(int x = 0; x < 10; ++x){
 			for(int z = 0; z < 3; ++z){
@@ -430,7 +433,7 @@ public:
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
 		auto Lat2 = make_lattice_view(Con.begin(), Con.end(), 10, 7, 4);
-		const lattice_view<iterator, 3, false>& Lat(Lat2);
+		const lattice_view<iterator, 3>& Lat(Lat2);
 
 		auto SubLot = hmLib::subview(Lat.locate(3, 2, 1), Lat.locate(3, 2, 1).plus(4, 0, 2));
 		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(3, 2, 1).plus(4, 0, 2).base_extent());
@@ -476,7 +479,8 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]() {return ++Val; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(4, 5));
+		static_assert(decltype(lattices::extent(4, 5))::static_size()==2,"");
+		torus_lattice_view<iterator, 2>  Lattice=make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(4, 5));
 
 		auto Size = Lattice.extent();
 		Assert::AreEqual(4u, Size[0], L"Size Error");
@@ -492,7 +496,7 @@ public:
 		Assert::AreEqual(4, UsedSize[0], L"Axis Size Error");
 		Assert::AreEqual(5, UsedSize[1], L"Axis Size Error");
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), UsedSize);
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), UsedSize);
 
 		auto Size = Lattice.extent();
 		Assert::AreEqual(4u, Size[0], L"Size Error");
@@ -506,13 +510,13 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int{return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Begin = Lattice.begin();
 		auto End = Lattice.end();
 		for(int i = 0; i < 90; ++i){
 			Assert::AreEqual(i, Con[i]);
-			Assert::AreEqual(i, Begin.get_index_on_lattice());
+			Assert::AreEqual(i, Begin.base_index());
 			Assert::IsTrue(Begin != End);
 			Assert::AreEqual(i, *Begin);
 			Assert::AreEqual<int>(90 - i, std::distance(Begin, End));
@@ -529,14 +533,14 @@ public:
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
 
-		torus_lattice_view<iterator, 2>  Lattice2(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice2=make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		const torus_lattice_view<iterator, 2>& Lattice = Lattice2;
 
 		auto Begin = Lattice.begin();
 		auto End = Lattice.end();
 		for(int i = 0; i < 90; ++i){
 			Assert::AreEqual(i, Con[i]);
-			Assert::AreEqual(i, Begin.get_index_on_lattice());
+			Assert::AreEqual(i, Begin.base_index());
 			Assert::IsTrue(Begin != End);
 			Assert::AreEqual(i, *Begin);
 			Assert::AreEqual<int>(90 - i, std::distance(Begin, End));
@@ -553,7 +557,7 @@ public:
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(10, 9));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(10, 9));
 
 		Assert::AreEqual(0, Lattice.at(0, 0));
 		Assert::AreEqual(1, Lattice.at(1, 0));
@@ -568,7 +572,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		auto lotr = Lattice.front_locate();
 
 		for(int i = 0; i < 9; ++i){
@@ -595,7 +599,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		auto lotr = Lattice.front_locate();
 		auto blotr = Lattice.locate(7, 5);
 
@@ -614,7 +618,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::extent(4, 5));
 
@@ -633,7 +637,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::extent(4, 5));
 
@@ -655,7 +659,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::point(4, 5));
 
@@ -679,7 +683,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(2, 3), lattices::point(4, 5));
 
@@ -702,7 +706,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(-2, -3), lattices::point(4, 5));
 
@@ -723,11 +727,11 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Sub = Lattice.subview(lattices::point(-2, -3), lattices::point(4, 5));
 
-		auto Itr = Sub.cbegin();
+		auto Itr = Sub.begin();
 
 		for(int y = 0; y < 5; ++y){
 			for(int x = 0; x < 4; ++x){
@@ -745,7 +749,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice= make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 
 		auto Size = hmLib::lattices::point(3,3);
 
@@ -783,7 +787,7 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		torus_lattice_view<iterator, 2>  Lattice2(Con.begin(), Con.end(), lattices::extent(9, 10));
+		torus_lattice_view<iterator, 2>  Lattice2=make_torus_lattice_view(Con.begin(), Con.end(), lattices::extent(9, 10));
 		const torus_lattice_view<iterator, 2>& Lattice(Lattice2);
 
 		auto Size = hmLib::lattices::point(3, 3);
@@ -987,4 +991,5 @@ public:
 		Assert::AreEqual(2, Lat.at(-4, 8), L"Ini Value error.");
 	}
 };
+
 }

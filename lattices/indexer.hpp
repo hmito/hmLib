@@ -1,7 +1,7 @@
-#ifndef HMLIB_LATTICES_LATTICEINDEXER_INC
-#define HMLIB_LATTICES_LATTICEINDEXER_INC 100
+#ifndef HMLIB_LATTICES_INDEXER_INC
+#define HMLIB_LATTICES_INDEXER_INC 100
 #
-//!@brief Definition of the lattice_indexer
+//!@brief Definition of the indexer
 
 #include<numeric>
 #include"../algorithm/compare.hpp"
@@ -10,18 +10,19 @@
 namespace hmLib {
 	namespace lattices {
 		template<unsigned int dim_>
-		struct lattice_indexer {
-			using this_type = lattice_indexer<dim_>;
+		struct indexer {
+			using this_type = indexer<dim_>;
 			using point_type = lattices::point_type<dim_>;
 			using extent_type = lattices::extent_type<dim_>;
 			using index_type = lattices::index_type;
+			using size_type = std::size_t;
 		public:
 			static constexpr unsigned int dim() { return dim_; }
 		public:
-			lattice_indexer() : Extent(0) {}
-			lattice_indexer(const extent_type& Extent_) : Extent(Extent_){}
-			lattice_indexer(const this_type&) = default;
-			lattice_indexer(this_type&&) = default;
+			indexer() : Extent(0) {}
+			explicit indexer(const extent_type& Extent_) : Extent(Extent_){}
+			indexer(const this_type&) = default;
+			indexer(this_type&&) = default;
 			this_type& operator=(const this_type&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:

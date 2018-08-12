@@ -74,10 +74,10 @@ public:
 		container Con(1000);
 		container Con2(1000);
 
-		auto Sampler = hmLib::make_shuffle_sampler(Con.begin(), Con.end(), hmLib::random::default_engine());
+		auto Sampler = hmLib::make_random_removal_sampler(Con.begin(), Con.end());
 
 		for(auto& Val : Con2){
-			Val = *Sampler();
+			Val = *Sampler(hmLib::random::default_engine());
 		}
 	}
 	};
@@ -278,7 +278,7 @@ public:
 			Assert::AreEqual(6u, Keeper.size());
 			Assert::AreEqual(6, std::distance(Keeper.begin(), Keeper.end()));
 
-			auto Range = hmLib::make_index_access_range(Con, Keeper);
+			auto Range = hmLib::make_index_access_range(Con.begin(), Keeper.begin(), Keeper.end());
 			auto Itr = Range.begin();
 
 			Assert::AreEqual(-1, *Itr++);
