@@ -74,10 +74,10 @@ public:
 		container Con(1000);
 		container Con2(1000);
 
-		auto Sampler = hmLib::make_shuffle_sampler(Con.begin(), Con.end(), hmLib::random::default_engine());
+		auto Sampler = hmLib::make_random_removal_sampler(Con.begin(), Con.end());
 
 		for(auto& Val : Con2){
-			Val = *Sampler();
+			Val = *Sampler(hmLib::random::default_engine());
 		}
 	}
 	};

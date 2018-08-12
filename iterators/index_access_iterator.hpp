@@ -300,11 +300,11 @@ namespace hmLib {
 	auto make_index_access_range(const container& Container, const index_container& IndexContainer) {
 		return index_access_range<decltype(Container.cbegin()), decltype(IndexContainer.cbegin())>(Container.cbegin(), IndexContainer.cbegin(), IndexContainer.end());
 	}
-	template<typename iterator, typename index_container, typename std::enable_if<std::is_same<typename std::iterator_traits<iterator>::type, std::random_access_iterator_tag>::value>::type>
+	template<typename iterator, typename index_container, typename std::enable_if<std::is_same<typename std::iterator_traits<iterator>::iterator_category, std::random_access_iterator_tag>::value, std::nullptr_t>::type = nullptr>
 	auto make_index_access_range(iterator Itr, const index_container& IndexContainer) {
 		return index_access_range<iterator, decltype(IndexContainer.cbegin())>(Itr, IndexContainer.cbegin(), IndexContainer.end());
 	}
-	template<typename iterator, typename index_iterator, typename std::enable_if<std::is_same<typename std::iterator_traits<iterator>::type, std::random_access_iterator_tag>::value>::type>
+	template<typename iterator, typename index_iterator, typename std::enable_if<std::is_same<typename std::iterator_traits<iterator>::iterator_category, std::random_access_iterator_tag>::value,std::nullptr_t>::type = nullptr>
 	auto make_index_access_range(iterator Itr, index_iterator IndexBegin, index_iterator IndexEnd) {
 		return index_access_range<iterator, index_iterator>(Itr, IndexBegin, IndexEnd);
 	}

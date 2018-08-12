@@ -164,4 +164,105 @@ namespace hmLib {
 			Assert::AreEqual(23.0, std::get<2>(Zip.at(3)), 1e-10);
 		}
 	};
+	TEST_CLASS(test_transform_iterator) {
+		TEST_METHOD(test_ref) {
+			std::vector<std::pair<double, int>> Vec(20, std::make_pair(2.0,1));
+			auto Range = hmLib::make_transform_range(Vec.begin(), Vec.end(), [](std::pair<double, int>& p)->int& {return p.second; });
+			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::random_access_iterator_tag>::value, "iterator category is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, int>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::reference, int&>::value, "reference is incorrect");
+
+			int cnt = 0;
+			for(auto& v:Range)v = cnt++;
+
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(Vec.at(i).second, i);
+			}
+
+			auto itr = Range.begin();
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(*itr, i);
+				itr++;
+			}
+			Assert::IsTrue(itr==Range.end());
+		}
+		TEST_METHOD(test_cref) {
+			std::vector<std::pair<double, int>> Vec(20, std::make_pair(2.0, 1));
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Vec.at(i).second = i;
+			}
+
+			auto Range = hmLib::make_transform_range(Vec.cbegin(), Vec.cend(), [](auto& p)->const int&{return p.second; });
+			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::random_access_iterator_tag>::value, "iterator category is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, const int>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::reference, const int&>::value, "reference is incorrect");
+
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(Vec.at(i).second, i);
+			}
+
+			auto itr = Range.begin();
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(*itr, i);
+				itr++;
+			}
+			Assert::IsTrue(itr==Range.end());
+		}
+		TEST_METHOD(test_value) {
+			std::vector<std::pair<double, int>> Vec(20, std::make_pair(2.0, 1));
+			auto Range = hmLib::make_transform_range(Vec.begin(), Vec.end(), [](std::pair<double, int>& p){return p.second; });
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Vec.at(i).second = i;
+			}
+
+			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::random_access_iterator_tag>::value, "iterator category is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, const int>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::reference, const int>::value, "reference is incorrect");
+
+			auto itr = Range.begin();
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(*itr, i);
+				itr++;
+			}
+			Assert::IsTrue(itr==Range.end());
+		}
+		TEST_METHOD(test_arrow) {
+			std::vector<std::pair<double, int>> Vec(20, std::make_pair(2.0, 1));
+			auto Range = hmLib::make_transform_range(Vec.begin(), Vec.end(), [](std::pair<double, int>& p) {return std::make_pair(p.second,p.first); });
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Vec.at(i).first = 1.0/(i+1.0);
+				Vec.at(i).second = i;
+			}
+
+			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::random_access_iterator_tag>::value, "iterator category is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, const std::pair<int,double>>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::reference, const std::pair<int, double>>::value, "reference is incorrect");
+
+			auto itr = Range.begin();
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(itr->first, i);
+				Assert::AreEqual(itr->second, 1.0/(i+1.0), 1e-10);
+				itr++;
+			}
+			Assert::IsTrue(itr==Range.end());
+		}
+		TEST_METHOD(test_list) {
+			std::list<std::pair<double, int>> Vec(20, std::make_pair(2.0, 1));
+			auto Range = hmLib::make_transform_range(Vec.begin(), Vec.end(), [](std::pair<double, int>& p)->int& {return p.second; });
+			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::bidirectional_iterator_tag>::value, "iterator category is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, int>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::reference, int&>::value, "reference is incorrect");
+
+			int cnt = 0;
+			for(auto& v:Range)v = cnt++;
+
+			auto itr = Range.begin();
+			for(int i = 0; i<static_cast<int>(Vec.size()); ++i) {
+				Assert::AreEqual(*itr, i);
+				itr++;
+			}
+			Assert::IsTrue(itr==Range.end());
+		}
+
+	};
 }

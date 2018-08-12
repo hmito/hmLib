@@ -40,7 +40,7 @@ namespace hmLib{
 		dist_type Dist;
 	public:
 		random_sampler(){}
-		random_sampler(InputIterator Begin_,InputIterator End_){sync(Begin_,End_);}
+		random_sampler(InputIterator Begin_,InputIterator End_){reset(Begin_,End_);}
 	public:
 		template<typename RandEngine>
 		InputIterator operator()(RandEngine Engine){
@@ -257,7 +257,6 @@ namespace hmLib{
 		bool IsShuffled;
 	public:
 		random_removal_sampler() {}
-		template<typename RandEngine>
 		random_removal_sampler(InputIterator Begin_, InputIterator End_) { reset(Begin_, End_); }
 	public:
 		template<typename RandEngine>
@@ -285,7 +284,7 @@ namespace hmLib{
 		bool empty()const { return Vec.empty(); }
 		unsigned int size()const{return Vec.size();}
 	};
-	template<typename InputIterator, typename RandEngine>
+	template<typename InputIterator>
 	random_removal_sampler<InputIterator> make_random_removal_sampler(InputIterator Begin_, InputIterator End_) {
 		return random_removal_sampler<InputIterator>(Begin_, End_);
 	}
