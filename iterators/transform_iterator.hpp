@@ -3,17 +3,40 @@
 #
 #include<iterator>
 #include<type_traits>
+#include"iterator.hpp"
+#include"../clone_ptrproxy.hpp"
 namespace hmLib {
-	template<typename base_iterator_, typename transform_, typename iterator_category_>
-	struct transform_iterator {};
+	namespace iterators {
+		namespace detail {
+			template<typename base_iterator_, typename transform_>
+			struct transform_iterator_category {
+			private:
+				using base_value_type = typename std::iterator_traits<base_iterator_>::value_type;
+			private:
+				using raw_value_type = typename std::remove_reference<decltype(std::declval<transform_>()(std::declval<base_value_type>()))>::type;
+				using raw_reference = decltype((std::declval<transform_>()(std::declval<base_value_type>())));
+			public:
+				static constexpr bool is_reference = std::is_same<raw_value_type&, raw_reference>::value;
+				using value_type = typename std::conditional<is_reference, raw_value_type, const raw_value_type>::type;
+				using reference = typename std::conditional<is_reference, raw_reference, const raw_value_type>::type;
+				using pointer = typename std::conditional<is_reference, raw_value_type*, clone_ptrproxy<raw_value_type> >::type;
+			};
+		}
+	}
+
+	template<typename base_iterator_, typename transform_, typename iterator_category_ = typename std::iterator_traits<base_iterator_>::iterator_category>
+	struct transform_iterator{};
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::input_iterator_tag>{
 		using this_type = transform_iterator<base_iterator_, transform_, std::input_iterator_tag>;
+	private:
 		using base_iterator = base_iterator_;
 		using transform = transform_;
-		using value_type = decltype(std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>()));
-		using reference = decltype((std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>())));
-		using pointer = void;
+		using transform_iterator_category = iterators::detail::transform_iterator_category<base_iterator, transform>;
+	public:
+		using value_type = typename transform_iterator_category::value_type;
+		using reference = typename transform_iterator_category::reference;
+		using pointer = typename transform_iterator_category::pointer;
 		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 		using iterator_category = std::input_iterator_tag;
 	private:
@@ -25,17 +48,21 @@ namespace hmLib {
 		this_type& operator++() { ++Itr; return *this; }
 		this_type operator++(int) { this_type Prev = *this; operator++(); return Prev; }
 		reference operator*() { return Transform(*Itr); }
+		pointer operator->() { return pointer(&Transform(*Itr)); }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 	};
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::output_iterator_tag> {
 		using this_type = transform_iterator<base_iterator_, transform_, std::output_iterator_tag>;
+	private:
 		using base_iterator = base_iterator_;
 		using transform = transform_;
-		using value_type = decltype(std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>()));
-		using reference = decltype((std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>())));
-		using pointer = void;
+		using transform_iterator_category = iterators::detail::transform_iterator_category<base_iterator, transform>;
+	public:
+		using value_type = typename transform_iterator_category::value_type;
+		using reference = typename transform_iterator_category::reference;
+		using pointer = typename transform_iterator_category::pointer;
 		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 		using iterator_category = std::output_iterator_tag;
 	private:
@@ -51,11 +78,14 @@ namespace hmLib {
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::forward_iterator_tag>{
 		using this_type = transform_iterator<base_iterator_, transform_, std::forward_iterator_tag>;
+	private:
 		using base_iterator = base_iterator_;
 		using transform = transform_;
-		using value_type = decltype(std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>()));
-		using reference = decltype((std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>())));
-		using pointer = void;
+		using transform_iterator_category = iterators::detail::transform_iterator_category<base_iterator, transform>;
+	public:
+		using value_type = typename transform_iterator_category::value_type;
+		using reference = typename transform_iterator_category::reference;
+		using pointer = typename transform_iterator_category::pointer;
 		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 		using iterator_category = std::forward_iterator_tag;
 	private:
@@ -67,17 +97,21 @@ namespace hmLib {
 		this_type& operator++() { ++Itr; return *this; }
 		this_type operator++(int) { this_type Prev = *this; operator++(); return Prev; }
 		reference operator*() { return Transform(*Itr); }
+		pointer operator->() { return pointer(&Transform(*Itr)); }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 	};
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::bidirectional_iterator_tag> {
 		using this_type = transform_iterator<base_iterator_, transform_, std::bidirectional_iterator_tag>;
+	private:
 		using base_iterator = base_iterator_;
 		using transform = transform_;
-		using value_type = decltype(std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>()));
-		using reference = decltype((std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>())));
-		using pointer = void;
+		using transform_iterator_category = iterators::detail::transform_iterator_category<base_iterator, transform>;
+	public:
+		using value_type = typename transform_iterator_category::value_type;
+		using reference = typename transform_iterator_category::reference;
+		using pointer = typename transform_iterator_category::pointer;
 		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 		using iterator_category = std::bidirectional_iterator_tag;
 	private:
@@ -91,17 +125,21 @@ namespace hmLib {
 		this_type& operator--() { --Itr; return *this; }
 		this_type operator--(int) { this_type Prev = *this; operator--(); return Prev; }
 		reference operator*() { return Transform(*Itr); }
+		pointer operator->() { return pointer(&Transform(*Itr)); }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 	};
 	template<typename base_iterator_, typename transform_>
 	struct transform_iterator<base_iterator_, transform_, std::random_access_iterator_tag> {
 		using this_type = transform_iterator<base_iterator_, transform_, std::random_access_iterator_tag>;
+	private:
 		using base_iterator = base_iterator_;
 		using transform = transform_;
-		using value_type = decltype(std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>()));
-		using reference = decltype((std::declval<transform_>()(std::declval<typename std::iterator_traits<base_iterator>::reference>())));
-		using pointer = void;
+		using transform_iterator_category = iterators::detail::transform_iterator_category<base_iterator, transform>;
+	public:
+		using value_type = typename transform_iterator_category::value_type;
+		using reference = typename transform_iterator_category::reference;
+		using pointer = typename transform_iterator_category::pointer;
 		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
 		using iterator_category = std::random_access_iterator_tag;
 	private:
@@ -121,6 +159,7 @@ namespace hmLib {
 		friend this_type operator-(const this_type& itr, difference_type n) { this_type nitr = itr; nitr -= n; return nitr; }
 		friend difference_type operator-(this_type itr1, const this_type& itr2) {return itr1.Itr - itr2.Itr; }
 		reference operator*() { return Transform(*Itr); }
+		pointer operator->() { return pointer(&Transform(*Itr)); }
 		friend bool operator==(const this_type& itr1, const this_type& itr2) { return itr1.Itr==itr2.Itr; }
 		friend bool operator!=(const this_type& itr1, const this_type& itr2) { return itr1.Itr!=itr2.Itr; }
 		friend bool operator>(const this_type& itr1, const this_type& itr2) { return itr1.Itr>itr2.Itr; }
@@ -129,7 +168,7 @@ namespace hmLib {
 		friend bool operator<=(const this_type& itr1, const this_type& itr2) { return itr1.Itr<=itr2.Itr; }
 	};
 
-	template<typename base_iterator_, typename transform_, typename iterator_category_>
+	template<typename base_iterator_, typename transform_, typename iterator_category_ = typename std::iterator_traits<base_iterator_>::iterator_category>
 	struct transform_range {
 		using base_iterator = base_iterator_;
 		using transform = transform_;
@@ -145,24 +184,8 @@ namespace hmLib {
 		iterator end() { return iterator(End, Transform); }
 	};
 	template<typename base_iterator_, typename transform_>
-	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::input_iterator_tag> make_input_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
-		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::input_iterator_tag>(std::move(Beg), std::move(End), std::move(Transform));
-	}
-	template<typename base_iterator_, typename transform_>
-	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::output_iterator_tag> make_output_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
-		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::output_iterator_tag>(std::move(Beg), std::move(End), std::move(Transform));
-	}
-	template<typename base_iterator_, typename transform_>
-	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::forward_iterator_tag> make_forward_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
-		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::forward_iterator_tag>(std::move(Beg), std::move(End), std::move(Transform));
-	}
-	template<typename base_iterator_, typename transform_>
-	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::bidirectional_iterator_tag> make_bidirectional_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
-		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::bidirectional_iterator_tag>(std::move(Beg), std::move(End), std::move(Transform));
-	}
-	template<typename base_iterator_, typename transform_>
-	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::random_access_iterator_tag> make_random_access_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
-		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type, std::random_access_iterator_tag>(std::move(Beg), std::move(End), std::move(Transform));
+	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type> make_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
+		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type>(std::move(Beg), std::move(End), std::move(Transform));
 	}
 }
 #
