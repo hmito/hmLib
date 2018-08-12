@@ -4,11 +4,9 @@
 #include<iterator>
 #include<utility>
 #include<vector>
-#include"../exceptions.hpp"
 #include"../utility.hpp"
 #include"../type_traits.hpp"
-#include"../iterators/index_access_iterator.hpp"
-#include"../iterators/index_accessor_iterator.hpp"
+
 namespace hmLib {
 	namespace algorithm {
 		template<typename forward_iterator_, bool is_const = is_const_iterator<forward_iterator_>::value>
@@ -123,8 +121,6 @@ namespace hmLib {
 			const_iterator cend()const { return iterator(KeptBlock.end()); }
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
-			base_iterator front_itr()const { return KeptBlock.front(); }
-			base_iterator back_itr()const { return KeptBlock.back(); }
 		private:
 			element_container KeptBlock;
 		};
@@ -200,8 +196,6 @@ namespace hmLib {
 			const_iterator cend()const { return const_iterator(KeptBlock.end()); }
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
-			base_iterator front_itr()const { return KeptBlock.front(); }
-			base_iterator back_itr()const { return KeptBlock.back(); }
 		private:
 			element_container KeptBlock;
 		};
@@ -355,17 +349,15 @@ namespace hmLib {
 			iterator begin() { return iterator(JumpBlock.begin(), Itr); }
 			iterator end() { 
 				if(empty())return iterator(JumpBlock.end(), Itr);
-				return iterator(JumpBlock.end(), JumpBlock.back().second);
+				return iterator(JumpBlock.begin(), JumpBlock.back().second);
 			}
 			const_iterator begin()const{ return cbegin(); }
 			const_iterator end() const { return cend(); }
 			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Itr); }
 			const_iterator cend() const {
 				if(JumpBlock.empty())return const_iterator(JumpBlock.end(), Itr);
-				return iterator(JumpBlock.end(), JumpBlock.back().second);
+				return iterator(JumpBlock.begin(), JumpBlock.back().second);
 			}
-			base_iterator front_itr()const { return Itr; }
-			base_iterator back_itr()const { return JumpBlock.back().first-1; }
 		private:
 			base_iterator Itr;
 			std::size_t Size;
@@ -482,8 +474,6 @@ namespace hmLib {
 			}
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
-			base_iterator front_itr()const { return Itr; }
-			base_iterator back_itr()const { return JumpBlock.back().first-1; }
 		private:
 			base_iterator Itr;
 			std::size_t Size;
@@ -531,16 +521,6 @@ namespace hmLib {
 			const_iterator cend()const { return KeptBlock.cend(); }
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end() const { return cend(); }
-			value_type front_index()const { return KeptBlock.front(); }
-			value_type back_index()const { return KeptBlock.back(); }
-			template<typename random_access_iterator, typename std::enable_if<std::is_constructible<typename std::iterator_traits<random_access_iterator>::iterator_category, typename std::random_access_iterator_tag>::value,std::nullptr_t>::type = nullptr>
-			auto itr_range(random_access_iterator Beg)const{
-				return make_index_access_range(Beg, begin(),end());
-			}
-			template<typename container>
-			auto range(container& Container)const {
-				return make_index_op_access_range(Container, begin(), end());
-			}
 		private:
 			element_container KeptBlock;
 		};
@@ -646,7 +626,16 @@ namespace hmLib {
 				Size = 0;
 				Index = 0;
 			}
-			void push_back(value_type Index_) {
+			bool empty()const { return Size==0; }
+			std::size_t size()const { return Size; }
+			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Index); }
+			const_iterator cend()const {
+				if(JumpBlock.empty())return const_iterator(JumpBlock.end(), Index);
+				return const_iterator(JumpBlock.end(), JumpBlock.back().second);
+			}
+			const_iterator begin()const { return cbegin(); }
+			const_iterator end() const { return cend(); }
+			void push_back(value_type Index_){
 				if(Size==0) {
 					Index = Index_;
 					JumpBlock.emplace_back(Index_+1, Index_+1);
@@ -662,25 +651,6 @@ namespace hmLib {
 					}
 				}
 				++Size;
-			}
-			bool empty()const { return Size==0; }
-			std::size_t size()const { return Size; }
-			const_iterator cbegin()const { return const_iterator(JumpBlock.begin(), Index); }
-			const_iterator cend()const {
-				if(JumpBlock.empty())return const_iterator(JumpBlock.end(), Index);
-				return const_iterator(JumpBlock.end(), JumpBlock.back().second);
-			}
-			const_iterator begin()const { return cbegin(); }
-			const_iterator end() const { return cend(); }
-			value_type front_index()const { return Index; }
-			value_type back_index()const { return JumpBlock.back().first-1; }
-			template<typename random_access_iterator, typename std::enable_if<std::is_constructible<typename std::iterator_traits<random_access_iterator>::iterator_category, typename std::random_access_iterator_tag>::value, std::nullptr_t>::type = nullptr>
-			auto itr_range(random_access_iterator Beg)const {
-				return make_index_access_range(Beg, begin(), end());
-			}
-			template<typename container>
-			auto range(container& Container)const {
-				return make_index_op_access_range(Container, begin(), end());
 			}
 		private:
 			index_type Index;
