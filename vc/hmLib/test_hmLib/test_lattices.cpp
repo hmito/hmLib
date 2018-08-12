@@ -3,7 +3,10 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include<boost/iterator/iterator_facade.hpp>
+#include"../../../random.hpp"
 #include "../../../lattices.hpp"
+#include"../../../math/multiaxis.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -987,6 +990,299 @@ public:
 		Assert::AreEqual(2, Lat.at(-1, 0), L"Ini Value error.");
 		Assert::AreEqual(2, Lat.at(-1, -8), L"Ini Value error.");
 		Assert::AreEqual(2, Lat.at(-4, 8), L"Ini Value error.");
+	}
+};
+
+TEST_CLASS(test_lattice_keep_if) {
+	TEST_METHOD(block_point_keep) {
+		lattice<int, 3> Lat(lattices::extent(3u,4u,5u),0);
+		{
+			auto Itr = Lat.begin();
+			for(int i = 0; i<60; ++i) {
+				*(Itr++) = i;
+			}
+		}
+
+		lattices::block_point_keeper<3> Keeper(Lat.begin(), Lat.end(), [](int v) {return (v>=6 && v<10) || (17<=v && v<25)|| (34<=v && v<41); });
+		//4,8,7
+		auto Range = Keeper.range(Lat);
+		Assert::AreEqual(19u, Range.size());
+
+		auto Itr = Range.begin();
+		auto End = Range.end();
+
+		for(int i = 6; i<10; ++i) {
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++Itr;
+		}
+		for(int i = 17; i<25; ++i) {
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++Itr;
+		}
+		for(int i = 34; i<41; ++i) {
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+	}
+	TEST_METHOD(element_point_keep) {
+		lattice<int, 3> Lat(lattices::extent(3u, 4u, 5u), 0);
+		{
+			auto Itr = Lat.begin();
+			for(int i = 0; i<60; ++i) {
+				*(Itr++) = i;
+			}
+		}
+
+		lattices::element_point_keeper<3> Keeper(Lat.begin(), Lat.end(), [](int v) {return (v>=6 && v<10) || (17<=v && v<25)|| (34<=v && v<41); });
+		//4,8,7
+		auto Range = Keeper.range(Lat);
+		Assert::AreEqual(19u, Range.size());
+
+		auto KItr = Keeper.begin();
+		auto KEnd = Keeper.end();
+		auto Itr = Range.begin();
+		auto End = Range.end();
+
+		for(int i = 6; i<10; ++i) {
+			Assert::IsFalse(KItr==KEnd);
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++KItr;
+			++Itr;
+		}
+		for(int i = 17; i<25; ++i) {
+			Assert::IsFalse(KItr==KEnd);
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++KItr;
+			++Itr;
+		}
+		for(int i = 34; i<41; ++i) {
+			Assert::IsFalse(KItr==KEnd);
+			Assert::IsFalse(Itr==End);
+			Assert::AreEqual(i, *Itr);
+			++KItr;
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+		Assert::IsTrue(KItr==KEnd);
+	}
+	TEST_METHOD(block_point_keep_with_blocklat) {
+		block_lattice<int, 3> Lat(lattices::extent(3u, 3u, 3u));
+		{
+			int cnt = 0;
+			for(int x = 2; x<10; ++x) {
+				for(int y = 3; y<9; ++y) {
+					for(int z = 0; z<4; ++z) {
+						Lat.ref(x, y, z) = cnt++;
+					}
+				}
+			}
+		}
+
+		lattices::block_point_keeper<3> Keeper;
+		Assert::IsTrue(Keeper.empty());
+		Assert::AreEqual(0u, Keeper.size());
+
+		Keeper.reset(Lat.begin(), Lat.end(), [](int v) {return (v>=40 && v<60) || (80<=v && v<95); });
+
+		Assert::IsFalse(Keeper.empty());
+		Assert::AreEqual(35u, Keeper.size());
+
+
+		auto Range = Keeper.range(Lat);
+
+		auto Itr = Range.begin();
+		auto End = Range.end();
+
+		std::vector<int> Ans;
+		for(int i = 40; i<60; ++i) {
+			Assert::IsFalse(Itr==End);
+			Ans.push_back(*Itr);
+			++Itr;
+		}
+		for(int i = 80; i<95; ++i) {
+			Assert::IsFalse(Itr==End);
+			Ans.push_back(*Itr);
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+
+		std::sort(Ans.begin(), Ans.end());
+		Assert::AreEqual(35u, Ans.size());
+		auto AnsItr = Ans.begin();
+		for(int i = 40; i<60; ++i) {
+			Assert::AreEqual(i, *AnsItr);
+			++AnsItr;
+		}
+		for(int i = 80; i<95; ++i) {
+			Assert::AreEqual(i, *AnsItr);
+			++AnsItr;
+		}
+	}
+};
+
+TEST_CLASS(test_block_lattice) {
+	TEST_METHOD(block_construct) {
+		block_lattice<int, 2> Lat(4,4);
+
+		Assert::AreEqual(0u, Lat.block_num());
+		Assert::AreEqual(0u, Lat.lattice_size());
+
+		Lat.assign(6, 7);
+		Assert::AreEqual(0u, Lat.block_num());
+		Assert::AreEqual(0u, Lat.lattice_size());
+
+		Lat = block_lattice<int, 2>(2, 2);
+	}
+	TEST_METHOD(block_ref) {
+		block_lattice<int, 2> Lat(4, 4);
+
+		Lat.ref(0, 0) = 1;
+		Assert::AreEqual(1u, Lat.block_num());
+		Assert::AreEqual(16u, Lat.lattice_size());
+
+		Lat.ref(3, 1) = 2;
+		Assert::AreEqual(1u, Lat.block_num());
+		Assert::AreEqual(16u, Lat.lattice_size());
+
+		Lat.ref(7, 9) = 3;
+		Assert::AreEqual(2u, Lat.block_num());
+		Assert::AreEqual(32u, Lat.lattice_size());
+
+		Assert::AreEqual(1, Lat.ref(0, 0));
+		Assert::AreEqual(2, Lat.ref(3, 1));
+		Assert::AreEqual(3, Lat.ref(7, 9));
+	}
+	TEST_METHOD(block_ref2) {
+		block_lattice<int, 2> Lat(5, 5);
+
+		Lat.ref(22, 18) = 1;	//[4,3] [2,3]
+		Lat.ref(19, 0) = 2; 	//[3,0] [4,0]
+		Lat.ref(5, 10) = 3; 	//[1,2] [0,0]
+		Lat.ref(45, 1) = 4;		//[9,0] [0,1]
+		Lat.ref(23, 16) = 5;	//[4,3] [3,1]
+		Lat.ref(49, 4) = 6; 	//[9,0] [4,4]
+
+		auto BItr = Lat.block_begin();
+		auto BEnd = Lat.block_end();
+		Assert::AreEqual(4, std::distance(BItr, BEnd));
+
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(15,0));
+		Assert::IsTrue(BItr->at(4, 0)== 2);
+		++BItr;
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(45, 0));
+		Assert::IsTrue(BItr->at(0, 1)== 4);
+		Assert::IsTrue(BItr->at(4, 4)== 6);
+		++BItr;
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(5, 10));
+		Assert::IsTrue(BItr->at(0, 0)== 3);
+		++BItr;
+		Assert::IsFalse(BItr==BEnd);
+		Assert::IsTrue(BItr->point()==lattices::point(20, 15));
+		Assert::IsTrue(BItr->at(2, 3)== 1);
+		Assert::IsTrue(BItr->at(3, 1)== 5);
+		++BItr;
+		Assert::IsTrue(BItr==BEnd);
+
+		auto Itr = Lat.begin();
+		auto End = Lat.end();
+		Assert::AreEqual(4*5*5, std::distance(Itr, End));
+	}
+	TEST_METHOD(block_itr) {
+		block_lattice<int, 2> Lat(4, 4);
+
+		Lat.ref(0, 0) = 10;
+		Lat.ref(3, 1) = 20;
+		Lat.ref(7, 9) = 30;
+
+		auto Itr = Lat.begin();
+		auto End = Lat.end();
+
+		Assert::AreEqual<int>(10, *Itr);
+		Assert::IsFalse(Itr==End);
+		++Itr;
+		for(unsigned int i = 1; i<7; ++i) {
+			Assert::AreEqual<int>(0, *Itr);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+		Assert::AreEqual<int>(20, *Itr);
+		Assert::IsFalse(Itr==End);
+		++Itr;
+		for(unsigned int i = 8; i<16; ++i) {
+			Assert::AreEqual<int>(0, *Itr);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+
+		for(unsigned int i = 0; i<7; ++i) {
+			Assert::AreEqual<int>(0, *Itr);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+		Assert::AreEqual<int>(30, *Itr);
+		Assert::IsFalse(Itr==End);
+		++Itr;
+		for(unsigned int i = 8; i<16; ++i) {
+			Assert::AreEqual<int>(0, *Itr);
+			Assert::IsFalse(Itr==End);
+			++Itr;
+		}
+		Assert::IsTrue(Itr==End);
+	}
+};
+
+TEST_CLASS(test_zip_lattice) {
+	TEST_METHOD(zip_access) {
+		multiaxis<double, 2> Axes({hmLib::make_axis(0.0,1.0,5),hmLib::make_axis(0.0,1.0,6) });
+		lattice<double, 2> Lat(lattices::extent(4,5),0.0);
+
+		auto Zip = lattices::make_zip_lattice(Axes, Lat);
+
+		auto Elm = Zip.at(lattices::point(2,3));
+		Assert::AreEqual(0.50, std::get<0>(Elm).at(0), 1e-5);
+		Assert::AreEqual(0.60, std::get<0>(Elm).at(1), 1e-5);
+		Assert::AreEqual(0.00, std::get<1>(Elm), 1e-5);
+
+		std::get<1>(Elm) = 5.0;
+		Assert::AreEqual(5.00, std::get<1>(Elm), 1e-5);
+	}
+	TEST_METHOD(zip_access_block) {
+		multiaxis<double, 2> Axes({ hmLib::make_axis(0.0,10.0,41),hmLib::make_axis(0.0,10.0,51) });
+		block_lattice<double, 2> Lat(10,10);
+
+		auto Zip = lattices::make_zip_lattice(Axes, Lat);
+
+		auto Elm = Zip.ref(lattices::point(2, 3));
+		Assert::AreEqual(0.50, std::get<0>(Elm).at(0), 1e-5);
+		Assert::AreEqual(0.60, std::get<0>(Elm).at(1), 1e-5);
+		Assert::AreEqual(0.00, std::get<1>(Elm), 1e-5);
+
+		std::get<1>(Elm) = 5.0;
+		Assert::AreEqual(5.00, std::get<1>(Elm), 1e-5);
+
+
+		Elm = Zip.ref(lattices::point(20, 30));
+		Assert::AreEqual(5.0, std::get<0>(Elm).at(0), 1e-5);
+		Assert::AreEqual(6.0, std::get<0>(Elm).at(1), 1e-5);
+		Assert::AreEqual(0.0, std::get<1>(Elm), 1e-5);
+	}
+	TEST_METHOD(freq_use_case) {
+		multiaxis<double, 2> Axes({ hmLib::make_axis(0.0,100.0,10000),hmLib::make_axis(0.0,100.0,10000) });
+		block_lattice<double, 2> Lat(10, 10);
+
+		auto ZipLat = lattices::make_zip_lattice(Axes, Lat);
+
+		lattices::block_point_keeper<2> Keeper;
+		//Keeper.reset(Lat.begin(),Lat.end(),)
 	}
 };
 }

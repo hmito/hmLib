@@ -209,11 +209,11 @@ namespace hmLib {
 			return Ans;
 		}
 		this_type& operator+=(difference_type d) {
-			IItr = +d;
+			IItr += d;
 			return *this;
 		}
 		this_type& operator-=(difference_type d) {
-			IItr = -d;
+			IItr -= d;
 			return *this;
 		}
 		friend this_type operator+(const this_type& itr, difference_type d) {

@@ -15,6 +15,7 @@ namespace hmLib {
 			using point_type = lattices::point_type<dim_>;
 			using extent_type = lattices::extent_type<dim_>;
 			using index_type = lattices::index_type;
+			using size_type = std::size_t;
 		public:
 			static constexpr unsigned int dim() { return dim_; }
 		public:

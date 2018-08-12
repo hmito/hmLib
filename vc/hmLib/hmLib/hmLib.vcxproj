@@ -26,6 +26,7 @@
     <ClInclude Include="..\..\..\ccontainer\cstack.h" />
     <ClInclude Include="..\..\..\ccontainer\cstring.h" />
     <ClInclude Include="..\..\..\circular.hpp" />
+    <ClInclude Include="..\..\..\clone_ptrproxy.hpp" />
     <ClInclude Include="..\..\..\color.hpp" />
     <ClInclude Include="..\..\..\config_vc.h" />
     <ClInclude Include="..\..\..\coordinates.hpp" />

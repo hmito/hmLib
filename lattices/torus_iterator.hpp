@@ -52,7 +52,7 @@ namespace hmLib {
 			base_iterator base()const { return Begin+base_index(); }
 			reference operator*()const { return base().operator*(); }
 			pointer operator->()const { return base().operator->(); }
-			reference operator[](index_type Dif_)const { return Begin[Indexer.torus_index(Indexer.calc_point(Index+Dif_)]); }
+			reference operator[](index_type Dif_)const { return Begin[Indexer.torus_index(Indexer.calc_point(Index+Dif_))]; }
 		public:
 			locator locate()const { return locator(Begin, Indexer, base_point()); }
 			explicit operator locator()const { return locate(); }
