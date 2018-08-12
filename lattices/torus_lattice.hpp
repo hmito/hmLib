@@ -52,6 +52,9 @@ namespace hmLib {
 			: Indexer(Extent_) {
 			Data.assign(Indexer.lattice_size(), IniVal);
 		}
+		torus_lattice(const extent_type& Extent_, std::initializer_list<value_type> Ini_) {
+			resize(Extent_, std::move(Ini_));
+		}
 		torus_lattice(const extent_type& Extent_, const data_type& Data_) {
 			resize(Extent_, Data_);
 		}
@@ -78,19 +81,23 @@ namespace hmLib {
 			return at(lattices::point(Pos_, Others_...));
 		}
 		//!Return reference of the elemtn at the given point
-		reference operator[](const point_type& Point_) { return Data[Indexer.torus_index(Point_)]; }
+		reference ref(const point_type& Point_) { return Data[Indexer.torus_index(Point_)]; }
 		//!Return const_reference of the elemtn at the given point
-		const_reference operator[](const point_type& Point_)const { return Data[Indexer.torus_index(Point_)]; }
+		const_reference ref(const point_type& Point_)const { return Data[Indexer.torus_index(Point_)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
 		reference ref(index_type Pos_, others... Others_) {
-			return operator[](lattices::point(Pos_, Others_...));
+			return ref(lattices::point(Pos_, Others_...));
 		}
 		//!Return const_reference of the elemtn at the given elements point
 		template<typename... others>
 		const_reference ref(index_type Pos_, others... Others_)const {
-			return operator[](lattices::point(Pos_, Others_...));
+			return ref(lattices::point(Pos_, Others_...));
 		}
+		//!Return reference of the elemtn at the given point
+		reference operator[](const point_type& Point_) { return ref(Point_); }
+		//!Return const_reference of the elemtn at the given point
+		const_reference operator[](const point_type& Point_)const { return ref(Point_); }
 	public:
 		//!Get number of elements included in the lattice
 		size_type lattice_size()const { return Indexer.lattice_size(); }
@@ -100,6 +107,14 @@ namespace hmLib {
 		point_type index_to_point(index_type Index_)const { return Indexer.point(Index_); }
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
+		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
+		reference index_at(index_type Index_) { return Data.at(Index_); }
+		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
+		const_reference index_at(index_type Index_)const { return Data.at(Index_); }
+		//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
+		reference index_ref(index_type Index_) { return Data[Index_]; }
+		//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
+		const_reference index_ref(index_type Index_)const { return Data[Index_]; }
 	public:
 		//!Return begin iterator fot the lattice
 		iterator begin() { return iterator(Data.begin(), Indexer, 0);}
@@ -135,14 +150,14 @@ namespace hmLib {
 	public:
 		view subview(const point_type& Point_, const extent_type& Extent_) {
 			hmLib_assert(hmLib::all_less_equal_than(Extent_, Indexer.extent()), lattices::invalid_range, "The given range is smaller than the lattice size.");
-			return view(Begin, Indexer.extent(), Point_, Extent_);
+			return view(Data.begin(), Indexer.extent(), Point_, Extent_);
 		}
 		const_view subview(const point_type& Point_, const extent_type& Extent_) const {
 			return csubview(Point_, Extent_);
 		}
 		const_view csubview(const point_type& Point_, const extent_type& Extent_) const {
 			hmLib_assert(hmLib::all_less_equal_than(Extent_, Indexer.extent()), lattices::invalid_range, "The given range is smaller than the lattice size.");
-			return view(Begin, Indexer.extent(), Point_, Extent_);
+			return view(Data.begin(), Indexer.extent(), Point_, Extent_);
 		}
 	public:
 		bool empty()const { return Data.empty(); }
@@ -157,6 +172,12 @@ namespace hmLib {
 		void resize(const extent_type& Extent_, const_reference IniVal) {
 			Indexer.resize(Extent_);
 			Data.assign(Indexer.lattice_size(), IniVal);
+		}
+		void resize(const extent_type& Extent_, std::initializer_list<value_type> Ini_) {
+			indexer NewIndexer(Extent_);
+			hmLib_assert(Ini_.size() >= NewIndexer.lattice_size(), lattices::invalid_range, "The given Data is smaller than the lattice size.");
+			Indexer = NewIndexer;
+			Data.assign(std::move(Ini_));
 		}
 		void resize(const extent_type& Extent_, const data_type& Data_) {
 			indexer NewIndexer(Extent_);

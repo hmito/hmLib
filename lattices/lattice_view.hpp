@@ -54,10 +54,12 @@ namespace hmLib{
 		template<typename... others>
 		reference at(index_type Pos_, others... Others_)const { return at(lattices::point(Pos_, Others_...)); }
 		//!Return reference of the elemtn at the given point
-		reference operator[](const point_type& Point_)const { return Begin[OriginalIndexer(Point_+Pos)]; }
+		reference ref(const point_type& Point_)const { return Begin[OriginalIndexer(Point_+Pos)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		reference ref(index_type Pos_, others... Others_)const { return operator[](lattices::point(Pos_, Others_...)); }
+		reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
+		//!Return reference of the elemtn at the given point
+		reference operator[](const point_type& Point_)const { return ref(Point_); }
 	public:
 		//!Get number of elements included in the lattice
 		size_type lattice_size()const { return SubIndexer.lattice_size(); }
@@ -67,6 +69,10 @@ namespace hmLib{
 		point_type index_to_point(index_type Index_)const { return SubIndexer.point(Index_); }
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const { return SubIndexer.index(Point_); }
+		//!Return reference of the elemtn at the given Index, i.e., at(Pos) == index_at(point_to_index(Pos));
+		reference index_at(index_type Index_)const {return at(index_to_point(Index_));}
+		//!Return reference of the elemtn at the given Index, i.e., ref(Pos) == index_ref(point_to_index(Pos));
+		reference index_ref(index_type Index_)const { return ref(index_to_point(Index_)); }
 	public:
 		//!Return begin iterator fot the lattice
 		iterator begin() const { return iterator(Begin, OriginalIndexer, Pos, SubIndexer.extent(), 0); }
@@ -133,10 +139,12 @@ namespace hmLib{
 		template<typename... others>
 		reference at(index_type Pos_, others... Others_)const {return at(lattices::point(Pos_, Others_...));}
 		//!Return reference of the elemtn at the given point
-		reference operator[](const point_type& Point_)const { return Begin[Indexer(Point_)]; }
+		reference ref(const point_type& Point_)const { return Begin[Indexer(Point_)]; }
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
-		reference ref(index_type Pos_, others... Others_)const {return operator[](lattices::point(Pos_, Others_...));}
+		reference ref(index_type Pos_, others... Others_)const {return ref(lattices::point(Pos_, Others_...));}
+		//!Return reference of the elemtn at the given point
+		reference operator[](const point_type& Point_)const { return ref(Point_); }
 	public:
 		//!Get number of elements included in the lattice
 		size_type lattice_size()const { return Indexer.lattice_size(); }
@@ -146,6 +154,13 @@ namespace hmLib{
 		point_type index_to_point(index_type Index_)const { return Indexer.point(Index_); }
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
+		//!Return reference of the elemtn at the given Index, i.e., at(Pos) == index_at(point_to_index(Pos));
+		reference index_at(index_type Index_)const { 
+			hmLib_assert(Index_<lattice_size(), lattices::out_of_range_access, "Requested point is out of lattice.");
+			return Begin[Index_]; 
+		}
+		//!Return reference of the elemtn at the given Index, i.e., ref(Pos) == index_ref(point_to_index(Pos));
+		reference index_ref(index_type Index_)const { return Begin[Index_]; }
 	public:
 		//!Return begin iterator fot the lattice
 		iterator begin() const { return iterator(Begin,Indexer, 0); }
