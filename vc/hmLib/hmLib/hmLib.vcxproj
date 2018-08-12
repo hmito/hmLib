@@ -77,7 +77,11 @@
     <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\inserter.hpp" />
     <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\range.hpp" />
+    <ClInclude Include="..\..\..\iterators\transform_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\zip_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />

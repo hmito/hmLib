@@ -10,6 +10,7 @@ namespace hmLib {
 		T val;
 	public:
 		clone_ptrproxy() = delete;
+		explicit clone_ptrproxy(const T* val_):val(*val_) {}
 		explicit clone_ptrproxy(const T& val_):val(val_) {}
 		explicit clone_ptrproxy(T&& val_):val(std::move(val_)) {}
 	public:

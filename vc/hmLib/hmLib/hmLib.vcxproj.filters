@@ -269,15 +269,6 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\inserter.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\streambuf_interface.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -434,12 +425,6 @@
     <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\lattices\indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
@@ -448,6 +433,33 @@
     </ClInclude>
     <ClInclude Include="..\..\..\clone_ptrproxy.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\inserter.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\range.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\transform_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\zip_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
