@@ -17,7 +17,7 @@ namespace hmLib {
 				using raw_reference = decltype((std::declval<transform_>()(std::declval<base_value_type>())));
 			public:
 				static constexpr bool is_reference = std::is_same<raw_value_type&, raw_reference>::value;
-				using value_type = typename std::conditional<is_reference, raw_value_type, const raw_value_type>::type;
+				using value_type = typename std::conditional<is_reference, raw_value_type, raw_value_type>::type;
 				using reference = typename std::conditional<is_reference, raw_reference, const raw_value_type>::type;
 				using pointer = typename std::conditional<is_reference, raw_value_type*, clone_ptrproxy<raw_value_type> >::type;
 			};
