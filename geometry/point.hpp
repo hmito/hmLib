@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_GEOMETRY_POSITION_INC
-#define HMLIB_GEOMETRY_POSITION_INC 100
+﻿#ifndef HMLIB_GEOMETRY_POINT_INC
+#define HMLIB_GEOMETRY_POINT_INC 100
 #include<cmath>
 #include<type_traits>
 #include"../utility.hpp"
@@ -14,35 +14,22 @@ namespace hmLib{
 			T x;
 			T y;
 		public:
-			point():x(0),y(0) {}
+			point() = default;
 			point(const this_type&) = default;
 			this_type& operator=(const this_type&) = default;
 			point(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			point(U x_, U y_) : x(x_), y(y_) {}
-			//template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			//point(const point<U>& Other): x(Other.x), y(Other.y) {}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			explicit point(const point<U>& Other) : x(static_cast<T>(Other.x)), y(static_cast<T>(Other.y)) {}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			this_type& operator=(const point<U>& Other) {
-				if(this != static_cast<const void*>(&Other)) {
-					set(Other.x, Other.y);
-				}
-				return *this;
-			}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			void set(U x_, U y_) {
+			point(T x_, T y_) : x(x_), y(y_) {}
+			void set(T x_, T y_) {
 				x = x_;
 				y = y_;
 			}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			void set(const point<U>& Other) {
-				if(this != static_cast<const void*>(&Other)) {
-					set(Other.p1, Other.p2);
-				}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+			explicit point(const point<U>& Other) : x(static_cast<T>(Other.x)), y(static_cast<T>(Other.y)) {}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+			operator point<U>()const {
+				return point<U>(x,y);
 			}
 		public:
 			point<T> operator+()const { return *this; }
@@ -82,10 +69,6 @@ namespace hmLib{
 				x /= val;
 				y /= val;
 				return *this;
-			}
-			template<typename U, typename std::enable_if<std::is_convertible<T, U>::value>::type*& = hmLib::utility::enabler>
-			operator point<U>()const {
-				return point<U>(x,y);
 			}
 		};
 		template<typename T, typename U, typename ans_type = decltype(std::declval<T>() + std::declval<U>())>

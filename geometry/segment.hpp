@@ -20,27 +20,16 @@ namespace hmLib {
 			segment(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
-			template<typename point_type_, typename std::enable_if<std::is_convertible<point_type_, point_type>::value>::type*& = hmLib::utility::enabler>
-			segment(point_type_ p1_, point_type_ p2_) : p1(p1_), p2(p2_) {}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			segment(const segment<U>& Other) : p1(Other.p1), p2(Other.p2) {}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			this_type& operator=(const segment<U>& Other) {
-				if(this != static_cast<const void*>(&Other)) {
-					set(Other.p1, Other.p2);
-				}
-				return *this;
-			}
-			template<typename point_type_, typename std::enable_if<std::is_convertible<point_type_, point_type>::value>::type*& = hmLib::utility::enabler>
-			void set(point_type_ x_, point_type_ y_) {
+			segment(point_type p1_, point_type p2_) : p1(p1_), p2(p2_) {}
+			void set(point_type p1_, point_type p2_) {
 				p1 = p1_;
 				p2 = p2_;
 			}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-			void set(const segment<U>& Other) {
-				if(this != static_cast<const void*>(&Other)) {
-					set(Other.p1, Other.p2);
-				}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+			explicit segment(const segment<U>& Other) : p1(static_cast<point_type>(Other.p1)), p2(static_cast<point_type>(Other.p2)) {}
+			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+			operator segment<U>()const{
+				return segment<U>(p1, p2);
 			}
 		public:
 			segment<T> operator+()const { return *this; }
