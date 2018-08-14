@@ -4,6 +4,7 @@
 #include<array>
 #include<algorithm>
 #include<numeric>
+#include<cmath>
 #include<initializer_list>
 #include<type_traits>
 #include"utility.hpp"
