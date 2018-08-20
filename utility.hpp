@@ -40,6 +40,11 @@ namespace hmLib{
 	inline bool are_equal(double v1, double v2, double tolerance = 1e-8) {
 		return v1+tolerance >= v2 && v2+tolerance >= v1;
 	}
+
+	template<typename T>
+	void hash_combine(size_t& seed, const T& v) {
+		seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
 }
 #
 #endif

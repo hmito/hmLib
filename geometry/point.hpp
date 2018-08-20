@@ -2,6 +2,7 @@
 #define HMLIB_GEOMETRY_POINT_INC 100
 #include<cmath>
 #include<type_traits>
+#include<functional>
 #include"../utility.hpp"
 #include"../algorithm/compare.hpp"
 namespace hmLib{
@@ -161,5 +162,18 @@ namespace hmLib{
 		using pint = point<int>;
 		using pdouble = point<double>;
 	}
+}
+
+namespace std {
+	template <typename T>
+	class hash<hmLib::plane_geometry::point<T>> {
+	public:
+		size_t operator()(const hmLib::plane_geometry::point<T>& p) const {
+			size_t s = 0;
+			hmLib::hash_combine(s, p.x);
+			hmLib::hash_combine(s, p.y);
+			return s;
+		}
+	};
 }
 #endif

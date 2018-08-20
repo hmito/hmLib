@@ -61,6 +61,9 @@
     <Filter Include="hmLib\gates\comgate">
       <UniqueIdentifier>{8631be19-6e7d-430a-ba4e-4cb6372d84c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\geometry\math">
+      <UniqueIdentifier>{e4ed890b-e02b-422b-a72f-5d0ef4e31aac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="use_odeint.cpp">
@@ -448,6 +451,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\clone_ptrproxy.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\line.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\rectangle.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\math\root.hpp">
+      <Filter>hmLib\geometry\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

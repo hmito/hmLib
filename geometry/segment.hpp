@@ -70,10 +70,7 @@ namespace hmLib {
 				p2 /= val;
 				return *this;
 			}
-			template<typename U, typename std::enable_if<std::is_convertible<T, U>::value>::type*& = hmLib::utility::enabler>
-			explicit operator point<U>()const {
-				return point<U>(static_cast<U>(x), static_cast<U>(y));
-			}
+			void reverse() {std::swap(p1, p2);}
 		};
 		template<typename T, typename U>
 		bool operator==(const segment<T>& s1, const segment<U>& s2) {
@@ -128,6 +125,12 @@ namespace hmLib {
 		auto length(const segment<T>& s) { return norm(s.p1 - s.p2); }
 		template<typename T, typename U>
 		auto length2(const segment<T>& s) { return norm2(s.p1 - s.p2); }
+		namespace detail {
+			template<typename T, typename U>
+			auto line_function_value(const segment<T>& s, const point<U>& p) {
+				return (s.p1.y-s.p2.y)*p.x - (s.p1.x-s.p2.x)*p.y + (s.p1.x*s.p2.y-s.p2.x*s.p1.y);
+			}
+		}
 	}
 }
 #
