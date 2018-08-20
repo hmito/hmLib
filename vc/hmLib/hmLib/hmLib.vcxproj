@@ -52,6 +52,8 @@
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
+    <ClInclude Include="..\..\..\functional\higher_order_function.hpp" />
+    <ClInclude Include="..\..\..\functional\function_ptr.hpp" />
     <ClInclude Include="..\..\..\gates.hpp" />
     <ClInclude Include="..\..\..\gates\bufgate.hpp" />
     <ClInclude Include="..\..\..\gates\comgate.hpp" />
@@ -94,6 +96,7 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
+    <ClInclude Include="..\..\..\lazy.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
     <ClInclude Include="..\..\..\math\constants.hpp" />

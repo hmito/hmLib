@@ -61,6 +61,9 @@
     <Filter Include="hmLib\gates\comgate">
       <UniqueIdentifier>{8631be19-6e7d-430a-ba4e-4cb6372d84c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\functional">
+      <UniqueIdentifier>{c65ccdf2-3c8d-4b0b-87be-0d83391c8d7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="use_odeint.cpp">
@@ -460,6 +463,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\iterators\iterator.hpp">
       <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\functional\function_ptr.hpp">
+      <Filter>hmLib\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\functional\higher_order_function.hpp">
+      <Filter>hmLib\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lazy.hpp">
+      <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
