@@ -49,6 +49,7 @@ namespace hmLib {
 			template<typename Fn, typename... Tuple>
 			decltype(auto) operator()(unsigned int pos, Fn&& f, Tuple&&... v) {
 				hmLib_throw(hmLib::access_exceptions::out_of_range_access, "tuple access is out of range.");
+				return f(std::get<0>(v)...);
 			}
 		};
 	}

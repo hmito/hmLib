@@ -24,11 +24,19 @@ TEST_CLASS(test_lazy) {
 		}
 	};
 public:
-TEST_METHOD(make_from_later) {
-	auto val = hmLib::later([](int i) {return hoge(i); }, 5);
+TEST_METHOD(call_make_lazy) {
+	auto val = hmLib::make_lazy<hoge>([](int i) {return hoge(i); }, 5);
 
 	auto v1 = val.get();
 	Assert::AreEqual(5, v1.value,L"");
+	Assert::AreEqual(2, v1.type, L"");
+}
+TEST_METHOD(call_make_lazy_function) {
+	auto fn = hmLib::make_lazy_function([](int i) {return hoge(i); });
+	auto val = fn(5);
+
+	auto v1 = val.get();
+	Assert::AreEqual(5, v1.value, L"");
 	Assert::AreEqual(2, v1.type, L"");
 }
 };

@@ -473,5 +473,8 @@
     <ClInclude Include="..\..\..\lazy.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\functional\share.hpp">
+      <Filter>hmLib\functional</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

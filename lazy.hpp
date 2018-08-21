@@ -7,12 +7,12 @@
 #include<boost/variant.hpp>
 #include"tuple.hpp"
 namespace hmLib {
-	template<typename eval_func_, typename... arg_type_>
+	template<typename return_type_, typename... arg_type_>
 	struct lazy {
 	private:
-		using this_type = lazy<eval_func_, arg_type_...>;
-		using return_type = decltype(std::declval<eval_func_>()(std::declval<arg_type_>()...));
-		using eval_func = eval_func_;
+		using this_type = lazy<return_type_, arg_type_...>;
+		using return_type = return_type_;
+		using eval_func = std::function<return_type(arg_type_...)>;
 		using arg_tuple = std::tuple<arg_type_...>;
 		using eval_type = std::pair<eval_func, arg_tuple>;
 		using variant = boost::variant<return_type, eval_type>;
@@ -24,8 +24,10 @@ namespace hmLib {
 		this_type& operator=(return_type val) {
 			Var = val;
 		}
+		template<typename eval_func_>
 		lazy(eval_func_ Eval_, arg_type_... Args_):Var(eval_type(std::move(Eval_), arg_tuple(Args_...))) {}
 		void reset(return_type val) { Var = val; }
+		template<typename eval_func_>
 		void reset(eval_func_ Eval_, arg_type_... Args_) { Var = eval_type(std::move(Eval_), arg_tuple(Args_...)); }
 	public:
 		operator return_type&()& noexcept {
@@ -62,12 +64,12 @@ namespace hmLib {
 			return true;
 		}
 	};
-	template<typename eval_func_>
-	struct lazy<eval_func_> {
+	template<typename return_type_>
+	struct lazy<return_type_> {
 	private:
-		using this_type = lazy<eval_func_>;
-		using return_type = decltype(std::declval<eval_func_>()());
-		using eval_func = eval_func_;
+		using this_type = lazy<return_type_>;
+		using return_type = return_type_;
+		using eval_func = std::function<return_type()>;
 		using eval_type = eval_func;
 		using variant = boost::variant<return_type, eval_type>;
 	private:
@@ -78,8 +80,10 @@ namespace hmLib {
 		this_type& operator=(return_type val) {
 			Var = val;
 		}
+		template<typename eval_func_>
 		explicit lazy(eval_func_ Eval_):Var(eval_type(std::move(Eval_))) {}
 		void reset(return_type val) { Var = val; }
+		template<typename eval_func_>
 		void reset(eval_func_ Eval_) { Var = eval_type(std::move(Eval_)); }
 	public:
 		operator return_type&()&noexcept {
@@ -117,29 +121,29 @@ namespace hmLib {
 		}
 	};
 
-	template<typename eval_func, typename... arg_type>
-	auto later(eval_func&& Eval, arg_type... Args) {
-		return lazy<eval_func, typename std::decay<arg_type>::type...>(std::forward<eval_func>(Eval),std::forward<arg_type>(Args)...);
+	template<typename return_type, typename eval_func, typename... arg_type>
+	auto make_lazy(eval_func&& Eval, arg_type&&... Args) {
+		return lazy<return_type, typename std::decay<arg_type>::type...>(std::forward<eval_func>(Eval),std::forward<arg_type>(Args)...);
 	}
 
 	template<typename eval_func_>
-	struct lazy_function_wrapper {
+	struct lazy_function {
 	private:
 		using eval_func = eval_func_;
 	private:
 		eval_func Fn;
 	public:
-		lazy_function_wrapper() = delete;
-		lazy_function_wrapper(const eval_func& Fn_):Fn(Fn_) {}
-		lazy_function_wrapper(eval_func&& Fn_):Fn(std::move(Fn_)) {}
+		lazy_function() = delete;
+		lazy_function(const eval_func& Fn_):Fn(Fn_) {}
+		lazy_function(eval_func&& Fn_):Fn(std::move(Fn_)) {}
 		template<typename... arg_type>
-		auto operator()(arg_type... Args)noexcept {
-			return later(Fn, Args...)
+		auto operator()(arg_type... Args) {
+			return make_lazy<decltype(Fn(Args...))>(Fn, Args...);
 		}
 	};
 	template<typename fn>
-	auto as_lazy_function(fn&& Fn) {
-		return detail::lazy_wrapper<typename std::decay<fn>::type>(std::forward<fn>(Fn));
+	auto make_lazy_function(fn&& Fn) {
+		return lazy_function<typename std::decay<fn>::type>(std::forward<fn>(Fn));
 	}
 }
 #

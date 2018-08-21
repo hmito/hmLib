@@ -54,6 +54,7 @@
     <ClInclude Include="..\..\..\functional.hpp" />
     <ClInclude Include="..\..\..\functional\higher_order_function.hpp" />
     <ClInclude Include="..\..\..\functional\function_ptr.hpp" />
+    <ClInclude Include="..\..\..\functional\share.hpp" />
     <ClInclude Include="..\..\..\gates.hpp" />
     <ClInclude Include="..\..\..\gates\bufgate.hpp" />
     <ClInclude Include="..\..\..\gates\comgate.hpp" />
