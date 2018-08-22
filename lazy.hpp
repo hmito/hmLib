@@ -30,28 +30,28 @@ namespace hmLib {
 		template<typename eval_func_>
 		void reset(eval_func_ Eval_, arg_type_... Args_) { Var = eval_type(std::move(Eval_), arg_tuple(Args_...)); }
 	public:
-		operator return_type&()& noexcept {
+		operator return_type&()& {
 			return get();
 		}
-		operator const return_type&()const& noexcept {
+		operator const return_type&()const& {
 			return get();
 		}
-		operator return_type&&()&& noexcept {
+		operator return_type&&()&& {
 			return static_cast<this_type&&>(*this).get();
 		}
-		return_type& get()& noexcept {
+		return_type& get()& {
 			if(eval_type* p = boost::get<eval_type>(&Var)) {
 				Var = tuple_apply(p->first, p->second);
 			}
 			return *boost::get<return_type>(&Var);
 		}
-		const return_type& get()const& noexcept {
+		const return_type& get()const& {
 			if(eval_type* p = boost::get<eval_type>(&Var)) {
 				Var = tuple_apply(p->first, p->second);
 			}
 			return *boost::get<const return_type>(&Var);
 		}
-		return_type&& get()&& noexcept {
+		return_type&& get()&& {
 			if(eval_type* p = boost::get<eval_type>(&Var)) {
 				Var = tuple_apply(p->first, p->second);
 			}
@@ -62,6 +62,16 @@ namespace hmLib {
 				return false;
 			}
 			return true;
+		}
+		eval_type get_evaluator()const& {
+			eval_type* p = boost::get<eval_type>(&Var);
+			hmLib_assert(p, hmLib::access_exceptions::invalid_access, "lazy has been already evaluated.");
+			return *p;
+		}
+		eval_type get_evaluator()&& {
+			eval_type* p = boost::get<eval_type>(&Var);
+			hmLib_assert(p, hmLib::access_exceptions::invalid_access, "lazy has been already evaluated.");
+			return std::move(*p);
 		}
 	};
 	template<typename return_type_>
@@ -86,28 +96,28 @@ namespace hmLib {
 		template<typename eval_func_>
 		void reset(eval_func_ Eval_) { Var = eval_type(std::move(Eval_)); }
 	public:
-		operator return_type&()&noexcept {
+		operator return_type&()& {
 			return get();
 		}
-		operator const return_type&()const& noexcept {
+		operator const return_type&()const& {
 			return get();
 		}
-		operator return_type&&()&& noexcept {
+		operator return_type&&()&& {
 			return static_cast<this_type&&>(*this).get();
 		}
-		return_type& get()& noexcept {
+		return_type& get()& {
 			if(eval_type* p = boost::get<eval_type>(&Var)) {
 				Var = (*p)();
 			}
 			return *boost::get<return_type>(&Var);
 		}
-		const return_type& get()const& noexcept {
+		const return_type& get()const& {
 			if(eval_type* p = boost::get<eval_type>(&Var)) {
 				Var = (*p)();
 			}
 			return *boost::get<const return_type>(&Var);
 		}
-		return_type&& get()&& noexcept {
+		return_type&& get()&& {
 			if(eval_type* p = boost::get<eval_type>(&Var)) {
 				Var = (*p)();
 			}
@@ -119,10 +129,15 @@ namespace hmLib {
 			}
 			return true;
 		}
-		eval_type get_evaluator()const {
+		eval_type get_evaluator()const& {
 			eval_type* p = boost::get<eval_type>(&Var);
 			hmLib_assert(p, hmLib::access_exceptions::invalid_access, "lazy has been already evaluated.");
 			return *p;
+		}
+		eval_type get_evaluator()&& {
+			eval_type* p = boost::get<eval_type>(&Var);
+			hmLib_assert(p, hmLib::access_exceptions::invalid_access, "lazy has been already evaluated.");
+			return std::move(*p);
 		}
 	};
 
