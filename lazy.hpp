@@ -119,6 +119,11 @@ namespace hmLib {
 			}
 			return true;
 		}
+		eval_type get_evaluator()const {
+			eval_type* p = boost::get<eval_type>(&Var);
+			hmLib_assert(p, hmLib::access_exceptions::invalid_access, "lazy has been already evaluated.");
+			return *p;
+		}
 	};
 
 	template<typename return_type, typename eval_func, typename... arg_type>

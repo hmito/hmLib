@@ -64,6 +64,9 @@
     <Filter Include="hmLib\functional">
       <UniqueIdentifier>{c65ccdf2-3c8d-4b0b-87be-0d83391c8d7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\monad">
+      <UniqueIdentifier>{74a884c7-cc01-460d-b459-05bf8f28ef50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="use_odeint.cpp">
@@ -475,6 +478,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\functional\share.hpp">
       <Filter>hmLib\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\monad_traits.hpp">
+      <Filter>hmLib\monad</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

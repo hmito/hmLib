@@ -1,0 +1,6 @@
+#ifndef HMLIB_MONAD_MONADTRAITS_INC
+#define HMLIB_MONAD_MONADTRAITS_INC 100
+#
+
+#
+#endif

@@ -105,6 +105,8 @@
     <ClInclude Include="..\..\..\math\plane_root.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
     <ClInclude Include="..\..\..\math\factorial.hpp" />
+    <ClInclude Include="..\..\..\monad.hpp" />
+    <ClInclude Include="..\..\..\monad\monad_traits.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
