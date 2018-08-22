@@ -16,6 +16,7 @@ namespace hmLib {
 		template<typename fn>
 		static decltype(auto) fmap(fn&& Fn, const T& v) { return flatten(Fn(v)); }
 	};
+
 	template<typename T>
 	decltype(auto) flatten(T&& v) {
 		using traits = monad_traits<typename std::decay<T>::type>;

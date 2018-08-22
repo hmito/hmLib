@@ -2,18 +2,64 @@
 #define HMLIB_MONAD_MONADTRAITS_INC 100
 #
 #include<type_traits>
+#include"../type_traits.hpp"
 namespace hmLib {
 	namespace monad {
-		namespace monad_categories {
-			struct immutable_monad_tag {};
-			struct omittable_monad_tag {};
-			struct flattenable_monad_tag {};
+		template<typename fn_,typename arg_type_>
+		struct later_applier{
+			using fn = fn_;
+			using arg_type = arg_type_;
+			using return_type = decltype(std::declval<fn>()(std::declval<arg_type>()));
+		private:
+			fn Fn;
+			arg_type Arg;
+		public:
+			template<typename fn_t, typename arg_t>
+			later_applier(fn_t&& Fn_, arg_t&& Arg_) :Fn(std::forward<fn_t>(Fn_)), Arg(std::forward<arg_t>(Arg_)){}
+			decltype(auto) operator()(void) { return Fn(Arg); }
+			template<typename fn_t>
+			auto operator&(fn_t&& Fn_)const & {
+				return make_later_applier([Fn1 = Fn, Fn2 = std::forward<fn_t>(Fn_)](const arg_type& Arg_) {return Fn2(Fn1(Arg_)); }, Arg);
+			}
+			template<typename fn_t>
+			auto operator&(fn_t&& Fn_)&& {
+				return make_later_applier([Fn1 = std::move(Fn), Fn2 = std::forward<fn_t>(Fn_)](const arg_type& Arg_) {return Fn2(Fn1(Arg_)); }, std::move(Arg));
+			}
+		};
+		template<typename fn_t, typename arg_t>
+		auto make_later_applier(fn_t&& Fn_, arg_t&& Arg_) {
+			return later_applier<typename std::decay<fn_t>::type, typename std::decay<arg_t>::type>(std::forward<fn_t>(Fn_), std::forward<arg_t>(Arg_));
+		}
+
+		namespace detail {
+			template<typename fn, typename arg>
+			struct apply_later_impl {
+				template<typename fn_t, typename arg_t>
+				auto operator()(fn_t&& Fn_, arg_t&& Arg_) {
+					return make_later_applier(std::forward<fn_t>(Fn_), std::forward<arg_t>(Arg_));
+				}
+			};
+			template<typename fn, typename later_fn, typename later_arg>
+			struct apply_later_impl<fn, later_applier<later_fn, later_arg>> {
+				template<typename fn_t>
+				auto operator()(fn_t&& Fn_, const later_applier<later_fn, later_arg>& Arg_) {
+					return Arg_&Fn_;
+				}
+				template<typename fn_t>
+				auto operator()(fn_t&& Fn_, later_applier<later_fn, later_arg>&& Arg_) {
+					return std::move(Arg_)&Fn_;
+				}
+			};
+		}
+		template<typename fn_t, typename arg_t>
+		auto apply_later(fn_t&& Fn_, arg_t&& Arg_) {
+			return detail::apply_later_impl<typename std::decay<fn_t>::type, typename std::decay<arg_t>::type>()(std::forward<fn_t>(Fn_), std::forward<arg_t>(Arg_));
 		}
 
 		template<typename T>
 		struct is_monad {
 		private:
-			template<typename U, typename V = typename U::monad_category>
+			template<typename U, typename V = typename monad_traits::>
 			static auto check(U)->std::true_type;
 			static auto check(...)->std::false_type;
 		public:
@@ -33,7 +79,8 @@ namespace hmLib {
 				using type = typename monad_base<typename T::value_type>::type;
 			};
 		}
-		template<typename M, bool IsNonMonad = !is_monad<M>::value>
+
+		template<typename M>
 		struct monad_traits {
 			using monad_category = typename M::monad_category;
 			using value_type = typename M::value_type;
