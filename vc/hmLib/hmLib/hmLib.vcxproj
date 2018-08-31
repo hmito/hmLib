@@ -52,7 +52,6 @@
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
-    <ClInclude Include="..\..\..\functional\higher_order_function.hpp" />
     <ClInclude Include="..\..\..\functional\function_ptr.hpp" />
     <ClInclude Include="..\..\..\functional\share.hpp" />
     <ClInclude Include="..\..\..\gates.hpp" />
@@ -106,6 +105,9 @@
     <ClInclude Include="..\..\..\math\root.hpp" />
     <ClInclude Include="..\..\..\math\factorial.hpp" />
     <ClInclude Include="..\..\..\monad.hpp" />
+    <ClInclude Include="..\..\..\monad\fmap.hpp" />
+    <ClInclude Include="..\..\..\monad\fmap_later.hpp" />
+    <ClInclude Include="..\..\..\monad\function.hpp" />
     <ClInclude Include="..\..\..\monad\monad_traits.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />

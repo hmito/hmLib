@@ -470,9 +470,6 @@
     <ClInclude Include="..\..\..\functional\function_ptr.hpp">
       <Filter>hmLib\functional</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\functional\higher_order_function.hpp">
-      <Filter>hmLib\functional</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\lazy.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -483,6 +480,15 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\monad\monad_traits.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\fmap.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\fmap_later.hpp">
+      <Filter>hmLib\monad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\monad\function.hpp">
       <Filter>hmLib\monad</Filter>
     </ClInclude>
   </ItemGroup>
