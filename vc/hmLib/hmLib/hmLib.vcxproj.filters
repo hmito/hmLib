@@ -410,9 +410,6 @@
     <ClInclude Include="..\..\..\geometry\segment.hpp">
       <Filter>hmLib\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\math\factorial.hpp">
-      <Filter>hmLib\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\geometry\point.hpp">
       <Filter>hmLib\geometry</Filter>
     </ClInclude>
@@ -460,6 +457,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\iterators\iterator.hpp">
       <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\combinatorics.hpp">
+      <Filter>hmLib\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
