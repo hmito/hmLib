@@ -228,15 +228,8 @@ namespace hmLib {
 		combination_indexer() = default;
 		combination_indexer(integer_type N_, integer_type R_):N(N_), Index(R_, 0) { reset(); }
 		template<typename except_index_iterator>
-		combination_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_) : N(N_), Index(R_), ExcIndex(Beg_, End_) {
-			std::sort(ExcIndex.begin(), ExcIndex.Index());
-			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
-			ExcIndex.erase(Itr, ExcIndex.end());
-			for(unsigned int i = 1; i<ExcIndex.size(); ++i) {
-				ExcIndex[i] -= i;
-			}
-			N -= ExcIndex.size();
-			reset();
+		combination_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_) {
+			reset(N_, R_, Beg_, End_);
 		}
 		integer_count_type total_casenum()const { return nCr<integer_type, integer_count_type>(N, Index.size()); }
 		bool next() {
@@ -260,8 +253,9 @@ namespace hmLib {
 			Index.assign(R_, 0);
 
 			ExcIndex.assign(Beg_, End_);
-			std::sort(ExcIndex.begin(), ExcIndex.Index());
+			std::sort(ExcIndex.begin(), ExcIndex.end());
 			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
+			Itr = std::lower_bound(ExcIndex.begin(), Itr, N);
 			ExcIndex.erase(Itr, ExcIndex.end());
 			for(unsigned int i = 1; i<ExcIndex.size(); ++i) {
 				ExcIndex[i] -= i;
@@ -336,15 +330,8 @@ namespace hmLib {
 		multicombination_indexer() = default;
 		multicombination_indexer(integer_type N_, integer_type R_):N(N_), Index(R_, 0) { reset(); }
 		template<typename except_index_iterator>
-		multicombination_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_) : N(N_), Index(R_), ExcIndex(Beg_, End_) {
-			std::sort(ExcIndex.begin(), ExcIndex.end());
-			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
-			ExcIndex.erase(Itr, ExcIndex.end());
-			for(unsigned int i = 1; i<ExcIndex.size(); ++i) {
-				ExcIndex[i] -= i;
-			}
-			N -= ExcIndex.size();
-			reset();
+		multicombination_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_){
+			reset(N_, R_, Beg_, End_);
 		}
 		integer_count_type total_casenum()const { return nHr<integer_type, integer_count_type>(N, Index.size()); }
 		integer_count_type order_casenum()const {
@@ -387,8 +374,9 @@ namespace hmLib {
 			Index.assign(R_, 0);
 
 			ExcIndex.assign(Beg_, End_);
-			std::sort(ExcIndex.begin(), ExcIndex.Index());
+			std::sort(ExcIndex.begin(), ExcIndex.end());
 			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
+			Itr = std::lower_bound(ExcIndex.begin(), Itr, N);
 			ExcIndex.erase(Itr, ExcIndex.end());
 			for(unsigned int i = 1; i<ExcIndex.size(); ++i) {
 				ExcIndex[i] -= i;
@@ -428,20 +416,23 @@ namespace hmLib {
 		permutation_indexer() = default;
 		permutation_indexer(integer_type N_, integer_type R_):N(N_), Index(R_, 0) { reset(); }
 		template<typename except_index_iterator>
-		permutation_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_) : N(N_), Index(R_), ExcIndex(Beg_, End_) {
-			std::sort(ExcIndex.begin(), ExcIndex.Index());
-			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
-			ExcIndex.erase(Itr, ExcIndex.end());
-			reset();
+		permutation_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_) {
+			reset(N_, R_, Beg_, End_);
 		}
-		integer_count_type total_casenum()const { return nPr<integer_type, integer_count_type>(N, Index.size()); }
+		integer_count_type total_casenum()const { return nPr<integer_type, integer_count_type>(N-ExcIndex.size(), Index.size()); }
 		bool next() {
 			Valid = next_permutation_index(N, Index.begin(), Index.end(), ExcIndex.begin(), ExcIndex.end());
 			return valid();
 		}
 		bool valid()const { return Valid; }
 		void reset() {
-			std::iota(Index.begin(), Index.end(), 0);
+			integer_type Cnt = 0;
+			for(auto Itr = Index.begin(); Itr!=Index.end(); ++Itr) {
+				while(std::find(ExcIndex.begin(), ExcIndex.end(), Cnt) != ExcIndex.end()) {
+					++Cnt;
+				}
+				*Itr = (Cnt++);
+			}
 			Valid = true;
 		}
 		void reset(integer_type N_, integer_type R_) {
@@ -456,8 +447,9 @@ namespace hmLib {
 			Index.assign(R_, 0);
 
 			ExcIndex.assign(Beg_, End_);
-			std::sort(ExcIndex.begin(), ExcIndex.Index());
+			std::sort(ExcIndex.begin(), ExcIndex.end());
 			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
+			Itr = std::lower_bound(ExcIndex.begin(), Itr, N);
 			ExcIndex.erase(Itr, ExcIndex.end());
 
 			reset();
@@ -526,15 +518,8 @@ namespace hmLib {
 		multipermutation_indexer() = default;
 		multipermutation_indexer(integer_type N_, integer_type R_):N(N_), Index(R_, 0) { reset(); }
 		template<typename except_index_iterator>
-		multipermutation_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_) : N(N_), Index(R_), ExcIndex(Beg_, End_) {
-			std::sort(ExcIndex.begin(), ExcIndex.end());
-			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
-			ExcIndex.erase(Itr, ExcIndex.end());
-			N -= ExcIndex.size();
-			for(unsigned int i = 1; i<ExcIndex.size(); ++i) {
-				ExcIndex[i] -= i;
-			}
-			reset();
+		multipermutation_indexer(integer_type N_, integer_type R_, except_index_iterator Beg_, except_index_iterator End_){
+			reset(N_,R_,Beg_,End_);
 		}
 		integer_count_type total_casenum()const { integer_count_type Ans = N; for(std::size_t i = 1; i<Index.size(); ++i) Ans *= N; return Ans; }
 		bool next() {
@@ -558,8 +543,9 @@ namespace hmLib {
 			Index.assign(R_, 0);
 
 			ExcIndex.assign(Beg_, End_);
-			std::sort(ExcIndex.begin(), ExcIndex.Index());
+			std::sort(ExcIndex.begin(), ExcIndex.end());
 			auto Itr = std::unique(ExcIndex.begin(), ExcIndex.end());
+			Itr = std::lower_bound(ExcIndex.begin(), Itr, N);
 			ExcIndex.erase(Itr, ExcIndex.end());
 
 			N -= ExcIndex.size();
