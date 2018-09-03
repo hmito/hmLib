@@ -47,7 +47,7 @@ namespace hmLib{
 	}
 	//3要素のmedian
 	template<class T>
-	inline T median(T val1,T val2,T val3){
+	inline constexpr T median(T val1,T val2,T val3){
 		if(val1>val2){
 			if(val2>val3)return val2;
 			else if(val1>val3)return val3;
@@ -61,18 +61,18 @@ namespace hmLib{
 
 	//3要素のmedian
 	template<class T>
-	inline T clamp(T val, T lower, T upper) {
+	inline constexpr T clamp(T val, T lower, T upper) {
 		return std::min(std::max(lower, val), upper);
 	}
 
 	template<typename T, typename... Others>
-	inline T min_value(T val1,T val2,Others... vals){return std::min(val1,min_value(val2,vals...));}
+	inline constexpr T min_value(T val1,T val2,Others... vals){return std::min(val1,min_value(val2,vals...));}
 	template<typename T>
-	inline T min_value(T val){return val;}
+	inline constexpr T min_value(T val){return val;}
 	template<typename T, typename... Others>
-	inline T max_value(T val1,T val2,Others... vals){return std::max(val1,max_value(val2,vals...));}
+	inline constexpr T max_value(T val1,T val2,Others... vals){return std::max(val1,max_value(val2,vals...));}
 	template<typename T>
-	inline T max_value(T val){return val;}
+	inline constexpr T max_value(T val){return val;}
 	//負にならない余り
 	template<class T>
 	inline T positive_mod(T num,T divisor){

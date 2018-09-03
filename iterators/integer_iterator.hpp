@@ -90,6 +90,11 @@ namespace hmLib {
 	template<typename T>
 	struct integer_range {
 		using iterator = integer_iterator<T>;
+		using range_category = typename std::iterator_traits<iterator>::iterator_category;
+		using value_type = typename std::iterator_traits<iterator>::value_type;
+		using reference = typename std::iterator_traits<iterator>::reference;
+		using pointer = typename std::iterator_traits<iterator>::pointer;
+		using difference_type = typename std::iterator_traits<iterator>::difference_type;
 	private:
 		T Min;
 		T Max;

@@ -6,7 +6,7 @@
 #include "../../../iterators.hpp"
 #include "../../../math/root.hpp"
 #include "../../../math/axis.hpp"
-#include "../../../math/multiaxis.hpp"
+#include "../../../math/combinatorics.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {
@@ -416,303 +416,495 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 	};
-	TEST_CLASS(test_math_multiaxis) {
-		TEST_METHOD(construct) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,10),
-				make_axis<double>(0,1.5,15),
-				make_axis<double>(0,2.0,20) 
-			};
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
+	TEST_CLASS(test_math_combi) {
+		TEST_METHOD(test_combination) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			combination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
 
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(make) {
-			multiaxis<double, 3> Axes = make_multiaxis(
-				varray<double, 3>{0.0,0.0,0.0},
-				varray<double, 3>{1.0,1.5,2.0},
-				varray<std::size_t, 3>{10,15,20}
-			);
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(bind) {
-			multiaxis<double, 3> Axes = bind_axis(
-				make_axis<double>(0, 1.0, 10),
-				make_axis<double>(0, 1.5, 15),
-				make_axis<double>(0, 2.0, 20)
-			);
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(make_assign_axis_each) {
-			multiaxis<double, 3> Axes;
-
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(0, make_axis<double>(0, 1, 10));
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(1, make_axis<double>(0, 1.5, 15));
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(2, make_axis<double>(0, 2, 20));
-			Assert::IsFalse(Axes.empty());
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(make_assign_axis_emplace) {
-			multiaxis<double, 3> Axes;
-
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(0, 0, 1, 10);
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(1, 0, 1.5, 15);
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(2, 0, 2, 20);
-			Assert::IsFalse(Axes.empty());
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(multiaxis_at) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,1.5,16),
-				make_axis<double>(0,2.0,21)
-			};
-			using value_point_type = typename decltype(Axes)::value_point_type;
-
-			for(unsigned int x = 0; x<11; ++x) {
-				for(unsigned int y = 0; y<16; ++y) {
-					for(unsigned int z = 0; z<21; ++z) {
-						auto p = Axes.at(x, y, z);
-						Assert::AreEqual(p[0], x*0.1, 1e-10);
-						Assert::AreEqual(p[1], y*0.1, 1e-10);
-						Assert::AreEqual(p[2], z*0.1, 1e-10);
-					}
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
 				}
+				Vec.push_back(Val);
 			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
-		TEST_METHOD(multiaxis_ref) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,1.5,16),
-				make_axis<double>(0,2.0,21)
-			};
-			using value_point_type = typename decltype(Axes)::value_point_type;
+		TEST_METHOD(test_combination_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			combination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
 
-			for(unsigned int x = 0; x<11; ++x) {
-				for(unsigned int y = 0; y<16; ++y) {
-					for(unsigned int z = 0; z<21; ++z) {
-						auto p = Axes.ref(x, y, z);
-						Assert::AreEqual(p[0], x*0.1, 1e-10);
-						Assert::AreEqual(p[1], y*0.1, 1e-10);
-						Assert::AreEqual(p[2], z*0.1, 1e-10);
-					}
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
 				}
+				Vec.push_back(Val);
 			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
-		TEST_METHOD(iterator_access) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,1.5,16),
-				make_axis<double>(0,2.0,21)
-			};
+		TEST_METHOD(test_combination_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
 
-			auto Itr = Axes.begin();
-			auto End = Axes.end();
-
-			for(unsigned int z = 0; z<21; ++z) {
-				for(unsigned int y = 0; y<16; ++y) {
-					for(unsigned int x = 0; x<11; ++x) {
-						Assert::IsFalse(Itr==End);
-
-						auto p = *Itr;
-						Assert::AreEqual(p[0], x*0.1, 1e-10);
-						Assert::AreEqual(p[1], y*0.1, 1e-10);
-						Assert::AreEqual(p[2], z*0.1, 1e-10);
-
-						++Itr;
-					}
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
 				}
+				Vec.push_back(Val);
 			}
-			Assert::IsTrue(Itr==End);
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
-		TEST_METHOD(locator_access) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,0.5,6),
-				make_axis<double>(0,0.7,8),
-				make_axis<double>(0,0.9,10)
-			};
+		TEST_METHOD(test_combination_excp1) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			combination_indexer<> Indexer(N, R,Excp.begin(),Excp.end());
+			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
 
-			for(unsigned int x = 1; x<5; ++x) {
-				for(unsigned int y = 1; y<7; ++y) {
-					for(unsigned int z = 1; z<9; ++z) {
-						auto ltr = Axes.locate(x, y, z);
-
-						auto q = *ltr;
-						Assert::AreEqual(q[0], x*0.1, 1e-10);
-						Assert::AreEqual(q[1], y*0.1, 1e-10);
-						Assert::AreEqual(q[2], z*0.1, 1e-10);
-
-						for(int dx = -1; dx<=1; ++dx) {
-							for(int dy = -1; dy<=1; ++dy) {
-								for(int dz = -1; dz<=1; ++dz) {
-									auto p = ltr.ref(dx,dy,dz);
-									Assert::AreEqual(p[0], (x+dx)*0.1, 1e-10);
-									Assert::AreEqual(p[1], (y+dy)*0.1, 1e-10);
-									Assert::AreEqual(p[2], (z+dz)*0.1, 1e-10);
-								}
-							}
-						}
-					}
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
 				}
+				Vec.push_back(Val);
 			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
-		TEST_METHOD(weighted_iterator) {
-			multiaxis<double, 2> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,2.0,21)
-			};
+		TEST_METHOD(test_combination_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
 
-			auto Weighted = Axes.weighted_point(
-				varray<double, 2>{0.06, 1.07}, varray<double, 2>{0.58, 1.33}
-			);
-			//[1:6,11:13]
-
-			Assert::IsFalse(Weighted.empty());
-			Assert::AreEqual(6u*3u, Weighted.size());
-			Assert::AreEqual(5.2*2.6, Weighted.weight(), 1e-10);
-
-			auto Itr = Weighted.begin();
-			auto End = Weighted.end();
-
-			for(int x = 1; x<=6; ++x) {
-				Assert::IsFalse(Itr==End);
-				auto wp = *Itr;
-				Assert::AreEqual(x, wp.first[0]);
-				Assert::AreEqual(11, wp.first[1]);
-
-				double wx = 1.0;
-				if(x==1) {
-					wx = 0.9;
-				} else if(x==6) {
-					wx = 0.3;
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
 				}
-				Assert::AreEqual(wx*0.8, wp.second, 1e-10);
-				++Itr;
+				Vec.push_back(Val);
 			}
-
-			for(int x = 1; x<=6; ++x) {
-				Assert::IsFalse(Itr==End);
-				auto wp = *Itr;
-				Assert::AreEqual(x, wp.first[0]);
-				Assert::AreEqual(12, wp.first[1]);
-
-				double wx = 1.0;
-				if(x==1) {
-					wx = 0.9;
-				} else if(x==6) {
-					wx = 0.3;
-				}
-
-				Assert::AreEqual(wx*1.0, wp.second, 1e-10);
-				++Itr;
-			}
-
-			for(int x = 1; x<=6; ++x) {
-				Assert::IsFalse(Itr==End);
-				auto wp = *Itr;
-				Assert::AreEqual(x, wp.first[0]);
-				Assert::AreEqual(13, wp.first[1]);
-
-				double wx = 1.0;
-				if(x==1) {
-					wx = 0.9;
-				} else if(x==6) {
-					wx = 0.3;
-				}
-				Assert::AreEqual(wx*0.8, wp.second, 1e-10);
-				++Itr;
-			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
-		TEST_METHOD(self_mapper_check) {
-			multiaxis<double, 2> Axes1{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,2.0,21)
-			};
-			multiaxis<double, 2> Axes2{
-				make_axis<double>(-0.5,1.5,21),
-				make_axis<double>(-1.0,2.0,21)
-			};
-			//x: 5:15
-			//y: 
-			auto Mapper = Axes1.map_to(Axes2);
+		TEST_METHOD(test_combination_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
+		TEST_METHOD(test_multicombination) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multicombination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multicombination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(nHr(5, 3), Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(nHr(N-Excp.size(),R), Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			permutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			permutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp1) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multipermutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multipermutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+
+			std::vector<unsigned int> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned int Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+
 	};
 }
