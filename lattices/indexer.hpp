@@ -40,8 +40,8 @@ namespace hmLib {
 				index_type Index = 0;
 				index_type Step = 1;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Index += Point_[i] * Step;
-					Step *= static_cast<index_type>(Extent[i]);
+					Index += Point_[dim_-1-i] * Step;
+					Step *= static_cast<index_type>(Extent[dim_-1-i]);
 				}
 
 				return Index;
@@ -59,8 +59,8 @@ namespace hmLib {
 			point_type calc_point(index_type Index)const {
 				point_type Pos;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Pos[i] = (Index%Extent[i]);
-					Index /= static_cast<index_type>(Extent[i]);
+					Pos[i] = (Index%Extent[dim_-1-i]);
+					Index /= static_cast<index_type>(Extent[dim_-1-i]);
 				}
 
 				return Pos;
