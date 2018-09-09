@@ -1,6 +1,8 @@
 #ifndef HMLIB_LATICES_BLOCKLATTICE_INC
 #define HMLIB_LATICES_BLOCKLATTICE_INC 100
 #include<vector>
+#include<functional>
+#include<algorithm>
 #include"utility.hpp"
 #include"exceptions.hpp"
 #include"indexer.hpp"
@@ -74,7 +76,7 @@ namespace hmLib {
 			//!Return true if the given point is inclueded incide of this block.
 			bool inside(point_type Point_)const {
 				for(unsigned int i = 0; i<dim_; ++i) {
-					if(Point_[i]<Pos[i] || Pos[i]+Indexer.extent()[i]<=Point_[i])return false;
+					if(Point_[i]<Pos[i] || static_cast<index_type>(Pos[i]+Indexer.extent()[i])<=Point_[i])return false;
 				}
 				return true;
 			}
@@ -563,10 +565,19 @@ namespace hmLib {
 		void block_erase_if(block_condition_ BlockCondition){
 			Size = std::distance(
 				block_begin(),
-				std::remove_if(block_begin(), block_end(), BlockCondition)
+				std::partition(block_begin(), block_end(), [cond = std::move(BlockCondition)](block& b){return !BlockCOndition(b); })
 			);
 			HintPos = 0;
 		}
+		template<typename element_condition_>
+		void block_erase_if_all_of(element_condition_ ElementConditiion) {
+			Size = std::distance(
+				block_begin(),
+				std::partition(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return !std::all_of(b.begin(), b.end(), cond); })
+			);
+			HintPos = 0;
+		}
+
 	private:
 		block_iterator block_find(point_type Pos_) {
 			Pos_ = Pos_ - (Pos_%Indexer.extent());
@@ -597,6 +608,8 @@ namespace hmLib {
 			return block_find(Pos_);
 		}
 		block_iterator block_get(point_type Pos_) {
+			Pos_ = Pos_ - (Pos_%Indexer.extent());
+
 			//first time
 			if(empty()) {
 				Blocks.push_back(block(Pos_, Indexer, BlockSize));
@@ -606,7 +619,6 @@ namespace hmLib {
 				return Blocks.begin();
 			}
 
-			Pos_ = Pos_ - (Pos_%Indexer.extent());
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 
 			//fail to find
@@ -628,7 +640,7 @@ namespace hmLib {
 		block_iterator block_get(point_type Pos_, block_iterator Hint_) {
 			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
-				return Itr;
+				return Hint_;
 			}
 			return block_get(Pos_);
 		}
