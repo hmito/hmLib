@@ -113,13 +113,16 @@ namespace hmLib {
 			using difference_type = int;
 			using reference = typename this_type::const_reference;
 			using pointer = typename this_type::const_pointer;
-			using iterator_category = std::bidirectional_iterator_tag;
+			using iterator_category = std::random_access_iterator_tag;
 		public:
 			const_iterator() = default;
 			const_iterator(block_const_iterator BItr_, element_const_iterator Itr_):BItr(BItr_), Itr(Itr_) {}
 		public:
 			reference operator*() {
 				return Itr.operator*();
+			}
+			reference operator[](difference_type n) {
+				return (*this + n).operator*();
 			}
 			pointer operator->() {
 				return Itr.operator->();
@@ -150,17 +153,81 @@ namespace hmLib {
 				operator--();
 				return Ans;
 			}
+			const_iterator& operator+=(difference_type n) {
+				if(n<0)return operator-=(-n);
+
+				if(n < std::distance(Itr, BItr->end())) {
+					Itr += n;
+				}else{
+					auto Size = BItr->size();
+					n -= std::distance(Itr, BItr->end());
+					++BItr;
+
+					BItr += n/Size;
+					Itr = std::next(BItr->begin(), n%Size);
+				}
+				return *this;
+			}
+			const_iterator& operator-=(difference_type n) {
+				if(n<0)return operator+=(-n);
+
+				if(n < std::distance(BItr->begin(), Itr)) {
+					Itr -= n;
+				} else {
+					n -= std::distance(BItr->begin(), Itr);
+					--BItr;
+					auto Size = BItr->size();
+
+					BItr -= n/Size;
+					Itr = std::next(BItr->end()-1, -(n%Size));
+				}
+				return *this;
+			}
+			friend const_iterator operator+(const const_iterator& v, difference_type n) {
+				auto v2 = v;
+				v2 += n;
+				return v2;
+			}
+			friend const_iterator operator+(difference_type n, const const_iterator& v) {
+				return v+n;
+			}
+			friend const_iterator operator-(const const_iterator& v, difference_type n) {
+				auto v2 = v;
+				v2 -= n;
+				return v2;
+			}
+			friend difference_type operator-(const const_iterator& v1, const const_iterator&  v2) {
+				if(v1.BItr > v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v2.Bitr->size());
+				else if(v1.BItr < v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v1.Bitr->size());
+				else return v1.Itr - v2.Itr;
+			}
 			friend bool operator==(const const_iterator& v1, const const_iterator&  v2) {
 				return v1.BItr == v2.BItr && v1.Itr == v2.Itr;
 			}
 			friend bool operator!=(const const_iterator&  v1, const const_iterator&  v2) {
 				return v1.BItr != v2.BItr || v1.Itr != v2.Itr;
 			}
+			friend bool operator< (const const_iterator& v1, const const_iterator&  v2) {
+				if(v1.BItr < v2.BItr) return true;
+				else if(v1.BItr > v2.BItr) return false;
+				else return v1.Itr < v2.Itr;
+			}
+			friend bool operator<=(const const_iterator& v1, const const_iterator&  v2) {
+				if(v1.BItr < v2.BItr) return true;
+				else if(v1.BItr > v2.BItr) return false;
+				else return v1.Itr <= v2.Itr;
+			}
+			friend bool operator> (const const_iterator& v1, const const_iterator&  v2) {
+				return operator<(v2, v1);
+			}
+			friend bool operator>=(const const_iterator& v1, const const_iterator&  v2) {
+				return operator<=(v2, v1);
+			}
 		public:
 			point_type point()const { return BItr->point(Itr); }
 		public:
-			block_iterator block_itr() { return BItr; }
-			element_iterator element_itr() { return Itr; }
+			block_const_iterator block_itr() { return BItr; }
+			element_const_iterator element_itr() { return Itr; }
 		private:
 			block_const_iterator BItr;
 			element_const_iterator Itr;
@@ -171,13 +238,17 @@ namespace hmLib {
 			using difference_type = int;
 			using reference = typename this_type::reference;
 			using pointer = typename this_type::pointer;
-			using iterator_category = std::bidirectional_iterator_tag;
+			using iterator_category = std::random_access_iterator_tag;
 		public:
 			iterator() = default;
 			iterator(block_iterator BItr_, element_iterator Itr_):BItr(BItr_),Itr(Itr_){}
+			operator const_iterator() { return const_iterator(BItr, Itr); }
 		public:
 			reference operator*() {
 				return Itr.operator*();
+			}
+			reference operator[](difference_type n) {
+				return (*this + n).operator*();
 			}
 			pointer operator->() {
 				return Itr.operator->();
@@ -208,12 +279,75 @@ namespace hmLib {
 				operator--();
 				return Ans;
 			}
-			operator const_iterator() { return const_iterator(BItr, Itr); }
+			iterator& operator+=(difference_type n) {
+				if(n<0)return operator-=(-n);
+
+				if(n < std::distance(Itr, BItr->end())) {
+					Itr += n;
+				} else {
+					auto Size = BItr->size();
+					n -= std::distance(Itr, BItr->end());
+					++BItr;
+
+					BItr += n/Size;
+					Itr = std::next(BItr->begin(), n%Size);
+				}
+				return *this;
+			}
+			iterator& operator-=(difference_type n) {
+				if(n<0)return operator+=(-n);
+
+				if(n < std::distance(BItr->begin(), Itr)) {
+					Itr -= n;
+				} else {
+					n -= std::distance(BItr->begin(), Itr);
+					--BItr;
+					auto Size = BItr->size();
+
+					BItr -= n/Size;
+					Itr = std::next(BItr->end()-1, -(n%Size));
+				}
+				return *this;
+			}
+			friend iterator operator+(const iterator& v, difference_type n) {
+				auto v2 = v;
+				v2 += n;
+				return v2;
+			}
+			friend iterator operator+(difference_type n, const iterator& v) {
+				return v+n;
+			}
+			friend iterator operator-(const iterator& v, difference_type n) {
+				auto v2 = v;
+				v2 -= n;
+				return v2;
+			}
+			friend difference_type operator-(const iterator& v1, const iterator&  v2) {
+				if(v1.BItr > v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v2.Bitr->size());
+				else if(v1.BItr < v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v1.Bitr->size());
+				else return v1.Itr - v2.Itr;
+			}
 			friend bool operator==(const iterator& v1, const iterator& v2) {
 				return v1.BItr == v2.BItr && v1.Itr == v2.Itr;
 			}
 			friend bool operator!=(const iterator& v1, const iterator& v2) {
 				return v1.BItr != v2.BItr || v1.Itr != v2.Itr;
+			}
+			friend bool operator< (const iterator& v1, const iterator&  v2) {
+				if(v1.BItr < v2.BItr) return true;
+				else if(v1.BItr > v2.BItr) return false;
+				else return v1.Itr < v2.Itr;
+			}
+			friend bool operator<=(const iterator& v1, const iterator&  v2) {
+				if(v1.BItr < v2.BItr) return true;
+				else if(v1.BItr > v2.BItr) return false;
+				else return v1.Itr <= v2.Itr;
+			}
+			friend bool operator> (const iterator& v1, const iterator&  v2) {
+				return operator<(v2, v1);
+			}
+			friend bool operator>=(const iterator& v1, const iterator&  v2) {
+				return operator<=(v2, v1);
 			}
 		public:
 			point_type point()const { return BItr->point(Itr); }
@@ -421,6 +555,9 @@ namespace hmLib {
 			return block_get(Pos_);
 		}
 	private:
+		//BLocks should keep unused empty element in back()
+		//	In other words, Blocks.end() != End should be satishied anytime
+		//	This is because of end iterator's requirement.
 		block_container Blocks;
 		block_iterator End;
 		indexer Indexer;
