@@ -33,6 +33,7 @@ namespace hmLib {
 			using iterator = typename container::iterator;
 			using const_iterator = typename container::const_iterator;
 		public:
+			block() = default;
 			block(point_type Pos_, indexer Indexer_, unsigned int Size_):Pos(Pos_), Indexer(Indexer_), Data(Size_, 0) {}
 			iterator begin() { return Data.begin(); }
 			iterator end() { return Data.end(); }
@@ -359,34 +360,42 @@ namespace hmLib {
 			element_iterator Itr;
 		};
 	public:
-		block_lattice() = delete;
-		explicit block_lattice(extent_type BlockExtent) {
-			assign(BlockExtent);
-		}
-		template<typename... others>
-		explicit block_lattice(std::size_t Size_, others... Others_) {
-			assign(extent_type{ Size_,static_cast<std::size_t>(Others_)... });
-		}
-		void assign(extent_type BlockExtent) {
-			Indexer.resize(BlockExtent);
+		block_lattice()noexcept:block_lattice(extent_type(10)) {}
+		explicit block_lattice(extent_type BlockExtent)noexcept:Blocks(), Indexer(BlockExtent), HintPos(0), Size(0){
 			BlockSize = Indexer.lattice_size();
-			Blocks.assign(1, block(point_type(0), Indexer, BlockSize));
-			End = Blocks.begin();
 		}
 		template<typename... others>
-		void assign(std::size_t Size_, others... Others_) {
-			assign(extent_type{ Size_,static_cast<std::size_t>(Others_)... });
+		explicit block_lattice(std::size_t Size_, others... Others_)noexcept: block_lattice(extent_type{ Size_,static_cast<std::size_t>(Others_)... }) {}
+	public:
+		bool empty()const{ return Blocks.empty(); }
+		std::size_t size()const { return Blocks.size()*BlockSize; }
+		void resize(extent_type BlockExtent){
+			if(empty()) {
+				Indexer.resize(BlockExtent);
+				BlockSize = Indexer.lattice_size();
+			} else {
+				this_type New(BlockExtent);
+				auto End = end();
+				for(auto Itr = begin(); Itr!=End; ++Itr) {
+					New[Itr.point()] = *Itr;
+				}
+				*this = std::move(New);
+			}
+		}
+		template<typename... others>
+		void resize(std::size_t Size_, others... Others_) {
+			block_resize(extent_type{ Size_,static_cast<std::size_t>(Others_)... });
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
 		reference at(point_type Point_) {
-			auto Itr = block_find(Point_);
+			auto Itr = block_find(Point_,block_begin()+HintPos);
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
 		//!Return const_reference of the elemtn at the given point with range check
 		const_reference at(point_type Point_)const {
-			auto Itr = block_find(Point_);
+			auto Itr = block_find(Point_, block_begin()+HintPos);
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
@@ -402,13 +411,13 @@ namespace hmLib {
 		}
 		//!Return reference of the elemtn at the given point with range check
 		reference at(iterator Hint_, point_type Point_) {
-			auto Itr = block_find(Point_, Hint_);
+			auto Itr = block_find(Point_, Hint_.block_itr());
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
 		//!Return const_reference of the elemtn at the given point with range check
 		const_reference at(const_iterator Hint_, point_type Point_)const {
-			auto Itr = block_find(Point_, Hint_);
+			auto Itr = block_find(Point_, Hint_.block_itr());
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return Itr->at(Point_);
 		}
@@ -422,9 +431,53 @@ namespace hmLib {
 		const_reference at(const_iterator Hint_, index_type Pos_, others... Others_)const {
 			return at(Hint_, lattices::point(Pos_, Others_...));
 		}
+		//!Return reference of the elemtn at the given point with range check
+		iterator find(point_type Point_) {
+			auto Itr = block_find(Point_, block_begin()+HintPos);
+			if(Itr==block_end())return end();
+			return iterator(Itr, Itr->begin()+Indexer.torus_index(Point_));
+		}
+		//!Return const_reference of the elemtn at the given point with range check
+		const_iterator find(point_type Point_)const {
+			auto Itr = block_find(Point_, block_begin()+HintPos);
+			if(Itr==block_end())return end();
+			return const_iterator(Itr, Itr->begin()+Indexer.torus_index(Point_));
+		}
+		//!Return reference of the elemtn at the given elements point with range check
+		template<typename... others>
+		iterator find(index_type Pos_, others... Others_) {
+			return find(lattices::point(Pos_, Others_...));
+		}
+		//!Return const_reference of the elemtn at the given elements point with range check
+		template<typename... others>
+		const_iterator find(index_type Pos_, others... Others_)const {
+			return find(lattices::point(Pos_, Others_...));
+		}
+		//!Return reference of the elemtn at the given point with range check
+		iterator find(iterator Hint_, point_type Point_) {
+			auto Itr = block_find(Point_, Hint_.block_itr());
+			if(Itr==block_end())return end();
+			return iterator(Itr, Itr->begin()+Indexer.torus_index(Point_));
+		}
+		//!Return const_reference of the elemtn at the given point with range check
+		const_iterator find(const_iterator Hint_, point_type Point_)const {
+			auto Itr = block_find(Point_, Hint_.block_itr());
+			if(Itr==block_end())return end();
+			return const_iterator(Itr, Itr->begin()+Indexer.torus_index(Point_));
+		}
+		//!Return reference of the elemtn at the given elements point with range check
+		template<typename... others>
+		iterator find(iterator Hint_, index_type Pos_, others... Others_) {
+			return find(Hint_, lattices::point(Pos_, Others_...));
+		}
+		//!Return const_reference of the elemtn at the given elements point with range check
+		template<typename... others>
+		const_iterator find(const_iterator Hint_, index_type Pos_, others... Others_)const {
+			return find(Hint_, lattices::point(Pos_, Others_...));
+		}
 		//!Return reference of the elemtn at the given point
 		reference ref(point_type Point_) {
-			auto Itr = block_get(Point_);
+			auto Itr = block_get(Point_, block_begin()+HintPos);
 			return Itr->at(Point_);
 		}
 		//!Return reference of the elemtn at the given elements point
@@ -459,17 +512,17 @@ namespace hmLib {
 			return std::distance(block_begin(), Itr)*BlockSize + Indexer.torus_index(Point_);
 		}
 		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
-		reference index_at(index_type Index_) {
-			return Blocks.at(static_cast<index_type>(Index_/BlockSize)).index_ref(Index_%BlockSize);
-		}
+		//reference index_at(index_type Index_) {
+		//	return Blocks.at(static_cast<index_type>(Index_/BlockSize)).index_ref(Index_%BlockSize);
+		//}
 		//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
-		const_reference index_at(index_type Index_)const {
-			return Blocks.at(static_cast<index_type>(Index_/BlockSize)).index_ref(Index_%BlockSize);
-		}
+		//const_reference index_at(index_type Index_)const {
+		//	return Blocks.at(static_cast<index_type>(Index_/BlockSize)).index_ref(Index_%BlockSize);
+		//}
 		//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
-		reference index_ref(index_type Index_) {
-			return Blocks[static_cast<index_type>(Index_/BlockSize)].index_ref(Index_%BlockSize);
-		}
+		//reference index_ref(index_type Index_) {
+		//	return Blocks[static_cast<index_type>(Index_/BlockSize)].index_ref(Index_%BlockSize);
+		//}
 	public:
 		//!Return begin iterator fot the lattice
 		iterator begin() { return iterator(block_begin(), block_begin()->begin()); }
@@ -493,65 +546,90 @@ namespace hmLib {
 		//!Get block access iterator at begin
 		block_const_iterator block_begin()const { return Blocks.begin(); }
 		//!Get block access iterator at end
-		block_iterator block_end() { return End; }
+		block_iterator block_end() { return Blocks.begin()+Size; }
 		//!Get block access iterator at end
-		block_const_iterator block_end()const { return End; }
+		block_const_iterator block_end()const { return Blocks.begin()+Size; }
 		//!Remove block
 		void block_erase(block_iterator Itr) {
-			if(Itr==block_end())return;
-			std::rotate(Itr, Itr+1, End);
-			--End;
+			if(Itr == block_end())return;
+			if(std::distance(block_begin(), Itr)<=HintPos) {
+				--HintPos;
+			}
+			std::rotate(Itr, Itr+1, block_end());
+			--Size;
 		}
 		//!Remove block
 		template<typename block_condition_>
 		void block_erase_if(block_condition_ BlockCondition){
-			End = std::remove_if(block_begin(), block_end(), BlockCondition);
+			Size = std::distance(
+				block_begin(),
+				std::remove_if(block_begin(), block_end(), BlockCondition)
+			);
+			HintPos = 0;
 		}
 	private:
 		block_iterator block_find(point_type Pos_) {
 			Pos_ = Pos_ - (Pos_%Indexer.extent());
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
-			if(Itr != block_end() && Itr->point() != Pos_) return block_end();
+			if(Itr != block_end() && Itr->point() != Pos_) return block_end();			
+			HintPos = std::distance(block_begin(), Itr);
 			return Itr;
 		}
 		block_const_iterator block_find(point_type Pos_)const {
 			Pos_ = Pos_ - (Pos_%Indexer.extent());
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();
+			HintPos = std::distance(block_begin(), Itr);
 			return Itr;
 		}
-		block_iterator block_find(point_type Pos_, iterator Hint_) {
-			auto Itr = Hint_->block_itr();
-			if(Itr->inside(Pos_))return Itr;
+		block_iterator block_find(point_type Pos_, block_iterator Hint_) {
+			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
+				HintPos = std::distance(block_begin(), Hint_);
+				return Itr;
+			}
 			return block_find(Pos_);
 		}
-		block_const_iterator block_find(point_type Pos_, const_iterator Hint_) {
-			auto Itr = Hint_->block_itr();
-			if(Itr->inside(Pos_))return Itr;
+		block_const_iterator block_find(point_type Pos_, block_const_iterator Hint_) {
+			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
+				HintPos = std::distance(block_begin(), Hint_);
+				return Itr;
+			}
 			return block_find(Pos_);
 		}
 		block_iterator block_get(point_type Pos_) {
+			//first time
+			if(empty()) {
+				Blocks.push_back(block(Pos_, Indexer, BlockSize));
+				Blocks.push_back(block());//should keep empty element in the end of container!!!
+				Size = 1;
+				HintPos = 0;
+				return Blocks.begin();
+			}
+
 			Pos_ = Pos_ - (Pos_%Indexer.extent());
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 
 			//fail to find
 			if(Itr==block_end() || Itr->point() != Pos_) {
-				//Still remain more than one element
-				if(std::next(End)!=Blocks.end()) {
-					End->assign(Pos_, Indexer, BlockSize);
-					std::rotate(Itr, End, End+1);
-					++End;
+				if(Size+1 < Blocks.size()) {
+					//Still remain more than one element
+					Blocks[Size].assign(Pos_, Indexer, BlockSize);
+					std::rotate(Itr, block_end(), block_end()+1);
+					++Size;
 				} else {
 					Itr = Blocks.insert(Itr, block(Pos_, Indexer, BlockSize));
-					End = Blocks.end()-1;
+					++Size;
 				}
 			}
 
+			HintPos = std::distance(Blocks.begin(), Itr);
 			return Itr;
 		}
-		block_iterator block_get(point_type Pos_, iterator Hint_) {
-			auto Itr = Hint_->block_itr();
-			if(Itr->inside(Pos_))return Itr;
+		block_iterator block_get(point_type Pos_, block_iterator Hint_) {
+			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
+				HintPos = std::distance(block_begin(), Hint_);
+				return Itr;
+			}
 			return block_get(Pos_);
 		}
 	private:
@@ -559,7 +637,8 @@ namespace hmLib {
 		//	In other words, Blocks.end() != End should be satishied anytime
 		//	This is because of end iterator's requirement.
 		block_container Blocks;
-		block_iterator End;
+		unsigned int HintPos;
+		unsigned int Size;
 		indexer Indexer;
 		std::size_t BlockSize;
 	};
