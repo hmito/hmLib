@@ -7,6 +7,5 @@
 #include "lattices/torus_lattice_view.hpp"
 #include "lattices/block_lattice.hpp"
 #include "lattices/zip_lattice.hpp"
-#include "lattices/keep_if.hpp"
 #
 #endif

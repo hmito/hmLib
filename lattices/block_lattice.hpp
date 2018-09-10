@@ -37,15 +37,13 @@ namespace hmLib {
 		public:
 			block() = default;
 			block(point_type Pos_, indexer Indexer_, unsigned int Size_):Pos(Pos_), Indexer(Indexer_), Data(Size_, 0) {}
+		public:
 			iterator begin() { return Data.begin(); }
 			iterator end() { return Data.end(); }
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end()const { return cend(); }
 			const_iterator cbegin()const { return Data.begin(); }
 			const_iterator cend()const { return Data.end(); }
-			point_type point()const { return Pos; }
-			point_type point(const_iterator Itr)const { return Pos + Indexer.calc_point(std::distance(begin(),Itr)); }
-		public:
 			reference at(point_type Pos_) {
 				return Data[Indexer.torus_index(Pos_)];
 			}
@@ -69,10 +67,11 @@ namespace hmLib {
 			reference operator[](point_type Pos_) {return ref(Pos_);}
 			const_reference operator[](point_type Pos_)const {return ref(Pos_);}
 		public:
-			//!Get number of elements included in the lattice
-			size_type lattice_size()const { return Indexer.lattice_size(); }
-			//!Get point_type Size
+			point_type point()const { return Pos; }
+			point_type point(const_iterator Itr)const { return Pos + Indexer.calc_point(std::distance(begin(),Itr)); }
+			//!Get point_type BlockNum
 			const extent_type& extent()const { return Indexer.extent(); }
+			size_type lattice_size()const { return Indexer.lattice_size(); }
 			//!Return true if the given point is inclueded incide of this block.
 			bool inside(point_type Point_)const {
 				for(unsigned int i = 0; i<dim_; ++i) {
@@ -162,12 +161,12 @@ namespace hmLib {
 				if(n < std::distance(Itr, BItr->end())) {
 					Itr += n;
 				}else{
-					auto Size = BItr->size();
+					auto BlockSize = BItr->size();
 					n -= std::distance(Itr, BItr->end());
 					++BItr;
 
-					BItr += n/Size;
-					Itr = std::next(BItr->begin(), n%Size);
+					BItr += n/BlockSize;
+					Itr = std::next(BItr->begin(), n%BlockSize);
 				}
 				return *this;
 			}
@@ -179,10 +178,10 @@ namespace hmLib {
 				} else {
 					n -= std::distance(BItr->begin(), Itr);
 					--BItr;
-					auto Size = BItr->size();
+					auto BlockSize = BItr->size();
 
-					BItr -= n/Size;
-					Itr = std::next(BItr->end()-1, -(n%Size));
+					BItr -= n/BlockSize;
+					Itr = std::next(BItr->end()-1, -(n%BlockSize));
 				}
 				return *this;
 			}
@@ -288,12 +287,12 @@ namespace hmLib {
 				if(n < std::distance(Itr, BItr->end())) {
 					Itr += n;
 				} else {
-					auto Size = BItr->size();
+					auto BlockSize = BItr->size();
 					n -= std::distance(Itr, BItr->end());
 					++BItr;
 
-					BItr += n/Size;
-					Itr = std::next(BItr->begin(), n%Size);
+					BItr += n/BlockSize;
+					Itr = std::next(BItr->begin(), n%BlockSize);
 				}
 				return *this;
 			}
@@ -305,10 +304,10 @@ namespace hmLib {
 				} else {
 					n -= std::distance(BItr->begin(), Itr);
 					--BItr;
-					auto Size = BItr->size();
+					auto BlockSize = BItr->size();
 
-					BItr -= n/Size;
-					Itr = std::next(BItr->end()-1, -(n%Size));
+					BItr -= n/BlockSize;
+					Itr = std::next(BItr->end()-1, -(n%BlockSize));
 				}
 				return *this;
 			}
@@ -363,14 +362,15 @@ namespace hmLib {
 		};
 	public:
 		block_lattice()noexcept:block_lattice(extent_type(10)) {}
-		explicit block_lattice(extent_type BlockExtent)noexcept:Blocks(), Indexer(BlockExtent), HintPos(0), Size(0){
+		explicit block_lattice(extent_type BlockExtent)noexcept:Blocks(), Indexer(BlockExtent), HintPos(0), BlockNum(0){
 			BlockSize = Indexer.lattice_size();
 		}
 		template<typename... others>
 		explicit block_lattice(std::size_t Size_, others... Others_)noexcept: block_lattice(extent_type{ Size_,static_cast<std::size_t>(Others_)... }) {}
 	public:
-		bool empty()const{ return Blocks.empty(); }
-		std::size_t size()const { return Blocks.size()*BlockSize; }
+		bool empty()const{ return BlockNum==0; }
+		void clear(){BlockNum = 0;}
+		std::size_t size()const { return block_num()*block_size(); }
 		void resize(extent_type BlockExtent){
 			if(empty()) {
 				Indexer.resize(BlockExtent);
@@ -387,6 +387,60 @@ namespace hmLib {
 		template<typename... others>
 		void resize(std::size_t Size_, others... Others_) {
 			block_resize(extent_type{ Size_,static_cast<std::size_t>(Others_)... });
+		}
+	public://manipulation related to block
+		//!Get block extent
+		extent_type block_extent()const { return Indexer.extent(); }
+		//!Get block size
+		size_type block_size()const { return BlockSize; }
+		//!Get block number
+		size_type block_num()const { return BlockNum; }
+		//!Get block access iterator at begin
+		block_iterator block_begin() { return Blocks.begin(); }
+		//!Get block access iterator at begin
+		block_const_iterator block_begin()const { return Blocks.begin(); }
+		//!Get block access iterator at end
+		block_iterator block_end() { return Blocks.begin()+BlockNum; }
+		//!Get block access iterator at end
+		block_const_iterator block_end()const { return Blocks.begin()+BlockNum; }
+		//!Remove block
+		void block_erase(block_iterator Itr) {
+			if(Itr == block_end())return;
+			if(std::distance(block_begin(), Itr)<=HintPos) {
+				--HintPos;
+			}
+			std::rotate(Itr, Itr+1, block_end());
+			--BlockNum;
+		}
+		//!Remove block
+		template<typename block_condition_>
+		void block_erase_if(block_condition_ BlockCondition){
+			BlockNum = std::distance(
+				block_begin(),
+				std::partition(block_begin(), block_end(), [cond = std::move(BlockCondition)](block& b){return !BlockCOndition(b); })
+			);
+			HintPos = 0;
+		}
+		template<typename element_condition_>
+		void block_erase_if_all_of(element_condition_ ElementConditiion) {
+			BlockNum = std::distance(
+				block_begin(),
+				std::partition(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return !std::all_of(b.begin(), b.end(), cond); })
+			);
+			HintPos = 0;
+		}
+		std::size_t block_capacity()const{ return std::max(Blocks.size(),1)-1;}
+		void block_reserve(std::size_t n)const{
+			if(n < block_capacity()return;
+
+			while(block_capacity() < n){
+				Blocks.push_back(block(point_type(0), BlockSize));
+			}
+		}
+		void block_shrink_to_fit()const{
+			while(block_num() < block_capacity()){
+				Blocks.pop_back();
+			}
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
@@ -480,7 +534,7 @@ namespace hmLib {
 		//!Return reference of the elemtn at the given point
 		reference ref(point_type Point_) {
 			auto Itr = block_get(Point_, block_begin()+HintPos);
-			return Itr->at(Point_);
+			return Itr->ref(Point_);
 		}
 		//!Return reference of the elemtn at the given elements point
 		template<typename... others>
@@ -490,7 +544,7 @@ namespace hmLib {
 		//!Return reference of the elemtn at the given point
 		reference ref(iterator Hint_, point_type Point_) {
 			auto Itr = block_get(Point_, Hint_);
-			return Itr->at(Point_);
+			return Itr->ref(Point_);
 		}
 		template<typename... others>
 		reference ref(iterator Hint_, index_type Pos_, others... Others_) {
@@ -538,56 +592,16 @@ namespace hmLib {
 		const_iterator cbegin()const { return const_iterator(block_begin(), block_begin()->begin());}
 		//!Return end const_iterator fot the lattice
 		const_iterator cend()const { return const_iterator(block_end(), block_end()->begin());}
-	public://manipulation related to block
-		//!Get block size
-		extent_type block_extent()const { return Indexer.extent(); }
-		//!Get block number
-		size_type block_num()const { return std::distance(block_begin(),block_end()); }
-		//!Get block access iterator at begin
-		block_iterator block_begin() { return Blocks.begin(); }
-		//!Get block access iterator at begin
-		block_const_iterator block_begin()const { return Blocks.begin(); }
-		//!Get block access iterator at end
-		block_iterator block_end() { return Blocks.begin()+Size; }
-		//!Get block access iterator at end
-		block_const_iterator block_end()const { return Blocks.begin()+Size; }
-		//!Remove block
-		void block_erase(block_iterator Itr) {
-			if(Itr == block_end())return;
-			if(std::distance(block_begin(), Itr)<=HintPos) {
-				--HintPos;
-			}
-			std::rotate(Itr, Itr+1, block_end());
-			--Size;
-		}
-		//!Remove block
-		template<typename block_condition_>
-		void block_erase_if(block_condition_ BlockCondition){
-			Size = std::distance(
-				block_begin(),
-				std::partition(block_begin(), block_end(), [cond = std::move(BlockCondition)](block& b){return !BlockCOndition(b); })
-			);
-			HintPos = 0;
-		}
-		template<typename element_condition_>
-		void block_erase_if_all_of(element_condition_ ElementConditiion) {
-			Size = std::distance(
-				block_begin(),
-				std::partition(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return !std::all_of(b.begin(), b.end(), cond); })
-			);
-			HintPos = 0;
-		}
-
 	private:
 		block_iterator block_find(point_type Pos_) {
-			Pos_ = Pos_ - (Pos_%Indexer.extent());
+			Pos_ = euclidean_div(Pos_,Indexer.extent());
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();			
 			HintPos = std::distance(block_begin(), Itr);
 			return Itr;
 		}
 		block_const_iterator block_find(point_type Pos_)const {
-			Pos_ = Pos_ - (Pos_%Indexer.extent());
+			Pos_ = euclidean_div(Pos_,Indexer.extent());
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();
 			HintPos = std::distance(block_begin(), Itr);
@@ -608,13 +622,13 @@ namespace hmLib {
 			return block_find(Pos_);
 		}
 		block_iterator block_get(point_type Pos_) {
-			Pos_ = Pos_ - (Pos_%Indexer.extent());
+			Pos_ = euclidean_div(Pos_,Indexer.extent());
 
 			//first time
 			if(empty()) {
 				Blocks.push_back(block(Pos_, Indexer, BlockSize));
 				Blocks.push_back(block());//should keep empty element in the end of container!!!
-				Size = 1;
+				BlockNum = 1;
 				HintPos = 0;
 				return Blocks.begin();
 			}
@@ -623,14 +637,14 @@ namespace hmLib {
 
 			//fail to find
 			if(Itr==block_end() || Itr->point() != Pos_) {
-				if(Size+1 < Blocks.size()) {
+				if(BlockNum+1 < Blocks.size()) {
 					//Still remain more than one element
-					Blocks[Size].assign(Pos_, Indexer, BlockSize);
+					Blocks[BlockNum].assign(Pos_, Indexer, BlockSize);
 					std::rotate(Itr, block_end(), block_end()+1);
-					++Size;
+					++BlockNum;
 				} else {
 					Itr = Blocks.insert(Itr, block(Pos_, Indexer, BlockSize));
-					++Size;
+					++BlockNum;
 				}
 			}
 
@@ -650,7 +664,7 @@ namespace hmLib {
 		//	This is because of end iterator's requirement.
 		block_container Blocks;
 		unsigned int HintPos;
-		unsigned int Size;
+		unsigned int BlockNum;
 		indexer Indexer;
 		std::size_t BlockSize;
 	};
