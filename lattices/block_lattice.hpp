@@ -623,7 +623,7 @@ namespace hmLib {
 			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
 
 			//first time
-			if(empty()) {
+			if(Blocks.empty()) {
 				Blocks.push_back(block(Pos_, Indexer, BlockSize));
 				Blocks.push_back(block());//should keep empty element in the end of container!!!
 				BlockNum = 1;
