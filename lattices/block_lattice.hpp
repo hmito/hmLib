@@ -362,7 +362,7 @@ namespace hmLib {
 		};
 	public:
 		block_lattice()noexcept:block_lattice(extent_type(10)) {}
-		explicit block_lattice(extent_type BlockExtent)noexcept:Blocks(), Indexer(BlockExtent), HintPos(0), BlockNum(0){
+		explicit block_lattice(extent_type BlockExtent)noexcept:Blocks(), Indexer(BlockExtent), BlockNum(0), HintPos(0){
 			BlockSize = Indexer.lattice_size();
 		}
 		template<typename... others>
@@ -431,8 +431,6 @@ namespace hmLib {
 		}
 		std::size_t block_capacity()const{ return std::max(Blocks.size(),1)-1;}
 		void block_reserve(std::size_t n)const{
-			if(n < block_capacity()return;
-
 			while(block_capacity() < n){
 				Blocks.push_back(block(point_type(0), BlockSize));
 			}
@@ -594,14 +592,14 @@ namespace hmLib {
 		const_iterator cend()const { return const_iterator(block_end(), block_end()->begin());}
 	private:
 		block_iterator block_find(point_type Pos_) {
-			Pos_ = euclidean_div(Pos_,Indexer.extent());
+			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();			
 			HintPos = std::distance(block_begin(), Itr);
 			return Itr;
 		}
 		block_const_iterator block_find(point_type Pos_)const {
-			Pos_ = euclidean_div(Pos_,Indexer.extent());
+			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();
 			HintPos = std::distance(block_begin(), Itr);
@@ -610,7 +608,7 @@ namespace hmLib {
 		block_iterator block_find(point_type Pos_, block_iterator Hint_) {
 			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
-				return Itr;
+				return Hint_;
 			}
 			return block_find(Pos_);
 		}
@@ -622,7 +620,7 @@ namespace hmLib {
 			return block_find(Pos_);
 		}
 		block_iterator block_get(point_type Pos_) {
-			Pos_ = euclidean_div(Pos_,Indexer.extent());
+			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
 
 			//first time
 			if(empty()) {

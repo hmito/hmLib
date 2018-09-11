@@ -59,7 +59,7 @@ namespace hmLib {
 			point_type calc_point(index_type Index)const {
 				point_type Pos;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Pos[i] = (Index%Extent[dim_-1-i]);
+					Pos[dim_-1-i] = (Index%Extent[dim_-1-i]);
 					Index /= static_cast<index_type>(Extent[dim_-1-i]);
 				}
 
@@ -78,13 +78,13 @@ namespace hmLib {
 			point_type translate_for_torus(const point_type& Point)const {
 				point_type Ans = Point;
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Ans[i] = positive_mod<index_type>(Ans[i], Extent[i]);
+					Ans[i] = euclidean_mod<index_type>(Ans[i], Extent[i]);
 				}
 				return Ans;
 			}
 			void fit_for_torus(point_type& Point) {
 				for(unsigned int i = 0; i < dim_; ++i) {
-					Point[i] = positive_mod<index_type>(Point[i], Extent[i]);
+					Point[i] = euclidean_mod<index_type>(Point[i], Extent[i]);
 				}
 			}
 			//Get index value from torus point

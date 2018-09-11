@@ -56,7 +56,7 @@ namespace hmLib{
 			size_type size()const { return Data.size(); }
 			//!Return true if the given point is inclueded incide of this block.
 			bool inside(index_type Pos_)const {
-				return Pos <= Pos_ && Pos_< Pos+size();
+				return Pos <= Pos_ && static_cast<std::size_t>(Pos_)< Pos+size();
 			}
 			//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
 			reference local_at(index_type Index_) { return Data.at(Index_); }
@@ -333,7 +333,7 @@ namespace hmLib{
 		};
 	public:
 		block_vector()noexcept:block_vector(size_type(10)) {}
-		explicit block_vector(size_type Size_)noexcept:Blocks(), HintPos(0), BlockSize(Size_){}
+		explicit block_vector(size_type Size_)noexcept:Blocks(), HintPos(0), BlockNum(0), BlockSize(Size_){}
 	public:
 		bool empty()const{ return BlockNum==0; }
 		void clear(){BlockNum = 0; }
@@ -352,7 +352,7 @@ namespace hmLib{
 		}
 	public://manipulation related to block
 		//!Get block size
-		extent_type block_size()const { return BlockSize; }
+		size_type block_size()const { return BlockSize; }
 		//!Get block number
 		size_type block_num()const { return BlockNum; }
 		//!Get block access iterator at begin
@@ -391,9 +391,7 @@ namespace hmLib{
 		}
 		std::size_t block_capacity()const{ return std::max(Blocks.size(),1)-1;}
 		void block_reserve(std::size_t n)const{
-			if(n < block_capacity()return;
-
-			while(Blocks.size()+1 < n){
+			while(block_capacity() < n){
 				Blocks.push_back(block(0, BlockSize));
 			}
 		}
@@ -440,7 +438,7 @@ namespace hmLib{
 			return const_iterator(Itr, Itr->begin()+n);
 		}
 		//!Return reference of the elemtn at the given point with range check
-		iterator find(iterator Hint_, index_type nullptr) {
+		iterator find(iterator Hint_, index_type n) {
 			auto Itr = block_find(n, Hint_.block_itr());
 			if(Itr==block_end())return end();
 			return iterator(Itr, Itr->begin()+n);
@@ -480,14 +478,14 @@ namespace hmLib{
 		const_iterator cend()const { return const_iterator(block_end(), block_end()->begin());}
 	private:
 		block_iterator block_find(index_type n) {
-			n = euclidean_div(n,BlockSize);
+			n = euclidean_div(n, static_cast<int>(BlockSize))*BlockSize;
 			auto Itr = std::partition_point(block_begin(), block_end(), [n](const block& Block) {return Block.index_begin()<n; });
 			if(Itr != block_end() && Itr->index_begin() != n) return block_end();			
 			HintPos = std::distance(block_begin(), Itr);
 			return Itr;
 		}
 		block_const_iterator block_find(index_type n)const {
-			n = euclidean_div(n,BlockSize);
+			n = euclidean_div(n, static_cast<int>(BlockSize))*BlockSize;
 			auto Itr = std::partition_point(block_begin(), block_end(), [n](const block& Block) {return Block.index_begin()<n; });
 			if(Itr != block_end() && Itr->index_begin() != n) return block_end();
 			HintPos = std::distance(block_begin(), Itr);
@@ -496,7 +494,7 @@ namespace hmLib{
 		block_iterator block_find(index_type n, block_iterator Hint_) {
 			if(Hint_!=block_end() && Hint_->inside(n)) {
 				HintPos = std::distance(block_begin(), Hint_);
-				return Itr;
+				return Hint_;
 			}
 			return block_find(n);
 		}
@@ -508,7 +506,7 @@ namespace hmLib{
 			return block_find(n);
 		}
 		block_iterator block_get(index_type n) {
-			n = euclidean_div(n,BlockSize);
+			n = euclidean_div(n, static_cast<int>(BlockSize))*BlockSize;
 
 			//first time
 			if(Blocks.empty()) {
@@ -519,7 +517,7 @@ namespace hmLib{
 				return Blocks.begin();
 			}
 
-			auto Itr = std::partition_point(block_begin(), block_end(), [n](const block& Block) {return Block.index_begin()<b; });
+			auto Itr = std::partition_point(block_begin(), block_end(), [n](const block& Block) {return Block.index_begin()<n; });
 
 			//fail to find
 			if(Itr==block_end() || Itr->index_begin() != n) {

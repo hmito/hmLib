@@ -85,7 +85,7 @@ namespace hmLib{
 
 	template<class T>
 	inline T euclidean_mod(T n, T divisor){
-		return (num % divisor + divisor)%divisor;
+		return (n % divisor + divisor)%divisor;
 	}
 	template<class T>
 	inline T euclidean_div(T n, T divisor){
