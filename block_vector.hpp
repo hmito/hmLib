@@ -501,7 +501,7 @@ namespace hmLib{
 		block_const_iterator block_find(index_type n, block_const_iterator Hint_) {
 			if(Hint_!=block_end() && Hint_->inside(n)) {
 				HintPos = std::distance(block_begin(), Hint_);
-				return Itr;
+				return Hint_;
 			}
 			return block_find(n);
 		}

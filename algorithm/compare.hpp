@@ -94,7 +94,7 @@ namespace hmLib{
 	template<class T>
 	inline std::pair<T,T> eucledian_divmod(T n, T divisor){
 		T m = euclidean_mod(n,divisor);
-		return std::pair<T,T>((n-m)/diviso,m);
+		return std::pair<T,T>((n-m)/divisor,m);
 	}
 
 }
