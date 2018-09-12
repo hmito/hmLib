@@ -3,6 +3,7 @@
 #include<vector>
 #include<functional>
 #include<algorithm>
+#include"../algorithm/algorithm.hpp"
 #include"utility.hpp"
 #include"exceptions.hpp"
 #include"indexer.hpp"
@@ -369,7 +370,7 @@ namespace hmLib {
 		explicit block_lattice(std::size_t Size_, others... Others_)noexcept: block_lattice(extent_type{ Size_,static_cast<std::size_t>(Others_)... }) {}
 	public:
 		bool empty()const{ return BlockNum==0; }
-		void clear(){BlockNum = 0;}
+		void clear() { BlockNum = 0; HintPos = 0; }
 		std::size_t size()const { return block_num()*block_size(); }
 		void resize(extent_type BlockExtent){
 			if(empty()) {
@@ -417,7 +418,7 @@ namespace hmLib {
 		void block_erase_if(block_condition_ BlockCondition){
 			BlockNum = std::distance(
 				block_begin(),
-				std::partition(block_begin(), block_end(), [cond = std::move(BlockCondition)](block& b){return !BlockCOndition(b); })
+				hmLib::swap_remove_if(block_begin(), block_end(), BlockCondition)
 			);
 			HintPos = 0;
 		}
@@ -425,7 +426,7 @@ namespace hmLib {
 		void block_erase_if_all_of(element_condition_ ElementConditiion) {
 			BlockNum = std::distance(
 				block_begin(),
-				std::partition(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return !std::all_of(b.begin(), b.end(), cond); })
+				hmLib::swap_remove_if(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return std::all_of(b.begin(), b.end(), cond); })
 			);
 			HintPos = 0;
 		}
@@ -606,14 +607,14 @@ namespace hmLib {
 			return Itr;
 		}
 		block_iterator block_find(point_type Pos_, block_iterator Hint_) {
-			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
+			if(Hint_<block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
 			}
 			return block_find(Pos_);
 		}
 		block_const_iterator block_find(point_type Pos_, block_const_iterator Hint_) {
-			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
+			if(Hint_<block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
 			}
@@ -650,7 +651,7 @@ namespace hmLib {
 			return Itr;
 		}
 		block_iterator block_get(point_type Pos_, block_iterator Hint_) {
-			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
+			if(Hint_<block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
 			}
