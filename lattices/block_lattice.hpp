@@ -662,9 +662,9 @@ namespace hmLib {
 		//	In other words, Blocks.end() != End should be satishied anytime
 		//	This is because of end iterator's requirement.
 		block_container Blocks;
-		unsigned int HintPos;
-		unsigned int BlockNum;
-		indexer Indexer;
+	  indexer Indexer;
+	  unsigned int BlockNum;
+	  unsigned int HintPos;
 		std::size_t BlockSize;
 	};
 }

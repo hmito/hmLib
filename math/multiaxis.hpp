@@ -477,7 +477,7 @@ namespace hmLib {
 	template<typename T, unsigned int dim_, typename grid_adjuster>
 	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, grid_adjuster GridAdjuster, math::make_axis_option Opt = math::make_axis_option::none) {
 		using multiaxis_type = multiaxis<typename std::decay<T>::type, dim_, grid_adjuster>;
-		using axis_type = typename multiaxis_type::axis_type;
+		//using axis_type = typename multiaxis_type::axis_type;
 		using axis_container = typename multiaxis_type::axis_container;
 
 		axis_container Container;
