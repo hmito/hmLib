@@ -297,8 +297,8 @@ namespace hmLib{
 				return v2;
 			}
 			friend difference_type operator-(const iterator& v1, const iterator&  v2) {
-				if(v1.BItr > v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v2.Bitr->size());
-				else if(v1.BItr < v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v1.Bitr->size());
+				if(v1.BItr > v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v2.BItr->size());
+				else if(v1.BItr < v2.BItr)return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*(v1.BItr->size());
 				else return v1.Itr - v2.Itr;
 			}
 			friend bool operator==(const iterator& v1, const iterator& v2) {
