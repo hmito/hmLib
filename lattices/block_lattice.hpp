@@ -363,16 +363,21 @@ namespace hmLib {
 		};
 	public:
 		block_lattice()noexcept:block_lattice(extent_type(10)) {}
-		explicit block_lattice(extent_type BlockExtent)noexcept:Blocks(), Indexer(BlockExtent), BlockNum(0), HintPos(0){
+		explicit block_lattice(extent_type BlockExtent)noexcept
+			: Blocks()
+			, Indexer(BlockExtent)
+			, BlockNum(0)
+			, HintPos(0){
 			BlockSize = Indexer.lattice_size();
+			Blocks.push_back(block(point_type(0), Indexer, BlockSize));
 		}
 		template<typename... others>
 		explicit block_lattice(std::size_t Size_, others... Others_)noexcept: block_lattice(extent_type{ Size_,static_cast<std::size_t>(Others_)... }) {}
 	public:
-		bool empty()const{ return BlockNum==0; }
+		bool empty()const{ return block_num()==0; }
 		void clear() { BlockNum = 0; HintPos = 0; }
 		std::size_t size()const { return block_num()*block_size(); }
-		void resize(extent_type BlockExtent){
+		void block_resize(extent_type BlockExtent){
 			if(empty()) {
 				Indexer.resize(BlockExtent);
 				BlockSize = Indexer.lattice_size();
@@ -386,7 +391,7 @@ namespace hmLib {
 			}
 		}
 		template<typename... others>
-		void resize(std::size_t Size_, others... Others_) {
+		void block_resize(std::size_t Size_, others... Others_) {
 			block_resize(extent_type{ Size_,static_cast<std::size_t>(Others_)... });
 		}
 	public://manipulation related to block
@@ -430,14 +435,14 @@ namespace hmLib {
 			);
 			HintPos = 0;
 		}
-		std::size_t block_capacity()const{ return std::max(Blocks.size(),1)-1;}
-		void block_reserve(std::size_t n)const{
+		std::size_t block_capacity()const{ return Blocks.size()-1;}
+		void block_reserve(std::size_t n){
 			while(block_capacity() < n){
-				Blocks.push_back(block(point_type(0), BlockSize));
+				Blocks.push_back(block(point_type(0), Indexer, BlockSize));
 			}
 		}
-		void block_shrink_to_fit()const{
-			while(block_num() < block_capacity()){
+		void block_shrink_to_fit(){
+			while(block_num() < block_capacity()) {
 				Blocks.pop_back();
 			}
 		}
@@ -623,20 +628,20 @@ namespace hmLib {
 		block_iterator block_get(point_type Pos_) {
 			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
 
-			//first time
-			if(Blocks.empty()) {
-				Blocks.push_back(block(Pos_, Indexer, BlockSize));
-				Blocks.push_back(block());//should keep empty element in the end of container!!!
-				BlockNum = 1;
-				HintPos = 0;
-				return Blocks.begin();
-			}
-
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 
 			//fail to find
-			if(Itr==block_end() || Itr->point() != Pos_) {
-				if(BlockNum+1 < Blocks.size()) {
+			if(Itr==block_end() || Itr->point() != Pos_) {			
+				//Add new block by using last unused block.
+				block_end()->assign(Pos_, Indexer, BlockSize);
+				Itr = std::rotate(Itr, block_end(), block_end()+1);
+				//Is there no unused block?
+				if(block_num() == block_capacity()) {
+					Blocks.push_back(block(point_type(0), Indexer, BlockSize));
+				}
+				++BlockNum;
+				/*
+				if(block_num() < block_capacity()) {
 					//Still remain more than one element
 					Blocks[BlockNum].assign(Pos_, Indexer, BlockSize);
 					std::rotate(Itr, block_end(), block_end()+1);
@@ -644,7 +649,7 @@ namespace hmLib {
 				} else {
 					Itr = Blocks.insert(Itr, block(Pos_, Indexer, BlockSize));
 					++BlockNum;
-				}
+				}*/
 			}
 
 			HintPos = std::distance(Blocks.begin(), Itr);
