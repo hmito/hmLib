@@ -634,10 +634,12 @@ namespace hmLib {
 			if(Itr==block_end() || Itr->point() != Pos_) {			
 				//Add new block by using last unused block.
 				block_end()->assign(Pos_, Indexer, BlockSize);
-				Itr = std::rotate(Itr, block_end(), block_end()+1);
+				if(Itr!=block_end())Itr = std::rotate(Itr, block_end(), block_end()+1);
+				HintPos = std::distance(Blocks.begin(), Itr);
 				//Is there no unused block?
 				if(block_num() == block_capacity()) {
 					Blocks.push_back(block(point_type(0), Indexer, BlockSize));
+					Itr = std::next(Blocks.begin(), HintPos);
 				}
 				++BlockNum;
 				/*
@@ -650,9 +652,10 @@ namespace hmLib {
 					Itr = Blocks.insert(Itr, block(Pos_, Indexer, BlockSize));
 					++BlockNum;
 				}*/
+			} else {
+				HintPos = std::distance(Blocks.begin(), Itr);
 			}
 
-			HintPos = std::distance(Blocks.begin(), Itr);
 			return Itr;
 		}
 		block_iterator block_get(point_type Pos_, block_iterator Hint_) {

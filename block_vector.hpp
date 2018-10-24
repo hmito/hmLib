@@ -526,15 +526,18 @@ namespace hmLib{
 			if(Itr==block_end() || Itr->index_begin() != n) {
 				//Add new block by using last unused block.
 				block_end()->assign(n, BlockSize);
-				Itr = std::rotate(Itr, block_end(), block_end()+1);
+				if(Itr!=block_end())Itr = std::rotate(Itr, block_end(), block_end()+1);
+				HintPos = std::distance(Blocks.begin(), Itr);
 				//Is there no unused block?
 				if(block_num() == block_capacity()) {
 					Blocks.push_back(block(0, BlockSize));
+					Itr = std::next(Blocks.begin(), HintPos);
 				}
 				++BlockNum;
+			} else {
+				HintPos = std::distance(Blocks.begin(), Itr);
 			}
 
-			HintPos = std::distance(Blocks.begin(), Itr);
 			return Itr;
 		}
 		block_iterator block_get(index_type n, block_iterator Hint_) {
