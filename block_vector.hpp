@@ -56,7 +56,7 @@ namespace hmLib{
 			size_type size()const { return Data.size(); }
 			//!Return true if the given point is inclueded incide of this block.
 			bool inside(index_type Pos_)const {
-				return Pos <= Pos_ && static_cast<std::size_t>(Pos_)< Pos+size();
+				return Pos <= Pos_ && Pos_< Pos+static_cast<index_type>(size());
 			}
 			//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
 			reference local_at(index_type Index_) { return Data.at(Index_); }
@@ -510,7 +510,7 @@ namespace hmLib{
 			}
 			return block_find(n);
 		}
-		block_const_iterator block_find(index_type n, block_const_iterator Hint_) {
+		block_const_iterator block_find(index_type n, block_const_iterator Hint_)const {
 			if(Hint_!=block_end() && Hint_->inside(n)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;

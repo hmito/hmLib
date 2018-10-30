@@ -76,7 +76,7 @@ namespace hmLib {
 			//!Return true if the given point is inclueded incide of this block.
 			bool inside(point_type Point_)const {
 				for(unsigned int i = 0; i<dim_; ++i) {
-					if(Point_[i]<Pos[i] || static_cast<index_type>(Pos[i]+Indexer.extent()[i])<=Point_[i])return false;
+					if( !(Pos[i]<=Point_[i] && Point_[i]<Pos[i]+Indexer.extent()[i]) )return false;
 				}
 				return true;
 			}
@@ -618,7 +618,7 @@ namespace hmLib {
 			}
 			return block_find(Pos_);
 		}
-		block_const_iterator block_find(point_type Pos_, block_const_iterator Hint_) {
+		block_const_iterator block_find(point_type Pos_, block_const_iterator Hint_)const {
 			if(Hint_<block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
@@ -641,17 +641,8 @@ namespace hmLib {
 					Blocks.push_back(block(point_type(0), Indexer, BlockSize));
 					Itr = std::next(Blocks.begin(), HintPos);
 				}
+				//Increment block_end
 				++BlockNum;
-				/*
-				if(block_num() < block_capacity()) {
-					//Still remain more than one element
-					Blocks[BlockNum].assign(Pos_, Indexer, BlockSize);
-					std::rotate(Itr, block_end(), block_end()+1);
-					++BlockNum;
-				} else {
-					Itr = Blocks.insert(Itr, block(Pos_, Indexer, BlockSize));
-					++BlockNum;
-				}*/
 			} else {
 				HintPos = std::distance(Blocks.begin(), Itr);
 			}
@@ -659,7 +650,7 @@ namespace hmLib {
 			return Itr;
 		}
 		block_iterator block_get(point_type Pos_, block_iterator Hint_) {
-			if(Hint_<block_end() && Hint_->inside(Pos_)) {
+			if(Hint_!=block_end() && Hint_->inside(Pos_)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
 			}
