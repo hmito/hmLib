@@ -16,11 +16,26 @@ namespace hmLib{
 	}
 	template<typename forward_iterator, typename condition>
 	forward_iterator swap_remove_if(forward_iterator Beg, forward_iterator End, condition Cond) {
-		for(auto Itr = Beg; Itr!=End; ++Itr) {
+		//Itr: condition checked element
+		//Beg: end of remaining elements
+
+		auto Itr = Beg;
+		//Beg==Itr as long as Cond is false
+		while(Itr!=End) {
+			if(Cond(*Itr)){
+				++Itr;
+				break;
+			}
+			++Beg;
+			++Itr;
+		}
+		//Beg!=Itr
+		while(Itr!=End){
 			if(!Cond(*Itr)){
-				if(Beg!=Itr)std::swap(*Beg, *Itr);
+				std::swap(*Beg, *Itr);
 				++Beg;
 			}
+			++Itr;
 		}
 		return Beg;
 	}
