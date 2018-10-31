@@ -228,7 +228,6 @@ namespace hmLib {
 			}
 		public:
 			point_type point()const { return BItr->point(Itr); }
-		public:
 			block_const_iterator block_itr() { return BItr; }
 			element_const_iterator element_itr() { return Itr; }
 		private:
@@ -354,7 +353,6 @@ namespace hmLib {
 			}
 		public:
 			point_type point()const { return BItr->point(Itr); }
-		public:
 			block_iterator block_itr() { return BItr; }
 			element_iterator element_itr() { return Itr; }
 		private:
@@ -423,17 +421,13 @@ namespace hmLib {
 		void block_erase_if(block_condition_ BlockCondition){
 			BlockNum = std::distance(
 				block_begin(),
-				hmLib::swap_remove_if(block_begin(), block_end(), BlockCondition)
+				hmLib::swap_remove_if(block_begin(), block_end(), std::forward<block_condition_>(BlockCondition))
 			);
 			HintPos = 0;
 		}
 		template<typename element_condition_>
 		void block_erase_if_all_of(element_condition_ ElementConditiion) {
-			BlockNum = std::distance(
-				block_begin(),
-				hmLib::swap_remove_if(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return std::all_of(b.begin(), b.end(), cond); })
-			);
-			HintPos = 0;
+			block_erase_if([&cond = ElementConditiion](const block& b) {return std::all_of(b.begin(), b.end(), cond); });
 		}
 		std::size_t block_capacity()const{ return Blocks.size()-1;}
 		void block_reserve(std::size_t n){
@@ -638,6 +632,7 @@ namespace hmLib {
 				HintPos = std::distance(Blocks.begin(), Itr);
 				//Is there no unused block?
 				if(block_num() == block_capacity()) {
+					//All iterators are broken
 					Blocks.push_back(block(point_type(0), Indexer, BlockSize));
 					Itr = std::next(Blocks.begin(), HintPos);
 				}
