@@ -360,14 +360,14 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		auto Lat2 = make_lattice_view(Con.begin(), Con.end(), 10, 7, 3);
+		auto Lat2 = make_lattice_view(Con.begin(), Con.end(), 3, 7, 10);
 		const lattice_view<iterator, 3>& Lat(Lat2);
 
 		for(int x = 0; x < 10; ++x){
 			for(int z = 0; z < 3; ++z){
 				for(int y = 0; y < 7; ++y){
-					Assert::AreEqual(x + 10 * (y + z * 7), Lat.at(x, y, z));
-					Assert::AreEqual(x + 10 * (y + z * 7), *(Lat.locate(x, y, z)));
+					Assert::AreEqual(x + 10 * (y + z * 7), Lat.at(z, y, x));
+					Assert::AreEqual(x + 10 * (y + z * 7), *(Lat.locate(z, y, x)));
 				}
 			}
 		}
@@ -376,10 +376,10 @@ public:
 		int Val1 = 0;
 		for(auto val : {1,1,2,3,2,2,1,1,3,-1,-3,2,-1,-2}){
 			if(val == 1){
-				lotr.add(1, 0, 0);
+				lotr.add(0, 0, 1);
 				Val1 += 1;
 			} else if(val == -1){
-				lotr.add(-1, 0, 0);
+				lotr.add(0, 0, -1);
 				Val1 -= 1;
 			} else if(val == 2){
 				lotr.add(0, 1, 0);
@@ -388,10 +388,10 @@ public:
 				lotr.add(0, -1, 0);
 				Val1 -= 10;
 			} else if(val == 3){
-				lotr.add(0, 0, 1);
+				lotr.add(1, 0, 0);
 				Val1 += 70;
 			} else if(val == -3){
-				lotr.add(0, 0, -1);
+				lotr.add(-1, 0, 0);
 				Val1 -= 70;
 			}
 
@@ -402,10 +402,10 @@ public:
 		Val1 = 9 + 10 * (6 + 7 * 2);
 		for(auto val : {-1,-1,-2,-3,-2,-2,-1,-1,3,1,-3,-2,1,2}){
 			if(val == 1){
-				lotr.add(1, 0, 0);
+				lotr.add(0, 0, 1);
 				Val1 += 1;
 			} else if(val == -1){
-				lotr.add(-1, 0, 0);
+				lotr.add(0, 0, -1);
 				Val1 -= 1;
 			} else if(val == 2){
 				lotr.add(0, 1, 0);
@@ -414,10 +414,10 @@ public:
 				lotr.add(0, -1, 0);
 				Val1 -= 10;
 			} else if(val == 3){
-				lotr.add(0, 0, 1);
+				lotr.add(1, 0, 0);
 				Val1 += 70;
 			} else if(val == -3){
-				lotr.add(0, 0, -1);
+				lotr.add(-1, 0, 0);
 				Val1 -= 70;
 			}
 
@@ -432,35 +432,35 @@ public:
 		int Val = 0;
 		std::generate(Con.begin(), Con.end(), [&]()->int {return Val++; });
 
-		auto Lat2 = make_lattice_view(Con.begin(), Con.end(), 10, 7, 4);
+		auto Lat2 = make_lattice_view(Con.begin(), Con.end(), 4, 7, 10);
 		const lattice_view<iterator, 3>& Lat(Lat2);
 
-		auto SubLot = hmLib::subview(Lat.locate(3, 2, 1), Lat.locate(3, 2, 1).plus(4, 0, 2));
-		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(3, 2, 1).plus(4, 0, 2).base_extent());
+		auto SubLot = hmLib::subview(Lat.locate(1, 2, 3), Lat.locate(1, 2, 3).plus(2, 0, 4));
+		typename decltype(SubLot)::indexer Va22l = typename decltype(SubLot)::indexer(Lat.locate(1, 2, 3).plus(2, 0, 4).base_extent());
 
-		typename decltype(SubLot)::indexer Indxer1(lattices::extent(3, 4, 4));
+		typename decltype(SubLot)::indexer Indxer1(lattices::extent(4, 4, 3));
 		typename decltype(SubLot)::indexer Indxer2 = Indxer1;
 		typename decltype(SubLot)::indexer Indxer3 = std::move(Indxer1);
 
 		auto Size = SubLot.extent();
-		Assert::AreEqual(5u, Size[0]);
+		Assert::AreEqual(5u, Size[2]);
 		Assert::AreEqual(1u, Size[1]);
-		Assert::AreEqual(3u, Size[2]);
+		Assert::AreEqual(3u, Size[0]);
 		Assert::AreEqual(15u, SubLot.lattice_size());
 
-		Assert::AreEqual(3, SubLot.front_locate().base_point()[0]);
+		Assert::AreEqual(3, SubLot.front_locate().base_point()[2]);
 		Assert::AreEqual(2, SubLot.front_locate().base_point()[1]);
-		Assert::AreEqual(1, SubLot.front_locate().base_point()[2]);
+		Assert::AreEqual(1, SubLot.front_locate().base_point()[0]);
 
 		auto Itr = SubLot.begin();
-		for(int z = 0; z < 3; ++z){
-			for(int x = 0; x < 5; ++x){
+		for(int z = 0; z < 5; ++z){
+			for(int x = 0; x < 3; ++x){
 				Assert::IsFalse(Itr == SubLot.end());
 				Assert::AreEqual(x + 5 * z, std::distance(SubLot.begin(),Itr));
 				auto Pos = SubLot.index_to_point(std::distance(SubLot.begin(), Itr));
-				Assert::AreEqual(x, Pos[0]);
+				Assert::AreEqual(x, Pos[2]);
 				Assert::AreEqual(0, Pos[1]);
-				Assert::AreEqual(z, Pos[2]);
+				Assert::AreEqual(z, Pos[0]);
 				Assert::AreEqual(x + 3 + 2 * 10 + (z + 1) * 70, *Itr);
 				++Itr;
 			}
@@ -736,7 +736,7 @@ public:
 		for(int y = 0; y < 5; ++y){
 			for(int x = 0; x < 4; ++x){
 				Assert::IsFalse(Itr == Sub.end());
-				Assert::AreEqual(hmLib::positive_mod(-2 + x,9) + 9*hmLib::positive_mod(-3 + y, 10),*Itr);
+				Assert::AreEqual(hmLib::euclidean_mod(-2 + x,9) + 9*hmLib::euclidean_mod(-3 + y, 10),*Itr);
 				++Itr;
 			}
 		}
@@ -763,7 +763,7 @@ public:
 				for(int sy = -3; sy <= 3; ++sy){
 					for(int sx = -3; sx <= 3; ++sx){
 						Assert::IsFalse(SItr == Sub.end());
-						Assert::AreEqual(positive_mod(x + sx, 9) + positive_mod(y + sy, 10) * 9, *SItr);
+						Assert::AreEqual(euclidean_mod(x + sx, 9) + euclidean_mod(y + sy, 10) * 9, *SItr);
 
 						auto Dis = SItr.locate() - Itr.locate();
 						Assert::AreEqual(sx, Dis[0]);
@@ -802,7 +802,7 @@ public:
 				for(int sy = -3; sy <= 3; ++sy){
 					for(int sx = -3; sx <= 3; ++sx){
 						Assert::IsFalse(SItr == Sub.end());
-						Assert::AreEqual(positive_mod(x + sx, 9) + positive_mod(y + sy, 10) * 9, *SItr);
+						Assert::AreEqual(euclidean_mod(x + sx, 9) + euclidean_mod(y + sy, 10) * 9, *SItr);
 
 						auto Dis = SItr.locate() - Itr.locate();
 						Assert::AreEqual(sx, Dis[0]);
@@ -858,29 +858,29 @@ public:
 		std::vector<int> Vec(12, 0);
 		int n = 0;
 		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
-		lattice<int, 2> Lat(lattices::extent(3, 4), Vec.begin(), Vec.end());
+		lattice<int, 2> Lat(lattices::extent(4, 3), Vec.begin(), Vec.end());
 		Assert::IsFalse(Lat.empty(), L"Empty error.");
-		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
-		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(3u, Lat.extent()[1], L"Initial size error.");
 		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
 		Assert::AreEqual(0, Lat.at(0, 0), L"Ini Value error.");
-		Assert::AreEqual(2, Lat.at(2, 0), L"Ini Value error.");
-		Assert::AreEqual(9, Lat.at(0, 3), L"Ini Value error.");
-		Assert::AreEqual(11, Lat.at(2, 3), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(0, 2), L"Ini Value error.");
+		Assert::AreEqual(9, Lat.at(3, 0), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(3, 2), L"Ini Value error.");
 	}
 	TEST_METHOD(datamove_construct) {
 		std::vector<int> Vec(12, 0);
 		int n = 0;
 		std::generate_n(Vec.begin(), 12, [&]() {return n++; });
-		lattice<int, 2> Lat(lattices::extent(3, 4), std::move(Vec));
+		lattice<int, 2> Lat(lattices::extent(4, 3), std::move(Vec));
 		Assert::IsFalse(Lat.empty(), L"Empty error.");
-		Assert::AreEqual(3u, Lat.extent()[0], L"Initial size error.");
-		Assert::AreEqual(4u, Lat.extent()[1], L"Initial size error.");
+		Assert::AreEqual(4u, Lat.extent()[0], L"Initial size error.");
+		Assert::AreEqual(3u, Lat.extent()[1], L"Initial size error.");
 		Assert::AreEqual(12u, Lat.lattice_size(), L"Initial size error.");
 		Assert::AreEqual(0, Lat.at(0, 0), L"Ini Value error.");
-		Assert::AreEqual(2, Lat.at(2, 0), L"Ini Value error.");
-		Assert::AreEqual(9, Lat.at(0, 3), L"Ini Value error.");
-		Assert::AreEqual(11, Lat.at(2, 3), L"Ini Value error.");
+		Assert::AreEqual(2, Lat.at(0, 2), L"Ini Value error.");
+		Assert::AreEqual(9, Lat.at(3, 0), L"Ini Value error.");
+		Assert::AreEqual(11, Lat.at(3, 2), L"Ini Value error.");
 	}
 	TEST_METHOD(locate) {
 		std::vector<int> Vec(12, 0);
@@ -992,4 +992,79 @@ public:
 	}
 };
 
+TEST_CLASS(test_block_lattice) {
+public:
+	TEST_METHOD(test_write1) {
+		hmLib::block_lattice<int, 2> Lat(5, 5);
+
+		int cnt = 0;
+		for(unsigned int i = 0; i<5; ++i) {
+			for(unsigned int j = 0; j<5; ++j) {
+				Lat.ref(i, j) = (cnt++);
+			}
+		}
+		for(unsigned int i = 0; i<5; ++i) {
+			for(unsigned int j = 0; j<5; ++j) {
+				Lat.ref(i, j+5) = (cnt++);
+			}
+		}
+		for(unsigned int i = 0; i<5; ++i) {
+			for(unsigned int j = 0; j<5; ++j) {
+				Lat.ref(i, j+10) = (cnt++);
+			}
+		}
+		for(unsigned int i = 0; i<5; ++i) {
+			for(unsigned int j = 0; j<5; ++j) {
+				Lat.ref(i+5, j) = (cnt++);
+			}
+		}
+		for(unsigned int i = 0; i<5; ++i) {
+			for(unsigned int j = 0; j<5; ++j) {
+				Lat.ref(i+5, j+5) = (cnt++);
+			}
+		}
+		for(unsigned int i = 0; i<5; ++i) {
+			for(unsigned int j = 0; j<5; ++j) {
+				Lat.ref(i+10, j) = (cnt++);
+			}
+		}
+
+		int no = 0;
+		for(auto Itr = Lat.begin(); Itr!=Lat.end(); ++Itr) {
+			Assert::AreEqual(*Itr, no++, L"");
+		}
+	}
+	TEST_METHOD(test_write2) {
+		hmLib::block_lattice<int, 2> Lat(4, 4);
+
+		for(int i = 0; i<10; ++i) {
+			for(int j = 0; j<=i; ++j) {
+				Lat.ref(i-j,j) += 10-i;
+			}
+		}
+
+		for(int i = 0; i<10; ++i) {
+			for(int j = 0; j<10; ++j) {
+				if((i/4+j/4)*4>10)continue;
+				Assert::AreEqual(std::max<int>(0, 10-i-j), Lat.at(i, j), L"");
+			}
+		}
+	}
+	TEST_METHOD(test_write3) {
+		hmLib::block_lattice<int, 2> Lat(4, 4);
+
+		for(int i = 0; i<10; ++i) {
+			for(int j = 0; j<=i; ++j) {
+				Lat.ref(j, i-j) += 10-i;
+			}
+		}
+
+		for(int i = 0; i<10; ++i) {
+			for(int j = 0; j<10; ++j) {
+				if((i/4+j/4)*4>10)continue;
+				Assert::AreEqual(std::max<int>(0, 10-i-j), Lat.at(i, j), L"");
+			}
+		}
+	}
+};
 }

@@ -76,7 +76,7 @@ namespace hmLib {
 			//!Return true if the given point is inclueded incide of this block.
 			bool inside(point_type Point_)const {
 				for(unsigned int i = 0; i<dim_; ++i) {
-					if( !(Pos[i]<=Point_[i] && Point_[i]<Pos[i]+Indexer.extent()[i]) )return false;
+					if( !(Pos[i]<=Point_[i] && Point_[i]<Pos[i]+static_cast<index_type>(Indexer.extent()[i])) )return false;
 				}
 				return true;
 			}
@@ -592,14 +592,18 @@ namespace hmLib {
 		const_iterator cend()const { return const_iterator(block_end(), block_end()->begin());}
 	private:
 		block_iterator block_find(point_type Pos_) {
-			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
+			for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
+				Pos_[i] = euclidean_div<index_type>(Pos_[i], Indexer.extent()[i])*Indexer.extent()[i];
+			}
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();			
 			HintPos = std::distance(block_begin(), Itr);
 			return Itr;
 		}
 		block_const_iterator block_find(point_type Pos_)const {
-			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
+			for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
+				Pos_[i] = euclidean_div<index_type>(Pos_[i], Indexer.extent()[i])*Indexer.extent()[i];
+			}
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 			if(Itr != block_end() && Itr->point() != Pos_) return block_end();
 			HintPos = std::distance(block_begin(), Itr);
@@ -620,7 +624,9 @@ namespace hmLib {
 			return block_find(Pos_);
 		}
 		block_iterator block_get(point_type Pos_) {
-			Pos_ = euclidean_div(Pos_, static_cast<point_type>(Indexer.extent()))*Indexer.extent();
+			for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
+				Pos_[i] = euclidean_div<index_type>(Pos_[i], Indexer.extent()[i])*Indexer.extent()[i];
+			}
 
 			auto Itr = std::partition_point(block_begin(), block_end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 
@@ -628,7 +634,7 @@ namespace hmLib {
 			if(Itr==block_end() || Itr->point() != Pos_) {			
 				//Add new block by using last unused block.
 				block_end()->assign(Pos_, Indexer, BlockSize);
-				if(Itr!=block_end())Itr = std::rotate(Itr, block_end(), block_end()+1);
+				if(Itr!=block_end())std::rotate(Itr, block_end(), block_end()+1);
 				HintPos = std::distance(Blocks.begin(), Itr);
 				//Is there no unused block?
 				if(block_num() == block_capacity()) {
