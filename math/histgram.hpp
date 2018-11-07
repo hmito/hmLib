@@ -4,11 +4,11 @@
 #include<vector>
 #include"axis.hpp"
 namespace hmLib {
-	template<typename value_type_, typename grid_policy_ = math::grid_policy::round_grid_tag>
+	template<typename value_type_, typename grid_adjuster_ = math::default_grid_adjuster>
 	struct histgram {
-		using axis_t = axis<value_type_, grid_policy_>;
+		using axis_t = axis<value_type_, grid_adjuster_>;
 		using value_type = value_type_;
-		using grid_policy = grid_policy_;
+		using grid_adjuster = grid_adjuster_;
 	private:
 		axis_t Axis;
 		std::vector<unsigned int> Vec;
@@ -66,14 +66,14 @@ namespace hmLib {
 		const axis_t& axis()const { return Axis; }
 	};
 
-	template<typename T, typename grid_policy>
-	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_policy GridPolicy, math::make_axis_option Opt = math::make_axis_option::none) {
+	template<typename T, typename grid_adjuster>
+	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_adjuster GridAdjuster, math::make_axis_option Opt = math::make_axis_option::none) {
 		using value_type = typename std::decay<T>::type;
-		return histgram<value_type, grid_policy>(make_axis(Lower,Upper,Size, GridPolicy, Opt));
+		return histgram<value_type, grid_adjuster>(make_axis(Lower,Upper,Size, GridAdjuster, Opt));
 	}
 	template<typename T>
 	auto make_histgram(T Lower, T Upper, unsigned int Size, math::make_axis_option Opt = math::make_axis_option::none) {
-		return make_histgram(Lower, Upper, Size, math::grid_policy::round_grid, Opt);
+		return make_histgram(Lower, Upper, Size, math::default_grid_adjuster(), Opt);
 	}
 }
 #
