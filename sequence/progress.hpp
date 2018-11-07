@@ -11,9 +11,9 @@ namespace hmLib{
 		}
 		template<typename stepper_type, typename system_type, typename state_type, typename time_type, typename observer>
 		void progress(stepper_type&& Stepper, system_type& System, state_type& State, time_type BeginStep, time_type EndStep, observer Observer){
-			for(; BeginStep != EndStep; ++BeginStep){
+			while(BeginStep != EndStep){
 				Stepper(System, State, BeginStep);
-				Observer(State, BeginStep);
+				Observer(State, ++BeginStep);
 			}
 		}
 		template<typename system_type,typename state_type, typename time_type>
@@ -24,9 +24,9 @@ namespace hmLib{
 		}
 		template<typename system_type, typename state_type, typename time_type, typename observer>
 		void progress_each(system_type& System, state_type& State, time_type BeginStep, time_type EndStep, observer Observer){
-			for(; BeginStep != EndStep; ++BeginStep){
+			while(BeginStep != EndStep){
 				System(State, BeginStep);
-				Observer(State, BeginStep);
+				Observer(State, ++BeginStep);
 			}
 		}
 	}

@@ -19,6 +19,7 @@ namespace hmLib{
 				if(Stepper(System,State, BeginStep++) == interfere_request::terminate)break;
 				Observer(State, BeginStep);
 			}
+            Observer(State, BeginStep);
             return BeginStep;
         }
         template<typename interfere_system_t, typename state_t, typename time_t>
@@ -34,6 +35,7 @@ namespace hmLib{
 				if(System(State, BeginStep++) == interfere_request::terminate)break;
 				Observer(State, BeginStep);
 			}
+            Observer(State, BeginStep);
             return BeginStep;
         }
     }
