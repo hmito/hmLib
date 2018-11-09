@@ -74,9 +74,7 @@ namespace hmLib{
 	template<typename T>
 	struct is_const_iterator<T, true> {
 	public:
-		using type = typename std::is_const<
-			typename std::remove_reference<typename std::iterator_traits<T>::reference>::type
-		>::type;
+		using type = std::integral_constant<bool, std::is_assignable<decltype(*std::declval<T>()), typename std::iterator_traits<T>::value_type>::value>;
 		constexpr static bool value = type::value;
 	};
 }
