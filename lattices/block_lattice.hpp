@@ -423,7 +423,7 @@ namespace hmLib {
 				block_begin(),
 				hmLib::swap_remove_if(block_begin(), block_end(), std::forward<block_condition_>(BlockCondition))
 			);
-			HintPos = 0;
+			HintPos = BlockNum;
 		}
 		template<typename element_condition_>
 		void block_erase_if_all_of(element_condition_ ElementConditiion) {
