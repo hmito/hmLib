@@ -1066,5 +1066,45 @@ public:
 			}
 		}
 	}
+	TEST_METHOD(test_remov_if_1) {
+		hmLib::block_lattice<int, 2> Lat(5, 5);
+
+		Lat.ref(1, 1) = 10;
+		Lat.ref(6, 1) = 10;
+		Lat.ref(11, 1) = 10;
+		Lat.ref(6, 6) = 1;
+		Lat.ref(11, 6) = 1;
+		Lat.ref(16, 1) = 1;
+
+		Lat.block_erase_if_all_of([](int i) {return i<5; });
+		Assert::AreEqual(3u, Lat.block_num());
+		auto BItr = Lat.block_begin();
+		Assert::IsTrue(BItr->point()==hmLib::lattices::point(0, 0));
+		++BItr;
+		Assert::IsTrue(BItr->point()==hmLib::lattices::point(5, 0));
+		++BItr;
+		Assert::IsTrue(BItr->point()==hmLib::lattices::point(10, 0));
+		++BItr;
+	}
+	TEST_METHOD(test_remov_if_2) {
+		hmLib::block_lattice<int, 2> Lat(5, 5);
+
+		Lat.ref(1, 1) = 10;
+		Lat.ref(6, 6) = 1;
+		Lat.ref(6, 1) = 10;
+		Lat.ref(11, 6) = 1;
+		Lat.ref(11, 1) = 10;
+		Lat.ref(16, 1) = 1;
+
+		Lat.block_erase_if_all_of([](int i) {return i<5; });
+		Assert::AreEqual(3u, Lat.block_num());
+		auto BItr = Lat.block_begin();
+		Assert::IsTrue(BItr->point()==hmLib::lattices::point(0, 0));
+		++BItr;
+		Assert::IsTrue(BItr->point()==hmLib::lattices::point(5, 0));
+		++BItr;
+		Assert::IsTrue(BItr->point()==hmLib::lattices::point(10, 0));
+		++BItr;
+	}
 };
 }
