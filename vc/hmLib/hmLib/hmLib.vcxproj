@@ -21,6 +21,7 @@
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />
+    <ClInclude Include="..\..\..\block_vector.hpp" />
     <ClInclude Include="..\..\..\ccontainer\cdeque.h" />
     <ClInclude Include="..\..\..\ccontainer\cqueue.h" />
     <ClInclude Include="..\..\..\ccontainer\cstack.h" />

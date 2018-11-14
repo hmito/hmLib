@@ -390,17 +390,13 @@ namespace hmLib{
 		void block_erase_if(block_condition_ BlockCondition){
 			BlockNum = std::distance(
 				block_begin(),
-				std::partition(block_begin(), block_end(), [cond = std::move(BlockCondition)](block& b){return !BlockCOndition(b); })
+				hmLib::swap_remove_if(block_begin(), block_end(), std::forward<block_condition_>(BlockCondition))
 			);
-			HintPos = 0;
+			HintPos = BlockNum;
 		}
 		template<typename element_condition_>
 		void block_erase_if_all_of(element_condition_ ElementConditiion) {
-			BlockNum = std::distance(
-				block_begin(),
-				std::partition(block_begin(), block_end(), [cond = std::move(ElementConditiion)](block& b) {return !std::all_of(b.begin(), b.end(), cond); })
-			);
-			HintPos = 0;
+			block_erase_if([&cond = ElementConditiion](const block& b) {return std::all_of(b.begin(), b.end(), cond); });
 		}
 		void block_reserve(std::size_t n){
 			while(block_capacity() < n){
@@ -441,25 +437,25 @@ namespace hmLib{
 		iterator find(index_type n) {
 			auto Itr = block_find(n, block_begin()+HintPos);
 			if(Itr==block_end())return end();
-			return iterator(Itr, Itr->begin()+n);
+			return iterator(Itr, Itr->begin()+euclidean_mod(n,static_cast<index_type>(block_size())));
 		}
 		//!Return const_reference of the elemtn at the given point with range check
 		const_iterator find(index_type n)const {
 			auto Itr = block_find(n, block_begin()+HintPos);
 			if(Itr==block_end())return end();
-			return const_iterator(Itr, Itr->begin()+n);
+			return const_iterator(Itr, Itr->begin()+euclidean_mod(n,static_cast<index_type>(block_size())));
 		}
 		//!Return reference of the elemtn at the given point with range check
 		iterator find(iterator Hint_, index_type n) {
 			auto Itr = block_find(n, Hint_.block_itr());
 			if(Itr==block_end())return end();
-			return iterator(Itr, Itr->begin()+n);
+			return iterator(Itr, Itr->begin()+euclidean_mod(n,static_cast<index_type>(block_size())));
 		}
 		//!Return const_reference of the elemtn at the given point with range check
 		const_iterator find(const_iterator Hint_, index_type n)const {
 			auto Itr = block_find(n, Hint_.block_itr());
 			if(Itr==block_end())return end();
-			return const_iterator(Itr, Itr->begin()+n);
+			return const_iterator(Itr, Itr->begin()+euclidean_mod(n,static_cast<index_type>(block_size())));
 		}
 		//!Return reference of the elemtn at the given point
 		reference ref(index_type n) {
@@ -504,14 +500,14 @@ namespace hmLib{
 			return Itr;
 		}
 		block_iterator block_find(index_type n, block_iterator Hint_) {
-			if(Hint_!=block_end() && Hint_->inside(n)) {
+			if(Hint_<block_end() && Hint_->inside(n)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
 			}
 			return block_find(n);
 		}
 		block_const_iterator block_find(index_type n, block_const_iterator Hint_)const {
-			if(Hint_!=block_end() && Hint_->inside(n)) {
+			if(Hint_<block_end() && Hint_->inside(n)) {
 				HintPos = std::distance(block_begin(), Hint_);
 				return Hint_;
 			}
@@ -526,7 +522,7 @@ namespace hmLib{
 			if(Itr==block_end() || Itr->index_begin() != n) {
 				//Add new block by using last unused block.
 				block_end()->assign(n, BlockSize);
-				if(Itr!=block_end())Itr = std::rotate(Itr, block_end(), block_end()+1);
+				if(Itr!=block_end())std::rotate(Itr, block_end(), block_end()+1);
 				HintPos = std::distance(Blocks.begin(), Itr);
 				//Is there no unused block?
 				if(block_num() == block_capacity()) {
