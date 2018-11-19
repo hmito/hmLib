@@ -4,6 +4,7 @@
 #include<vector>
 #include<algorithm>
 #include<utility>
+#include"algorithm/algorithm.hpp"
 #include"algorithm/compare.hpp"
 #include"exceptions.hpp"
 #include"iterators/integer_iterator.hpp"
