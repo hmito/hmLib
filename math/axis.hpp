@@ -189,9 +189,7 @@ namespace hmLib {
 			std::is_same<
 				decltype(std::declval<T>()*std::declval<double>()),
 				double
-			>::value,
-			double,
-			T
+			>::value,double,T
 		>::type
 	>
 	struct axis {
@@ -293,7 +291,7 @@ namespace hmLib {
 		using weighted_index_range = math::weighted_index_range<index_type>;
 	public:
 		axis():a(0), b(0), Size(0) {}
-		axis(value_type Lower_, value_type Upper_, size_type Size_):a(static_cast<calc_type>(Upper_-Lower_)/(Size_ - 1)), b(Lower_), Size(Size_) {}
+		axis(value_type Lower_, value_type Upper_, size_type Size_):a((static_cast<calc_type>(Upper_)-static_cast<calc_type>(Lower_))/(Size_ - 1)), b(Lower_), Size(Size_) {}
 		axis(const this_type&) = default;
 		axis& operator=(const this_type& Other) = default;
 		axis(this_type&&) = default;
@@ -444,8 +442,8 @@ namespace hmLib {
 		axis_mapper() = delete;
 		template<typename from_axis_type, typename to_axis_type>
 		axis_mapper(const from_axis_type& from, const to_axis_type& to) {
-			a = static_cast<index_calc_type>(from.upper() - from.lower() / (to.upper() - to.lower())) * (to.size() - 1) / (from.size() - 1);
-			b = static_cast<index_calc_type>(from.lower() - to.lower() / (to.upper() - to.lower()))* (to.size() - 1);
+			a = static_cast<index_calc_type>(from.upper() - from.lower()) / static_cast<index_calc_type>((to.upper() - to.lower())) * (to.size() - 1) / (from.size() - 1);
+			b = static_cast<index_calc_type>(from.lower() - to.lower()) / static_cast<index_calc_type>((to.upper() - to.lower()))* (to.size() - 1);
 
 			float_index_type LowerToFIndex = to_grid_adjuster::index_range(0).first;
 			float_index_type UpperToFIndex = to_grid_adjuster::index_range(to.size()-1).second;
