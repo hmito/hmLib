@@ -325,7 +325,8 @@ namespace hmLib {
 		iterator cend()const { return end(); }
 	public:
 		value_type interval()const { return a; }
-		value_type width()const { return grid_upper() - grid_lower(); }
+		value_type width()const { return a*(size()-1); }
+		value_type grid_width()const { return grid_upper() - grid_lower(); }
 		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
 		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
 		value_type grid_lower()const { return grid_lower_at(0); }
