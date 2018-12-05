@@ -199,7 +199,6 @@ namespace hmLib {
 		using this_type = axis<T, grid_adjuster_, index_type_, calc_type_>;
 	public:
 		using value_type = T;
-		//using difference_type = decltype(std::declval<T>() - std::declval<T>());
 		using grid_adjuster = grid_adjuster_;
 		using index_type = index_type_;
 		using float_index_type = double;
@@ -312,37 +311,13 @@ namespace hmLib {
 			Size = Size_;
 		}
 		void clear() { Size = 0; }
-		size_type size()const { return Size; }
 		bool empty()const { return Size == 0; }
+		size_type size()const { return Size; }
 		value_type operator[](index_type Index)const {return float_at(Index);}
 		value_type at(index_type Index)const {
 			hmLib_assert(0<=Index && Index < static_cast<int>(Size), hmLib::access_exceptions::out_of_range_access, "Out of axis range access.");
 			return operator[](Index);
 		}
-		iterator begin()const { return iterator(0, a, b); }
-		iterator end()const { return iterator(static_cast<int>(Size),a,b); }
-		iterator cbegin()const { return begin(); }
-		iterator cend()const { return end(); }
-	public:
-		value_type interval()const { return static_cast<value_type>(a); }
-		value_type width()const { return static_cast<value_type>(a*(size()-1)); }
-		value_type lower()const { return static_cast<value_type>(b); }
-		value_type upper()const { return static_cast<value_type>(a*(size()-1)+b); }
-		value_type grid_width()const { return grid_upper() - grid_lower(); }
-		value_type grid_lower()const { return grid_lower_at(0); }
-		value_type grid_upper()const { return grid_upper_at(static_cast<int>(size())-1); }
-		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
-		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
-		bool inside(value_type Value)const { return grid_lower() <= Value && Value < grid_upper(); }
-		bool inside(value_type LowerVal, value_type UpperVal)const { return grid_lower() <= LowerVal && UpperVal < grid_upper(); }
-	public:
-		friend bool operator==(const this_type& axis1, const this_type& axis2) {
-			return axis1.Size==axis2.Size && hmLib::are_equal(axis1.a, axis2.a) && hmLib::are_equal(axis1.b, axis2.b);
-		}
-		friend bool operator!=(const this_type& axis1, const this_type& axis2) {
-			return !(axis1==axis2);
-		}
-	public:
 		index_type index(value_type Val)const {
 			hmLib_assert(inside(Val), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
 			return grid_adjuster::template index_cast<index_type>(float_index(Val));
@@ -369,12 +344,36 @@ namespace hmLib {
 			);
 		}
 	public:
+		iterator begin()const { return iterator(0, a, b); }
+		iterator end()const { return iterator(static_cast<int>(Size),a,b); }
+		iterator cbegin()const { return begin(); }
+		iterator cend()const { return end(); }
+	public:
+		value_type interval()const { return static_cast<value_type>(a); }
+		value_type width()const { return static_cast<value_type>(a*(size()-1)); }
+		value_type lower()const { return static_cast<value_type>(b); }
+		value_type upper()const { return static_cast<value_type>(a*(size()-1)+b); }
+		value_type grid_width()const { return grid_upper() - grid_lower(); }
+		value_type grid_lower()const { return grid_lower_at(0); }
+		value_type grid_upper()const { return grid_upper_at(static_cast<int>(size())-1); }
+		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
+		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
+		bool inside(value_type Value)const { return grid_lower() <= Value && Value < grid_upper(); }
+		bool inside(value_type LowerVal, value_type UpperVal)const { return grid_lower() <= LowerVal && UpperVal < grid_upper(); }
+	public:
 		this_type subaxis(index_type LowerIndex, index_type UpperIndex) {
 			return this_type(operator[](LowerIndex), operator[](UpperIndex), UpperIndex - LowerIndex + 1);
 		}
 		template<typename to_axis>
 		auto map_to(const to_axis& to) {
 			return map_axis(*this, to);
+		}
+	public:
+		friend bool operator==(const this_type& axis1, const this_type& axis2) {
+			return axis1.Size==axis2.Size && hmLib::are_equal(axis1.a, axis2.a) && hmLib::are_equal(axis1.b, axis2.b);
+		}
+		friend bool operator!=(const this_type& axis1, const this_type& axis2) {
+			return !(axis1==axis2);
 		}
 	private:
 		calc_type a;

@@ -1,5 +1,5 @@
 #ifndef HMLIB_MATH_MULTIAXIS_INC
-#define HMLIB_MATH_MULTIAXIS_INC 100
+#define HMLIB_MATH_MULTIAXIS_INC 101
 #
 #include<iterator>
 #include<array>
@@ -130,23 +130,29 @@ namespace hmLib {
 			iterator cend()const { return end(); }
 		};
 	}
-	template<typename T, unsigned int dim_, typename grid_adjuster_ = math::default_grid_adjuster, typename index_type_ = int, typename calc_type_ = double>
+	template<typename T, unsigned int dim_, typename grid_adjuster_ = math::default_grid_adjuster, typename index_type_ = int, 
+		typename calc_type_ = typename std::conditional<
+			std::is_same<
+				decltype(std::declval<T>()*std::declval<double>()),
+				double
+			>::value,double,T
+		>::type
+	>
 	struct multiaxis {
 	private:
 		using this_type = multiaxis<T, dim_, grid_adjuster_, index_type_, calc_type_>;
 	public:
 		using value_type = T;
-		using difference_type = decltype(std::declval<value_type>()-std::declval<value_type>());
-		using index_type = index_type_;
 		using grid_adjuster = grid_adjuster_;
-		using axis_type = hmLib::axis<T, grid_adjuster_, index_type_, calc_type_>;
-		using axis_container = std::vector<axis_type>;
-	private:
-		using indexer_type = lattices::indexer<dim_>;
+		using index_type = index_type_;
+		using size_type = std::size_t;
+		using calc_type = calc_type_;
 	public:
+		using indexer_type = lattices::indexer<dim_>;
+		using axis_type = hmLib::axis<T, grid_adjuster, index_type, calc_type>;
+		using axis_container = std::vector<axis_type>;
 		using point_type = typename indexer_type::point_type;
 		using extent_type = typename indexer_type::extent_type;
-		using size_type = typename indexer_type::size_type;
 		using value_point_type = varray<value_type, dim_>;
 		using float_point_type = varray<double, dim_>;
 		using weighted_point_range = math::weighted_point_range<index_type, dim_>;
@@ -287,11 +293,6 @@ namespace hmLib {
 			assign(AxisSet_);
 		}
 	public:
-		void clear() {
-			for(auto& Axis: AxisSet)Axis.clear();
-			Indexer.resize(extent_type(0));
-		}
-		bool empty()const { return Indexer.lattice_size()==0; }
 		void assign(std::initializer_list<axis_type> axlist) {
 			assign(axlist.begin(), axlist.end());
 		}
@@ -316,6 +317,17 @@ namespace hmLib {
 			}
 			Indexer.resize(Extent);
 		}
+		//!Clear multiaxis; after this, empty return true and access is undefined until all axes are assigned.
+		void clear() {
+			for(auto& Axis: AxisSet)Axis.clear();
+			Indexer.resize(extent_type(0));
+		}
+		//!Check if the multiaxis is empty
+		bool empty()const { return Indexer.lattice_size()==0; }
+		//!Get number of elements included in the lattice
+		size_type lattice_size()const { return Indexer.lattice_size(); }
+		//!Get point_type Size
+		const extent_type& extent()const { return Indexer.extent(); }
 	public:
 		const axis_type& axis(index_type n)const { return AxisSet[n]; }
 		void assign_axis(index_type n, axis_type Axis) {
@@ -335,20 +347,6 @@ namespace hmLib {
 			Indexer.resize(Extent);
 		}
 	public:
-		value_point_type lower()const {
-			value_point_type Val;
-			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
-				Val[i] = AxisSet[i].lower();
-			}
-			return Val;
-		}
-		value_point_type upper()const {
-			value_point_type Val;
-			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
-				Val[i] = AxisSet[i].upper();
-			}
-			return Val;
-		}
 		value_point_type at(const point_type& p)const {
 			value_point_type Val;
 			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
@@ -388,7 +386,6 @@ namespace hmLib {
 			static_assert(sizeof...(others)==dim_-1, "argument number for float_at is different from dim.");
 			return float_at(float_point_type{ Pos_, static_cast<double>(Others_)... });
 		}
-	public:
 		point_type point(value_point_type p)const {
 			point_type Val;
 			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
@@ -438,14 +435,88 @@ namespace hmLib {
 		//!Return locator of (size-1)
 		locator back_locate() const{ return locate(extent() + point_type(-1)); }
 	public:
-		//!Get number of elements included in the lattice
-		size_type lattice_size()const { return Indexer.lattice_size(); }
-		//!Get point_type Size
-		const extent_type& extent()const { return Indexer.extent(); }
+		value_point_type interval()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].interval();
+			}
+			return Val;
+		}
+		value_point_type width()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].width();
+			}
+			return Val;
+		}
+		value_point_type lower()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].lower();
+			}
+			return Val;
+		}
+		value_point_type upper()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].upper();
+			}
+			return Val;
+		}
+		value_point_type grid_width()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].grid_width();
+			}
+			return Val;
+		}
+		value_point_type grid_lower()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].grid_lower();
+			}
+			return Val;
+		}
+		value_point_type grid_upper()const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].grid_upper();
+			}
+			return Val;
+		}
+		value_point_type grid_lower_at(point_type Pos)const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].grid_lower_at(Pos[i]);
+			}
+			return Val;
+		}
+		value_point_type grid_upper_at(point_type Pos)const {
+			value_point_type Val;
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				Val[i] = AxisSet[i].grid_upper_at(Pos[i]);
+			}
+			return Val;
+		}
+		bool inside(value_point_type Val)const {
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				if(!AxisSet[i].inside(Val[i]))return false;
+			}
+			return true;
+		}
+		bool inside(value_type LowerVal, value_type UpperVal)const {
+			for(unsigned int i = 0; i<AxisSet.size(); ++i) {
+				if(!AxisSet[i].inside(LowerVal[i],UpperVal[i]))return false;
+			}
+			return true;
+		}
+	public:
 		//!Convert from index to point
 		point_type index_to_point(index_type Index_)const { return Indexer.point(Index_); }
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
+		value_type index_at(index_type Index)const {return at(index_to_point(Index));}
+		value_type index_ref(index_type Index)const {return ref(index_to_point(Index));}
 	public:
 		template<typename to_multiaxis>
 		auto map_to(const to_multiaxis& to) {
