@@ -5,6 +5,7 @@
 #include<iterator>
 #include<type_traits>
 #include<cmath>
+#include"../utility.hpp"
 #include"../exceptions.hpp"
 #include"../clone_ptrproxy.hpp"
 namespace hmLib {
@@ -50,12 +51,13 @@ namespace hmLib {
 			grid_adjuster() = default;
 		};
 
-		namespace grid_policy {
-			constexpr grid_adjuster<round_grid_tag,-8> round_grid;
-			constexpr grid_adjuster<floor_grid_tag, -8> floor_grid;
-			constexpr grid_adjuster<ceil_grid_tag, -8> ceil_grid;
-		}
-		using default_grid_adjuster = grid_adjuster<math::grid_policy::round_grid_tag, -8>;
+		template<int log10_index_threshold>
+		using round_grid_adjuster = grid_adjuster<grid_policy::round_grid_tag,log10_index_threshold>;
+		template<int log10_index_threshold>
+		using floor_grid_adjuster = grid_adjuster<grid_policy::floor_grid_tag, log10_index_threshold>;
+		template<int log10_index_threshold>
+		using ceil_grid_adjuster = grid_adjuster<grid_policy::ceil_grid_tag, log10_index_threshold>;
+		using default_grid_adjuster = round_grid_adjuster<-8>;
 
 		template<typename index_type_>
 		struct weighted_index_range {

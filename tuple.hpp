@@ -4,6 +4,7 @@
 #include<tuple>
 #include<utility>
 #include"exceptions.hpp"
+#include"hash.hpp"
 namespace hmLib {
 	namespace detail {
 		template<unsigned int n, unsigned int r>
@@ -90,6 +91,14 @@ namespace hmLib {
 		);
 	}
 
+	template<typename... T>
+	struct hash< std::tuple<T...> > {
+		using result_type = std::size_t;
+		using argument_type = std::tuple<T...>;
+		result_type operator()(const argument_type& key)const {
+			return tuple_reduce([](result_type seed, auto v) {return merge_hash(seed, hash<typename std::decay<decltype(v)>::type>()(v)); }, key, result_type(0));
+		}
+	};
 }
 #
 #endif

@@ -64,6 +64,7 @@
     <ClInclude Include="..\..\..\geometry\segment.hpp" />
     <ClInclude Include="..\..\..\geometry\point.hpp" />
     <ClInclude Include="..\..\..\gps.hpp" />
+    <ClInclude Include="..\..\..\hash.hpp" />
     <ClInclude Include="..\..\..\hmLib_config.h" />
     <ClInclude Include="..\..\..\inquiries.hpp" />
     <ClInclude Include="..\..\..\inquiries\inquiry.hpp" />

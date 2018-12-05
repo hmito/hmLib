@@ -473,6 +473,9 @@
     <ClInclude Include="..\..\..\math\combinatorics.hpp">
       <Filter>hmLib\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hash.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\block_vector.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
