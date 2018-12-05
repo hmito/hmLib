@@ -319,20 +319,20 @@ namespace hmLib {
 			hmLib_assert(0<=Index && Index < static_cast<int>(Size), hmLib::access_exceptions::out_of_range_access, "Out of axis range access.");
 			return operator[](Index);
 		}
-		value_type lower()const { return static_cast<value_type>(b); }
-		value_type upper()const { return static_cast<value_type>(a*(size()-1)+b); }
 		iterator begin()const { return iterator(0, a, b); }
 		iterator end()const { return iterator(static_cast<int>(Size),a,b); }
 		iterator cbegin()const { return begin(); }
 		iterator cend()const { return end(); }
 	public:
-		value_type interval()const { return a; }
-		value_type width()const { return a*(size()-1); }
+		value_type interval()const { return static_cast<value_type>(a); }
+		value_type width()const { return static_cast<value_type>(a*(size()-1)); }
+		value_type lower()const { return static_cast<value_type>(b); }
+		value_type upper()const { return static_cast<value_type>(a*(size()-1)+b); }
 		value_type grid_width()const { return grid_upper() - grid_lower(); }
-		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
-		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
 		value_type grid_lower()const { return grid_lower_at(0); }
 		value_type grid_upper()const { return grid_upper_at(static_cast<int>(size())-1); }
+		value_type grid_lower_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).first; }
+		value_type grid_upper_at(index_type Index)const { return grid_adjuster::value_range(at(Index), interval()).second;}
 		bool inside(value_type Value)const { return grid_lower() <= Value && Value < grid_upper(); }
 		bool inside(value_type LowerVal, value_type UpperVal)const { return grid_lower() <= LowerVal && UpperVal < grid_upper(); }
 	public:
