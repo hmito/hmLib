@@ -3,7 +3,6 @@
 #
 #include<iterator>
 #include<array>
-#include<vector>
 #include<utility>
 #include<algorithm>
 #include<initializer_list>
@@ -148,9 +147,9 @@ namespace hmLib {
 		using size_type = std::size_t;
 		using calc_type = calc_type_;
 	public:
-		using indexer_type = lattices::indexer<dim_>;
 		using axis_type = hmLib::axis<T, grid_adjuster, index_type, calc_type>;
-		using axis_container = std::vector<axis_type>;
+		using axis_container = std::array<axis_type,dim_>;
+		using indexer_type = lattices::indexer<dim_>;
 		using point_type = typename indexer_type::point_type;
 		using extent_type = typename indexer_type::extent_type;
 		using value_point_type = varray<value_type, dim_>;
@@ -283,14 +282,11 @@ namespace hmLib {
 			this_type plus(index_type Pos_, others... Others_)const { return *this + point_type{ Pos_, static_cast<index_type>(Others_)... }; }
 		};
 	public:
-		multiaxis():AxisSet(dim(), axis_type()), Indexer(extent_type(0)) {}
-		multiaxis(std::initializer_list<axis_type> axlist) { assign(std::move(axlist)); }
+		multiaxis() = default;
+		multiaxis(std::initializer_list<axis_type> axlist)noexcept: AxisSet(std::move(axlist)) { }
 		template<typename input_iterator>
 		multiaxis(input_iterator Beg, input_iterator End) {
 			assign(Beg, End);
-		}
-		explicit multiaxis(axis_container AxisSet_) {
-			assign(AxisSet_);
 		}
 	public:
 		void assign(std::initializer_list<axis_type> axlist) {
@@ -299,53 +295,21 @@ namespace hmLib {
 		template<typename input_iteratro>
 		void assign(input_iteratro Beg, input_iteratro End) {
 			hmLib_assert(std::distance(Beg, End)==dim_, hmLib::numeric_exceptions::incorrect_arithmetic_request, "number of axis is different from dim.");
-			AxisSet.assign(Beg, End);
-
-			extent_type Extent;
-			for(unsigned int i = 0; i<dim(); ++i) {
-				Extent[i] = AxisSet[i].size();
-			}
-			Indexer.resize(Extent);
+			std::copy(Beg, End, AxisSet.begin());
 		}
-		void assign(axis_container AxisSet_) {
-			hmLib_assert(AxisSet_.size()==dim_, hmLib::numeric_exceptions::incorrect_arithmetic_request, "multiaxis require the axis container with size dim.");
-			AxisSet = std::move(AxisSet_);
-
-			extent_type Extent;
-			for(unsigned int i = 0; i<dim(); ++i) {
-				Extent[i] = AxisSet[i].size();
-			}
-			Indexer.resize(Extent);
+		size_type lattice_size()const {
+			size_type s = 1;
+			for(int i = 0; i<dim(); ++i) s *= AxisSet.size(i);
+			return s;
 		}
-		//!Clear multiaxis; after this, empty return true and access is undefined until all axes are assigned.
-		void clear() {
-			for(auto& Axis: AxisSet)Axis.clear();
-			Indexer.resize(extent_type(0));
+		extent_type extent()const {
+			extent_type e;
+			for(int i = 0; i<dim(); ++i) e[i] = AxisSet.size(i);
+			return e;
 		}
-		//!Check if the multiaxis is empty
-		bool empty()const { return Indexer.lattice_size()==0; }
-		//!Get number of elements included in the lattice
-		size_type lattice_size()const { return Indexer.lattice_size(); }
-		//!Get point_type Size
-		const extent_type& extent()const { return Indexer.extent(); }
-	public:
+		indexer_type indexer()const { return indexer_type(extent()); }
+		axis_type& axis(index_type n) { return AxisSet[n]; }
 		const axis_type& axis(index_type n)const { return AxisSet[n]; }
-		void assign_axis(index_type n, axis_type Axis) {
-			hmLib_assert(n<dim_, hmLib::access_exceptions::out_of_range_access, "out of axis range.");
-			AxisSet[n] = Axis;
-
-			extent_type Extent = extent();
-			Extent[n] = Axis.size();
-			Indexer.resize(Extent);
-		}
-		void assign_axis(index_type n, value_type Lower, value_type Upper, index_type Size) {
-			hmLib_assert(n<dim_, hmLib::access_exceptions::out_of_range_access, "out of axis range.");
-			AxisSet[n].assign(Lower, Upper, Size);
-
-			extent_type Extent = extent();
-			Extent[n] = Size;
-			Indexer.resize(Extent);
-		}
 	public:
 		value_point_type at(const point_type& p)const {
 			value_point_type Val;
@@ -420,7 +384,7 @@ namespace hmLib {
 	public:
 		iterator begin()const { return iterator(*this, 0); }
 		iterator cbegin()const { return begin(); }
-		iterator end()const { return iterator(*this, Indexer.lattice_size()); }
+		iterator end()const { return iterator(*this, lattice_size()); }
 		iterator cend()const { return end(); }
 	public:
 		//!Return locator of given point
@@ -512,9 +476,9 @@ namespace hmLib {
 		}
 	public:
 		//!Convert from index to point
-		point_type index_to_point(index_type Index_)const { return Indexer.point(Index_); }
+		point_type index_to_point(index_type Index_)const { return indexer().point(Index_); }
 		//!Convert from point to index
-		index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
+		index_type point_to_index(point_type Point_)const { return indexer().index(Point_); }
 		value_type index_at(index_type Index)const {return at(index_to_point(Index));}
 		value_type index_ref(index_type Index)const {return ref(index_to_point(Index));}
 	public:
@@ -543,7 +507,6 @@ namespace hmLib {
 		}
 	private:
 		std::vector<axis_type> AxisSet;
-		indexer_type Indexer;
 	};
 	template<typename T, unsigned int dim_, typename grid_adjuster>
 	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, grid_adjuster GridAdjuster, math::make_axis_option Opt = math::make_axis_option::none) {
