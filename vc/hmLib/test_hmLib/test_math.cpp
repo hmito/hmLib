@@ -81,7 +81,7 @@ namespace hmLib {
 				}
 			}
 			{
-				auto Axis = make_axis(0.0, 1.0, 11, math::grid_policy::ceil_grid);
+				auto Axis = make_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
@@ -173,7 +173,7 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_grid_floor_range) {
-			auto Axis = make_axis(0.0, 1.0, 11,math::grid_policy::floor_grid);
+			auto Axis = make_axis(0.0, 1.0, 11,math::floor_grid_adjuster<-8>());
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -245,7 +245,7 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_grid_ceil_range) {
-			auto Axis = make_axis(0.0, 1.0, 11, math::grid_policy::ceil_grid);
+			auto Axis = make_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -316,8 +316,8 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_mapping_floor_floor) {
-			auto Axis1 = make_axis(0.2, 0.89, 4, math::grid_policy::floor_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02, 0.74, 7, math::grid_policy::floor_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_axis(0.2, 0.89, 4, math::floor_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_axis(0.02, 0.74, 7, math::floor_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -341,8 +341,8 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_round) {
-			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::grid_policy::round_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::grid_policy::round_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -366,8 +366,8 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_ceil_round) {
-			auto Axis1 = make_axis(0.2+0.23, 0.89+0.23, 4, math::grid_policy::ceil_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::grid_policy::round_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_axis(0.2+0.23, 0.89+0.23, 4, math::ceil_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -391,8 +391,8 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_ceil) {
-			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::grid_policy::round_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12, 0.74+0.12, 7, math::grid_policy::ceil_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_axis(0.02+0.12, 0.74+0.12, 7, math::ceil_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
