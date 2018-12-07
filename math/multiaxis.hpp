@@ -97,7 +97,7 @@ namespace hmLib {
 				Weight = 1.0;
 				for(unsigned int i = 0; i<dim(); ++i) {
 					Extent[i] = Range.at(i).size();
-					Size *= Extent[i];
+					Size *= static_cast<unsigned int>(Extent[i]);
 					Weight *= Range.at(i).weight();
 				}
 			}
@@ -299,12 +299,12 @@ namespace hmLib {
 		}
 		size_type lattice_size()const {
 			size_type s = 1;
-			for(int i = 0; i<dim(); ++i) s *= AxisSet.size(i);
+			for(int i = 0; i<static_cast<int>(dim()); ++i) s *= AxisSet[i].size();
 			return s;
 		}
 		extent_type extent()const {
 			extent_type e;
-			for(int i = 0; i<dim(); ++i) e[i] = AxisSet.size(i);
+			for(int i = 0; i<static_cast<int>(dim()); ++i) e[i] = AxisSet[i].size();
 			return e;
 		}
 		indexer_type indexer()const { return indexer_type(extent()); }
@@ -483,7 +483,7 @@ namespace hmLib {
 		value_type index_ref(index_type Index)const {return ref(index_to_point(Index));}
 	public:
 		template<typename to_multiaxis>
-		auto map_to(const to_multiaxis& to) {
+		auto map_to(const to_multiaxis& to)const {
 			return map_multiaxis(*this, to);
 		}
 	public:
@@ -506,7 +506,7 @@ namespace hmLib {
 			return !(axis1==axis2);
 		}
 	private:
-		std::vector<axis_type> AxisSet;
+		axis_container AxisSet;
 	};
 	template<typename T, unsigned int dim_, typename grid_adjuster>
 	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, grid_adjuster GridAdjuster, math::make_axis_option Opt = math::make_axis_option::none) {
@@ -518,7 +518,7 @@ namespace hmLib {
 		for(unsigned int i = 0; i<dim_; ++i) {
 			Container.push_back(make_axis(Lower[i], Upper[i], Size[i], GridAdjuster, Opt));
 		}
-		return multiaxis_type(std::move(Container));
+		return multiaxis_type(Container.begin(), Container.end());
 	}
 	template<typename T, unsigned int dim_>
 	auto make_multiaxis(varray<T, dim_> Lower, varray<T, dim_> Upper, varray<std::size_t, dim_> Size, math::make_axis_option Opt = math::make_axis_option::none) {
