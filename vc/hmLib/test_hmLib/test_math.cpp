@@ -37,35 +37,35 @@ namespace hmLib {
 		}
 	};
 	TEST_CLASS(test_math_axis) {
-		TEST_METHOD(make_axis_with_borders) {
-			auto Axis1 = make_axis(0.0, 10.0, 11);
+		TEST_METHOD(make_range_axis_with_borders) {
+			auto Axis1 = make_range_axis(0.0, 10.0, 11);
 			Assert::AreEqual(11u, Axis1.size());
 			Assert::AreEqual( 0.0, Axis1.lower());
 			Assert::AreEqual(10.0, Axis1.upper());
 
-			auto Axis2 = make_axis(0.0, 10.0, 11, math::make_axis_option::none);
+			auto Axis2 = make_range_axis(0.0, 10.0, 11, math::range_axis_option::none);
 			Assert::AreEqual(11u, Axis2.size());
 			Assert::AreEqual(0.0, Axis2.lower());
 			Assert::AreEqual(10.0, Axis2.upper());
 
-			auto Axis3 = make_axis(0.0, 10.0, 9, math::make_axis_option::exclude_boundary);
+			auto Axis3 = make_range_axis(0.0, 10.0, 9, math::range_axis_option::exclude_boundary);
 			Assert::AreEqual(9u, Axis3.size());
 			Assert::AreEqual(1.0, Axis3.lower());
 			Assert::AreEqual(9.0, Axis3.upper());
 
-			auto Axis4 = make_axis(0.0, 10.0, 10, math::make_axis_option::exclude_lower_boundary);
+			auto Axis4 = make_range_axis(0.0, 10.0, 10, math::range_axis_option::exclude_lower_boundary);
 			Assert::AreEqual(10u, Axis4.size());
 			Assert::AreEqual(1.0, Axis4.lower());
 			Assert::AreEqual(10.0, Axis4.upper());
 
-			auto Axis5 = make_axis(0.0, 10.0, 10, math::make_axis_option::exclude_upper_boundary);
+			auto Axis5 = make_range_axis(0.0, 10.0, 10, math::range_axis_option::exclude_upper_boundary);
 			Assert::AreEqual(10u, Axis5.size());
 			Assert::AreEqual(0.0, Axis5.lower());
 			Assert::AreEqual(9.0, Axis5.upper());
 		}
 		TEST_METHOD(axis_grid_index) {
 			{
-				auto Axis = make_axis(0.0, 1.0, 11);
+				auto Axis = make_range_axis(0.0, 1.0, 11);
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
@@ -73,7 +73,7 @@ namespace hmLib {
 				}
 			}
 			{
-				auto Axis = make_axis(0.0, 1.0, 11, math::grid_adjuster<math::grid_policy::floor_grid_tag,-8>());
+				auto Axis = make_range_axis(0.0, 1.0, 11, math::grid_adjuster<math::grid_policy::floor_grid_tag,-8>());
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i+0.04));
@@ -81,7 +81,7 @@ namespace hmLib {
 				}
 			}
 			{
-				auto Axis = make_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
+				auto Axis = make_range_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
@@ -91,7 +91,7 @@ namespace hmLib {
 		}
 		TEST_METHOD(axis_flort_index) {
 			{
-				auto Axis = make_axis(0.0, 1.0, 11);
+				auto Axis = make_range_axis(0.0, 1.0, 11);
 
 				Assert::AreEqual(0.0, Axis.float_index(0.00), 1e-5);
 				Assert::AreEqual(0.2, Axis.float_index(0.02), 1e-5);
@@ -100,7 +100,7 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_grid_round_range) {
-			auto Axis = make_axis(0.0, 1.0, 11);
+			auto Axis = make_range_axis(0.0, 1.0, 11);
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -173,7 +173,7 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_grid_floor_range) {
-			auto Axis = make_axis(0.0, 1.0, 11,math::floor_grid_adjuster<-8>());
+			auto Axis = make_range_axis(0.0, 1.0, 11,math::floor_grid_adjuster<-8>());
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -245,7 +245,7 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_grid_ceil_range) {
-			auto Axis = make_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
+			auto Axis = make_range_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -316,8 +316,8 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_mapping_floor_floor) {
-			auto Axis1 = make_axis(0.2, 0.89, 4, math::floor_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02, 0.74, 7, math::floor_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2, 0.89, 4, math::floor_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02, 0.74, 7, math::floor_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -341,8 +341,8 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_round) {
-			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -366,8 +366,8 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_ceil_round) {
-			auto Axis1 = make_axis(0.2+0.23, 0.89+0.23, 4, math::ceil_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2+0.23, 0.89+0.23, 4, math::ceil_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -391,8 +391,8 @@ namespace hmLib {
 			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_ceil) {
-			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12, 0.74+0.12, 7, math::ceil_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02+0.12, 0.74+0.12, 7, math::ceil_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -421,11 +421,11 @@ namespace hmLib {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			combination_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Val *= 10;
@@ -433,26 +433,26 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_combination_at) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			combination_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Val *= 10;
 					Val += Indexer.at(i);
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_combination_excp1_at) {
@@ -460,12 +460,12 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
 					Val *= 10;
@@ -473,7 +473,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_combination_excp1) {
@@ -481,11 +481,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			combination_indexer<> Indexer(N, R,Excp.begin(),Excp.end());
-			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -494,7 +494,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_combination_excp2) {
@@ -502,11 +502,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
 			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -515,7 +515,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_combination_excp3) {
@@ -523,11 +523,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
 			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(10, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -536,18 +536,18 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multicombination) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			multicombination_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Val *= 10;
@@ -555,26 +555,26 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multicombination_at) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			multicombination_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Val *= 10;
 					Val += Indexer.at(i);
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multicombination_excp1_at) {
@@ -582,12 +582,12 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(nHr(5, 3), Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(nHr(5, 3), Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
 					Val *= 10;
@@ -595,7 +595,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multicombination_excp) {
@@ -603,11 +603,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(nHr(N-Excp.size(),R), Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(nHr(N-Excp.size(),R), Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -616,7 +616,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multicombination_excp2) {
@@ -624,11 +624,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
 			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -637,7 +637,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multicombination_excp3) {
@@ -645,11 +645,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
 			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(nHr(5,3), Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -658,18 +658,18 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_permutation) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			permutation_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Val *= 10;
@@ -677,26 +677,26 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_permutation_at) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			permutation_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Val *= 10;
 					Val += Indexer.at(i);
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_permutation_excp1_at) {
@@ -704,12 +704,12 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
 					Val *= 10;
@@ -717,7 +717,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_permutation_excp1) {
@@ -725,11 +725,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -738,7 +738,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_permutation_excp2) {
@@ -746,11 +746,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
 			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -759,7 +759,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_permutation_excp3) {
@@ -767,11 +767,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
 			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(60, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -780,18 +780,18 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multipermutation) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			multipermutation_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Val *= 10;
@@ -799,26 +799,26 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multipermutation_at) {
 			unsigned int N = 5;
 			unsigned int R = 3;
 			multipermutation_indexer<> Indexer(N, R);
-			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Val *= 10;
 					Val += Indexer.at(i);
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multipermutation_excp1_at) {
@@ -826,12 +826,12 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
-				for(unsigned int i = 0; i<Indexer.size(); ++i) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
 					Assert::IsTrue(Indexer[i]<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
 					Val *= 10;
@@ -839,7 +839,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multipermutation_excp) {
@@ -847,11 +847,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,4,6 };
 			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -860,7 +860,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multipermutation_excp2) {
@@ -868,11 +868,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
 			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -881,7 +881,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 		TEST_METHOD(test_multipermutation_excp3) {
@@ -889,11 +889,11 @@ namespace hmLib {
 			unsigned int R = 3;
 			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
 			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
-			Assert::AreEqual<unsigned int>(125, Indexer.total_casenum());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
 
-			std::vector<unsigned int> Vec;
+			std::vector<unsigned long long> Vec;
 			for(; Indexer.valid(); Indexer.next()) {
-				unsigned int Val = 0;
+				unsigned long long Val = 0;
 				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
 					Assert::IsTrue(*Itr<N);
 					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
@@ -902,7 +902,7 @@ namespace hmLib {
 				}
 				Vec.push_back(Val);
 			}
-			Assert::AreEqual<unsigned int>(Indexer.total_casenum(), Vec.size());
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
 			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
 		}
 
