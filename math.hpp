@@ -3,5 +3,6 @@
 #
 #include"math/constants.hpp"
 #include"math/combinatorics.hpp"
+#include"math/static_math.hpp"
 #
 #endif
