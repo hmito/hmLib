@@ -464,14 +464,14 @@ namespace hmLib {
 			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
 		}
 		index_type index(float_index_type FromFIndex)const {
-			hmLib_assert(inside(FromFIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value is out of [grid_lower, grid_upper).");
+			hmLib_assert(inside(FromFIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value "+std::to_string(FromFIndex) + " is out of ["+std::to_string(LowerFromIndex)+", "+std::to_string(UpperFromIndex)+"]");
 			return to_grid_adjuster::template index_cast<index_type>(float_index(FromFIndex));
 		}
 		float_index_type float_index(float_index_type FromFIndex)const {
 			return a*FromFIndex + b;
 		}
 		weighted_index_range weighted_index(index_type FromIndex)const {
-			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value range is out of [grid_lower, grid_upper).");
+			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value "+std::to_string(FromIndex) + " is out of ["+std::to_string(LowerFromIndex)+", "+std::to_string(UpperFromIndex)+"]");
 
 			auto FIndexRange = from_grid_adjuster::index_range(FromIndex);
 			float_index_type LowerFIndex = float_index(FIndexRange.first);
