@@ -3,23 +3,25 @@
 #
 namespace hmLib{
 	namespace math{
-		template<unsigned int p>
-		struct static_pow_impl{
-			template<typename T>
-			static constexpr T calc(const T& v){
-				return v*static_pow_impl<p-1>(v)::calc();
-			}
-		};
-		template<>
-		struct static_pow_impl<0>{
-			template<typename T>
-			static constexpr T calc(const T& v){
-				return 1;
-			}
-		};
+		namespace detail {
+			template<unsigned int p>
+			struct static_pow_impl {
+				template<typename T>
+				static constexpr T calc(const T& v) {
+					return v*static_pow_impl<p-1>::calc(v);
+				}
+			};
+			template<>
+			struct static_pow_impl<0> {
+				template<typename T>
+				static constexpr T calc(const T& v) {
+					return 1;
+				}
+			};
+		}
 	}
-	template<typename T>
-	constexpr T static_pow(T v, unsigned int p){
+	template<unsigned int p, typename T>
+	constexpr T static_pow(T v){
 		return math::detail::static_pow_impl<p>::calc(v);
 	}
 }

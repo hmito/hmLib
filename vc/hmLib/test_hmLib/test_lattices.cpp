@@ -995,7 +995,7 @@ public:
 TEST_CLASS(test_block_lattice) {
 public:
 	TEST_METHOD(test_write1) {
-		hmLib::block_lattice<int, 2> Lat(5, 5);
+		hmLib::block_lattice<int, 2, 5> Lat;
 
 		int cnt = 0;
 		for(unsigned int i = 0; i<5; ++i) {
@@ -1035,7 +1035,7 @@ public:
 		}
 	}
 	TEST_METHOD(test_write2) {
-		hmLib::block_lattice<int, 2> Lat(4, 4);
+		hmLib::block_lattice<int, 2, 4> Lat;
 
 		for(int i = 0; i<10; ++i) {
 			for(int j = 0; j<=i; ++j) {
@@ -1051,7 +1051,7 @@ public:
 		}
 	}
 	TEST_METHOD(test_write3) {
-		hmLib::block_lattice<int, 2> Lat(4, 4);
+		hmLib::block_lattice<int, 2, 4> Lat;
 
 		for(int i = 0; i<10; ++i) {
 			for(int j = 0; j<=i; ++j) {
@@ -1067,7 +1067,7 @@ public:
 		}
 	}
 	TEST_METHOD(test_remov_if_1) {
-		hmLib::block_lattice<int, 2> Lat(5, 5);
+		hmLib::block_lattice<int, 2, 5> Lat;
 
 		Lat.ref(1, 1) = 10;
 		Lat.ref(6, 1) = 10;
@@ -1076,9 +1076,9 @@ public:
 		Lat.ref(11, 6) = 1;
 		Lat.ref(16, 1) = 1;
 
-		Lat.block_erase_if_all_of([](int i) {return i<5; });
-		Assert::AreEqual(3u, Lat.block_num());
-		auto BItr = Lat.block_begin();
+		Lat.blocks().erase_if_all_of([](int i) {return i<5; });
+		Assert::AreEqual(3u, Lat.blocks().size());
+		auto BItr = Lat.blocks().begin();
 		Assert::IsTrue(BItr->point()==hmLib::lattices::point(0, 0));
 		++BItr;
 		Assert::IsTrue(BItr->point()==hmLib::lattices::point(5, 0));
@@ -1087,7 +1087,7 @@ public:
 		++BItr;
 	}
 	TEST_METHOD(test_remov_if_2) {
-		hmLib::block_lattice<int, 2> Lat(5, 5);
+		hmLib::block_lattice<int, 2,5> Lat;
 
 		Lat.ref(1, 1) = 10;
 		Lat.ref(6, 6) = 1;
@@ -1096,9 +1096,9 @@ public:
 		Lat.ref(11, 1) = 10;
 		Lat.ref(16, 1) = 1;
 
-		Lat.block_erase_if_all_of([](int i) {return i<5; });
-		Assert::AreEqual(3u, Lat.block_num());
-		auto BItr = Lat.block_begin();
+		Lat.blocks().erase_if_all_of([](int i) {return i<5; });
+		Assert::AreEqual(3u, Lat.blocks().size());
+		auto BItr = Lat.blocks().begin();
 		Assert::IsTrue(BItr->point()==hmLib::lattices::point(0, 0));
 		++BItr;
 		Assert::IsTrue(BItr->point()==hmLib::lattices::point(5, 0));
