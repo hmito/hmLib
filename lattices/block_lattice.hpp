@@ -77,6 +77,26 @@ namespace hmLib {
 			block& operator=(block&&)=default;
 			explicit block(point_type Pos_):Pos(Pos_),Data(BlockPool.get()){}
 			~block()noexcept{if(Data)BlockPool.release(std::move(Data));}
+			template<typename U, typename std::enable_if<std::is_same<T, U>::value, std::nullptr_t>::type = nullptr>
+			explicit block(const typename other_type<U>::block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
+				auto Itr = Other_.begin();
+				auto End = Other_.end();
+				auto Out = begin();
+				for(; Itr!=End; ++Itr, ++Out) {
+					*Out = static_cast<T>(*Itr);
+				}
+			}
+			template<typename U, typename std::enable_if<std::is_same<T, U>::value, std::nullptr_t>::type = nullptr>
+			operator typename other_type<U>::block() {
+				typename other_type<U>::block Block(point());
+				auto Itr = begin();
+				auto End = end();
+				auto Out = Block.begin();
+				for(; Itr!=End; ++Itr, ++Out) {
+					*Out = *Itr;
+				}
+				return std::move(Block);
+			}
 		public:
 			iterator begin() { return Data.get(); }
 			iterator end() { return Data.get()+block_size(); }
@@ -106,6 +126,126 @@ namespace hmLib {
 			const_reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
 			reference operator[](point_type Pos_) {return ref(Pos_);}
 			const_reference operator[](point_type Pos_)const {return ref(Pos_);}
+		public:
+			operator bool()const { return static_cast<bool>(Data); }
+			template<typename U>
+			block& operator+=(const typename other_type<U>::block& Other) {
+				if(!Data)Data = BlockPool.get();
+				if(!Other)return *this;
+
+				auto Itr = Other.begin();
+				auto End = Other.end();
+				auto Out = begin();
+				for(; Itr!=End; ++Itr, ++Oitr) {
+					*Out += *Itr;
+				}
+				return *this;
+			}
+			template<typename U>
+			block& operator-=(const typename other_type<U>::block& Other) {
+				if(!Data)Data = BlockPool.get();
+				if(!Other)return *this;
+
+				auto Itr = Other.begin();
+				auto End = Other.end();
+				auto Out = begin();
+				for(; Itr!=End; ++Itr, ++Oitr) {
+					*Out -= *Itr;
+				}
+				return *this;
+			}
+			template<typename U>
+			block& operator*=(const typename other_type<U>::block& Other) {
+				if(!Data) Data = BlockPool.get();
+				
+				if(!Other) {
+					fill(0);
+					return *this;
+				} 
+
+				auto Itr = Other.begin();
+				auto End = Other.end();
+				auto Out = begin();
+				for(; Itr!=End; ++Itr, ++Oitr) {
+					*Out *= *Itr;
+				}
+
+				return *this;
+			}
+			template<typename U>
+			block& operator/=(const typename other_type<U>::block& Other) {
+				if(!Data) Data = BlockPool.get();
+
+				if(!Other) {
+					fill(std::numeric_limits<double>::infinity());
+					return *this;
+				}
+
+				auto Itr = Other.begin();
+				auto End = Other.end();
+				auto Out = begin();
+				for(; Itr!=End; ++Itr, ++Oitr) {
+					if(*Itr==0)*Out = std::numeric_limits<double>::infinity()
+					else *Out /= *Itr;
+				}
+				
+				return *this;
+			}
+			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value,std::nullptr_t>::type = nullptr>
+			block& operator+=(const U& v) {
+				if(!Data)Data = BlockPool.get();
+				auto Itr = begin();
+				auto End = end();
+				for(; Itr!=End; ++Itr) {
+					*Itr += v;
+				}
+				return *this;
+			}
+			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+			block& operator-=(const U& v) {
+				if(!Data)Data = BlockPool.get();
+				auto Itr = begin();
+				auto End = end();
+				for(; Itr!=End; ++Itr) {
+					*Itr -= v;
+				}
+				return *this;
+			}
+			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+			block& operator*=(const U& v) {
+				if(!Data) {
+					Data = BlockPool.get();
+					return *this;
+				}
+				auto Itr = begin();
+				auto End = end();
+				for(; Itr!=End; ++Itr) {
+					*Itr *= v;
+				}
+				return *this;
+			}
+			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+			block& operator/=(const U& v) {
+				if(!Data) {
+					Data = BlockPool.get();
+					return *this;
+				}
+				auto Itr = begin();
+				auto End = end();
+				for(; Itr!=End; ++Itr) {
+					*Itr /= v;
+				}
+				return *this;
+			}
+			block& operator+() {
+				return *this;
+			}
+			block operator-()const {
+				block Ans = *this;
+				Ans *= -1;
+				return Ans;
+			}
+			void fill(T v) { std::fill(begin(), end(), v); }
 		public:
 			point_type point()const { return Pos; }
 			point_type point(const_iterator Itr)const { return Pos + indexer_type(extent_type(block_interval())).calc_point(std::distance(begin(),Itr)); }
@@ -736,6 +876,349 @@ namespace hmLib {
 		indexer_type indexer()const { return indexer_type(extent_type(block_interval())); }
 		blockset& blocks() { return Blocks; }
 		const blockset& blocks()const { return Blocks; }
+	public://operator
+		void fill(T v){
+			auto Itr = begin();
+			auto End = end();
+			for(; Itr!=End; ++Itr) {
+				Itr->fill(v);
+			}
+		}
+		template<typename U>
+		this_type& operator+=(const typename other_type<U>& other) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			auto OItr = other.blocks().begin();
+			auto OEnd = other.blocks().end();
+
+			while(OItr!=OEnd) {
+				if(TItr == TEnd || TItr->point() > OItr->point()) {
+					//Only other
+					TItr = blocks().insert_validated(TItr, OItr->point());
+					*TItr = *OItr;
+					++OItr;
+				} else if(TItr->point() == OItr->point()) {
+					//Both
+					*TItr += *OItr;
+					++TItr;
+					++OItr;
+				} else {
+					//Only this
+					++TItr;
+				}
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator+(const this_type& p1, const other_type<U>& p2) {
+			other_type<V> pa = p1;
+			pa += p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator+(this_type&& p1, const other_type<U>& p2) {
+			other_type<V> pa = std::move(p1);
+			pa += p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator+(const this_type& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p2);
+			pa += p1;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()),typename std::enable_if<!std::is_same<U,V>::value,std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator+(this_type&& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p1);
+			pa += p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator+(this_type&& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p2);
+			pa += p1;
+			return std::move(pa);
+		}
+		template<typename U>
+		this_type& operator-=(const typename other_type<U>& other) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			auto OItr = other.blocks().begin();
+			auto OEnd = other.blocks().end();
+
+			while(OItr!=OEnd) {
+				if(TItr == TEnd || TItr->point() > OItr->point()) {
+					//Only other
+					TItr = blocks().insert_validated(TItr, OItr->point());
+					*TItr = *OItr;
+					*TItr *= -1;
+					++OItr;
+				} else if(TItr->point() == OItr->point()) {
+					//Both
+					*TItr -= *OItr;
+					++TItr;
+					++OItr;
+				} else {
+					//Only this
+					++TItr;
+				}
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator-(const this_type& p1, const other_type<U>& p2) {
+			other_type<V> pa = p1;
+			pa -= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator-(this_type&& p1, const other_type<U>& p2) {
+			other_type<V> pa = std::move(p1);
+			pa -= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator-(const this_type& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p2);
+			pa -= p1;
+			pa *= -1;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<!std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator-(this_type&& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p1);
+			pa -= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator-(this_type&& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p2);
+			pa -= p1;
+			pa *= -1;
+			return std::move(pa);
+		}
+		template<typename U>
+		this_type& operator*=(const typename other_type<U>& other) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			auto OItr = other.blocks().begin();
+			auto OEnd = other.blocks().end();
+
+			while(OItr!=OEnd) {
+				if(TItr == TEnd || TItr->point() > OItr->point()) {
+					//Only other
+					++OItr; 
+				} else if(TItr->point() == OItr->point()) {
+					//Both
+					*TItr *= *OItr;
+					++TItr;
+					++OItr;
+				} else {
+					//Only this
+					TItr->fill(0);
+					++TItr;
+				}
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator*(const this_type& p1, const other_type<U>& p2) {
+			other_type<V> pa = p1;
+			pa *= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator*(this_type&& p1, const other_type<U>& p2) {
+			other_type<V> pa = std::move(p1);
+			pa *= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator*(const this_type& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p2);
+			pa *= p1;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<!std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator*(this_type&& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p1);
+			pa *= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator*(this_type&& p1, other_type<U>&& p2) {
+			other_type<V> pa = std::move(p2);
+			pa *= p1;
+			return std::move(pa);
+		}
+		template<typename U>
+		this_type& operator/=(const typename other_type<U>& other) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			auto OItr = other.blocks().begin();
+			auto OEnd = other.blocks().end();
+
+			while(OItr!=OEnd) {
+				if(TItr == TEnd || TItr->point() > OItr->point()) {
+					//Only other
+					++OItr;
+				} else if(TItr->point() == OItr->point()) {
+					//Both
+					*TItr /= *OItr;
+					++TItr;
+					++OItr;
+				} else {
+					//Only this
+					TItr->fill(std::numeric_limits<double>::infinity());
+					++TItr;
+				}
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator/(const this_type& p1, const other_type<U>& p2) {
+			other_type<V> pa = p1;
+			pa /= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
+		friend other_type<V> operator/(this_type&& p1, const other_type<U>& p2) {
+			other_type<V> pa = std::move(p1);
+			pa /= p2;
+			return std::move(pa);
+		}
+		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		this_type& operator+=(U v) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			for(; TItr!=TEnd; ++TItr) {
+				*TItr += v;
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator+(const this_type& p, U v) {
+			other_type<V> pa = p;
+			pa += v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator+(this_type&& p, U v) {
+			other_type<V> pa = std::move(p);
+			pa += v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator+(U v, const this_type& p) {
+			other_type<V> pa = p;
+			pa += v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator+(U v, this_type&& p) {
+			other_type<V> pa = std::move(p);
+			pa += v;
+			return std::move(pa);
+		}
+		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		this_type& operator-=(U v) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			for(; TItr!=TEnd; ++TItr) {
+				*TItr -= v;
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator-(const this_type& p, U v) {
+			other_type<V> pa = p;
+			pa -= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator-(this_type&& p, U v) {
+			other_type<V> pa = std::move(p);
+			pa -= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator-(U v, const this_type& p) {
+			other_type<V> pa = p;
+			pa -= v;
+			pa *= -1;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator-(U v, this_type&& p) {
+			other_type<V> pa = std::move(p);
+			pa -= v;
+			pa *= -1;
+			return std::move(pa);
+		}
+		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		this_type& operator*=(U v) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			for(; TItr!=TEnd; ++TItr) {
+				*TItr *= v;
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator*(const this_type& p, U v) {
+			other_type<V> pa = p;
+			pa *= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator*(this_type&& p, U v) {
+			other_type<V> pa = std::move(p);
+			pa *= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator*(U v, const this_type& p) {
+			other_type<V> pa = p;
+			pa *= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator*(U v, this_type&& p) {
+			other_type<V> pa = std::move(p);
+			pa *= v;
+			return std::move(pa);
+		}
+		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		this_type& operator/=(U v) {
+			auto TItr = blocks().begin();
+			auto TEnd = blocks().end();
+			for(; TItr!=TEnd; ++TItr) {
+				*TItr /= v;
+			}
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator/(const this_type& p, U v) {
+			other_type<V> pa = p;
+			pa /= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator/(this_type&& p, U v) {
+			other_type<V> pa = std::move(p);
+			pa /= v;
+			return std::move(pa);
+		}
+		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+		friend other_type<V> operator/(U v, const this_type& p) {
+			other_type<V> pa;
+			pa.blocks().reserve(p.blocks());
+			pa.fill(v);
+			pa /= p;
+			return std::move(pa);
+		}
+		this_type& operator+()const { return *this; }
+		this_type operator-()const &{ 
+			this_type pa = *this;
+			pa *= -1;
+			return std::move(pa);
+		}
+		this_type operator-()&& {
+			*this *= -1;
+			return std::move(*this);
+		}
 	private://variables
 		blockset Blocks;
 	};
