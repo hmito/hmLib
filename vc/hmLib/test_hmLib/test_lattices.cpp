@@ -1133,5 +1133,21 @@ public:
 		}
 		Assert::IsTrue(Itr==Lat.begin());
 	}
+	TEST_METHOD(test_add) {
+		hmLib::block_lattice<int, 2, 5> Lat1;
+		Lat1[hmLib::lattices::point_type<2>{6, 4}] = 1;
+		Lat1[hmLib::lattices::point_type<2>{8, 9}] = 1;
+		Lat1[hmLib::lattices::point_type<2>{1, 3}] = 1;
+
+		hmLib::block_lattice<int, 2, 5> Lat2;
+		Lat2[hmLib::lattices::point_type<2>{6, 4}] = 1;
+		Lat2[hmLib::lattices::point_type<2>{8, 9}] = 1;
+		Lat2[hmLib::lattices::point_type<2>{1, 3}] = 1;
+
+		Lat1 += Lat2;
+		Lat1 -= Lat2;
+		Lat1 *= Lat2;
+		Lat1 /= Lat2;
+	}
 	};
 }

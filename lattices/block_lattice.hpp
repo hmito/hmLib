@@ -14,71 +14,71 @@
 #include"lattice.hpp"
 namespace hmLib {
 	template<typename T, unsigned int dim_, unsigned int block_interval_>
-	struct block_lattice {
-	private://type definition
-		using this_type = block_lattice<T, dim_, block_interval_>;
-		template<typename U>
-		using other_type = block_lattice<U, dim_, block_interval_>;
-	public://type definition
-		using point_type = lattices::point_type<dim_>;
-		using extent_type = lattices::extent_type<dim_>;
-		using size_type = lattices::size_type;
-		using diff_type = lattices::diff_type;
-		using index_type = lattices::index_type;
-		using indexer_type = lattices::indexer<dim_>;
-		using value_type = typename std::decay<T>::type;
-		using reference = value_type&;
-		using const_reference = const value_type&;
-		using pointer = value_type*;
-		using const_pointer = const value_type*;
-		static constexpr unsigned int dim() { return dim_; }
-		static constexpr unsigned int block_interval(){return block_interval_;}
-		static constexpr unsigned int block_size(){return hmLib::static_pow<dim()>(block_interval_);}
-	private://block
-		struct block_pool{
-		private:
-			std::vector<std::unique_ptr<T[]>> BlockPool;
-		public:
-			std::unique_ptr<T[]> get(){
-				std::unique_ptr<T[]> Ans;
-				if(BlockPool.empty()){
-					Ans = std::make_unique<T[]>(block_size());
-				}else{
-					Ans = std::move(BlockPool.back());
-					BlockPool.pop_back();
-				}
-				std::fill(Ans.get(),Ans.get()+block_size(), 0);
-				return std::move(Ans);
-			}
-			void release(std::unique_ptr<T[]>&& Block)noexcept{
-				BlockPool.push_back(std::move(Block));
-			}
-		};
-		static block_pool BlockPool;
-	public://block
+	struct block_lattice;
+	namespace lattices {
+		template<typename T, unsigned int dim_, unsigned int block_interval_>
 		struct block {
 			friend struct block_lattice<T, dim_, block_interval_>;
+			using this_block = block<T, dim_, block_interval_>;
+			template<typename U>
+			using other_block = block<U, dim_, block_interval_>;
+			static constexpr unsigned int dim() { return dim_; }
+			static constexpr unsigned int block_interval() { return block_interval_; }
+			static constexpr unsigned int block_size() { return hmLib::static_pow<dim()>(block_interval_); }
+		private:
+			struct block_pool {
+			private:
+				std::vector<std::unique_ptr<T[]>> BlockPool;
+			public:
+				std::unique_ptr<T[]> get() {
+					std::unique_ptr<T[]> Ans;
+					if(BlockPool.empty()) {
+						Ans = std::make_unique<T[]>(block_size());
+					} else {
+						Ans = std::move(BlockPool.back());
+						BlockPool.pop_back();
+					}
+					std::fill(Ans.get(), Ans.get()+block_size(), 0);
+					return std::move(Ans);
+				}
+				void release(std::unique_ptr<T[]>&& Block)noexcept {
+					BlockPool.push_back(std::move(Block));
+				}
+			};
+			static block_pool BlockPool;
+		public:
+			using point_type = lattices::point_type<dim_>;
+			using extent_type = lattices::extent_type<dim_>;
+			using size_type = lattices::size_type;
+			using diff_type = lattices::diff_type;
+			using index_type = lattices::index_type;
+			using indexer_type = lattices::indexer<dim_>;
+			using value_type = typename std::decay<T>::type;
+			using reference = value_type&;
+			using const_reference = const value_type&;
+			using pointer = value_type*;
+			using const_pointer = const value_type*;
 			using container = std::unique_ptr<T[]>;
 			using iterator = T*;
 			using const_iterator = const T*;
 		public:
-			block():Pos(),Data(BlockPool.get()){}
-			block(const block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
+			block():Pos(), Data(BlockPool.get()) {}
+			block(const this_block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
 				std::copy(Other_.begin(), Other_.end(), begin());
 			}
-			block& operator=(const block& Other_) {
+			this_block& operator=(const this_block& Other_) {
 				if(this!=&Other_) {
 					if(!Data)Data = BlockPool.get();
 					std::copy(Other_.begin(), Other_.end(), begin());
 				}
 				return *this;
 			}
-			block(block&&)=default;
-			block& operator=(block&&)=default;
-			explicit block(point_type Pos_):Pos(Pos_),Data(BlockPool.get()){}
-			~block()noexcept{if(Data)BlockPool.release(std::move(Data));}
+			block(this_block&&) = default;
+			this_block& operator=(this_block&&) = default;
+			explicit block(point_type Pos_):Pos(Pos_), Data(BlockPool.get()) {}
+			~block()noexcept { if(Data)BlockPool.release(std::move(Data)); }
 			template<typename U, typename std::enable_if<std::is_same<T, U>::value, std::nullptr_t>::type = nullptr>
-			explicit block(const typename other_type<U>::block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
+			explicit block(const typename other_block<U>& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
 				auto Itr = Other_.begin();
 				auto End = Other_.end();
 				auto Out = begin();
@@ -87,8 +87,8 @@ namespace hmLib {
 				}
 			}
 			template<typename U, typename std::enable_if<std::is_same<T, U>::value, std::nullptr_t>::type = nullptr>
-			operator typename other_type<U>::block() {
-				typename other_type<U>::block Block(point());
+			operator typename other_block<U>() {
+				typename other_block<U> Block(point());
 				auto Itr = begin();
 				auto End = end();
 				auto Out = Block.begin();
@@ -112,87 +112,90 @@ namespace hmLib {
 			reference index_ref(index_type Index_) { return Data[Index_]; }
 			//!Return reference of the elemtn at the given Index without checking out-of-range, i.e., ref(Pos) == index_ref(point_to_index(Pos));
 			const_reference index_ref(index_type Index_)const { return Data[Index_]; }
-			reference at(point_type Pos_) {return index_at(indexer().torus_index(Pos_));}
-			const_reference at(point_type Pos_)const {return index_at(indexer().torus_index(Pos_));}
+			reference at(point_type Pos_) { return index_at(indexer().torus_index(Pos_)); }
+			const_reference at(point_type Pos_)const { return index_at(indexer().torus_index(Pos_)); }
 			template<typename... others>
-			reference at(index_type Pos_, others... Others_) {return at(lattices::point(Pos_, Others_...));}
+			reference at(index_type Pos_, others... Others_) { return at(lattices::point(Pos_, Others_...)); }
 			template<typename... others>
 			const_reference at(index_type Pos_, others... Others_)const { return at(lattices::point(Pos_, Others_...)); }
-			reference ref(point_type Pos_) {return at(Pos_);}
-			const_reference ref(point_type Pos_)const {return at(Pos_);}
+			reference ref(point_type Pos_) { return at(Pos_); }
+			const_reference ref(point_type Pos_)const { return at(Pos_); }
 			template<typename... others>
 			reference ref(index_type Pos_, others... Others_) { return ref(lattices::point(Pos_, Others_...)); }
 			template<typename... others>
 			const_reference ref(index_type Pos_, others... Others_)const { return ref(lattices::point(Pos_, Others_...)); }
-			reference operator[](point_type Pos_) {return ref(Pos_);}
-			const_reference operator[](point_type Pos_)const {return ref(Pos_);}
+			reference operator[](point_type Pos_) { return ref(Pos_); }
+			const_reference operator[](point_type Pos_)const { return ref(Pos_); }
 		public:
 			operator bool()const { return static_cast<bool>(Data); }
 			template<typename U>
-			block& operator+=(const typename other_type<U>::block& Other) {
+			this_block& operator+=(const typename other_block<U>& Other) {
 				if(!Data)Data = BlockPool.get();
 				if(!Other)return *this;
 
 				auto Itr = Other.begin();
 				auto End = Other.end();
 				auto Out = begin();
-				for(; Itr!=End; ++Itr, ++Oitr) {
+				for(; Itr!=End; ++Itr, ++Out) {
 					*Out += *Itr;
 				}
 				return *this;
 			}
 			template<typename U>
-			block& operator-=(const typename other_type<U>::block& Other) {
+			this_block& operator-=(const typename other_block<U>& Other) {
 				if(!Data)Data = BlockPool.get();
 				if(!Other)return *this;
 
 				auto Itr = Other.begin();
 				auto End = Other.end();
 				auto Out = begin();
-				for(; Itr!=End; ++Itr, ++Oitr) {
+				for(; Itr!=End; ++Itr, ++Out) {
 					*Out -= *Itr;
 				}
 				return *this;
 			}
 			template<typename U>
-			block& operator*=(const typename other_type<U>::block& Other) {
+			this_block& operator*=(const typename other_block<U>& Other) {
 				if(!Data) Data = BlockPool.get();
-				
+
 				if(!Other) {
 					fill(0);
 					return *this;
-				} 
+				}
 
 				auto Itr = Other.begin();
 				auto End = Other.end();
 				auto Out = begin();
-				for(; Itr!=End; ++Itr, ++Oitr) {
+				for(; Itr!=End; ++Itr, ++Out) {
 					*Out *= *Itr;
 				}
 
 				return *this;
 			}
 			template<typename U>
-			block& operator/=(const typename other_type<U>::block& Other) {
+			this_block& operator/=(const typename other_block<U>& Other) {
 				if(!Data) Data = BlockPool.get();
 
 				if(!Other) {
-					fill(std::numeric_limits<double>::infinity());
+					fill(std::numeric_limits<T>::max());
 					return *this;
 				}
 
 				auto Itr = Other.begin();
 				auto End = Other.end();
 				auto Out = begin();
-				for(; Itr!=End; ++Itr, ++Oitr) {
-					if(*Itr==0)*Out = std::numeric_limits<double>::infinity()
-					else *Out /= *Itr;
+				for(; Itr!=End; ++Itr, ++Out) {
+					if(*Itr==0) {
+						if(*Out!=0)*Out = std::numeric_limits<T>::max();
+					} else {
+						*Out /= *Itr;
+					}
 				}
-				
+
 				return *this;
 			}
-			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value,std::nullptr_t>::type = nullptr>
-			block& operator+=(const U& v) {
+			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
+			this_block& operator+=(const U& v) {
 				if(!Data)Data = BlockPool.get();
 				auto Itr = begin();
 				auto End = end();
@@ -202,7 +205,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
-			block& operator-=(const U& v) {
+			this_block& operator-=(const U& v) {
 				if(!Data)Data = BlockPool.get();
 				auto Itr = begin();
 				auto End = end();
@@ -212,7 +215,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
-			block& operator*=(const U& v) {
+			this_block& operator*=(const U& v) {
 				if(!Data) {
 					Data = BlockPool.get();
 					return *this;
@@ -225,7 +228,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
-			block& operator/=(const U& v) {
+			this_block& operator/=(const U& v) {
 				if(!Data) {
 					Data = BlockPool.get();
 					return *this;
@@ -237,24 +240,24 @@ namespace hmLib {
 				}
 				return *this;
 			}
-			block& operator+() {
+			this_block& operator+() {
 				return *this;
 			}
-			block operator-()const {
-				block Ans = *this;
+			this_block operator-()const {
+				this_block Ans = *this;
 				Ans *= -1;
 				return Ans;
 			}
 			void fill(T v) { std::fill(begin(), end(), v); }
 		public:
 			point_type point()const { return Pos; }
-			point_type point(const_iterator Itr)const { return Pos + indexer_type(extent_type(block_interval())).calc_point(std::distance(begin(),Itr)); }
+			point_type point(const_iterator Itr)const { return Pos + indexer_type(extent_type(block_interval())).calc_point(std::distance(begin(), Itr)); }
 			//!Get point_type BlockNum
 			extent_type extent()const { return extent_type(block_interval()); }
-			indexer_type indexer()const{ return indexer_type(extent());}
+			indexer_type indexer()const { return indexer_type(extent()); }
 			bool inside(point_type Point_)const {
 				for(unsigned int i = 0; i<dim_; ++i) {
-					if( !(Pos[i]<=Point_[i] && Point_[i]<Pos[i]+static_cast<index_type>(block_interval())) )return false;
+					if(!(Pos[i]<=Point_[i] && Point_[i]<Pos[i]+static_cast<index_type>(block_interval())))return false;
 				}
 				return true;
 			}
@@ -263,16 +266,26 @@ namespace hmLib {
 		private:
 			void assign(point_type Pos_) {
 				Pos = Pos_;
-				std::fill(begin(),end(),0);
+				std::fill(begin(), end(), 0);
 			}
 		private:
 			point_type Pos;
 			container Data;
 		};
+		template<typename T, unsigned int dim_, unsigned int block_interval_>
 		struct blockset {
+			using this_blockset = blockset<T, dim_, block_interval_>;
+			template<typename U>
+			using other_blockset = blockset<U, dim_, block_interval_>;
+		public:
+			using point_type = lattices::point_type<dim_>;
+			using block = lattices::block<T, dim_, block_interval_>;
 			using container = std::vector<block>;
 			using iterator = typename container::iterator;
 			using const_iterator = typename container::const_iterator;
+			static constexpr unsigned int dim() { return dim_; }
+			static constexpr unsigned int block_interval() { return block_interval_; }
+			static constexpr unsigned int block_size() { return hmLib::static_pow<dim()>(block_interval_); }
 			static void point_validate(point_type& Pos_) {
 				for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
 					Pos_[i] -= euclidean_mod<index_type>(Pos_[i], block_interval());
@@ -354,7 +367,7 @@ namespace hmLib {
 				return Itr;
 			}
 			iterator get(point_type Pos_) {
-				return get(begin()+HintPos,Pos_);
+				return get(begin()+HintPos, Pos_);
 			}
 			iterator get(iterator Hint_, point_type Pos_) {
 				if(Hint_!= end() && Hint_->inside(Pos_)) {
@@ -380,13 +393,13 @@ namespace hmLib {
 			}
 			iterator insert(iterator Hint_, point_type Pos_) {
 				point_validate(Pos_);
-				return insert_validated(Hint_,Pos_)
+				return insert_validated(Hint_, Pos_)
 			}
 			template<typename input_iterator>
 			void insert(input_iterator Beg, input_iterator End) {
 				if(Beg==End)return;
 
-				point_type Pos_=*Beg++;
+				point_type Pos_ = *Beg++;
 				point_validate(Pos_);
 				auto Itr = std::partition_point(begin(), end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 
@@ -433,7 +446,7 @@ namespace hmLib {
 				}
 			}
 			template<typename U>
-			void reserve(const typename other_type<U>::blockset& Other) {
+			void reserve(const typename other_blockset<U>& Other) {
 				auto Beg = Other.begin();
 				auto End = Other.end();
 
@@ -447,7 +460,7 @@ namespace hmLib {
 				}
 			}
 			template<typename U, typename V>
-			void reserve_union(const typename other_type<U>::blockset& Other1, const typename other_type<V>::blockset& Other2) {
+			void reserve_union(const typename other_blockset<U>& Other1, const typename other_blockset<V>& Other2) {
 				auto Beg1 = Other1.begin();
 				auto End1 = Other1.end();
 				auto Beg2 = Other2.begin();
@@ -464,7 +477,7 @@ namespace hmLib {
 						Pos_ = *(Beg1).point();
 						++Beg1;
 						++Beg2;
-					}					
+					}
 					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
 					if(Itr == end() || Itr->point() != Pos_) {
 						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
@@ -486,7 +499,7 @@ namespace hmLib {
 				}
 			}
 			template<typename U, typename V>
-			void reserve_intersection(const typename other_type<U>::blockset& Other1, const typename other_type<V>::blockset& Other2) {
+			void reserve_intersection(const typename other_blockset<U>& Other1, const typename other_blockset<V>& Other2) {
 				auto Beg1 = Other1.begin();
 				auto End1 = Other1.end();
 				auto Beg2 = Other2.begin();
@@ -512,6 +525,30 @@ namespace hmLib {
 				}
 			}
 		};
+	}
+	template<typename T, unsigned int dim_, unsigned int block_interval_>
+	struct block_lattice {
+	private://type definition
+		using this_type = block_lattice<T, dim_, block_interval_>;
+		template<typename U>
+		using other_type = block_lattice<U, dim_, block_interval_>;
+	public://type definition
+		using point_type = lattices::point_type<dim_>;
+		using extent_type = lattices::extent_type<dim_>;
+		using size_type = lattices::size_type;
+		using diff_type = lattices::diff_type;
+		using index_type = lattices::index_type;
+		using indexer_type = lattices::indexer<dim_>;
+		using value_type = typename std::decay<T>::type;
+		using reference = value_type&;
+		using const_reference = const value_type&;
+		using pointer = value_type*;
+		using const_pointer = const value_type*;
+		static constexpr unsigned int dim() { return dim_; }
+		static constexpr unsigned int block_interval(){return block_interval_;}
+		static constexpr unsigned int block_size(){return hmLib::static_pow<dim()>(block_interval_);}
+		using block = lattices::block<T, dim_, block_interval_>;
+		using blockset = lattices::blockset<T, dim_, block_interval_>;
 	public://iterator
 		struct const_iterator {
 		public:
@@ -907,6 +944,7 @@ namespace hmLib {
 					++TItr;
 				}
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator+(const this_type& p1, const other_type<U>& p2) {
@@ -962,6 +1000,7 @@ namespace hmLib {
 					++TItr;
 				}
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator-(const this_type& p1, const other_type<U>& p2) {
@@ -1017,6 +1056,7 @@ namespace hmLib {
 					++TItr;
 				}
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator*(const this_type& p1, const other_type<U>& p2) {
@@ -1066,10 +1106,11 @@ namespace hmLib {
 					++OItr;
 				} else {
 					//Only this
-					TItr->fill(std::numeric_limits<double>::infinity());
+					TItr->fill(std::numeric_limits<T>::max());
 					++TItr;
 				}
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator/(const this_type& p1, const other_type<U>& p2) {
@@ -1090,6 +1131,7 @@ namespace hmLib {
 			for(; TItr!=TEnd; ++TItr) {
 				*TItr += v;
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator+(const this_type& p, U v) {
@@ -1122,6 +1164,7 @@ namespace hmLib {
 			for(; TItr!=TEnd; ++TItr) {
 				*TItr -= v;
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator-(const this_type& p, U v) {
@@ -1156,6 +1199,7 @@ namespace hmLib {
 			for(; TItr!=TEnd; ++TItr) {
 				*TItr *= v;
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator*(const this_type& p, U v) {
@@ -1188,6 +1232,7 @@ namespace hmLib {
 			for(; TItr!=TEnd; ++TItr) {
 				*TItr /= v;
 			}
+			return *this;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator/(const this_type& p, U v) {
@@ -1224,7 +1269,7 @@ namespace hmLib {
 	};
 
 	template<typename T, unsigned int dim_, unsigned int block_interval_>
-	typename block_lattice<T,dim_,block_interval_>::block_pool block_lattice<T,dim_,block_interval_>::BlockPool;
+	typename lattices::block<T,dim_,block_interval_>::block_pool lattices::block<T,dim_,block_interval_>::BlockPool;
 }
 #
 #endif
