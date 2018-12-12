@@ -63,8 +63,16 @@ namespace hmLib {
 			using const_iterator = const T*;
 		public:
 			block():Pos(),Data(BlockPool.get()){}
-			block(const block&)=delete;
-			block& operator=(const block&)=delete;
+			block(const block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
+				std::copy(Other_.begin(), Other_.end(), begin());
+			}
+			block& operator=(const block& Other_) {
+				if(this!=&Other_) {
+					if(!Data)Data = BlockPool.get();
+					std::copy(Other_.begin(), Other_.end(), begin());
+				}
+				return *this;
+			}
 			block(block&&)=default;
 			block& operator=(block&&)=default;
 			explicit block(point_type Pos_):Pos(Pos_),Data(BlockPool.get()){}
@@ -125,9 +133,14 @@ namespace hmLib {
 			using container = std::vector<block>;
 			using iterator = typename container::iterator;
 			using const_iterator = typename container::const_iterator;
+			static void point_validate(point_type& Pos_) {
+				for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
+					Pos_[i] -= euclidean_mod<index_type>(Pos_[i], block_interval());
+				}
+			}
 		private:
 			container BlockSet;
-			std::size_t HintPos;
+			mutable std::size_t HintPos;
 		public:
 			blockset()noexcept:BlockSet(), HintPos(0) { BlockSet.push_back(block()); }
 		public:
@@ -144,6 +157,7 @@ namespace hmLib {
 			const_iterator end()const { return cend(); }
 			const_iterator cbegin()const { return BlockSet.begin(); }
 			const_iterator cend()const { return BlockSet.end()-1; }
+		public:
 			void erase(iterator Itr) {
 				if(Itr == end())return;
 				auto Pos = std::distance(begin(), Itr);
@@ -173,10 +187,8 @@ namespace hmLib {
 					HintPos = std::distance(begin(), Hint_);
 					return Hint_;
 				}
-				for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
-					Pos_[i] = euclidean_div<index_type>(Pos_[i], block_interval())*block_interval();
-				}
-				return find_impl(Pos_);
+				point_validate(Pos_);
+				return find_validated(Pos_);
 			}
 			const_iterator find(point_type Pos_)const {
 				return find(begin()+HintPos, Pos_);
@@ -186,10 +198,20 @@ namespace hmLib {
 					HintPos = std::distance(begin(), Hint_);
 					return Hint_;
 				}
-				for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
-					Pos_[i] = euclidean_div<index_type>(Pos_[i], block_interval())*block_interval();
-				}
-				return find_impl(Pos_);
+				point_validate(Pos_);
+				return find_validated(Pos_);
+			}
+			iterator find_validated(point_type vPos_) {
+				auto Itr = std::partition_point(begin(), end(), [vPos_](const block& Block) {return Block.point()<vPos_; });
+				if(Itr == end() || Itr->point() != vPos_) return end();
+				HintPos = std::distance(begin(), Itr);
+				return Itr;
+			}
+			const_iterator find_validated(point_type vPos_)const {
+				auto Itr = std::partition_point(begin(), end(), [vPos_](const block& Block) {return Block.point()<vPos_; });
+				if(Itr == end() || Itr->point() != vPos_) return end();
+				HintPos = std::distance(begin(), Itr);
+				return Itr;
 			}
 			iterator get(point_type Pos_) {
 				return get(begin()+HintPos,Pos_);
@@ -201,47 +223,153 @@ namespace hmLib {
 				}
 				return insert(Pos_);
 			}
-			iterator insert(point_type Pos_) {
-				for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
-					Pos_[i] = euclidean_div<index_type>(Pos_[i], block_interval())*block_interval();
-				}
-				return get_impl(Pos_);
-			}
-			iterator insert(iterator Hint_, point_type Pos_) {
-				for(unsigned int i = 0; i<Pos_.static_size(); ++i) {
-					Pos_[i] = euclidean_div<index_type>(Pos_[i], block_interval())*block_interval();
-				}
-
-				if((Hint_==begin() || std::prev(Hint_)->point() < Pos_) && (Hint_==end() || Pos_ < Hint_->point())) {
-					auto Itr = BlockSet.insert(Hint_, block(Pos_));
-					HintPos = std::distance(BlockSet.begin(), Itr);
-					return Itr;
-				}
-				return get_impl(Pos_);
-			}
-		private:
-			iterator find_impl(point_type Pos_) {
-				auto Itr = std::partition_point(begin(), end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
-				if(Itr == end() || Itr->point() != Pos_) return end();
-				HintPos = std::distance(begin(), Itr);
-				return Itr;
-			}
-			const_iterator find_impl(point_type Pos_)const {
-				auto Itr = std::partition_point(begin(), end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
-				if(Itr == end() || Itr->point() != Pos_) return end();
-				HintPos = std::distance(begin(), Itr);
-				return Itr;
-			}
-			iterator get_impl(point_type Pos_) {
-				auto Itr = std::partition_point(begin(), end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+			iterator get_validated(point_type vPos_) {
+				auto Itr = std::partition_point(begin(), end(), [vPos_](const block& Block) {return Block.point()<vPos_; });
 
 				//fail to find
-				if(Itr == end() || Itr->point() != Pos_) {
-					Itr = BlockSet.insert(Itr, block(Pos_));
+				if(Itr == end() || Itr->point() != vPos_) {
+					Itr = BlockSet.insert(Itr, block(vPos_));
 				}
 				HintPos = std::distance(BlockSet.begin(), Itr);
 
 				return Itr;
+			}
+			iterator insert(point_type Pos_) {
+				point_validate(Pos_);
+				return get_validated(Pos_);
+			}
+			iterator insert(iterator Hint_, point_type Pos_) {
+				point_validate(Pos_);
+				return insert_validated(Hint_,Pos_)
+			}
+			template<typename input_iterator>
+			void insert(input_iterator Beg, input_iterator End) {
+				if(Beg==End)return;
+
+				point_type Pos_=*Beg++;
+				point_validate(Pos_);
+				auto Itr = std::partition_point(begin(), end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+
+				//fail to find
+				if(Itr == end() || Itr->point() != Pos_) {
+					Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+				}
+				point_type Prev = Pos_;
+
+				while(Beg!=End) {
+					auto Pos_ = *Beg++;
+					point_validate(Pos_);
+					if(Prev<=Pos_) {
+						Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					} else {
+						Itr = std::partition_point(begin(), Itr, [Pos_](const block& Block) {return Block.point()<Pos_; });
+					}
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+					Prev = Pos_;
+				}
+			}
+			iterator insert_validated(point_type vPos_) {
+				return get_validated(vPos_);
+			}
+			iterator insert_validated(iterator Hint_, point_type vPos_) {
+				if((Hint_==begin() || std::prev(Hint_)->point() < vPos_) && (Hint_==end() || vPos_ < Hint_->point())) {
+					auto Itr = BlockSet.insert(Hint_, block(vPos_));
+					HintPos = std::distance(BlockSet.begin(), Itr);
+					return Itr;
+				}
+				return get_validated(vPos_);
+			}
+			template<typename input_iterator>
+			void insert_sorted_validated(input_iterator Beg, input_iterator End) {
+				auto Itr = begin();
+				while(Beg!=End) {
+					point_type Pos_ = *Beg++;
+					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+				}
+			}
+			template<typename U>
+			void reserve(const typename other_type<U>::blockset& Other) {
+				auto Beg = Other.begin();
+				auto End = Other.end();
+
+				auto Itr = begin();
+				while(Beg!=End) {
+					point_type Pos_ = *(Beg++).point();
+					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+				}
+			}
+			template<typename U, typename V>
+			void reserve_union(const typename other_type<U>::blockset& Other1, const typename other_type<V>::blockset& Other2) {
+				auto Beg1 = Other1.begin();
+				auto End1 = Other1.end();
+				auto Beg2 = Other2.begin();
+				auto End2 = Other2.end();
+
+				point_type Pos_;
+				auto Itr = begin();
+				while(Beg1!=End1 && Beg2!=End2) {
+					if(*(Beg1).point() < *(Beg2).point()) {
+						Pos_ = *(Beg1++).point();
+					} else if(*(Beg1).point() > *(Beg2).point()) {
+						Pos_ = *(Beg2++).point();
+					} else {
+						Pos_ = *(Beg1).point();
+						++Beg1;
+						++Beg2;
+					}					
+					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+				}
+				while(Beg1!=End1) {
+					Pos_ = *(Beg1++).point();
+					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+				}
+				while(Beg2!=End2) {
+					Pos_ = *(Beg2++).point();
+					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+				}
+			}
+			template<typename U, typename V>
+			void reserve_intersection(const typename other_type<U>::blockset& Other1, const typename other_type<V>::blockset& Other2) {
+				auto Beg1 = Other1.begin();
+				auto End1 = Other1.end();
+				auto Beg2 = Other2.begin();
+				auto End2 = Other2.end();
+
+				auto Itr = begin();
+				while(Beg1!=End1 && Beg2!=End2) {
+					if(*(Beg1).point() < *(Beg2).point()) {
+						++Beg1;
+						continue;
+					} else if(*(Beg1).point() > *(Beg2).point()) {
+						++Beg2;
+						continue;
+					}
+					point_type Pos_ = *(Beg1).point();
+					++Beg1;
+					++Beg2;
+
+					Itr = std::partition_point(Itr, end(), [Pos_](const block& Block) {return Block.point()<Pos_; });
+					if(Itr == end() || Itr->point() != Pos_) {
+						Itr = std::next(BlockSet.insert(Itr, block(Pos_)));
+					}
+				}
 			}
 		};
 	public://iterator
@@ -249,18 +377,14 @@ namespace hmLib {
 		public:
 			using value_type = typename this_type::value_type;
 			using difference_type = int;
-			using reference = typename this_type::reference;
-			using pointer = typename this_type::pointer;
+			using reference = typename this_type::const_reference;
+			using pointer = typename this_type::const_pointer;
 			using iterator_category = std::random_access_iterator_tag;
 		public:
 			const_iterator() = default;
 			const_iterator(typename blockset::const_iterator BItr_, typename block::const_iterator Itr_):BItr(BItr_),Itr(Itr_){}
 		public:
 			reference operator*() {
-				if(Itr == BItr->end()) {
-					++BItr;
-					Itr = BItr->begin();
-				}
 				return *Itr;
 			}
 			reference operator[](difference_type n) {
@@ -270,11 +394,11 @@ namespace hmLib {
 				return Itr.operator->();
 			}
 			const_iterator& operator++() {
+				++Itr;
 				if(Itr == BItr->end()) {
 					++BItr;
 					Itr = BItr->begin();
 				}
-				++Itr;
 				return *this;
 			}
 			const_iterator operator++(int) {
@@ -299,8 +423,8 @@ namespace hmLib {
 				if(n<0)return operator-=(-n);
 
 				n += std::distance(BItr->begin(), Itr);
-				BItr += (n-1)/block_size();
-				Itr = std::next(BItr->begin(), (n-1)%block_size()+1);
+				BItr += n/block_size();
+				Itr = std::next(BItr->begin(), n%block_size());
 
 				return *this;
 			}
@@ -330,22 +454,26 @@ namespace hmLib {
 				std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*block_size();
 			}
 			friend bool operator==(const const_iterator& v1, const const_iterator& v2) {
-				return v1-v2 == 0;
+				return v1.BItr == v2.BItr && v1.Itr == v2.Itr;
 			}
 			friend bool operator!=(const const_iterator& v1, const const_iterator& v2) {
-				return v1-v2 != 0;
+				return !(v1==v2);
 			}
 			friend bool operator< (const const_iterator& v1, const const_iterator&  v2) {
-				return v1-v2<0;
+				if(v1.BItr==v2.BItr)return v1.Itr < v2.Itr;
+				return v1.BItr < v2.BItr;
 			}
 			friend bool operator<=(const const_iterator& v1, const const_iterator&  v2) {
-				return v1-v2<=0;
+				if(v1.BItr==v2.BItr)return v1.Itr <= v2.Itr;
+				return v1.BItr < v2.BItr;
 			}
 			friend bool operator> (const const_iterator& v1, const const_iterator&  v2) {
-				return v1-v2>0;
+				if(v1.BItr==v2.BItr)return v1.Itr > v2.Itr;
+				return v1.BItr > v2.BItr;
 			}
 			friend bool operator>=(const const_iterator& v1, const const_iterator&  v2) {
-				return v1-v2>=0;
+				if(v1.BItr==v2.BItr)return v1.Itr >= v2.Itr;
+				return v1.BItr > v2.BItr;
 			}
 		public:
 			point_type point()const { return BItr->point(Itr); }
@@ -368,10 +496,6 @@ namespace hmLib {
 			operator const_iterator() { return const_iterator(BItr, Itr); }
 		public:
 			reference operator*() {
-				if(Itr == BItr->end()) {
-					++BItr;
-					Itr = BItr->begin();
-				}
 				return *Itr;
 			}
 			reference operator[](difference_type n) {
@@ -381,11 +505,11 @@ namespace hmLib {
 				return Itr.operator->();
 			}
 			iterator& operator++() {
+				++Itr;
 				if(Itr == BItr->end()) {
 					++BItr;
 					Itr = BItr->begin();
 				}
-				++Itr;
 				return *this;
 			}
 			iterator operator++(int) {
@@ -410,8 +534,8 @@ namespace hmLib {
 				if(n<0)return operator-=(-n);
 
 				n += std::distance(BItr->begin(), Itr);
-				BItr += (n-1)/block_size();
-				Itr = std::next(BItr->begin(), (n-1)%block_size()+1);
+				BItr += n/block_size();
+				Itr = std::next(BItr->begin(), n%block_size());
 
 				return *this;
 			}
@@ -441,22 +565,26 @@ namespace hmLib {
 				return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*block_size();
 			}
 			friend bool operator==(const iterator& v1, const iterator& v2) {
-				return v1-v2 == 0;
+				return v1.BItr == v2.BItr && v1.Itr == v2.Itr;
 			}
 			friend bool operator!=(const iterator& v1, const iterator& v2) {
-				return v1-v2 != 0;
+				return !(v1==v2);
 			}
 			friend bool operator< (const iterator& v1, const iterator&  v2) {
-				return v1-v2<0;
+				if(v1.BItr==v2.BItr)return v1.Itr < v2.Itr;
+				return v1.BItr < v2.BItr;
 			}
 			friend bool operator<=(const iterator& v1, const iterator&  v2) {
-				return v1-v2<=0;
+				if(v1.BItr==v2.BItr)return v1.Itr <= v2.Itr;
+				return v1.BItr < v2.BItr;
 			}
 			friend bool operator> (const iterator& v1, const iterator&  v2) {
-				return v1-v2>0;
+				if(v1.BItr==v2.BItr)return v1.Itr > v2.Itr;
+				return v1.BItr > v2.BItr;
 			}
 			friend bool operator>=(const iterator& v1, const iterator&  v2) {
-				return v1-v2>=0;
+				if(v1.BItr==v2.BItr)return v1.Itr >= v2.Itr;
+				return v1.BItr > v2.BItr;
 			}
 		public:
 			point_type point()const { return BItr->point(Itr); }
@@ -467,9 +595,6 @@ namespace hmLib {
 			typename block::iterator  Itr;
 		};
 	public://container access functions
-		indexer_type indexer()const { return indexer_type(extent_type(block_interval())); }
-		blockset& blocks() { return Blocks; }
-		const blockset& blocks()const { return Blocks; }
 		std::size_t size()const { return Blocks.size()*block_size(); }
 		bool empty()const{ return Blocks.empty(); }
 		void clear() { Blocks.clear();}
@@ -608,6 +733,9 @@ namespace hmLib {
 			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
 			return std::distance(block_begin(), Itr)*block_size() + indexer().torus_index(Point_);
 		}
+		indexer_type indexer()const { return indexer_type(extent_type(block_interval())); }
+		blockset& blocks() { return Blocks; }
+		const blockset& blocks()const { return Blocks; }
 	private://variables
 		blockset Blocks;
 	};
