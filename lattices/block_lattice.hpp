@@ -39,7 +39,7 @@ namespace hmLib {
 						BlockPool.pop_back();
 					}
 					std::fill(Ans.get(), Ans.get()+block_size(), 0);
-					return std::move(Ans);
+					return (Ans);
 				}
 				void release(std::unique_ptr<T[]>&& Block)noexcept {
 					BlockPool.push_back(std::move(Block));
@@ -62,17 +62,7 @@ namespace hmLib {
 			using iterator = T*;
 			using const_iterator = const T*;
 		public:
-			block():Pos(), Data(BlockPool.get()) {}
-			block(const this_block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
-				std::copy(Other_.begin(), Other_.end(), begin());
-			}
-			this_block& operator=(const this_block& Other_) {
-				if(this!=&Other_) {
-					if(!Data)Data = BlockPool.get();
-					std::copy(Other_.begin(), Other_.end(), begin());
-				}
-				return *this;
-			}
+			block() = default;
 			block(this_block&&) = default;
 			this_block& operator=(this_block&&) = default;
 			explicit block(point_type Pos_):Pos(Pos_), Data(BlockPool.get()) {}
@@ -95,15 +85,15 @@ namespace hmLib {
 				for(; Itr!=End; ++Itr, ++Out) {
 					*Out = *Itr;
 				}
-				return std::move(Block);
+				return Block;
 			}
 		public:
-			iterator begin() { return Data.get(); }
-			iterator end() { return Data.get()+block_size(); }
+			iterator begin() { if(Data)return Data.get(); return nullptr; }
+			iterator end() { if(Data)return Data.get()+block_size(); return nullptr; }
 			const_iterator begin()const { return cbegin(); }
 			const_iterator end()const { return cend(); }
-			const_iterator cbegin()const { return Data.get(); }
-			const_iterator cend()const { return Data.get()+block_size(); }
+			const_iterator cbegin()const { if(Data)return Data.get(); return nullptr; }
+			const_iterator cend()const { if(Data)return Data.get()+block_size(); return nullptr; }
 			//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
 			reference index_at(index_type Index_) { return Data[Index_]; }
 			//!Return reference of the elemtn at the given Index with checking out-of-range, i.e., at(Pos) == index_at(point_to_index(Pos));
@@ -264,6 +254,16 @@ namespace hmLib {
 			point_type index_to_point(index_type Index_)const { return Indexer.calc_point(Index_); }
 			index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
 		private:
+			block(const this_block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
+				std::copy(Other_.begin(), Other_.end(), begin());
+			}
+			this_block& operator=(const this_block& Other_) {
+				if(this!=&Other_) {
+					if(!Data)Data = BlockPool.get();
+					std::copy(Other_.begin(), Other_.end(), begin());
+				}
+				return *this;
+			}
 			void assign(point_type Pos_) {
 				Pos = Pos_;
 				std::fill(begin(), end(), 0);
@@ -950,31 +950,31 @@ namespace hmLib {
 		friend other_type<V> operator+(const this_type& p1, const other_type<U>& p2) {
 			other_type<V> pa = p1;
 			pa += p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator+(this_type&& p1, const other_type<U>& p2) {
 			other_type<V> pa = std::move(p1);
 			pa += p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator+(const this_type& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p2);
 			pa += p1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()),typename std::enable_if<!std::is_same<U,V>::value,std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator+(this_type&& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p1);
 			pa += p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator+(this_type&& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p2);
 			pa += p1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U>
 		this_type& operator-=(const typename other_type<U>& other) {
@@ -1006,33 +1006,33 @@ namespace hmLib {
 		friend other_type<V> operator-(const this_type& p1, const other_type<U>& p2) {
 			other_type<V> pa = p1;
 			pa -= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator-(this_type&& p1, const other_type<U>& p2) {
 			other_type<V> pa = std::move(p1);
 			pa -= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator-(const this_type& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p2);
 			pa -= p1;
 			pa *= -1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<!std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator-(this_type&& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p1);
 			pa -= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator-(this_type&& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p2);
 			pa -= p1;
 			pa *= -1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U>
 		this_type& operator*=(const typename other_type<U>& other) {
@@ -1062,31 +1062,31 @@ namespace hmLib {
 		friend other_type<V> operator*(const this_type& p1, const other_type<U>& p2) {
 			other_type<V> pa = p1;
 			pa *= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator*(this_type&& p1, const other_type<U>& p2) {
 			other_type<V> pa = std::move(p1);
 			pa *= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator*(const this_type& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p2);
 			pa *= p1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<!std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator*(this_type&& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p1);
 			pa *= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_same<U, V>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator*(this_type&& p1, other_type<U>&& p2) {
 			other_type<V> pa = std::move(p2);
 			pa *= p1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U>
 		this_type& operator/=(const typename other_type<U>& other) {
@@ -1116,13 +1116,13 @@ namespace hmLib {
 		friend other_type<V> operator/(const this_type& p1, const other_type<U>& p2) {
 			other_type<V> pa = p1;
 			pa /= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>())>
 		friend other_type<V> operator/(this_type&& p1, const other_type<U>& p2) {
 			other_type<V> pa = std::move(p1);
 			pa /= p2;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		this_type& operator+=(U v) {
@@ -1137,25 +1137,25 @@ namespace hmLib {
 		friend other_type<V> operator+(const this_type& p, U v) {
 			other_type<V> pa = p;
 			pa += v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator+(this_type&& p, U v) {
 			other_type<V> pa = std::move(p);
 			pa += v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator+(U v, const this_type& p) {
 			other_type<V> pa = p;
 			pa += v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator+(U v, this_type&& p) {
 			other_type<V> pa = std::move(p);
 			pa += v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		this_type& operator-=(U v) {
@@ -1170,27 +1170,27 @@ namespace hmLib {
 		friend other_type<V> operator-(const this_type& p, U v) {
 			other_type<V> pa = p;
 			pa -= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator-(this_type&& p, U v) {
 			other_type<V> pa = std::move(p);
 			pa -= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator-(U v, const this_type& p) {
 			other_type<V> pa = p;
 			pa -= v;
 			pa *= -1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator-(U v, this_type&& p) {
 			other_type<V> pa = std::move(p);
 			pa -= v;
 			pa *= -1;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		this_type& operator*=(U v) {
@@ -1205,25 +1205,25 @@ namespace hmLib {
 		friend other_type<V> operator*(const this_type& p, U v) {
 			other_type<V> pa = p;
 			pa *= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator*(this_type&& p, U v) {
 			other_type<V> pa = std::move(p);
 			pa *= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator*(U v, const this_type& p) {
 			other_type<V> pa = p;
 			pa *= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator*(U v, this_type&& p) {
 			other_type<V> pa = std::move(p);
 			pa *= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		this_type& operator/=(U v) {
@@ -1238,13 +1238,13 @@ namespace hmLib {
 		friend other_type<V> operator/(const this_type& p, U v) {
 			other_type<V> pa = p;
 			pa /= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator/(this_type&& p, U v) {
 			other_type<V> pa = std::move(p);
 			pa /= v;
-			return std::move(pa);
+			return pa;
 		}
 		template<typename U, typename V = decltype(std::declval<T>()+std::declval<U>()), typename std::enable_if<std::is_arithmetic<U>::value, std::nullptr_t>::type = nullptr>
 		friend other_type<V> operator/(U v, const this_type& p) {
@@ -1252,13 +1252,13 @@ namespace hmLib {
 			pa.blocks().reserve(p.blocks());
 			pa.fill(v);
 			pa /= p;
-			return std::move(pa);
+			return pa;
 		}
 		this_type& operator+()const { return *this; }
 		this_type operator-()const &{ 
 			this_type pa = *this;
 			pa *= -1;
-			return std::move(pa);
+			return pa;
 		}
 		this_type operator-()&& {
 			*this *= -1;
