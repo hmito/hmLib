@@ -152,7 +152,7 @@ namespace hmLib {
 		using weighted_point_range = math::weighted_point_range<index_type, dim_>;
 	public:
 		static constexpr unsigned int dim() { return dim_; }
-	public:
+	public://locator
 		struct locator {
 			using value_type = value_point_type;
 			using reference = const value_type;
@@ -315,10 +315,6 @@ namespace hmLib {
 		locator locate(index_type Pos_, others... Others_)const {
 			return locate(point_type{ Pos_, static_cast<index_type>(Others_)... }); 
 		}
-		//!Return locator of (0,0,0...)
-		locator front_locate()const { return locate(point_type(0)); }
-		//!Return locator of (size-1)
-		locator back_locate() const{ return locate(extent() + point_type(-1)); }
 	public:
 		value_point_type interval()const {
 			value_point_type Val;

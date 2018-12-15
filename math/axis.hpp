@@ -310,8 +310,8 @@ namespace hmLib {
 		value_type operator[](index_type Index)const {return float_at(Index);}
 		value_type at(index_type Index)const {return operator[](Index);}
 		index_type index(value_type Val)const {return grid_adjuster::template index_cast<index_type>(float_index(Val));}
-		index_type max_index()const { return std::numeric_limits<index_type>()::max(); }
-		index_type min_index()const { return std::numeric_limits<index_type>()::min(); }
+		index_type max_index()const { return std::numeric_limits<index_type>::max(); }
+		index_type min_index()const { return std::numeric_limits<index_type>::min(); }
 		weighted_index_range weighted_index(value_type LowerVal, value_type UpperVal)const {
 			if(LowerVal > UpperVal)std::swap(LowerVal, UpperVal);
 

@@ -68,7 +68,7 @@ namespace hmLib {
 			explicit block(point_type Pos_):Pos(Pos_), Data(BlockPool.get()) {}
 			~block()noexcept { if(Data)BlockPool.release(std::move(Data)); }
 			template<typename U, typename std::enable_if<std::is_same<T, U>::value, std::nullptr_t>::type = nullptr>
-			explicit block(const typename other_block<U>& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
+			explicit block(const other_block<U>& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
 				auto Itr = Other_.begin();
 				auto End = Other_.end();
 				auto Out = begin();
@@ -77,8 +77,8 @@ namespace hmLib {
 				}
 			}
 			template<typename U, typename std::enable_if<std::is_same<T, U>::value, std::nullptr_t>::type = nullptr>
-			operator typename other_block<U>() {
-				typename other_block<U> Block(point());
+			operator other_block<U>() {
+				other_block<U> Block(point());
 				auto Itr = begin();
 				auto End = end();
 				auto Out = Block.begin();
@@ -119,7 +119,7 @@ namespace hmLib {
 		public:
 			operator bool()const { return static_cast<bool>(Data); }
 			template<typename U>
-			this_block& operator+=(const typename other_block<U>& Other) {
+			this_block& operator+=(const other_block<U>& Other) {
 				if(!Data)Data = BlockPool.get();
 				if(!Other)return *this;
 
@@ -132,7 +132,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U>
-			this_block& operator-=(const typename other_block<U>& Other) {
+			this_block& operator-=(const other_block<U>& Other) {
 				if(!Data)Data = BlockPool.get();
 				if(!Other)return *this;
 
@@ -145,7 +145,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U>
-			this_block& operator*=(const typename other_block<U>& Other) {
+			this_block& operator*=(const other_block<U>& Other) {
 				if(!Data) Data = BlockPool.get();
 
 				if(!Other) {
@@ -163,7 +163,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U>
-			this_block& operator/=(const typename other_block<U>& Other) {
+			this_block& operator/=(const other_block<U>& Other) {
 				if(!Data) Data = BlockPool.get();
 
 				if(!Other) {
@@ -251,8 +251,8 @@ namespace hmLib {
 				}
 				return true;
 			}
-			point_type index_to_point(index_type Index_)const { return Indexer.calc_point(Index_); }
-			index_type point_to_index(point_type Point_)const { return Indexer.index(Point_); }
+			point_type index_to_point(index_type Index_)const { return indexer().calc_point(Index_); }
+			index_type point_to_index(point_type Point_)const { return indexer().index(Point_); }
 		private:
 			block(const this_block& Other_): Pos(Other_.Pos), Data(BlockPool.get()) {
 				std::copy(Other_.begin(), Other_.end(), begin());
@@ -393,7 +393,7 @@ namespace hmLib {
 			}
 			iterator insert(iterator Hint_, point_type Pos_) {
 				point_validate(Pos_);
-				return insert_validated(Hint_, Pos_)
+				return insert_validated(Hint_, Pos_);
 			}
 			template<typename input_iterator>
 			void insert(input_iterator Beg, input_iterator End) {
@@ -446,7 +446,7 @@ namespace hmLib {
 				}
 			}
 			template<typename U>
-			void reserve(const typename other_blockset<U>& Other) {
+			void reserve(const other_blockset<U>& Other) {
 				auto Beg = Other.begin();
 				auto End = Other.end();
 
@@ -460,7 +460,7 @@ namespace hmLib {
 				}
 			}
 			template<typename U, typename V>
-			void reserve_union(const typename other_blockset<U>& Other1, const typename other_blockset<V>& Other2) {
+			void reserve_union(const other_blockset<U>& Other1, const other_blockset<V>& Other2) {
 				auto Beg1 = Other1.begin();
 				auto End1 = Other1.end();
 				auto Beg2 = Other2.begin();
@@ -499,7 +499,7 @@ namespace hmLib {
 				}
 			}
 			template<typename U, typename V>
-			void reserve_intersection(const typename other_blockset<U>& Other1, const typename other_blockset<V>& Other2) {
+			void reserve_intersection(const other_blockset<U>& Other1, const other_blockset<V>& Other2) {
 				auto Beg1 = Other1.begin();
 				auto End1 = Other1.end();
 				auto Beg2 = Other2.begin();
@@ -875,7 +875,7 @@ namespace hmLib {
 		}
 		//!Return reference of the elemtn at the given point
 		reference ref(iterator Hint_, point_type Point_) {
-			auto Itr = Blocks.get(Himt_.block_itr(), Point_);
+			auto Itr = Blocks.get(Hint_.block_itr(), Point_);
 			return Itr->ref(Point_);
 		}
 		template<typename... others>
@@ -896,42 +896,42 @@ namespace hmLib {
 		//!Return end const_iterator fot the lattice
 		const_iterator end()const { return cend(); }
 		//!Return begin const_iterator fot the lattice
-		const_iterator cbegin()const { return const_iterator(block_begin(), block_begin()->begin());}
+		const_iterator cbegin()const { return const_iterator(Blocks.begin(), Blocks.begin()->begin());}
 		//!Return end const_iterator fot the lattice
-		const_iterator cend()const { return const_iterator(block_end(), block_end()->begin());}
+		const_iterator cend()const { return const_iterator(Blocks.end(), Blocks.end()->begin());}
 	public://lattice functions
 		//!Convert from index to point
 		point_type index_to_point(index_type Index_)const { 
-			return Blocks.at(static_cast<index_type>(Index_/block_size())).point() + Indexer.point(Index_%block_size());
+			return Blocks.at(static_cast<index_type>(Index_/block_size())).point() + indexer().point(Index_%block_size());
 		}
 		//!Convert from point to index
 		index_type point_to_index(point_type Point_)const {
-			auto Itr = block_find(Point_);
-			hmLib_assert(Itr!=block_end(), lattices::out_of_range_access, "out of range.");
-			return std::distance(block_begin(), Itr)*block_size() + indexer().torus_index(Point_);
+			auto Itr = Blocks.find(Point_);
+			hmLib_assert(Itr!=Blocks.end(), lattices::out_of_range_access, "out of range.");
+			return std::distance(Blocks.begin(), Itr)*block_size() + indexer().torus_index(Point_);
 		}
 		indexer_type indexer()const { return indexer_type(extent_type(block_interval())); }
 		blockset& blocks() { return Blocks; }
 		const blockset& blocks()const { return Blocks; }
 	public://operator
 		void fill(T v){
-			auto Itr = begin();
-			auto End = end();
+			auto Itr = Blocks.begin();
+			auto End = Blocks.end();
 			for(; Itr!=End; ++Itr) {
 				Itr->fill(v);
 			}
 		}
 		template<typename U>
-		this_type& operator+=(const typename other_type<U>& other) {
-			auto TItr = blocks().begin();
-			auto TEnd = blocks().end();
-			auto OItr = other.blocks().begin();
-			auto OEnd = other.blocks().end();
+		this_type& operator+=(const other_type<U>& other) {
+			auto TItr = Blocks.begin();
+			auto TEnd = Blocks.end();
+			auto OItr = other.Blocks.begin();
+			auto OEnd = other.Blocks.end();
 
 			while(OItr!=OEnd) {
 				if(TItr == TEnd || TItr->point() > OItr->point()) {
 					//Only other
-					TItr = blocks().insert_validated(TItr, OItr->point());
+					TItr = Blocks.insert_validated(TItr, OItr->point());
 					*TItr = *OItr;
 					++OItr;
 				} else if(TItr->point() == OItr->point()) {
@@ -977,7 +977,7 @@ namespace hmLib {
 			return pa;
 		}
 		template<typename U>
-		this_type& operator-=(const typename other_type<U>& other) {
+		this_type& operator-=(const other_type<U>& other) {
 			auto TItr = blocks().begin();
 			auto TEnd = blocks().end();
 			auto OItr = other.blocks().begin();
@@ -1035,7 +1035,7 @@ namespace hmLib {
 			return pa;
 		}
 		template<typename U>
-		this_type& operator*=(const typename other_type<U>& other) {
+		this_type& operator*=(const other_type<U>& other) {
 			auto TItr = blocks().begin();
 			auto TEnd = blocks().end();
 			auto OItr = other.blocks().begin();
@@ -1089,7 +1089,7 @@ namespace hmLib {
 			return pa;
 		}
 		template<typename U>
-		this_type& operator/=(const typename other_type<U>& other) {
+		this_type& operator/=(const other_type<U>& other) {
 			auto TItr = blocks().begin();
 			auto TEnd = blocks().end();
 			auto OItr = other.blocks().begin();
