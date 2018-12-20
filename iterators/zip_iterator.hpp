@@ -7,6 +7,7 @@
 #include"../tuple.hpp"
 #include"../clone_ptrproxy.hpp"
 namespace hmLib {
+
 	namespace iterators {
 		template<typename... iterators>
 		struct zip_iterator_traits {
@@ -151,8 +152,8 @@ namespace hmLib {
 			explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
 			template<typename... other_iterators_>
 			zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			reference operator*() { return hmLib::tuple_for_each([](auto& itr) {return *itr; }, Itrs); }
-			reference operator[](difference_type n) { return hmLib::tuple_for_each([n](auto& itr)->auto& {return itr[n]; }, Itrs); }
+			reference operator*() { return hmLib::tuple_for_each([](auto& itr)->decltype((*itr)) {return *itr; }, Itrs); }
+			reference operator[](difference_type n) { return hmLib::tuple_for_each([n](auto& itr)->decltype((*itr)) {return itr[n]; }, Itrs); }
 			pointer operator->() { return pointer(operator*()); }
 			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
 			this_type operator++(int) {

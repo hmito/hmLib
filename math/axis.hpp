@@ -22,6 +22,7 @@ namespace hmLib {
 			inline static double index_threshold() { return std::pow(10, log10_index_threshold); }
 			template<typename index_type>
 			static index_type index_cast(double index_) { return static_cast<index_type>(std::round(index_)); }
+			inline static std::pair<double, double> castable_index_range(double FIndexLower, double FIndexUpper) { return std::make_pair(FIndexLower + 0.50, FIndexUpper + 0.50 -index_threshold()); }
 			template<typename index_type>
 			static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index-0.5, Index+0.5); }
 			template<typename value_type, typename difference_type>
@@ -33,6 +34,7 @@ namespace hmLib {
 			inline static double index_threshold() { return std::pow(10, log10_index_threshold); }
 			template<typename index_type>
 			static index_type index_cast(double index_) { return static_cast<index_type>(std::floor(index_+index_threshold())); }
+			inline static std::pair<double, double> castable_index_range(double FIndexLower, double FIndexUpper) { return std::make_pair(FIndexLower, FIndexUpper -index_threshold()); }
 			template<typename index_type>
 			static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index+0.0, Index+1.0); }
 			template<typename value_type, typename difference_type>
@@ -44,6 +46,7 @@ namespace hmLib {
 			inline static double index_threshold() { return std::pow(10, log10_index_threshold); }
 			template<typename index_type>
 			static index_type index_cast(double index_) { return static_cast<index_type>(std::ceil(index_-index_threshold())); }
+			inline static std::pair<double, double> castable_index_range(double FIndexLower, double FIndexUpper) { return std::make_pair(FIndexLower + 1.0 + index_threshold(), FIndexUpper + 1.0); }
 			template<typename index_type>
 			static std::pair<double, double> index_range(index_type Index) { return std::pair<double, double>(Index-1.0, Index+0.0); }
 			template<typename value_type, typename difference_type>
@@ -64,11 +67,9 @@ namespace hmLib {
 			using index_type = index_type_;
 			using weighted_index = std::pair<index_type, double>;
 		private:
-			index_type LowerIndex;
-			index_type EndIndex;
-			double LowerProb;
-			double UpperProb;
-			double Weight;
+			double LowerCIndex;	//Castable index: [0.0, 1.0) is the range 
+			double UpperCIndex;	//	static_cast<index_type>(CIndex) == Index <=> Same Index
+			std::size_t Size;
 		public:
 			struct iterator {
 			public:
@@ -76,30 +77,26 @@ namespace hmLib {
 				using difference_type = signed int;
 				using reference = value_type;
 				using pointer = hmLib::clone_ptrproxy<value_type>;
-				using iterator_category = std::input_iterator_tag;
+				using iterator_category = std::random_access_iterator_tag;
 			private:
 				index_type Index;
-				index_type LowerIndex;
-				index_type EndIndex;
-				double LowerProb;
-				double UpperProb;
+				double LowerCIndex;
+				double UpperCIndex;
 			public:
 				iterator() = default;
-				iterator(index_type Index_, index_type LowerIndex_, index_type EndIndex_, double LowerProb_, double UpperProb_)
-					: Index(Index_) 
-					, LowerIndex(LowerIndex_)
-					, EndIndex(EndIndex_)
-					, LowerProb(LowerProb_)
-					, UpperProb(UpperProb_){
+				iterator(index_type Index_, double LowerCIndex_, double UpperCIndex_)
+					: Index(Index_)
+					, LowerCIndex(LowerCIndex_)
+					, UpperCIndex(UpperCIndex_){
 				}
 				reference operator*()const {
-					if(Index==0) {
-						return weighted_index(LowerIndex, LowerProb);
-					} else if(LowerIndex+Index==EndIndex-1) {
-						return weighted_index(EndIndex-1, UpperProb);
+					if(Index == 0) {
+						return weighted_index(static_cast<index_type>(LowerCIndex), std::min(1.0, (std::ceil(LowerCIndex) - LowerCIndex)/(UpperCIndex-LowerCIndex)));
+					} else {
+						return weighted_index(static_cast<index_type>(LowerCIndex)+Index, std::min(1.0, UpperCIndex - (std::floor(LowerCIndex) + Index))/(UpperCIndex-LowerCIndex));
 					}
-					return weighted_index(Index+LowerIndex, 1.0);
 				}
+				reference operator[](difference_type n) { return *(*this+n); }
 				pointer operator->()const { return pointer(operator*()); }
 				iterator& operator++() { ++Index; return *this; }
 				iterator operator++(int) {
@@ -107,80 +104,84 @@ namespace hmLib {
 					operator++();
 					return Prev;
 				}
+				iterator& operator--() { --Index; return *this; }
+				iterator operator--(int) {
+					iterator Prev = *this;
+					operator--();
+					return Prev;
+				}
+				iterator& operator+=(difference_type n) {
+					Index += n;
+					return *this;
+				}
+				iterator& operator-=(difference_type n) {
+					Index -= n;
+					return *this;
+				}
+				friend iterator operator+(const iterator& itr1, difference_type n) {
+					auto ans = itr1;
+					ans += n;
+					return ans;
+				}
+				friend iterator operator+(difference_type n, const iterator& itr1) {
+					auto ans = itr1;
+					ans += n;
+					return ans;
+				}
+				friend iterator operator-(const iterator& itr1, difference_type n) {
+					auto ans = itr1;
+					ans -= n;
+					return ans;
+				}
+				friend difference_type operator-(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index - itr2.Index;
+				}
 				friend bool operator==(const iterator& itr1, const iterator& itr2) {
 					return itr1.Index==itr2.Index;
 				}
 				friend bool operator!=(const iterator& itr1, const iterator& itr2) {
 					return itr1.Index!=itr2.Index;
 				}
+				friend bool operator<(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index<itr2.Index;
+				}
+				friend bool operator<=(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index<=itr2.Index;
+				}
+				friend bool operator>(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index>itr2.Index;
+				}
+				friend bool operator>=(const iterator& itr1, const iterator& itr2) {
+					return itr1.Index>=itr2.Index;
+				}
 			};
 		public:
-			weighted_index_range()noexcept
-				: LowerIndex(0)
-				, EndIndex(0)
-				, LowerProb(0.0)
-				, UpperProb(0.0)
-				, Weight(0.0) {
-			}
-			weighted_index_range(index_type Index_, double Weidth_)noexcept
-				: LowerIndex(Index_)
-				, EndIndex(Index_+1)
-				, LowerProb(1.0)
-				, UpperProb(0.0)
-				, Weight(Weidth_) {
-			}
-			weighted_index_range(index_type LowerIndex_, index_type UpperIndex_, double LowerProb_, double UpperProb_, double Weight_, double index_threshold_)noexcept
-				: LowerIndex(LowerIndex_)
-				, EndIndex(UpperIndex_+1)
-				, LowerProb(LowerProb_)
-				, UpperProb(UpperProb_)
-				, Weight(Weight_) {
-				if(LowerProb<index_threshold_) {
-					if(LowerIndex+2==EndIndex) {
-						if(UpperProb<index_threshold_) {
-							LowerIndex = 0;
-							EndIndex = 0;
-							LowerProb = 0.0;
-							UpperProb = 0.0;
-							Weight = 0.0;
-						}
-						LowerProb = UpperProb;
-						UpperProb = 0.0;
-						++LowerIndex;
-					} else {
-						LowerProb = 1.0;
-						++LowerIndex;
-					}
-				}else if(UpperProb<index_threshold_) {
-					if(LowerIndex+2==EndIndex) {
-						UpperProb = 0.0;
-						--EndIndex;
-					} else {
-						UpperProb = 1.0;
-						--EndIndex;
-					}
+			weighted_index_range()noexcept: LowerCIndex(0.0), UpperCIndex(0.0), Size(0){}
+			weighted_index_range(double LowerCIndex_, double UpperCIndex_)noexcept: LowerCIndex(LowerCIndex_), UpperCIndex(UpperCIndex_)
+				, Size(static_cast<index_type>(UpperCIndex) -static_cast<index_type>(LowerCIndex)+1){
+				if(LowerCIndex > UpperCIndex) {
+					Size = 0;
 				}
 			}
 			weighted_index operator[](index_type Index)const {
-				if(Index==0) {
-					return weighted_index(LowerIndex, LowerProb);
-				} else if(LowerIndex+Index==EndIndex-1) {
-					return weighted_index(EndIndex-1, UpperProb);
+				if(Index == 0) {
+					return weighted_index(static_cast<index_type>(LowerCIndex), std::min(1.0, (std::ceil(LowerCIndex) - LowerCIndex)/(UpperCIndex-LowerCIndex)));
+				} else {
+					return weighted_index(static_cast<index_type>(LowerCIndex)+Index, std::min(1.0, UpperCIndex - (std::floor(LowerCIndex) + Index))/(UpperCIndex-LowerCIndex));
 				}
-				return weighted_index(Index+LowerIndex, 1.0);
 			}
 			weighted_index at(index_type Index)const {
 				hmLib_assert(0<=Index && Index < static_cast<int>(size()), hmLib::access_exceptions::out_of_range_access, "Out of range access.");
 				return operator[](Index);
 			}
-			bool empty()const { return LowerIndex==EndIndex; }
-			std::size_t size()const { return static_cast<std::size_t>(EndIndex-LowerIndex); }
-			double weight()const { return Weight; }
+			bool empty()const { return Size==0; }
+			std::size_t size()const { return Size; }
+			double volume()const { return UpperCIndex-LowerCIndex; }
 			iterator begin()const {
-				return iterator(0, LowerIndex, EndIndex, LowerProb, UpperProb);
+				return iterator(0, LowerCIndex, UpperCIndex);
 			}
 			iterator end()const {
-				return iterator(static_cast<int>(size()), LowerIndex, EndIndex, LowerProb, UpperProb);
+				return iterator(static_cast<int>(size()), LowerCIndex, UpperCIndex);
 			}
 			iterator cbegin()const { return begin(); }
 			iterator cend()const { return end(); }
@@ -314,29 +315,11 @@ namespace hmLib {
 		index_type min_index()const { return std::numeric_limits<index_type>::min(); }
 		weighted_index_range weighted_index(value_type LowerVal, value_type UpperVal)const {
 			if(LowerVal > UpperVal)std::swap(LowerVal, UpperVal);
-
-			float_index_type LowerFIndex = float_index(LowerVal);
-			float_index_type UpperFIndex = float_index(UpperVal);
-
-			index_type LowerIndex = grid_adjuster::template index_cast<index_type>(LowerFIndex);
-			index_type UpperIndex = grid_adjuster::template index_cast<index_type>(UpperFIndex);
-			if(LowerIndex == UpperIndex) {
-				return weighted_index_range(LowerIndex,UpperFIndex-LowerFIndex);
-			}
-
-			return weighted_index_range(
-				LowerIndex, UpperIndex, 
-				grid_adjuster::index_range(LowerIndex).second - LowerFIndex, 
-				UpperFIndex - grid_adjuster::index_range(UpperIndex).first,
-				UpperFIndex-LowerFIndex,
-				grid_adjuster::index_threshold()
-			);
+			auto CIndex = grid_adjuster::castable_index_range(float_index(LowerVal), float_index(UpperVal));
+			return weighted_index_range(CIndex.first, CIndex.second);
 		}
 	public:
-		iterator begin(index_type Index_)const { return iterator(0, a, b); }
-		iterator end()const { return iterator(std::numeric_limits<index_type>::max(),a,b); }
-		iterator cbegin()const { return begin(); }
-		iterator cend()const { return end(); }
+		iterator itr_at(index_type Index_)const { return iterator(0, a, b); }
 	public:
 		value_type interval()const { return static_cast<value_type>(a); }
 		value_type origin()const { return static_cast<value_type>(b); }
@@ -423,8 +406,8 @@ namespace hmLib {
 				return Axis.weighted_index(LowerVal, UpperVal);
 			}
 		public:
-			iterator begin()const { return Axis.begin(); }
-			iterator end()const { return Axis.end(); }
+			iterator begin()const { return Axis.itr_at(0); }
+			iterator end()const { return Axis.itr_at(Size); }
 			iterator cbegin()const { return begin(); }
 			iterator cend()const { return end(); }
 		public:
@@ -553,21 +536,13 @@ namespace hmLib {
 			hmLib_assert(inside(FromIndex), hmLib::numeric_exceptions::out_of_valuerange, "Requested value "+std::to_string(FromIndex) + " is out of ["+std::to_string(LowerFromIndex)+", "+std::to_string(UpperFromIndex)+"]");
 
 			auto FIndexRange = from_grid_adjuster::index_range(FromIndex);
+
 			float_index_type LowerFIndex = float_index(FIndexRange.first);
 			float_index_type UpperFIndex = float_index(FIndexRange.second);
 
-			index_type LowerIndex = to_grid_adjuster::template index_cast<index_type>(LowerFIndex+to_grid_adjuster::index_threshold());
-			index_type UpperIndex = to_grid_adjuster::template index_cast<index_type>(UpperFIndex-to_grid_adjuster::index_threshold());
-			if(LowerIndex == UpperIndex) {
-				return weighted_index_range(LowerIndex, UpperFIndex-LowerFIndex);
-			}
-
-			return weighted_index_range(LowerIndex, UpperIndex,
-				to_grid_adjuster::index_range(LowerIndex).second - LowerFIndex,
-				UpperFIndex - to_grid_adjuster::index_range(UpperIndex).first,
-				UpperFIndex-LowerFIndex,
-				to_grid_adjuster::index_threshold()
-			);
+			if(LowerFIndex > UpperFIndex)std::swap(LowerFIndex, UpperFIndex);
+			auto CIndex = to_grid_adjuster::castable_index_range(LowerFIndex, UpperFIndex);
+			return weighted_index_range(CIndex.first, CIndex.second);
 		}
 	};
 	template<typename from_axis, typename to_axis>

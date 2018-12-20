@@ -22,7 +22,7 @@ namespace hmLib {
 		public:
 			using point_type = typename indexer_type::point_type;
 			using extent_type = typename indexer_type::extent_type;
-			using weighted_point_type = std::pair<point_type, double>;
+			using weighted_point_type = std::pair<point_type, double>;	//point - proportion of the point
 			using waighted_range_container = std::vector<math::weighted_index_range<index_type>>;
 			using waighted_range_iterator = typename waighted_range_container::const_iterator;
 		public:
@@ -98,7 +98,7 @@ namespace hmLib {
 				for(unsigned int i = 0; i<dim(); ++i) {
 					Extent[i] = Range.at(i).size();
 					Size *= static_cast<unsigned int>(Extent[i]);
-					Weight *= Range.at(i).weight();
+					Weight *= Range.at(i).width();
 				}
 			}
 			weighted_point_type operator[](index_type Index)const {
@@ -118,7 +118,7 @@ namespace hmLib {
 			}
 			bool empty()const { return Range.empty(); }
 			unsigned int size()const { return Size; }
-			double weight()const { return Weight; }
+			double volume()const { return Weight; }
 			iterator begin()const {
 				return iterator(0, Range.begin());
 			}
