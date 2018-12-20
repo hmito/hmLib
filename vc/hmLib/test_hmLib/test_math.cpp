@@ -6,6 +6,7 @@
 #include "../../../iterators.hpp"
 #include "../../../math/root.hpp"
 #include "../../../math/axis.hpp"
+#include "../../../math/multiaxis.hpp"
 #include "../../../math/combinatorics.hpp"
 #include <boost/math/distributions/normal.hpp>
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -443,6 +444,46 @@ namespace hmLib {
 
 			Assert::AreEqual(1.0, Sum1, 1e-3);
 			Assert::AreEqual(Sum1, Sum2, 1e-4);
+		}
+	};
+	TEST_CLASS(test_math_multiaxis) {
+		TEST_METHOD(test_map) {
+			lattice_axis<double, 2> Axes1;
+			Axes1.axis(0).assign(4.95, 5.05, 101);
+			Axes1.axis(1).assign(0.80, 0.90, 101);
+
+			lattice_axis<double, 2> Axes2;
+			Axes2.axis(0).assign(4.90, 5.10, 101);
+			Axes2.axis(1).assign(0.80, 0.90, 101);
+
+			auto Dist1 = boost::math::normal_distribution<double>(5.00, 0.01);
+			auto Dist2 = boost::math::normal_distribution<double>(0.85, 0.01);
+			lattices::indexer<2> Indexer(lattices::extent_type<2>{101, 101});
+			std::vector<double> Vec1(101*101, 0.0);
+			for(unsigned int i = 0; i<Axes1.axis(0).size(); ++i) {
+				for(unsigned int j = 0; j<Axes1.axis(1).size(); ++j) {
+					Vec1[Indexer.index(lattices::point_type<2>{static_cast<int>(i), static_cast<int>(j)})] = boost::math::pdf(Dist1, Axes1.axis(0)[i])*Axes1.axis(0).interval()
+						* boost::math::pdf(Dist2, Axes1.axis(1)[j])*Axes1.axis(1).interval();
+				}
+			}
+
+			auto Mapper = Axes1.map_to(Axes2);
+			std::vector<double> Vec2(Vec1.size(), 0.);
+			for(unsigned int i = 0; i<Axes1.axis(0).size(); ++i) {
+				for(unsigned int j = 0; j<Axes1.axis(1).size(); ++j) {
+					auto wi = Mapper.weighted_point(lattices::point_type<2>{static_cast<int>(i), static_cast<int>(j)});
+					for(auto p:wi) {
+						Vec2[Indexer.index(p.first)] += p.second*Vec1[Indexer.index(lattices::point_type<2>{static_cast<int>(i), static_cast<int>(j)})];
+					}
+				}
+			}
+
+			auto Sum1 = std::accumulate(Vec1.begin(), Vec1.end(), 0.0);
+			auto Sum2 = std::accumulate(Vec2.begin(), Vec2.end(), 0.0);
+
+			Assert::AreEqual(1.0, Sum1, 1e-3);
+			Assert::AreEqual(Sum1, Sum2, 1e-4);
+
 		}
 	};
 	TEST_CLASS(test_math_combi) {

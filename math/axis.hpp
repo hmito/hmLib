@@ -91,7 +91,7 @@ namespace hmLib {
 				}
 				reference operator*()const {
 					if(Index == 0) {
-						return weighted_index(static_cast<index_type>(LowerCIndex), std::min(1.0, (std::ceil(LowerCIndex) - LowerCIndex)/(UpperCIndex-LowerCIndex)));
+						return weighted_index(static_cast<index_type>(LowerCIndex), std::min(1.0, ((std::floor(LowerCIndex)+1 - LowerCIndex)/(UpperCIndex-LowerCIndex))));
 					} else {
 						return weighted_index(static_cast<index_type>(LowerCIndex)+Index, std::min(1.0, UpperCIndex - (std::floor(LowerCIndex) + Index))/(UpperCIndex-LowerCIndex));
 					}
@@ -165,7 +165,7 @@ namespace hmLib {
 			}
 			weighted_index operator[](index_type Index)const {
 				if(Index == 0) {
-					return weighted_index(static_cast<index_type>(LowerCIndex), std::min(1.0, (std::ceil(LowerCIndex) - LowerCIndex)/(UpperCIndex-LowerCIndex)));
+					return weighted_index(static_cast<index_type>(LowerCIndex), std::min(1.0, (std::floor(LowerCIndex) + 1 - LowerCIndex)/(UpperCIndex-LowerCIndex)));
 				} else {
 					return weighted_index(static_cast<index_type>(LowerCIndex)+Index, std::min(1.0, UpperCIndex - (std::floor(LowerCIndex) + Index))/(UpperCIndex-LowerCIndex));
 				}
