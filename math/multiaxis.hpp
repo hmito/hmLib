@@ -98,7 +98,7 @@ namespace hmLib {
 				for(unsigned int i = 0; i<dim(); ++i) {
 					Extent[i] = Range.at(i).size();
 					Size *= static_cast<unsigned int>(Extent[i]);
-					Weight *= Range.at(i).width();
+					Weight *= Range.at(i).volume();
 				}
 			}
 			weighted_point_type operator[](index_type Index)const {
