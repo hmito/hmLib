@@ -30,7 +30,10 @@
     <ClInclude Include="..\..\..\color.hpp" />
     <ClInclude Include="..\..\..\config_vc.h" />
     <ClInclude Include="..\..\..\coordinates.hpp" />
-    <ClInclude Include="..\..\..\csv_iterator.hpp" />
+    <ClInclude Include="..\..\..\csv\csvbase.hpp" />
+    <ClInclude Include="..\..\..\csv\csvline.hpp" />
+    <ClInclude Include="..\..\..\csv\csv_iterator.hpp" />
+    <ClInclude Include="..\..\..\csv\csv_table.hpp" />
     <ClInclude Include="..\..\..\date.hpp" />
     <ClInclude Include="..\..\..\debugstream.hpp" />
     <ClInclude Include="..\..\..\either.hpp" />
@@ -72,7 +75,7 @@
     <ClInclude Include="..\..\..\inquiries\signaled_contact.hpp" />
     <ClInclude Include="..\..\..\inquiries\signal_inquiry.hpp" />
     <ClInclude Include="..\..\..\inquiries\unique_connections.hpp" />
-    <ClInclude Include="..\..\..\iocsv.hpp" />
+    <ClInclude Include="..\..\..\csv.hpp" />
     <ClInclude Include="..\..\..\iterators.hpp" />
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp" />

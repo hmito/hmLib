@@ -61,6 +61,9 @@
     <Filter Include="hmLib\gates\comgate">
       <UniqueIdentifier>{8631be19-6e7d-430a-ba4e-4cb6372d84c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\csv">
+      <UniqueIdentifier>{f90a09b8-52b4-4c50-b330-5b5f50932922}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="use_odeint.cpp">
@@ -308,9 +311,6 @@
     <ClInclude Include="..\..\..\coordinates.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\csv_iterator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\date.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -339,9 +339,6 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inquiries.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iocsv.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\iterators.hpp">
@@ -463,6 +460,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hash.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\block_vector.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csvbase.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csv_iterator.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csv_table.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csvline.hpp">
+      <Filter>hmLib\csv</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
