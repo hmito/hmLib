@@ -71,7 +71,7 @@ namespace hmLib {
 		result_type operator()(const argument_type& key)const { return fnv1a_algorithm().get(std::begin(key), std::end(key)); }
 	};
 
-	std::size_t merge_hash(std::size_t seed1, std::size_t seed2) {
+	inline std::size_t merge_hash(std::size_t seed1, std::size_t seed2) {
 		return seed1 ^ (seed2 + 0x9e3779b9 + (seed1 << 6) + (seed1 >> 2));
 	};
 	template<typename... others>

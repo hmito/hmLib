@@ -8,13 +8,13 @@
 #include"../algorithm/compare.hpp"
 namespace hmLib {
 	template<typename integer_type, typename integer_ans_type = unsigned long long>
-	constexpr integer_ans_type factorial(integer_type val) {
+	integer_ans_type factorial(integer_type val) {
 		return val>1 ? val*factorial(val - 1) : 1;
 	}
 	namespace math {
 		namespace detail {
 			template<typename integer_ans_type, typename integer_type, typename... other_types>
-			constexpr unsigned long long factorial_ratio_impl(integer_ans_type value, integer_type max_lower, integer_type lower, other_types... other_lowers) {
+			unsigned long long factorial_ratio_impl(integer_ans_type value, integer_type max_lower, integer_type lower, other_types... other_lowers) {
 				if(max_lower==lower) {
 					return factorial_ratio_impl(value, 0, other_lowers...);
 				} else {
@@ -22,19 +22,19 @@ namespace hmLib {
 				}
 			}
 			template<typename integer_ans_type, typename integer_type>
-			constexpr unsigned long long factorial_ratio_impl(integer_ans_type value, integer_type) {
+			unsigned long long factorial_ratio_impl(integer_ans_type value, integer_type) {
 				return value;
 			}
 		}
 	}
 	template<typename integer_type, typename... other_types>
-	constexpr unsigned long long factorial_ratio(integer_type upper, integer_type lower, other_types... other_lowers) {
+	unsigned long long factorial_ratio(integer_type upper, integer_type lower, other_types... other_lowers) {
 		auto max_lower = max_value(lower, other_lowers...);
 		auto ans = nPr(upper, upper-max_lower);
 		return math::detail::factorial_ratio_impl(ans, max_lower, lower, other_lowers...);
 	}
 	template<typename integer_type, typename integer_ans_type = unsigned long long>
-	constexpr integer_ans_type nPr(integer_type n, integer_type r) {
+	integer_ans_type nPr(integer_type n, integer_type r) {
 		integer_ans_type Ans = 1;
 		for(integer_type i = 1; i<=r; ++i) {
 			Ans *= (n - i + 1);
@@ -42,7 +42,7 @@ namespace hmLib {
 		return Ans;
 	}
 	template<typename integer_type, typename integer_ans_type = unsigned long long>
-	constexpr integer_ans_type nCr(integer_type n, integer_type r) {
+	integer_ans_type nCr(integer_type n, integer_type r) {
 		r = std::min(r, n-r);
 		integer_ans_type dividend = 1;
 		integer_ans_type divisor = 1;
@@ -53,7 +53,7 @@ namespace hmLib {
 		return dividend / divisor;
 	}
 	template<typename integer_type, typename integer_ans_type = unsigned long long>
-	constexpr integer_ans_type nHr(integer_type n, integer_type r) {
+	integer_ans_type nHr(integer_type n, integer_type r) {
 		return nCr<integer_type, integer_ans_type>(n + r - 1, r);
 	}
 

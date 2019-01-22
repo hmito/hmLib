@@ -4,6 +4,42 @@
 #include<utility>
 #include<algorithm>
 namespace hmLib{
+	template<typename forward_iterator, typename type>
+	forward_iterator swap_remove(forward_iterator Beg, forward_iterator End, const type& Value) {
+		for(auto Itr = Beg; Itr!=End; ++Itr) {
+			if(*Itr!=Value) {
+				if(Beg!=Itr)std::swap(*Beg, *Itr);
+				++Beg;
+			}
+		}
+		return Beg;
+	}
+	template<typename forward_iterator, typename condition>
+	forward_iterator swap_remove_if(forward_iterator Beg, forward_iterator End, condition Cond) {
+		//Itr: condition checked element
+		//Beg: end of remaining elements
+
+		auto Itr = Beg;
+		//Beg==Itr as long as Cond is false
+		while(Itr!=End) {
+			if(Cond(*Itr)){
+				++Itr;
+				break;
+			}
+			++Beg;
+			++Itr;
+		}
+		//Beg!=Itr
+		while(Itr!=End){
+			if(!Cond(*Itr)){
+				std::swap(*Beg, *Itr);
+				++Beg;
+			}
+			++Itr;
+		}
+		return Beg;
+	}
+
 	template<typename Iterator, typename Transform>
 	std::pair<decltype(std::declval<Transform>()(*std::declval<Iterator>())), Iterator>
 	transform_max_element(Iterator Beg, Iterator End, Transform Fn){

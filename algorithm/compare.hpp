@@ -73,13 +73,32 @@ namespace hmLib{
 	inline constexpr T max_value(T val1,T val2,Others... vals){return std::max(val1,max_value(val2,vals...));}
 	template<typename T>
 	inline constexpr T max_value(T val){return val;}
-	//負にならない余り
+	
+	//mod with positive value
 	template<class T>
+	[[deprecated("please use euclidean_mod() function")]]
 	inline T positive_mod(T num,T divisor){
 		num %= divisor;
 		if(num < 0)return num + divisor;
 		return num;
 	}
+
+	template<class T>
+	inline T euclidean_mod(T n, T divisor){
+		n %= divisor;
+		if(n < 0)return n + divisor;
+		return n;
+	}
+	template<class T>
+	inline T euclidean_div(T n, T divisor){
+		return (n-euclidean_mod(n,divisor))/divisor;
+	}
+	template<class T>
+	inline std::pair<T,T> eucledian_divmod(T n, T divisor){
+		T m = euclidean_mod(n,divisor);
+		return std::pair<T,T>((n-m)/divisor,m);
+	}
+
 }
 #
 #endif

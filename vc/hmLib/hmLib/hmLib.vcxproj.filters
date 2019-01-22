@@ -428,6 +428,18 @@
     <ClInclude Include="..\..\..\clone_ptrproxy.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\math\multiaxis.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\keep_if.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
       <Filter>hmLib\iterators</Filter>
     </ClInclude>
@@ -478,6 +490,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\csv\csvline.hpp">
       <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\block_vector.hpp">
+      <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

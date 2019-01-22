@@ -28,6 +28,17 @@ namespace hmLib {
 			FullPath.substr(SlashPos+1, FileLength)
 		);
 	}
+	inline std::pair<std::string, std::string> splite_fileextension(std::string FullPath){
+		auto ExtLength = std::distance(
+			FullPath.rbegin(), 
+			std::find(FullPath.rbegin(), FullPath.rend(), '.')
+		);
+		auto DotPos = FullPath.size() - ExtLength - 1;
+		return std::pair<std::string, std::string>(
+			FullPath.substr(0, DotPos),
+			FullPath.substr(DotPos+1, ExtLength)
+		);
+	}
 }
 #
 #endif
