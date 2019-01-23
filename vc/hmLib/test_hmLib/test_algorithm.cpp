@@ -291,77 +291,126 @@ namespace hmLib{
 	};
 
 	TEST_CLASS(test_basic_algorithms) {
+	private:
+		void test_unstable_remove_if_impl(std::vector<int> Vec, int AnsNum) {
+			auto Size = Vec.size();
+
+			auto REnd = unstable_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
+
+			Assert::AreEqual(AnsNum, std::distance(Vec.begin(), REnd));
+
+			std::sort(Vec.begin(), REnd);
+			int Cnt = 1;
+			for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
+				Assert::AreEqual(Cnt++, *Itr);
+			}
+		}
 	public:
-		TEST_METHOD(test_swap_remove_if1){
-			std::vector<int> Vec{ 101,1,2,3,4,5,6,102,7,8,9,103,104,105,10,11,12,13,106 };
-			auto Size = Vec.size();
-
-			auto REnd= swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
-
-			Assert::AreEqual(Size, Vec.size());
-			Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
-			int Cnt = 1;
-			for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
-			}
-			std::sort(REnd, Vec.end());
-			Cnt = 101;
-			for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
-			}
+		TEST_METHOD(test_unstable_remove_if1) {
+			test_unstable_remove_if_impl(std::vector<int>{ 101, 1, 2, 3, 4, 5, 6, 102, 7, 8, 9, 103, 104, 105, 10, 11, 12, 13, 106 }, 13);
 		}
-		TEST_METHOD(test_swap_remove_if2) {
-			std::vector<int> Vec{ 1,2,3,4,5,6,101,102,103,104,105,106 ,7,8,9,10,11,12,13};
-			auto Size = Vec.size();
-
-			auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
-
-			Assert::AreEqual(Size, Vec.size());
-			Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
-			int Cnt = 1;
-			for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
-			}
-			std::sort(REnd, Vec.end());
-			Cnt = 101;
-			for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
-			}
+		TEST_METHOD(test_unstable_remove_if2) {
+			test_unstable_remove_if_impl(std::vector<int>{ 1, 2, 3, 4, 5, 6, 101, 102, 103, 7, 8, 104, 9, 105, 106, 10, 11, 12, 13 }, 13);
 		}
-		TEST_METHOD(test_swap_remove_if3) {
-			std::vector<int> Vec{ 101,102,103,104,105,106 ,1,2,3,4,5,6,7,8,9,10,11,12,13 };
-			auto Size = Vec.size();
-
-			auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
-
-			Assert::AreEqual(Size, Vec.size());
-			Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
-			int Cnt = 1;
-			for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
-			}
-			std::sort(REnd, Vec.end());
-			Cnt = 101;
-			for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
-			}
+		TEST_METHOD(test_unstable_remove_if3) {
+			test_unstable_remove_if_impl(std::vector<int>{ 101, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 }, 13);
 		}
-		TEST_METHOD(test_swap_remove_if4) {
-			std::vector<int> Vec{1,2,3,4,5,6,7,8,9,10,11,12,13, 101,102,103,104,105,106 };
-			auto Size = Vec.size();
+		TEST_METHOD(test_unstable_remove_if4) {
+			test_unstable_remove_if_impl(std::vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 101 }, 13);
+		}
+		TEST_METHOD(test_unstable_remove_if5) {
+			test_unstable_remove_if_impl(std::vector<int>{ 101, 102, 103, 104, 105, 106, 1 }, 1);
+		}
+		TEST_METHOD(test_unstable_remove_if6) {
+			test_unstable_remove_if_impl(std::vector<int>{ 1, 101, 102, 103, 104, 105, 106 }, 1);
+		}
+		TEST_METHOD(test_unstable_remove_if7) {
+			test_unstable_remove_if_impl(std::vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 }, 13);
+		}
+		TEST_METHOD(test_unstable_remove_if8) {
+			test_unstable_remove_if_impl(std::vector<int>{ 101, 102, 103, 104, 105, 106 }, 0);
+		}
+		TEST_METHOD(test_unstable_remove_if9) {
+			test_unstable_remove_if_impl(std::vector<int>{ 1 }, 1);
+		}
+		TEST_METHOD(test_unstable_remove_if10) {
+			test_unstable_remove_if_impl(std::vector<int>{ 101}, 0);
+		}
+		TEST_METHOD(test_unstable_remove_if11) {
+			test_unstable_remove_if_impl(std::vector<int>{}, 0);
+		}
+		TEST_METHOD(test_swap_remove_if){
+			{
+				std::vector<int> Vec{ 101,1,2,3,4,5,6,102,7,8,9,103,104,105,10,11,12,13,106 };
+				auto Size = Vec.size();
 
-			auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
+				auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
 
-			Assert::AreEqual(Size, Vec.size());
-			Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
-			int Cnt = 1;
-			for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
+				Assert::AreEqual(Size, Vec.size());
+				Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
+				int Cnt = 1;
+				for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
+				std::sort(REnd, Vec.end());
+				Cnt = 101;
+				for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
 			}
-			std::sort(REnd, Vec.end());
-			Cnt = 101;
-			for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
-				Assert::AreEqual(Cnt++, *Itr);
+			{
+				std::vector<int> Vec{ 1,2,3,4,5,6,101,102,103,104,105,106 ,7,8,9,10,11,12,13 };
+				auto Size = Vec.size();
+
+				auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
+
+				Assert::AreEqual(Size, Vec.size());
+				Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
+				int Cnt = 1;
+				for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
+				std::sort(REnd, Vec.end());
+				Cnt = 101;
+				for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
+			}
+			{
+				std::vector<int> Vec{ 101,102,103,104,105,106 ,1,2,3,4,5,6,7,8,9,10,11,12,13 };
+				auto Size = Vec.size();
+
+				auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
+
+				Assert::AreEqual(Size, Vec.size());
+				Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
+				int Cnt = 1;
+				for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
+				std::sort(REnd, Vec.end());
+				Cnt = 101;
+				for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
+			}
+			{
+				std::vector<int> Vec{ 1,2,3,4,5,6,7,8,9,10,11,12,13, 101,102,103,104,105,106 };
+				auto Size = Vec.size();
+
+				auto REnd = swap_remove_if(Vec.begin(), Vec.end(), [](int i) {return i>100; });
+
+				Assert::AreEqual(Size, Vec.size());
+				Assert::AreEqual(13, std::distance(Vec.begin(), REnd));
+				int Cnt = 1;
+				for(auto Itr = Vec.begin(); Itr!=REnd; ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
+				std::sort(REnd, Vec.end());
+				Cnt = 101;
+				for(auto Itr = REnd; Itr!=Vec.end(); ++Itr) {
+					Assert::AreEqual(Cnt++, *Itr);
+				}
 			}
 		}
 	};
