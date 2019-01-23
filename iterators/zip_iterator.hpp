@@ -300,9 +300,9 @@ namespace hmLib {
 					End = zip_iterator_shorten(Beg, End);
 				}
 				template<typename... ranges>
-				zip_range_impl(ranges&&... Ranges) {
-					Beg = iterator(std::begin(Ranges)...);
-					End = iterator(std::end(Ranges)...);
+				zip_range_impl(ranges&&... Ranges)
+					: Beg(std::begin(Ranges)...)
+					, End(std::end(Ranges)...){
 					End = zip_iterator_shorten(Beg, End);
 				}
 				iterator begin()const { return Beg; }

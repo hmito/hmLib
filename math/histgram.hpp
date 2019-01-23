@@ -6,7 +6,7 @@
 namespace hmLib {
 	template<typename value_type_, typename grid_adjuster_ = math::default_grid_adjuster>
 	struct histgram {
-		using axis_t = axis<value_type_, grid_adjuster_>;
+		using axis_t = range_axis<value_type_, grid_adjuster_>;
 		using value_type = value_type_;
 		using grid_adjuster = grid_adjuster_;
 	private:
