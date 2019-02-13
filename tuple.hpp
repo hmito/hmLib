@@ -4,6 +4,7 @@
 #include<tuple>
 #include<utility>
 #include"exceptions.hpp"
+#include"iterators/transform_iterator.hpp"
 #include"hash.hpp"
 namespace hmLib {
 	namespace detail {
@@ -99,6 +100,17 @@ namespace hmLib {
 			return tuple_reduce([](result_type seed, auto v) {return merge_hash(seed, hash<typename std::decay<decltype(v)>::type>()(v)); }, key, result_type(0));
 		}
 	};
+
+	template<std::size_t n>
+	struct getter{
+		template<typename T>
+		decltype(auto) operator()(T&& val)const{ return std::get<n>(std::forward<T>(val)); }
+	};
+
+	template<std::size_t n, typename iterator>
+	decltype(auto) make_get_range(iterator Beg, iterator End) {
+		return hmLib::make_transform_range(Beg, End, getter<n>());
+	}
 }
 #
 #endif
