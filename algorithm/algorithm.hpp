@@ -107,9 +107,8 @@ namespace hmLib{
 	}
 
 	template<typename Iterator, typename Transform>
-	std::pair<decltype(std::declval<Transform>()(*std::declval<Iterator>())), Iterator>
-	transform_max_element(Iterator Beg, Iterator End, Transform Fn){
-		auto Max = std::numeric_limits<decltype(std::declval<Transform>()(*std::declval<Iterator>()))>::lowest();
+	auto transform_max_element(Iterator Beg, Iterator End, Transform Fn){
+		auto Max = std::numeric_limits<typename std::remove_reference<decltype(Fn(*Beg))>::type>::lowest();
 		Iterator MaxItr = End;
 
 		for(; Beg != End; ++Beg){
@@ -122,8 +121,7 @@ namespace hmLib{
 		return std::make_pair(Max,MaxItr);
 	}
 	template<typename Iterator, typename Transform>
-	std::pair<decltype(std::declval<Transform>()(*std::declval<Iterator>())), Iterator>
-	transform_min_element(Iterator Beg, Iterator End, Transform Fn){
+	auto transform_min_element(Iterator Beg, Iterator End, Transform Fn){
 		auto Min = std::numeric_limits<decltype(std::declval<Transform>()(*std::declval<Iterator>()))>::max();
 		Iterator MinItr = End;
 
@@ -137,8 +135,7 @@ namespace hmLib{
 		return std::make_pair(Min,MinItr);
 	}
 	template<typename Iterator, typename Transform>
-	std::pair<std::pair<decltype(std::declval<Transform>()(*std::declval<Iterator>())), Iterator>,std::pair<decltype(std::declval<Transform>()(*std::declval<Iterator>())), Iterator>>
-	transform_minmax_element(Iterator Beg, Iterator End, Transform Fn){
+	auto transform_minmax_element(Iterator Beg, Iterator End, Transform Fn){
 		auto Min = std::numeric_limits<decltype(std::declval<Transform>()(*std::declval<Iterator>()))>::max();
 		Iterator MinItr = End;
 		auto Max = std::numeric_limits<decltype(std::declval<Transform>()(*std::declval<Iterator>()))>::lowest();
