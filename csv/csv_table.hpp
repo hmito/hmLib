@@ -1,21 +1,16 @@
-﻿#ifndef HMLIB_IOCSV_INC
-#define HMLIB_IOCSV_INC 100
+#ifndef HMLIB_CSV_CSVTABLE_INC
+#define HMLIB_CSV_CSVTABLE_INC 100
 #
 #include<string>
-#include<hmLib/table.hpp>
-#include<hmLib/csv_iterator.hpp>
-#include<hmLib/exceptions.hpp>
-namespace hmLib{
-	namespace{
-		struct iocsv_identifier{};
-	}
-	using iocsv_exception = hmLib::exceptions::exception_pattern<iocsv_identifier>;
-
-	template<typename Elem=char, typename Traits=std::char_traits<Elem> >
-	basic_table<Elem, Traits> read_csv(std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false, Elem SepChar = ',', Elem EndChar = '\n', Elem EscChar ='"'){
-		using my_ifstream = std::basic_ifstream<Elem, Traits>;
-		using my_table = basic_table<Elem, Traits>;
-		using my_icsv_iterator = basic_icsv_iterator<Elem, Traits>;
+#include"../table.hpp"
+#include"csvbase.hpp"
+namespace hmLib {
+	//read&write table
+	template<typename csv_traits_>
+	basic_table<typename csv_traits_::elem_type, typename csv_traits_::trait_type> read_csv(std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false) {
+		using my_ifstream = std::basic_ifstream<typename csv_traits_::elem_type, typename csv_traits_::trait_type>;
+		using my_table = basic_table<typename csv_traits_::elem_type, typename csv_traits_::trait_type>;
+		using my_icsv_iterator = basic_icsv_iterator<typename csv_traits_::elem_type, typename csv_traits_::trait_type>;
 
 		//open CSV file, or return null data
 		my_ifstream fin(FileName);
@@ -32,12 +27,12 @@ namespace hmLib{
 		//investigate max size of row/column
 		{
 			unsigned int ColumnCnt = 0;
-			for(my_icsv_iterator itr = beg; itr != end; ++itr){
-				if(itr.eol()){
+			for(my_icsv_iterator itr = beg; itr != end; ++itr) {
+				if(itr.eol()) {
 					ColumnNum = std::max(ColumnNum, ColumnCnt);
 					ColumnCnt = 0;
 					++RowNum;
-				} else{
+				} else {
 					++ColumnCnt;
 				}
 			}
@@ -49,10 +44,10 @@ namespace hmLib{
 		my_table Table;
 
 		//read Horizontal Column
-		if(IsHorizontalColumn){
-			if(HasNameRow){
+		if(IsHorizontalColumn) {
+			if(HasNameRow) {
 				Table.assign(ColumnNum-1, RowNum);
-			} else{
+			} else {
 				Table.assign(ColumnNum, RowNum);
 			}
 
@@ -60,26 +55,26 @@ namespace hmLib{
 
 			unsigned int RowCnt = 0;
 			unsigned int ColumnCnt = 0;
-			while(itr != end){
-				if(HasNameRow){
+			while(itr != end) {
+				if(HasNameRow) {
 					if(ColumnCnt == 0) Table.column(RowCnt).rename(*itr);
 					else Table(ColumnCnt-1, RowCnt) = *itr;
-				} else{
+				} else {
 					Table(ColumnCnt, RowCnt) = *itr;
 				}
 				++itr;
 
-				if(itr.eol()){
+				if(itr.eol()) {
 					ColumnCnt = 0;
 					++RowCnt;
-				} else{
+				} else {
 					++ColumnCnt;
 				}
 			}
 		} else {
-			if(HasNameRow){
+			if(HasNameRow) {
 				Table.assign(RowNum - 1, ColumnNum);
-			} else{
+			} else {
 				Table.assign(RowNum, ColumnNum);
 			}
 
@@ -88,21 +83,21 @@ namespace hmLib{
 			unsigned int RowCnt = 0;
 			unsigned int ColumnCnt = 0;
 
-			if(HasNameRow){
-				do{
+			if(HasNameRow) {
+				do {
 					Table.column(ColumnCnt++).rename(*itr++);
 				} while(!itr.eol());
 			}
 
 			ColumnCnt = 0;
-			while(itr != end){
+			while(itr != end) {
 				Table(RowCnt, ColumnCnt) = *itr;
 				++itr;
 
-				if(itr.eol()){
+				if(itr.eol()) {
 					ColumnCnt = 0;
 					++RowCnt;
-				} else{
+				} else {
 					++ColumnCnt;
 				}
 			}
@@ -110,8 +105,8 @@ namespace hmLib{
 
 		return std::move(Table);
 	}
-	template<typename Elem = char, typename Traits = std::char_traits<Elem> >
-	void write_csv(const basic_table<Elem, Traits>& Table,std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false, Elem SepChar = ',', Elem EndChar = '\n', Elem EscChar = '"'){
+	template<typename csv_traits_>
+	void write_csv(const basic_table<Elem, Traits>& Table, std::string FileName, bool HasNameRow = false, bool IsHorizontalColumn = false) {
 		using my_ofstream = std::basic_ofstream<Elem, Traits>;
 		using my_ocsv_iterator = basic_ocsv_iterator<Elem, Traits>;
 
@@ -122,30 +117,31 @@ namespace hmLib{
 		//get iterator
 		my_ocsv_iterator itr(fout, SepChar, EndChar, EscChar);
 
-		if(IsHorizontalColumn){
-			for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt){
+		if(IsHorizontalColumn) {
+			for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt) {
 				if(HasNameRow)*itr++ = Table.column(ColumnCnt).name();
-				for(unsigned int RowCnt = 0; RowCnt < Table.row_size(); ++RowCnt){
+				for(unsigned int RowCnt = 0; RowCnt < Table.row_size(); ++RowCnt) {
 					*itr++ = Table.at(RowCnt, ColumnCnt);
 				}
 				itr.endl();
 			}
-		} else{
-			if(HasNameRow){
-				for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt){
+		} else {
+			if(HasNameRow) {
+				for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt) {
 					*itr++ = Table.column(ColumnCnt).name();
 				}
 				itr.endl();
 			}
 
-			for(unsigned int RowCnt = 0; RowCnt < Table.row_size(); ++RowCnt){
-				for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt){
+			for(unsigned int RowCnt = 0; RowCnt < Table.row_size(); ++RowCnt) {
+				for(unsigned int ColumnCnt = 0; ColumnCnt < Table.column_size(); ++ColumnCnt) {
 					*itr++ = Table.at(RowCnt, ColumnCnt);
 				}
 				itr.endl();
 			}
 		}
 	}
+
 }
 #
 #endif

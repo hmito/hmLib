@@ -1,55 +1,35 @@
-﻿#ifndef HMLIB_CSVITERATOR_INC
-#define HMLIB_CSVITERATOR_INC 100
+﻿#ifndef HMLIB_CSV_CSVITERATOR_INC
+#define HMLIB_CSV_CSVITERATOR_INC 100
 #
 #include<iterator>
 #include<iostream>
 #include<sstream>
 namespace hmLib{
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	struct basic_csv_mode{
-	public:
-		Elem Sep;
-		Elem End;
-		Elem Esc;
-	public:
-		constexpr basic_csv_mode(Elem Sep_, Elem End_ = '\n', Elem Esc_ = '"')
-			: Sep(Sep_)
-			, End(End_)
-			, Esc(Esc_){
-		}
-	};
-
 	namespace csv{
-		namespace mode{
-			constexpr const basic_csv_mode<char> csv(',');
-			constexpr const basic_csv_mode<char> tsv('\t');
-			constexpr const basic_csv_mode<char> ssv(' ');
-		}
-
-		template<class Elem = char, class Traits = std::char_traits<Elem> >
-		std::basic_string < Elem, Traits > cell_encode(std::basic_string < Elem, Traits > Str, basic_csv_mode<Elem, Traits> CSVMode){
-			if(Str.find(CSVMode.Sep) < Str.size() || Str.find(CSVMode.Esc) < Str.size()){
+		template<typename csv_traits_>
+		std::basic_string <typename csv_traits_::elem_type, typename csv_traits_::trait_type> cell_encode(std::basic_string <typename csv_traits_::elem_type, typename csv_traits_::trait_type> Str, csv_traits_ Traits){
+			if(Str.find(Traits.sep()) < Str.size() || Str.find(Traits.esc()) < Str.size()){
 				for(auto itr = Str.begin(); itr != Str.end(); ++itr){
-					if(*itr == CSVMode.Esc){
-						itr = Str.insert(++itr, CSVMode.Esc);
+					if(*itr == Traits.esc()){
+						itr = Str.insert(++itr, Traits.esc());
 					}
 				}
 
-				Str.insert(Str.begin(), CSVMode.Esc);
-				Str.push_back(CSVMode.Esc);
+				Str.insert(Str.begin(), Traits.esc());
+				Str.push_back(Traits.esc());
 			}
 
 			return std::move(Str);
 		}
-		template<class Elem = char, class Traits = std::char_traits<Elem> >
-		std::basic_string < Elem, Traits > cell_decode(std::basic_string < Elem, Traits > Str, basic_csv_mode<Elem, Traits> CSVMode){
-			if(Str.size()>1 && Str.front()== CSVMode.Esc && Str.back()== CSVMode.Esc){
+		template<class elem_type = char, class Traits = std::char_traits<elem_type> >
+		std::basic_string <typename csv_traits_::elem_type, typename csv_traits_::trait_type> cell_decode(std::basic_string <typename csv_traits_::elem_type, typename csv_traits_::trait_type> Str, csv_traits_ Traits){
+			if(Str.size()>1 && Str.front()== Traits.esc() && Str.back()== Traits.esc()){
 				Str.erase(Str.begin());
 				Str.pop_back();
 
 				bool EscFlag=false;
 				for(auto itr = Str.begin(); itr != Str.end(); ++itr){
-					if(*itr == CSVMode.Esc){
+					if(*itr == Traits.esc()){
 						if(EscFlag){
 							itr = Str.erase(itr);
 							--itr;
@@ -66,29 +46,40 @@ namespace hmLib{
 			return std::move(Str);
 		}
 	}
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	class basic_ocsv_iterator : public std::iterator < std::output_iterator_tag, void, void, void, void > {
+	template<typename csv_traits_>
+	class ocsv_iterator {
 	private:
-		using my_type = basic_ocsv_iterator < Elem, Traits >;
-		using ostream_type = std::basic_ostream < Elem, Traits > ;
-		using string_type = std::basic_string < Elem, Traits > ;
-		using csv_mode_type = basic_csv_mode<Elem, Traits>;
+		using this_type = icsv_iterator < csv_traits_ >;
+	public:
+		using csv_traits = csv_traits_;
+		using elem_type = typename csv_traits::elem_type;
+		using traits_type = typename csv_traits::traits_type;
+		using sstream_type = std::basic_stringstream < elem_type, traits_type >;
+		using ostream_type = std::basic_ostream < elem_type, traits_type >;
+		using pos_type = typename ostream_type::pos_type;
+		using string_type = std::basic_string < elem_type, traits_type >;
+	public:
+		using iterator_category = std::output_iterator_tag;
+		using value_type = void;
+		using reference = void;
+		using pointer = void;
+		using difference_type = int;
 	private:
 		struct output_proxy{
 		private:
-			my_type& My;
+			this_type& My;
 		private:
 			void cell_head_treat(){
 				if(My.IsCellHead && !My.IsLineHead){
-					*(My.pstream) << My.CSVMode.Sep;
+					*(My.pstream) << My.Traits.sep();
 				}
 				My.IsCellHead = false;
 			}
 		public:
-			output_proxy(my_type& My_) :My(My_){}
+			output_proxy(this_type& My_) :My(My_){}
 			void operator=(const string_type& Str){
 				cell_head_treat();
-				*(My.pstream) << csv::cell_encode(Str,My.CSVMode);
+				*(My.pstream) << csv::cell_encode(Str,My.Traits);
 			}
 			void raw_str(const string_type& Str){
 				cell_head_treat();
@@ -107,7 +98,7 @@ namespace hmLib{
 				*(My.pstream) << TmpVal;
 				return *this;
 			}
-			friend std::basic_istream<Elem, Traits>& operator>>(std::basic_istream<Elem, Traits>& in, output_proxy p){
+			friend std::basic_istream<elem_type, Traits>& operator>>(std::basic_istream<elem_type, Traits>& in, output_proxy p){
 				string_type Str;
 				in >> Str;
 				p = Str;
@@ -116,56 +107,87 @@ namespace hmLib{
 		};
 	private:
 		ostream_type* pstream;
-		csv_mode_type CSVMode;
+		csv_traits Traits;
 		bool IsCellHead;
 		bool IsLineHead;
 	public:
 		basic_ocsv_iterator()
 			: pstream(nullptr){
 		}
-		basic_ocsv_iterator(ostream_type& Stream_, csv_mode_type CSVMode_)
+		basic_ocsv_iterator(ostream_type& Stream_, csv_traits CSVMode_)
 			: pstream(&Stream_)
-			, CSVMode(CSVMode_)
+			, Traits(CSVMode_)
 			, IsCellHead(false)
 			, IsLineHead(true){
 		}
-		basic_ocsv_iterator(const my_type& My_) = default;
-		my_type& operator=(const my_type& My_) = default;
+		basic_ocsv_iterator(const this_type& My_) = default;
+		this_type& operator=(const this_type& My_) = default;
 	public:
 		operator bool()const{ return pstream; }
 		output_proxy operator*(){ return output_proxy(*this); }
-		my_type& operator++(){
+		this_type& operator++(){
 			IsCellHead = true;
 			IsLineHead = false;
 			return *this;
 		}
-		my_type operator++(int){
-			my_type ans(*this);
+		this_type operator++(int){
+			this_type ans(*this);
 			operator++();
 			return ans;
 		}
 		bool eol()const{ return IsLineHead; }
 		void endl(){
-			(*pstream) << CSVMode.End;
+			(*pstream) << Traits.end();
 			IsLineHead = true;
 			IsCellHead = false;
 		}
 	};
-	using ocsv_iterator = basic_ocsv_iterator < char, std::char_traits<char> >;
 
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	class basic_icsv_iterator : public std::iterator < std::input_iterator_tag, std::basic_string<Elem,Traits>> {
+	template<typename csv_traits_>
+	class icsv_iterator{
 	private:
-		using my_type = basic_icsv_iterator < Elem, Traits > ;
+		using this_type = icsv_iterator < csv_traits_ > ;
 	public:
-		using sstream_type = std::basic_stringstream < Elem, Traits >;
-		using istream_type = std::basic_istream < Elem, Traits > ;
+		using csv_traits = csv_traits_;
+		using elem_type = typename csv_traits::elem_type;
+		using traits_type = typename csv_traits::traits_type;
+		using sstream_type = std::basic_stringstream < elem_type, traits_type >;
+		using istream_type = std::basic_istream < elem_type, traits_type > ;
 		using pos_type = typename istream_type::pos_type;
-		using string_type = std::basic_string < Elem, Traits > ;
-		using csv_mode_type = basic_csv_mode<Elem, Traits>;
+		using string_type = std::basic_string < elem_type, traits_type > ;
+	private:
+		struct input_proxy {
+		private:
+			this_type& My;
+		public:
+			input_proxy(this_type& My_):My(My_) {}
+			operator string_type() { return csv::cell_decode(My.read().str(), My.Traits); }
+			string_type raw_str() { return My.read().str(); }
+			template<typename T>
+			input_proxy& operator>>(T& Val) {
+				My.read() >> Val;
+				return *this;
+			}
+			template<typename T, typename U>
+			input_proxy& read(U& Val) {
+				T TmpVal;
+				My.read() >> TmpVal;
+				Val = TmpVal;
+				return *this;
+			}
+			friend std::basic_ostream<elem_type, Traits>& operator<<(std::basic_ostream<elem_type, Traits>& out, input_proxy p) {
+				return out << static_cast<string_type>(p);
+			}
+		};
+	public:
+		using iterator_category = std::input_iterator_tag;
+		using value_type = string_type;
+		using reference = input_proxy;
+		using pointer = void;
+		using difference_type = int;
 	private:
 		istream_type* pstream;
-		csv_mode_type CSVMode;
+		csv_traits Traits;
 		pos_type Pos;
 		sstream_type sstream;
 		bool HasRead;
@@ -177,7 +199,7 @@ namespace hmLib{
 				HasRead = false;
 				Pos = ReadPos;
 			} else{
-				Elem c;
+				elem_type c;
 				pstream->seekg(0, std::ios::end);
 				auto EndPos = pstream->tellg();
 				pstream->seekg(Pos);
@@ -186,17 +208,17 @@ namespace hmLib{
 				while(pstream->tellg() != EndPos){
 					c = pstream->get();
 
-					if(c == CSVMode.End || c == EOF){
+					if(c == Traits.end() || c == EOF){
 						IsLineHead = true;
 						break;
 					}
 
-					if(c == CSVMode.Sep && !EscFlag){
+					if(c == Traits.sep() && !EscFlag){
 						IsLineHead = false;
 						break;
 					}
 
-					if(c == CSVMode.Esc){
+					if(c == Traits.esc()){
 						EscFlag = !EscFlag;
 					}
 				}
@@ -206,7 +228,7 @@ namespace hmLib{
 		}
 		sstream_type& read(){
 			if(!HasRead){
-				Elem c;
+				elem_type c;
 				sstream.str(string_type());
 				sstream.clear();
 
@@ -218,17 +240,17 @@ namespace hmLib{
 				while(pstream->tellg() != EndPos){
 					c = pstream->get();
 
-					if(c == CSVMode.End || c == EOF){
+					if(c == Traits.end() || c == EOF){
 						IsLineHead = true;
 						break;
 					}
 
-					if(c == CSVMode.Sep && !EscFlag){
+					if(c == Traits.sep() && !EscFlag){
 						IsLineHead = false;
 						break;
 					}
 
-					if(c == CSVMode.Esc){
+					if(c == Traits.esc()){
 						EscFlag = !EscFlag;
 					}
 					
@@ -240,53 +262,29 @@ namespace hmLib{
 			}
 			return sstream;
 		}
-	private:
-		struct input_proxy{
-		private:
-			my_type& My;
-		public:
-			input_proxy(my_type& My_) :My(My_){}
-			operator string_type(){ return csv::cell_decode(My.read().str(), My.CSVMode); }
-			string_type raw_str(){return My.read().str();}
-			template<typename T>
-			input_proxy& operator>>(T& Val){
-				My.read() >> Val;
-				return *this;
-			}
-			template<typename T,typename U>
-			input_proxy& read(U& Val) {
-				T TmpVal;
-				My.read() >> TmpVal;
-				Val = TmpVal;
-				return *this;
-			}
-			friend std::basic_ostream<Elem, Traits>& operator<<(std::basic_ostream<Elem, Traits>& out, input_proxy p){
-				return out << static_cast<string_type>(p);
-			}
-		};
 	public:
-		basic_icsv_iterator() :pstream(nullptr){}
-		basic_icsv_iterator(istream_type& Stream_, pos_type Pos_, csv_mode_type CSVMode_,bool IsLineHead_)
+		icsv_iterator() :pstream(nullptr){}
+		icsv_iterator(istream_type& Stream_, pos_type Pos_, csv_traits CSVMode_,bool IsLineHead_)
 			: pstream(&Stream_)
-			, CSVMode(CSVMode_)
+			, Traits(CSVMode_)
 			, Pos(Pos_)
 			, sstream()
 			, HasRead(false)
 			, IsLineHead(IsLineHead_){
 		}
-		basic_icsv_iterator(const my_type& My_)
+		icsv_iterator(const this_type& My_)
 			: pstream(My_.pstream)
-			, CSVMode(My_.CSVMode)
+			, Traits(My_.Traits)
 			, Pos(My_.Pos)
 			, sstream(My_.sstream.str())
 			, HasRead(My_.HasRead)
 			, ReadPos(My_.ReadPos)
 			, IsLineHead(My_.IsLineHead){
 		}
-		my_type& operator=(const my_type& My_){
+		this_type& operator=(const this_type& My_){
 			if(this != &My_){
 				pstream = My_.pstream;
-				CSVMode = My_.CSVMode;
+				Traits = My_.Traits;
 				Pos = My_.Pos;
 				sstream = My_.sstream.str();
 				HasRead = My_.HasRead;
@@ -295,11 +293,11 @@ namespace hmLib{
 			}
 		}
 		input_proxy operator*(){return input_proxy(*this);}
-		my_type& operator++(){
+		this_type& operator++(){
 			next();
 			return *this;
 		}
-		my_type operator++(int){
+		this_type operator++(int){
 			basic_icsv_iterator ans(*this);
 			operator++();
 			return ans;
@@ -310,46 +308,45 @@ namespace hmLib{
 			return Pos == pstream->tellg();
 		}
 		pos_type pos()const{ return Pos; }
-		friend bool operator==(const my_type& my1, const my_type& my2){
+		friend bool operator==(const this_type& my1, const this_type& my2){
 			if(&my1 == &my2)return true;
 
 			if(my1.pstream != my2.pstream) return false;
 
 			return my1.Pos == my2.Pos;
 		}
-		friend bool operator!=(const my_type& my1, const my_type& my2){ return !(my1 == my2); }
+		friend bool operator!=(const this_type& my1, const this_type& my2){ return !(my1 == my2); }
 	};
-	using icsv_iterator = basic_icsv_iterator < char, std::char_traits<char> >;
 
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> icsv_begin(std::basic_istream < Elem, Traits >& Stream_, basic_csv_mode < Elem, Traits > CSVMode_ = basic_csv_mode<Elem, Traits>(',')){
+	template<typename csv_traits_>
+	inline icsv_iterator<csv_traits_> icsv_begin(std::basic_istream <typename csv_traits_::elem_type, typename csv_traits_::trait_type>& Stream_, csv_traits_ Traits){
 		Stream_.seekg(0, std::ios::beg);
 		auto Pos = Stream_.tellg();
-		return basic_icsv_iterator<Elem, Traits>(Stream_, Pos, CSVMode_, true);
+		return  icsv_iterator<csv_traits_>(Stream_, Pos,Traits, true);
 	}
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> icsv_current(std::basic_istream < Elem, Traits >& Stream_, basic_csv_mode < Elem, Traits > CSVMode_ = basic_csv_mode<Elem, Traits>(',')){
+	template<typename csv_traits_>
+	inline icsv_iterator<csv_traits_> icsv_current(std::basic_istream <typename csv_traits_::elem_type, typename csv_traits_::trait_type >& Stream_, csv_traits_ Traits){
 		auto Pos = Stream_.tellg();
-		return basic_icsv_iterator<Elem, Traits>(Stream_, Pos, CSVMode_, false);
+		return  icsv_iterator<csv_traits_>(Stream_, Pos, Traits, false);
 	}
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> icsv_end(std::basic_istream < Elem, Traits >& Stream_, basic_csv_mode < Elem, Traits > CSVMode_ = basic_csv_mode<Elem, Traits>(',')){
+	template<typename csv_traits_>
+	inline icsv_iterator<csv_traits_> icsv_end(std::basic_istream <typename csv_traits_::elem_type, typename csv_traits_::trait_type >& Stream_, csv_traits_ Traits){
 		Stream_.seekg(0, std::ios::end);
 		auto Pos = Stream_.tellg();
-		return basic_icsv_iterator<Elem, Traits>(Stream_, Pos, CSVMode_, true);
+		return  icsv_iterator<csv_traits_>(Stream_, Pos, Traits, true);
 	}
 
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline void advance_line(basic_icsv_iterator<Elem, Traits>& itr, unsigned int num = 1){
+	template<typename csv_traits_>
+	inline void advance_line(icsv_iterator<csv_traits_>& itr, unsigned int num = 1){
 		unsigned int no = 0;
 		do{
 			++itr;
 			if(itr.eol())++no;
 		} while(no < num);
 	}
-	template<class Elem = char, class Traits = std::char_traits<Elem> >
-	inline basic_icsv_iterator<Elem, Traits> next_line(const basic_icsv_iterator<Elem, Traits>& itr, unsigned int num = 1){
-		basic_icsv_iterator<Elem, Traits> next_itr(itr);
+	template<typename csv_traits_>
+	inline icsv_iterator<csv_traits_> next_line(const icsv_iterator<csv_traits_>& itr, unsigned int num = 1){
+		icsv_iterator<csv_traits_> next_itr(itr);
 		advance_line(next_itr);
 		return next_itr;
 	}

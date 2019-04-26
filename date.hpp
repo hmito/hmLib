@@ -1,10 +1,6 @@
 ﻿#ifndef HMLIB_DATE_INC
 #define HMLIB_DATE_INC 100
 #
-/*===date===
-system_clockを日付型に変換する
-あくまで入出力用であり、加算等の演算はできない
-*/
 #include<chrono>
 #include<ctime>
 namespace hmLib{

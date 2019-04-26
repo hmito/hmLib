@@ -2,311 +2,98 @@
 #define HMLIB_ITERATORS_INDEXACCESSITERATOR_INC 100
 #
 #include<iterator>
-#include"../utility.hpp"
+#include"transform_iterator.hpp"
 namespace hmLib {
-	template<typename random_access_iterator_, typename index_iterator_, typename index_iterator_category_ = typename std::iterator_traits<index_iterator_>::iterator_category>
-	struct index_access_iterator {};
-	template<typename random_access_iterator_, typename index_iterator_>
-	struct index_access_iterator<random_access_iterator_, index_iterator_, std::input_iterator_tag> {
-	private:
-		static_assert(std::is_same<typename std::iterator_traits<random_access_iterator_>::iterator_category, std::random_access_iterator_tag>::value, "index_iterator can use only for random_access_iterator");
-		using this_type = index_access_iterator<random_access_iterator_, index_iterator_, std::input_iterator_tag>;
-		using base_iterator = random_access_iterator_;
-		using index_iterator = index_iterator_;
-	public:
-		using value_type = typename std::iterator_traits<base_iterator>::value_type;
-		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
-		using reference = typename std::iterator_traits<base_iterator>::reference;
-		using pointer = typename std::iterator_traits<base_iterator>::pointer;
-		using iterator_category = std::input_iterator_tag;
-	private:
-		base_iterator Beg;
-		index_iterator IItr;
-	public://constructer
-		index_access_iterator() = default;
-		index_access_iterator(base_iterator Beg_, index_iterator_ IItr_):Beg(Beg_), IItr(IItr_) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		index_access_iterator(const index_access_iterator<other_iterator_, index_iterator_>& Other) : Beg(Other.Beg), IItr(Other.IItr) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		this_type& operator=(const index_access_iterator<other_iterator_, index_iterator_>& Other) {
-			Beg = Other.Beg;
-			IItr = Other.IItr;
-			return *this;
+	namespace iterators {
+		namespace detail {
+			template<typename iterator>
+			struct index_iterator_access {
+				using difference_type = typename std::iterator_traits<iterator>::difference_type;
+				using reference = typename std::iterator_traits<iterator>::reference;
+			private:
+				iterator beg;
+			public:
+				index_iterator_access(iterator beg_):beg(beg_) {}
+				reference operator()(difference_type n) { return *std::next(beg, n); }
+			};
+			template<typename container, typename index_type = unsigned int>
+			struct index_op_access {
+				using reference = decltype((std::declval<container>()[std::declval<index_type>()]));
+			private:
+				container* pContainer;
+			public:
+				index_op_access(container& Container_): pContainer(&Container_) {}
+				reference operator()(index_type n) { return pContainer->operator[](n); }
+			};
+			template<typename container, typename index_type = unsigned int>
+			struct index_at_access {
+				using reference = decltype((std::declval<container>()[std::declval<index_type>()]));
+			private:
+				container* pContainer;
+			public:
+				index_at_access(container& Container_): pContainer(&Container_) {}
+				reference operator()(index_type n) { return pContainer->at(n); }
+			};
 		}
-	public:
-		reference operator*()const { return Beg[*IItr]; }
-		pointer operator->()const { return &Beg[*IItr]; }
-		this_type& operator++() {
-			++IItr;
-			return *this;
-		}
-		this_type operator++(int) {
-			this_type Ans = *this;
-			operator++();
-			return Ans;
-		}
-		base_iterator base()const { return Beg+(*IItr); }
-		auto index()const { return *IItr; }
-		friend bool operator==(const this_type& v1, const this_type& v2) {
-			return v1.IItr == v2.IItr;
-		}
-		friend bool operator!=(const this_type& v1, const this_type& v2) {
-			return v1.IItr != v2.IItr;
-		}
-	};
-	template<typename random_access_iterator_, typename index_iterator_>
-	struct index_access_iterator<random_access_iterator_, index_iterator_, std::forward_iterator_tag> {
-	private:
-		static_assert(std::is_same<typename std::iterator_traits<random_access_iterator_>::iterator_category, std::random_access_iterator_tag>::value, "index_iterator can use only for random_access_iterator");
-		using this_type = index_access_iterator<random_access_iterator_, index_iterator_, std::forward_iterator_tag>;
-		using base_iterator = random_access_iterator_;
-		using index_iterator = index_iterator_;
-	public:
-		using value_type = typename std::iterator_traits<base_iterator>::value_type;
-		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
-		using reference = typename std::iterator_traits<base_iterator>::reference;
-		using pointer = typename std::iterator_traits<base_iterator>::pointer;
-		using iterator_category = std::forward_iterator_tag;
-	private:
-		base_iterator Beg;
-		index_iterator IItr;
-	public://constructer
-		index_access_iterator() = default;
-		index_access_iterator(base_iterator Beg_, index_iterator_ IItr_):Beg(Beg_), IItr(IItr_) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		index_access_iterator(const index_access_iterator<other_iterator_, index_iterator_>& Other) : Beg(Other.Beg), IItr(Other.IItr) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		this_type& operator=(const index_access_iterator<other_iterator_, index_iterator_>& Other) {
-			Beg = Other.Beg;
-			IItr = Other.IItr;
-			return *this;
-		}
-	public:
-		reference operator*()const { return Beg[*IItr]; }
-		pointer operator->()const { return &Beg[*IItr]; }
-		this_type& operator++() {
-			++IItr;
-			return *this;
-		}
-		this_type operator++(int) {
-			this_type Ans = *this;
-			operator++();
-			return Ans;
-		}
-		base_iterator base() { return Beg+(*IItr); }
-		auto index()const { return *IItr; }
-		friend bool operator==(const this_type& v1, const this_type& v2) {
-			return v1.IItr == v2.IItr;
-		}
-		friend bool operator!=(const this_type& v1, const this_type& v2) {
-			return v1.IItr != v2.IItr;
-		}
-	};
-	template<typename random_access_iterator_, typename index_iterator_>
-	struct index_access_iterator<random_access_iterator_, index_iterator_, std::bidirectional_iterator_tag> {
-	private:
-		static_assert(std::is_same<typename std::iterator_traits<random_access_iterator_>::iterator_category, std::random_access_iterator_tag>::value, "index_iterator can use only for random_access_iterator");
-		using this_type = index_access_iterator<random_access_iterator_, index_iterator_, std::bidirectional_iterator_tag>;
-		using base_iterator = random_access_iterator_;
-		using index_iterator = index_iterator_;
-	public:
-		using value_type = typename std::iterator_traits<base_iterator>::value_type;
-		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
-		using reference = typename std::iterator_traits<base_iterator>::reference;
-		using pointer = typename std::iterator_traits<base_iterator>::pointer;
-		using iterator_category = std::bidirectional_iterator_tag;
-	private:
-		base_iterator Beg;
-		index_iterator IItr;
-	public://constructer
-		index_access_iterator() = default;
-		index_access_iterator(base_iterator Beg_, index_iterator_ IItr_):Beg(Beg_), IItr(IItr_) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		index_access_iterator(const index_access_iterator<other_iterator_, index_iterator_>& Other) : Beg(Other.Beg), IItr(Other.IItr) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		this_type& operator=(const index_access_iterator<other_iterator_, index_iterator_>& Other) {
-			Beg = Other.Beg;
-			IItr = Other.IItr;
-			return *this;
-		}
-	public:
-		reference operator*()const { return Beg[*IItr]; }
-		pointer operator->()const { return &Beg[*IItr]; }
-		this_type& operator++() {
-			++IItr;
-			return *this;
-		}
-		this_type operator++(int) {
-			this_type Ans = *this;
-			operator++();
-			return Ans;
-		}
-		this_type& operator--() {
-			--IItr;
-			return *this;
-		}
-		this_type operator--(int) {
-			this_type Ans = *this;
-			operator--();
-			return Ans;
-		}
-		base_iterator base()const { return Beg+(*IItr); }
-		auto index()const { return *IItr; }
-		friend bool operator==(const this_type& v1, const this_type& v2) {
-			return v1.IItr == v2.IItr;
-		}
-		friend bool operator!=(const this_type& v1, const this_type& v2) {
-			return v1.IItr != v2.IItr;
-		}
-	};
-	template<typename random_access_iterator_, typename index_iterator_>
-	struct index_access_iterator<random_access_iterator_, index_iterator_, std::random_access_iterator_tag> {
-	private:
-		static_assert(std::is_same<typename std::iterator_traits<random_access_iterator_>::iterator_category, std::random_access_iterator_tag>::value, "index_iterator can use only for random_access_iterator");
-		using this_type = index_access_iterator<random_access_iterator_, index_iterator_, std::random_access_iterator_tag>;
-		using base_iterator = random_access_iterator_;
-		using index_iterator = index_iterator_;
-	public:
-		using value_type = typename std::iterator_traits<base_iterator>::value_type;
-		using difference_type = typename std::iterator_traits<base_iterator>::difference_type;
-		using reference = typename std::iterator_traits<base_iterator>::reference;
-		using pointer = typename std::iterator_traits<base_iterator>::pointer;
-		using iterator_category = std::random_access_iterator_tag;
-	private:
-		base_iterator Beg;
-		index_iterator IItr;
-	public://constructer
-		index_access_iterator() = default;
-		index_access_iterator(base_iterator Beg_, index_iterator_ IItr_):Beg(Beg_), IItr(IItr_) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		index_access_iterator(const index_access_iterator<other_iterator_, index_iterator_>& Other) : Beg(Other.Beg), IItr(Other.IItr) {}
-		template<typename other_iterator_, typename std::enable_if<std::is_convertible<base_iterator, other_iterator_>::value&&!std::is_same<base_iterator, other_iterator_>::value>::type *& = hmLib::utility::enabler>
-		this_type& operator=(const index_access_iterator<other_iterator_, index_iterator_>& Other) {
-			Beg = Other.Beg;
-			IItr = Other.IItr;
-			return *this;
-		}
-	public:
-		reference operator*()const { return Beg[*IItr]; }
-		pointer operator->()const { return &Beg[*IItr]; }
-		reference operator[](difference_type d) { return Beg[IItr[d]]; }
-		this_type& operator++() {
-			++IItr;
-			return *this;
-		}
-		this_type operator++(int) {
-			this_type Ans = *this;
-			operator++();
-			return Ans;
-		}
-		this_type& operator--() {
-			--IItr;
-			return *this;
-		}
-		this_type operator--(int) {
-			this_type Ans = *this;
-			operator--();
-			return Ans;
-		}
-		this_type& operator+=(difference_type d) {
-			IItr = +d;
-			return *this;
-		}
-		this_type& operator-=(difference_type d) {
-			IItr = -d;
-			return *this;
-		}
-		friend this_type operator+(const this_type& itr, difference_type d) {
-			this_type ans = itr;
-			ans += d;
-			return ans;
-		}
-		friend this_type operator+(difference_type d, const this_type& itr) {
-			return operator+(itr, d);
-		}
-		friend this_type operator-(const this_type& itr, difference_type d) {
-			this_type ans = itr;
-			ans -= d;
-			return ans;
-		}
-		friend difference_type operator-(const this_type& itr1, const this_type& itr2) {
-			return itr1.IItr - itr2.IItr;
-		}
-		base_iterator base()const { return Beg+(*IItr); }
-		auto index()const { return *IItr; }
-		friend bool operator==(const this_type& v1, const this_type& v2) {
-			return v1.IItr == v2.IItr;
-		}
-		friend bool operator!=(const this_type& v1, const this_type& v2) {
-			return v1.IItr != v2.IItr;
-		}
-		friend bool operator>(const this_type& v1, const this_type& v2) {
-			return v1.IItr > v2.IItr;
-		}
-		friend bool operator<(const this_type& v1, const this_type& v2) {
-			return v1.IItr < v2.IItr;
-		}
-		friend bool operator>=(const this_type& v1, const this_type& v2) {
-			return v1.IItr >= v2.IItr;
-		}
-		friend bool operator<=(const this_type& v1, const this_type& v2) {
-			return v1.IItr <= v2.IItr;
-		}
-	};
+	}
+	template<typename iterator_, typename index_iterator_>
+	using index_access_iterator = transform_iterator<index_iterator_, iterators::detail::index_iterator_access<iterator_>>;
+	template<typename iterator_, typename index_iterator_>
+	using index_access_range = transform_range<index_iterator_, iterators::detail::index_iterator_access<iterator_>>;
 
-	template<typename random_access_iterator, typename index_iterator>
-	auto make_index_access_iterator(random_access_iterator itr, index_iterator iitr) { return index_access_iterator<random_access_iterator, index_iterator>(itr, iitr); }
+	template<typename iterator_, typename index_iterator_>
+	auto make_index_access_iterator(iterator_ TergetItr, index_iterator_ IndexItr) {
+		return index_access_iterator<iterator_, index_iterator_>(
+			IndexItr,
+			iterators::detail::index_iterator_access<iterator_>(TergetItr)
+			);
+	}
+	template<typename iterator_, typename index_iterator_>
+	auto make_index_access_range(iterator_ TergetItr, index_iterator_ IndexBegin, index_iterator_ IndexEnd) {
+		return index_access_range<iterator_, index_iterator_>(
+			IndexBegin, IndexEnd,
+			iterators::detail::index_iterator_access<iterator_>(TergetItr)
+		);
+	}
 
-	template<typename random_access_iterator_, typename index_iterator_, typename index_iterator_category_ = typename std::iterator_traits<index_iterator_>::iterator_category>
-	struct index_access_range{
-		using base_iterator = random_access_iterator_;
-		using index_iterator = index_iterator_;
-	public:
-		using iterator = index_access_iterator<random_access_iterator_, index_iterator_, index_iterator_category_>;
-	private:
-		base_iterator Base;
-		index_iterator IBeg;
-		index_iterator IEnd;
-	public:
-		index_access_range() = default;
-		index_access_range(base_iterator Base_, index_iterator IBeg_, index_iterator IEnd_):Base(Base_), IBeg(IBeg_), IEnd(IEnd_) {}
-		iterator begin()const { return iterator(Base, IBeg); }
-		iterator end()const { return iterator(Base, IEnd); }
-	};
-	template<typename random_access_iterator_, typename index_iterator_>
-	struct index_access_range<random_access_iterator_, index_iterator_, std::random_access_iterator_tag> {
-		using base_iterator = random_access_iterator_;
-		using index_iterator = index_iterator_;
-	public:
-		using iterator = index_access_iterator<random_access_iterator_, index_iterator_, std::random_access_iterator_tag>;
-		using reference = typename std::iterator_traits<iterator>::reference;
-	private:
-		base_iterator Base;
-		index_iterator IBeg;
-		index_iterator IEnd;
-	public:
-		index_access_range() = default;
-		index_access_range(base_iterator Base_, index_iterator IBeg_, index_iterator IEnd_):Base(Base_), IBeg(IBeg_), IEnd(IEnd_) {}
-		iterator begin()const { return iterator(Base, IBeg); }
-		iterator end()const { return iterator(Base, IEnd); }
-		reference at(std::size_t Index)const { return Base[IBeg[Index]]; }
-		std::size_t size()const { return IEnd-IBeg; }
-	};
-	template<typename container, typename index_container>
-	auto make_index_access_range(container& Container, const index_container& IndexContainer) {
-		return index_access_range<decltype(Container.begin()), decltype(IndexContainer.cbegin())>(Container.begin(), IndexContainer.cbegin(), IndexContainer.end());
+	template<typename container_, typename index_iterator_>
+	using index_at_access_iterator = transform_iterator<index_iterator_, iterators::detail::index_at_access<container_>>;
+	template<typename container_, typename index_iterator_>
+	using index_at_access_range = transform_range<index_iterator_, iterators::detail::index_at_access<container_>>;
+
+	template<typename container_, typename index_iterator_>
+	auto make_index_at_access_iterator(container_& Container, index_iterator_ IndexItr) {
+		return index_access_iterator<container_, index_iterator_>(
+			IndexItr,
+			iterators::detail::index_at_access<container_>(Container)
+		);
 	}
-	template<typename container, typename index_container>
-	auto make_index_access_range(const container& Container, const index_container& IndexContainer) {
-		return index_access_range<decltype(Container.cbegin()), decltype(IndexContainer.cbegin())>(Container.cbegin(), IndexContainer.cbegin(), IndexContainer.end());
+	template<typename container_, typename index_iterator_>
+	auto make_index_at_access_range(container_& Container, index_iterator_ IndexBegin, index_iterator_ IndexEnd) {
+		return index_at_access_range<container_, index_iterator_>(
+			IndexBegin, IndexEnd,
+			iterators::detail::index_at_access<container_>(Container)
+		);
 	}
-	template<typename iterator, typename index_container, typename std::enable_if<std::is_same<typename std::iterator_traits<iterator>::type, std::random_access_iterator_tag>::value>::type>
-	auto make_index_access_range(iterator Itr, const index_container& IndexContainer) {
-		return index_access_range<iterator, decltype(IndexContainer.cbegin())>(Itr, IndexContainer.cbegin(), IndexContainer.end());
+
+	template<typename container_, typename index_iterator_>
+	using index_op_access_iterator = transform_iterator<index_iterator_, iterators::detail::index_op_access<container_>>;
+	template<typename container_, typename index_iterator_>
+	using index_op_access_range = transform_range<index_iterator_, iterators::detail::index_op_access<container_>>;
+
+	template<typename container_, typename index_iterator_>
+	auto make_index_op_access_iterator(container_& Container, index_iterator_ IndexItr) {
+		return index_access_iterator<container_, index_iterator_>(
+			IndexItr,
+			iterators::detail::index_op_access<container_>(Container)
+		);
 	}
-	template<typename iterator, typename index_iterator, typename std::enable_if<std::is_same<typename std::iterator_traits<iterator>::type, std::random_access_iterator_tag>::value>::type>
-	auto make_index_access_range(iterator Itr, index_iterator IndexBegin, index_iterator IndexEnd) {
-		return index_access_range<iterator, index_iterator>(Itr, IndexBegin, IndexEnd);
+	template<typename container_, typename index_iterator_>
+	auto make_index_op_access_range(container_& Container, index_iterator_ IndexBegin, index_iterator_ IndexEnd) {
+		return index_op_access_range<container_, index_iterator_>(
+			IndexBegin, IndexEnd,
+			iterators::detail::index_op_access<container_>(Container)
+		);
 	}
 }
 #

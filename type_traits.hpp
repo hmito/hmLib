@@ -46,21 +46,37 @@ namespace hmLib{
 		using type = typename check<terget, void>::ans_type;
 	};
 
-	namespace detail {
-		struct has_begin_and_end_impl {
-			template <class T>
-			static auto check(T&& x)->decltype(x.begin(), x.end(), std::true_type{});
-			template <class T>
-			static auto check(...)->std::false_type;
-		};
-	}
-	template <class T>
-	class has_begin_and_end :public decltype(detail::has_begin_and_end_impl::check<T>(std::declval<T>())) {};
+	template <typename T>
+	struct has_begin_and_end {
+	private:
+		template <class U>
+		static auto check(U&& x)->decltype(x.begin(), x.end(), std::true_type{});
+		static auto check(...)->std::false_type;
+	public:
+		using type = decltype(check(std::declval<typename std::decay<T>::type>()));
+		constexpr static bool value = type::value;
+	};
 
-	template<typename iterator>
-	using is_const_iterator = typename std::is_const<
-		typename std::remove_reference<typename std::iterator_traits<iterator>::reference>::type
-	>::type;
+	template<typename T>
+	struct is_iterator{
+	private:
+		template<typename U>
+		static auto check(U&&)->decltype(typename std::iterator_traits<U>::iterator_category{}, std::true_type{});
+		static auto check(...)->std::false_type;
+	public:
+		using type = decltype(check(std::declval<typename std::decay<T>::type>()));
+		constexpr static bool value = type::value;
+	};
+
+	template<typename T, bool is_iterator_ = is_iterator<T>::value>
+	struct is_const_iterator: public std::false_type {};
+
+	template<typename T>
+	struct is_const_iterator<T, true> {
+	public:
+		using type = std::integral_constant<bool, std::is_assignable<decltype(*std::declval<T>()), typename std::iterator_traits<T>::value_type>::value>;
+		constexpr static bool value = type::value;
+	};
 }
 #
 #endif

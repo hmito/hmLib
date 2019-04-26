@@ -4,10 +4,13 @@
 #include<array>
 #include<algorithm>
 #include<numeric>
+#include<cmath>
 #include<initializer_list>
 #include<type_traits>
 #include"utility.hpp"
 namespace hmLib {
+	//order of varray: same with multiarray
+	// [0,0] < [0,1] < [1,0]
 	template<typename T, std::size_t N>
 	struct varray {
 	private:
@@ -52,13 +55,6 @@ namespace hmLib {
 				*oitr = static_cast<T>(*itr);
 			}
 		}
-/*		template<typename U, typename std::enable_if<std::is_convertible<U, T>::value>::type*& = hmLib::utility::enabler>
-		this_type& operator=(const varray<U, N>& other) {
-			if(&other!=this) {
-				std::copy(other.begin(), other.end(), Arr.begin());
-			}
-			return *this;
-		}*/
 	public:
 		reference at(size_type n) { return Arr.at(n); }
 		constexpr const_reference at(size_type n)const{ return Arr.at(n); }

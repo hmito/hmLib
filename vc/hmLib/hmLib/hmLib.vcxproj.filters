@@ -61,6 +61,9 @@
     <Filter Include="hmLib\gates\comgate">
       <UniqueIdentifier>{8631be19-6e7d-430a-ba4e-4cb6372d84c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\csv">
+      <UniqueIdentifier>{f90a09b8-52b4-4c50-b330-5b5f50932922}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="use_odeint.cpp">
@@ -269,15 +272,6 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\inserter.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\streambuf_interface.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -317,9 +311,6 @@
     <ClInclude Include="..\..\..\coordinates.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\csv_iterator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\date.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -348,9 +339,6 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inquiries.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iocsv.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\iterators.hpp">
@@ -419,9 +407,6 @@
     <ClInclude Include="..\..\..\geometry\segment.hpp">
       <Filter>hmLib\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\math\factorial.hpp">
-      <Filter>hmLib\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\geometry\point.hpp">
       <Filter>hmLib\geometry</Filter>
     </ClInclude>
@@ -434,17 +419,80 @@
     <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\lattices\indexer.hpp">
       <Filter>hmLib\lattices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\lattices\torus_iterator.hpp">
       <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\clone_ptrproxy.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\multiaxis.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\keep_if.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp">
+      <Filter>hmLib\lattices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\inserter.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\range.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\transform_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\zip_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\math\combinatorics.hpp">
+      <Filter>hmLib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hash.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\block_vector.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csvbase.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csv_iterator.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csv_table.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\csvline.hpp">
+      <Filter>hmLib\csv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\block_vector.hpp">
+      <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
