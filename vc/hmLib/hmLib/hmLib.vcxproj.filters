@@ -473,9 +473,6 @@
     <ClInclude Include="..\..\..\hash.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\block_vector.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\csv\csvbase.hpp">
       <Filter>hmLib\csv</Filter>
     </ClInclude>
