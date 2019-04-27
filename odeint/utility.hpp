@@ -117,6 +117,35 @@ namespace hmLib{
 		void try_adjust_size(stepper& Stepper, state_type& State) {
 			detail::try_adjust_size_impl<typename std::decay<stepper>::type, typename std::decay<state_type>::type>()(Stepper, std::forward<state_type>(State));
 		}
+		namespace detail {
+			template<typename stepper_>
+			struct can_reset {
+			private:
+				template<typename T>
+				static auto check(T)->decltype(
+					std::declval<T>().reset(),
+					std::true_type{}
+				);
+				static auto check(...)->std::false_type;
+			public:
+				using type = decltype(check(std::declval<stepper_>()));
+				static constexpr bool value = type::value;
+			};
+			template<typename stepper_, bool can_reset = can_reset<stepper_>::value>
+			struct try_reset_impl {
+				template<typename stepper>
+				void operator()(stepper& Stepper) {Stepper.reset();}
+			};
+			template<typename stepper_>
+			struct try_reset_impl <stepper_, false> {
+				template<typename stepper>
+				void operator()(stepper& Stepper) {}
+			};
+		}
+		template<typename stepper>
+		void try_reset(stepper& Stepper) {
+			detail::try_reset_impl<typename std::decay<stepper>::type>()(Stepper);
+		}
 
 		namespace detail {
 			template<typename state, hmLib_static_restrict(has_begin_and_end<state>::value)>

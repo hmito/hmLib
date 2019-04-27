@@ -6,77 +6,30 @@ namespace hmLib {
 	namespace odeint {
 		enum struct interfere_request: unsigned int{
 			none=0, 
-			terminate=1,
-			initialize=2,
-			resize_and_initialize=3,
-			restep = 4, 
-			restep_with_dt = 5
+			breakable=1,
+			reset=2,
+			initialize = 3
+			//breakable: terminate integration (effective only in brakeable_intergare functions)
+			//reset: try to initlize the stepper with newx, t and dt and resize.
+			//initialize: try to initialize the stepper with newx, t and dt. (not adequate for resize)
 		};
-		namespace interferes {
-			namespace detail {
-				inline bool is_termination_requested(interfere_request req) {
-					return req == interfere_request::terminate;
+		namespace detail {
+/*			template<typename stepper, typename sys, typename state_type, typename time_type>
+			bool check_interfere(stepper& Stepper, sys& Sys, const state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
+				req = Sys.interfere(State, Time, dT, NewState);
+				switch(req) {
+				case interfere_request::breakable:
+					return true;
+				case interfere_request::reset:
+					try_reset(Stepper);
+					return false;
+				case interfere_request::initialize:
+					try_initialize(Stepper, Sys, Time, dT, NewState);
+					return false;
+				default:
+					return false;
 				}
-				inline bool is_initializing_requested(interfere_request req) {
-					return req == interfere_request::initialize || req==interfere_request::resize_and_initialize;
-				}
-				inline bool is_restep_requested(interfere_request req) {
-					return req==interfere_request::restep || req==interfere_request::restep_with_dt;
-				}
-				inline bool should_use_dt_on_restep(interfere_request req) {
-					return req==interfere_request::restep_with_dt;
-				}
-				template<typename stepper, typename sys, typename state_type, typename time_type>
-				bool excute(interfere_request req, stepper& Stepper, sys& Sys, const state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
-					switch(req) {
-					case interfere_request::none:
-						return false;
-					case interfere_request::terminate:
-						return true;
-					case interfere_request::initialize:
-						//State = NewState;
-						try_initialize(Stepper, Sys, NewState, Time, dT);
-						return false;
-					case interfere_request::resize_and_initialize:
-						//State = NewState;
-						try_adjust_size(Stepper, State);
-						try_initialize(Stepper, Sys, NewState, Time, dT);
-						return false;
-					default:
-						return false;
-					}
-				}
-				template<typename stepper, typename sys, typename state_type, typename time_type>
-				bool interfere_and_excute(interfere_request& req, stepper& Stepper, sys& Sys, const state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
-					req = Sys.interfere(State, Time, dT, NewState);
-					return excute(req, Stepper, Sys, State, Time, dT, NewState);
-				}
-				template<typename stepper, typename sys, typename state_type, typename time_type>
-				bool excute(interfere_request req, stepper& Stepper, sys& Sys, state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
-					switch(req) {
-					case interfere_request::none:
-						return false;
-					case interfere_request::terminate:
-						return true;
-					case interfere_request::initialize:
-						State = NewState;
-						try_initialize(Stepper, Sys, NewState, Time, dT);
-						return false;
-					case interfere_request::resize_and_initialize:
-						State = NewState;
-						try_adjust_size(Stepper, State);
-						try_initialize(Stepper, Sys, NewState, Time, dT);
-						return false;
-					default:
-						return false;
-					}
-				}
-				template<typename stepper, typename sys, typename state_type, typename time_type>
-				bool interfere_and_excute(interfere_request& req, stepper& Stepper, sys& Sys, state_type& State, time_type& Time, time_type& dT, state_type& NewState) {
-					req = Sys.interfere(State, Time, dT, NewState);
-					return excute(req, Stepper, Sys, State, Time, dT, NewState);
-				}
-			}
+			}*/
 		}
 		/*=== interfere_systme ===
 		template<typename state_type,typename time_type>
