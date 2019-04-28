@@ -1,10 +1,10 @@
 #ifndef HMLIB_ODEINT_INTERFERE_INTERFERESTEPPER_INC
 #define HMLIB_ODEINT_INTERFERE_INTERFERESTEPPER_INC 100
 #
-#include"interfere_type.hpp"
 #include<boost/numeric/odeint/stepper/controlled_step_result.hpp>
 #include<boost/numeric/odeint/util/unwrap_reference.hpp>
 #include<boost/numeric/odeint/stepper/stepper_categories.hpp>
+#include"interfere.hpp"
 namespace hmLib {
 	namespace odeint {
 		template<typename base_stepper_, typename stepper_category_>
@@ -17,39 +17,61 @@ namespace hmLib {
 			using time_type = typename base_stepper::time_type;
 			using order_type = typename base_stepper::order_type;
 			using stepper_category = boost::numeric::odeint::stepper_tag;
-		public:
-			interfere_stepper(base_stepper Stepper_) :CanBreak(false), Stepper(std::move(Stepper_)) {}
+		public:// stepper functions
+			interfere_stepper(base_stepper Stepper_) :IsInitialized(false), CanBreak(false), Stepper(std::move(Stepper_)) {}
 			order_type order()const { return Stepper.order(); }
 			template<typename sys_type>
 			void do_step(sys_type sys, state_type& x, time_type t, time_type dt) {
-				Stepper.do_step(sys, x, t, dt);
+				if (!IsInitialized) {
+					initialize(sys, x, t, dt);
+				}
 
+				Stepper.do_step(sys, x, t, dt);
+				interfere(sys, x, t, dt);
+			}
+		public:// interfere functions
+			base_stepper& base() { return Stepper; }
+			bool can_break()const { return CanBreak; }
+			bool is_initialized()const { return IsInitialized; }
+			template<typename sys_type>
+			void initialize(sys_type sys, state_type& x, time_type t, time_type dt) {
+				IsInitialized = true;
+				CanBreak = false;
+
+				interfere(sys, x, t, dt);
+				if(can_break())return;
+
+				try_initialize(Stepper, sys, x, t, dt);
+			}
+			void reset() {
+				IsInitialized = false;
+				try_reset(Stepper);
+			}
+		private:
+			template<typename sys_type>
+			void interfere(sys_type sys, state_type& x, time_type t, time_type dt) {
 				interfere_request req = sys.interfere(x, t, dt, nx);
 				switch (req) {
 				case interfere_request::breakable:
 					CanBreak = true;
-					break;
+					return;
 				case interfere_request::reset:
 					try_reset(Stepper);
 					boost::numeric::odeint::copy(nx, x);
 					CanBreak = false;
-					break;
+					return;
 				case interfere_request::initialize:
-					try_reset(Stepper);
+					try_initialize(Stepper, sys, x,t,dt);
 					boost::numeric::odeint::copy(nx, x);
 					CanBreak = false;
-					break;
+					return;
 				default:
 					CanBreak = false;
-					break;
+					return;
 				}
 			}
-			bool can_break()const { return CanBreak; }
-			void reset() {
-				CanBreak = false;
-				try_reset(Stepper);
-			}
 		private:
+			bool IsInitialized;
 			bool CanBreak;
 			base_stepper Stepper;
 			state_type nx;
