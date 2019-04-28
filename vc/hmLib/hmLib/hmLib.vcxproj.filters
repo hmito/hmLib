@@ -494,14 +494,14 @@
     <ClInclude Include="..\..\..\odeint\interfere\interfere_stepper.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\integrate\braekable_integrate_adaptive.hpp">
-      <Filter>hmLib\odeint\integrate</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\integrate\braekable_integrate_const.hpp">
-      <Filter>hmLib\odeint\integrate</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\interfere\interfere.hpp">
       <Filter>hmLib\odeint\interfere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_adaptive.hpp">
+      <Filter>hmLib\odeint\integrate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp">
+      <Filter>hmLib\odeint\integrate</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

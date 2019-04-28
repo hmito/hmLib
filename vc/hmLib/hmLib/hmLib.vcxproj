@@ -113,8 +113,8 @@
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
-    <ClInclude Include="..\..\..\odeint\integrate\braekable_integrate_adaptive.hpp" />
-    <ClInclude Include="..\..\..\odeint\integrate\braekable_integrate_const.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_adaptive.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp" />
     <ClInclude Include="..\..\..\odeint\interfere.hpp" />
     <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp" />
     <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp" />

@@ -13,47 +13,54 @@ namespace hmLib {
 		namespace detail {
 			namespace boost_odeint = boost::numeric::odeint;
 			// forward declaration
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_adaptive(
-				Stepper stepper, System system, State& start_state,
-				Time& start_time, Time end_time, Time& dt,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			std::tuple<size_t, Time, bool> integrate_adaptive(
+				Stepper stepper, System system, Breaker breaker, State& start_state,
+				Time& start_time, Time end_time, Time& dt, 
 				Observer observer, boost_odeint::controlled_stepper_tag
 			);
 
 
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_const(
-				Stepper stepper, System system, State& start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			std::tuple<size_t, Time, bool> integrate_const(
+				Stepper stepper, System system, Breaker breaker, State& start_state,
 				Time start_time, Time end_time, Time dt,
 				Observer observer, boost_odeint::stepper_tag
-			)
-			{
+			){
 
 				typename boost_odeint::unwrap_reference< Observer >::type& obs = observer;
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
 
 				Time time = start_time;
 				int step = 0;
+				bool IsBreak = false;
 				// cast time+dt explicitely in case of expression templates (e.g. multiprecision)
 				while (boost_odeint::detail::less_eq_with_sign(static_cast<Time>(time + dt), end_time, dt))
 				{
 					obs(start_state, time);
 					st.do_step(system, start_state, time, dt);
+
 					// direct computation of the time avoids error propagation happening when using time += dt
 					// we need clumsy type analysis to get boost units working here
 					++step;
 					time = start_time + static_cast<typename unit_value_type<Time>::type>(step) * dt;
+
+					// check breaker condition
+					if (breaker(start_state, time)) {
+						IsBreak = true;
+						break;
+					}
 				}
 				obs(start_state, time);
 
-				return step;
+				return std::make_tuple(step, time, IsBreak);
 			}
 
 
 
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_const(
-				Stepper stepper, System system, State& start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			std::tuple<size_t, Time, bool> integrate_const(
+				Stepper stepper, System system, Breaker breaker, State& start_state,
 				Time start_time, Time end_time, Time dt,
 				Observer observer, boost_odeint::controlled_stepper_tag
 			)
@@ -64,18 +71,27 @@ namespace hmLib {
 				const Time time_step = dt;
 				int real_steps = 0;
 				int step = 0;
+				bool IsBreak = false;
 
 				while (boost_odeint::detail::less_eq_with_sign(static_cast<Time>(time + time_step), end_time, dt))
 				{
 					obs(start_state, time);
 					// integrate_adaptive_checked uses the given checker to throw if an overflow occurs
-					real_steps += detail::integrate_adaptive(stepper, system, start_state, time,
+					auto ans = integrate_adaptive(stepper, system, breaker, start_state, time,
 						static_cast<Time>(time + time_step), dt,
 						boost_odeint::null_observer(), boost_odeint::controlled_stepper_tag());
+					real_steps += std::get<0>(ans);
 					// direct computation of the time avoids error propagation happening when using time += dt
 					// we need clumsy type analysis to get boost units working here
 					step++;
 					time = start_time + static_cast<typename boost_odeint::unit_value_type<Time>::type>(step) * time_step;
+
+					if (std::get<2>(ans)) {
+						//overwrite end time by break time
+						time = std::get<1>(ans);
+						IsBreak = true;
+						break;
+					}
 				}
 				obs(start_state, time);
 
@@ -83,9 +99,9 @@ namespace hmLib {
 			}
 
 
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_const(
-				Stepper stepper, System system, State & start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			std::tuple<size_t, Time, bool> integrate_const(
+				Stepper stepper, System system, Breaker breaker, State& start_state,
 				Time start_time, Time end_time, Time dt,
 				Observer observer, boost_odeint::dense_output_stepper_tag
 			)
@@ -101,6 +117,7 @@ namespace hmLib {
 
 				int obs_step(1);
 				int real_step(0);
+				bool IsBreak = false;
 
 				while (boost_odeint::detail::less_eq_with_sign(static_cast<Time>(time + dt), end_time, dt))
 				{
@@ -111,7 +128,7 @@ namespace hmLib {
 						++obs_step;
 						// direct computation of the time avoids error propagation happening when using time += dt
 						// we need clumsy type analysis to get boost units working here
-						time = start_time + static_cast<typename unit_value_type<Time>::type>(obs_step) * dt;
+						time = start_time + static_cast<typename boost_odeint::unit_value_type<Time>::type>(obs_step) * dt;
 					}
 					// we have not reached the end, do another real step
 					if (boost_odeint::detail::less_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()),
@@ -122,6 +139,7 @@ namespace hmLib {
 						{
 							st.do_step(system);
 							++real_step;
+							if(breaker(st.current_state(), st.current_time()))
 						}
 					}
 					else if (boost_odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step()))

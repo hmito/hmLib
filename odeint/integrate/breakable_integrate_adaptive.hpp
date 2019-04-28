@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include <boost/throw_exception.hpp>
-
+#include <boost/numeric/odeint/integrate/integrate_const.hpp>
 #include <boost/numeric/odeint/stepper/stepper_categories.hpp>
 #include <boost/numeric/odeint/stepper/controlled_step_result.hpp>
 #include <boost/numeric/odeint/integrate/max_step_checker.hpp>
@@ -20,18 +20,18 @@ namespace hmLib {
 		namespace detail {
 			namespace boost_odeint = boost::numeric::odeint;
 			// forward declaration
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_const(
-				Stepper stepper, System system, State& start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			Time integrate_const(
+				Stepper stepper, System system, Breaker breaker, State& start_state,
 				Time start_time, Time end_time, Time dt,
 				Observer observer, boost_odeint::stepper_tag);
 
 			/*
 				* integrate_adaptive for simple stepper is basically an integrate_const + some last step
 				*/
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_adaptive(
-				Stepper stepper, System system, State& start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			Time integrate_adaptive(
+				Stepper stepper, System system, Breaker breaker, State& start_state,
 				Time start_time, Time end_time, Time dt,
 				Observer observer, boost_odeint::stepper_tag)
 			{
@@ -54,9 +54,9 @@ namespace hmLib {
 			/*
 				* integrate adaptive for controlled stepper
 				*/
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_adaptive(
-				Stepper stepper, System system, State & start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			Time integrate_adaptive(
+				Stepper stepper, System system, Breaker breaker, State & start_state,
 				Time & start_time, Time end_time, Time & dt,
 				Observer observer, boost_odeint::controlled_stepper_tag
 			)
@@ -94,9 +94,9 @@ namespace hmLib {
 				*
 				* step size control is used if the stepper supports it
 				*/
-			template< class Stepper, class System, class State, class Time, class Observer >
-			size_t integrate_adaptive(
-				Stepper stepper, System system, State & start_state,
+			template< class Stepper, class System, class Breaker, class State, class Time, class Observer >
+			Time integrate_adaptive(
+				Stepper stepper, System system, Breaker breaker, State & start_state,
 				Time start_time, Time end_time, Time dt,
 				Observer observer, boost_odeint::dense_output_stepper_tag)
 			{
