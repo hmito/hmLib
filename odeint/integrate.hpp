@@ -3,7 +3,7 @@
 #
 #include "integrate/integrate_const.hpp"
 #include "integrate/integrate_adaptive.hpp"
-#include "breakable_integrate/integrate_const.hpp"
-#include "breakable_integrate/integrate_adaptive.hpp"
+#include "integrate/breakable_integrate_const.hpp"
+#include "integrate/breakable_integrate_adaptive.hpp"
 #
 #endif

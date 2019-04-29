@@ -195,7 +195,7 @@ namespace hmLib{
 			double maximum_absolute_error(const state_type& v1, const state_type& v2) {
 				state_type err;
 				boost::numeric::odeint::adjust_size_by_resizeability(err, v1, typename boost::numeric::odeint::is_resizeable<state_type>::type());
-				return maximum_absolute_error(err, v1, v2);
+				return maximum_absolute_error<state_type, argebra_type,operations_type>(err, v1, v2);
 			}
 		}
 	}

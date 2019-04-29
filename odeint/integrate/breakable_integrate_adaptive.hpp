@@ -31,7 +31,7 @@ namespace hmLib {
 				Time start_time, Time end_time, Time dt, Breaker breaker,
 				Observer observer, stepper_tag)
 			{
-				auto ans = detail::breakable_integrate_const(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_tag());
+				auto ans = breakable_integrate_const(stepper, sys, start_state, start_time, end_time, dt, breaker, observer, stepper_tag());
 				//if break is detected, end immidiately.
 				if (std::get<0>(ans))return ans;
 
@@ -68,7 +68,7 @@ namespace hmLib {
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
 
 				// check breaker condition with the initial state
-				bool IsBreak = breaker(start_state, start_time));
+				bool IsBreak = breaker(start_state, start_time);
 
 				boost_odeint::failed_step_checker fail_checker;  // to throw a runtime_error if step size adjustment fails
 				size_t step = 0;
@@ -85,12 +85,12 @@ namespace hmLib {
 					{
 						res = st.try_step(sys, start_state, start_time, dt);
 						fail_checker();  // check number of failed steps
-					} while (res == fail);
+					} while (res == boost_odeint::controlled_step_result::fail);
 					fail_checker.reset();  // if we reach here, the step was successful -> reset fail checker
 
 					++step;
 
-					IsBreak = breaker(start_state, start_time));
+					IsBreak = breaker(start_state, start_time);
 				}
 				obs(start_state, start_time);
 
@@ -108,7 +108,7 @@ namespace hmLib {
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
 
 				// check breaker condition with the initial state
-				bool IsBreak = breaker(start_state, start_time));
+				bool IsBreak = breaker(start_state, start_time);
 
 				size_t count = 0;
 				st.initialize(start_state, start_time, dt);
@@ -144,7 +144,7 @@ namespace hmLib {
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
 
 				// check breaker condition with the initial state
-				bool IsBreak = breaker(start_state, start_time));
+				bool IsBreak = breaker(start_state, start_time);
 
 				size_t count = 0;
 				st.initialize(start_state, start_time, dt);
@@ -180,7 +180,7 @@ namespace hmLib {
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
 
 				// check breaker condition with the initial state
-				bool IsBreak = breaker(start_state, start_time));
+				bool IsBreak = breaker(start_state, start_time);
 
 				boost_odeint::failed_step_checker fail_checker;  // to throw a runtime_error if step size adjustment fails
 				size_t count = 0;
@@ -195,7 +195,7 @@ namespace hmLib {
 					st.do_step(sys, start_state, start_time, dt);
 					++count;
 
-					IsBreak = breaker(start_state, start_time));
+					IsBreak = breaker(start_state, start_time);
 				}
 				obs(start_state, start_time);
 				return std::make_tuple(IsBreak, count, start_time);

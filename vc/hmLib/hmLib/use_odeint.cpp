@@ -2,100 +2,57 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<cmath>
+#include<fstream>
 #include<boost/numeric/odeint.hpp>
 #include"../../../odeint/varray_wrapper.hpp"
 #include"../../../odeint.hpp"
 #include"../../../varray.hpp"
-#include"../../../tuple.hpp"
-#include"../../../lattices.hpp"
-/*
-std::ostream& operator<<(std::ostream& out, const hmLib::varray<double, 2>& v) {
-	out<<"("<<v[0]<<", "<<v[1]<<")";
-	return out;
-}
-struct my_system1 {
+
+struct circle_dysys {
 	using state = hmLib::varray<double, 2>;
-	void operator()(const state& x, state& dx, double t) {
-		dx[0] = 1;
-		dx[1] = 1;
-		//std::cout<<"1"<<std::endl;
+	using result = hmLib::odeint::validate_result;
+	void operator()(const state& x, state& dx, double t)const {
+		double r2 = (x[0] - 1.0) * (x[0] - 1.0) + (x[1] - 0.8) * (x[1] - 0.8);
+		dx[0] = x[1] - 0.8;
+		dx[1] = -(x[0] - 1.0);
+	}
+	bool is_invalid_step(const state& x, double t)const {
+		if (x[0] < 0 || x[1] < 0)return true;
+		return false;
+	}
+	result validate(const state& x1, const state& x2, double t, state& nx)const {
+		nx = x2;
+		nx[0] = std::max(0.0, nx[0]);
+		nx[1] = std::max(0.0, nx[1]);
+
+		return result::assigned;
+	}
+	result validate(const state& x, double t, state& nx)const {
+		result res = result::none;
+		if (x[0] < 0 || x[1] < 0) {
+			nx = x;
+			nx[0] = std::max(0.0, nx[0]);
+			nx[1] = std::max(0.0, nx[1]);
+			res = result::assigned;
+		}
+		return res;
 	}
 };
-struct my_system2 {
-	using state = hmLib::varray<double, 2>;
-	void operator()(const state& x, state& dx, double t) {
-		dx[0] = 1;
-		dx[1] = -1;
-		//std::cout<<"2"<<std::endl;
-	}
-};
-struct my_system3 {
-	using state = hmLib::varray<double, 2>;
-	void operator()(const state& x, state& dx, double t) {
-		dx[0] = -1;
-		dx[1] = 0;
-		//std::cout<<"3"<<std::endl;
-	}
-};
-struct interferer {
-	using state = hmLib::varray<double, 2>;
-	hmLib::odeint::interfere_type operator()(const state& x, state& ix, double t) {
-		if(x.at(1)>1)return hmLib::odeint::interfere_type::terminate;
-		return hmLib::odeint::interfere_type::ignore;
-	}
-};
-int main() {
-	using state = hmLib::varray<double, 2>;
-	namespace bode = boost::numeric::odeint;
-	namespace hode = hmLib::odeint;
-	auto CmpSys = hode::system_switch(
-		hode::case_logical_and(
-			hode::state_at<state>(1, hode::case_lower_boundary(0.0)),
-			hode::state_at<state>(0, hode::case_greater_equal(-1.0))
-		), my_system3(),
-		hode::state_at<state>(0,hode::case_greater_equal(0.0)), my_system2(),
-		my_system1()
-	);
-
-	state x{ -1,0.1 };
-
-	CmpSys.update(x, 0);
-
-	using base_stepper_type = boost::numeric::odeint::runge_kutta_dopri5<state>;
-	auto Stepper = hmLib::odeint::make_composite_dense_output(1.0e-10, 1.0e-6, 1.0e-3, base_stepper_type());
-
-	hmLib::odeint::stream_observer Observer(std::cout,"\t");
-	interferer Interferer;
-
-	Stepper.initialize(x, 0, 0.01);
-	hode::interfere_integrate_const(Stepper, CmpSys, x, 0.0, 10.0, 0.1, Interferer, Observer);
-
-	system("pause");
-	return 0;
-}
-*/
-double f2(double a, double b) {
-	return a+b;
-}
-std::string f2(double a, int b) {
-	return "double_int";
-}
-int f2(int a, int b) {
-	return a+b;
-}
-std::string f2(const std::string& a, int b) {
-	std::string n;
-	for(int i = 0; i < b; ++i)n += a;
-	return n;
-}
-std::string f2(const std::string& a, const std::string& b) {
-	return a + b;
-}
 int main(void) {
-	auto Tuple1 = std::make_tuple(0.4, 0.7, "test", "std", 5);
-	auto Tuple2 = std::make_tuple(0.4, 5, "game", 4, 5);
+	using dysys = circle_dysys;
+	using state = typename dysys::state;
 
-	auto A = hmLib::tuple_for_each([](auto a, auto b) {return f2(a,b); }, Tuple1, Tuple2);
+	dysys Dysys;
+	state State{ 1.0,1.7 };
+	auto Stepper = hmLib::odeint::make_step_validate(0.001, 100, boost::numeric::odeint::make_dense_output(0.01, 0.01, boost::numeric::odeint::runge_kutta_dopri5<state>()));
+	std::ofstream fout("test.csv");
+	hmLib::odeint::stream_observer obs(fout);
+
+	obs(State, -1.0);
+	obs(state{0.5,0.5}, -0.5);
+	obs(State, 0.0);
+	hmLib::odeint::integrate_adaptive(Stepper, Dysys, State, 0.0, 10.0, 0.01, obs);
 
 	return 0;
 }

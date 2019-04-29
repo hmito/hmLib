@@ -12,15 +12,15 @@
 #include"validate_result.hpp"
 namespace hmLib {
 	namespace odeint {
-		template<typename base_stepper_, typename base_stepper_category_>
-		struct step_validate_stepper {};
 		template<typename base_stepper_>
-		struct step_validate_stepper<base_stepper_, stepper_tag> {
+		struct step_validate_stepper{
 			using base_stepper = base_stepper_;
 			using state_type = typename base_stepper::state_type;
 			using deriv_type = typename base_stepper::deriv_type;
 			using time_type = typename base_stepper::time_type;
 			using order_type = typename base_stepper::order_type;
+			using algebra_type = typename base_stepper::algebra_type;
+			using operations_type = typename base_stepper::operations_type;
 			using stepper_category = adaptive_stepper_tag;
 		public:// stepper functions
 			step_validate_stepper(base_stepper st_, double abs_error_, unsigned int max_binary_trial_) :st(std::move(st_)), abs_error(abs_error_), max_binary_trial(max_binary_trial_){}
@@ -70,7 +70,7 @@ namespace hmLib {
 						}
 
 						//error value check
-						if (detail::maximum_absolute_error(nx1, nx2) < abs_error || nt1 == nt2)break;
+						if (detail::maximum_absolute_error<state_type, algebra_type, operations_type>(nx1, nx2) < abs_error || nt1 == nt2)break;
 					}
 
 					//update arguments by new validated state
@@ -91,11 +91,11 @@ namespace hmLib {
 				validate_result res = sys.validate(x, t, nx1);
 				switch (res) {
 				case validate_result::assigned:
-					detail::move(nx1, x);
+					detail::move(std::move(nx1), x);
 					try_initialize(st, sys, x, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(nx1, x);
+					detail::move(std::move(nx1), x);
 					try_reset(st);
 					break;
 				}
@@ -112,17 +112,17 @@ namespace hmLib {
 			state_type nx1;
 			state_type nx2;
 		};
-		template<typename base_stepper_>
-		struct step_validate_stepper<base_stepper_, controlled_stepper_tag> {
-			using base_stepper = base_stepper_;
+		template<typename base_controlled_stepper_>
+		struct step_validate_controlled_stepper {
+			using base_stepper = base_controlled_stepper_;
 			using state_type = typename base_stepper::state_type;
 			using deriv_type = typename base_stepper::deriv_type;
 			using time_type = typename base_stepper::time_type;
-			using order_type = typename base_stepper::order_type;
+			using algebra_type = typename base_stepper::algebra_type;
+			using operations_type = typename base_stepper::operations_type;
 			using stepper_category = adaptive_stepper_tag;
 		public:// stepper functions
-			step_validate_stepper(base_stepper st_, double abs_error_, unsigned int max_binary_trial_) :st(std::move(st_)), abs_error(abs_error_), max_binary_trial(max_binary_trial_) {}
-			order_type order()const { return st.order(); }
+			step_validate_controlled_stepper(base_stepper st_, double abs_error_, unsigned int max_binary_trial_) :st(std::move(st_)), abs_error(abs_error_), max_binary_trial(max_binary_trial_) {}
 			template<typename sys_type>
 			bool do_step(sys_type sys, state_type& x, time_type& t, time_type& dt) {
 				detail::resize_and_copy(x, x0);
@@ -178,7 +178,7 @@ namespace hmLib {
 						}
 
 						//error value check
-						if (detail::maximum_absolute_error(nx1, nx2) < abs_error || nt1 == nt2)break;
+						if (detail::maximum_absolute_error<state_type, algebra_type, operations_type>(nx1, nx2) < abs_error || nt1 == nt2)break;
 					}
 
 					//update arguments by new validated state
@@ -199,11 +199,11 @@ namespace hmLib {
 				validate_result res = sys.validate(x, t, nx1);
 				switch (res) {
 				case validate_result::assigned:
-					detail::move(nx1, x);
+					detail::move(std::move(nx1), x);
 					try_initialize(st, sys, x, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(nx1, x);
+					detail::move(std::move(nx1), x);
 					try_reset(st);
 					break;
 				}
@@ -218,15 +218,17 @@ namespace hmLib {
 			state_type nx1;
 			state_type nx2;
 		};
-		template<typename base_stepper_>
-		struct step_validate_stepper<base_stepper_, dense_output_stepper_tag> {
-			using base_stepper = base_stepper_;
+		template<typename base_dense_output_stepper_>
+		struct step_validate_dense_output_stepper {
+			using base_stepper = base_dense_output_stepper_;
 			using state_type = typename base_stepper::state_type;
 			using deriv_type = typename base_stepper::deriv_type;
 			using time_type = typename base_stepper::time_type;
+			using algebra_type = typename base_stepper::algebra_type;
+			using operations_type = typename base_stepper::operations_type;
 			using stepper_category = semidense_output_stepper_tag;
 		public:
-			step_validate_stepper(base_stepper st_, double abs_error_, unsigned int max_binary_trial_) :Result(validate_result::none), st(std::move(st_)), abs_error(abs_error_), max_binary_trial(max_binary_trial_) {}
+			step_validate_dense_output_stepper(base_stepper st_, double abs_error_, unsigned int max_binary_trial_) :Result(validate_result::none), st(std::move(st_)), abs_error(abs_error_), max_binary_trial(max_binary_trial_) {}
 			void initialize(const state_type& x, time_type t, time_type dt) {
 				st.initialize(x, t, dt);
 				Result = validate_result::none;
@@ -247,7 +249,7 @@ namespace hmLib {
 				if (sys.is_invalid_step(st.current_state(), st.current_time())) {
 					time_type nt1 = step_range.first;
 					detail::resize(st.current_state(), nx1);
-					nx1 = st.calc_state(nt1, nx1);
+					st.calc_state(nt1, nx1);
 
 					//initial state is invalid
 					if (sys.is_invalid_step(nx1, nt1)) {
@@ -268,16 +270,16 @@ namespace hmLib {
 						st.calc_state(nt, nx);
 
 						if (sys.is_invalid_step(nx, nt)) {
-							detail::swap(nx1,nx);
-							nt1 = nt;
+							detail::swap(nx2,nx);
+							nt2 = nt;
 						}
 						else {
-							detail::swap(nx2, nx);
-							nt2 = nt;
+							detail::swap(nx1, nx);
+							nt1 = nt;
 						}
 
 						//error value check
-						if (detail::maximum_absolute_error(nx1, nx2) < abs_error || nt1 == nt2)break;
+						if (detail::maximum_absolute_error<state_type, algebra_type, operations_type>(nx1, nx2) < abs_error || nt1 == nt2)break;
 					}
 
 					//update arguments by new validated state
@@ -285,7 +287,7 @@ namespace hmLib {
 					Result = sys.validate(nx1, nx2, nt, nx);
 					if (Result == validate_result::none)Result = validate_result::assigned;
 
-					step_range.second = nt1;
+					step_range.second = nt;
 
 					return step_range;
 				}
@@ -297,11 +299,11 @@ namespace hmLib {
 				st.calc_state(t, x);
 			}
 			template<typename sys_type>
-			void calc_state(sys_type sys, time_type t, state_type& x)const {
+			void calc_state(sys_type sys, time_type t, state_type& x) {
 				st.calc_state(t, x);
-				auto Result = sys.validate(x, t, nx);
-				if (Result != validate_result::none) {
-					detail::move(nx,x);
+				auto TmpResult = sys.validate(x, t, nx);
+				if (TmpResult != validate_result::none) {
+					detail::move(std::move(nx),x);
 				}
 			}
 			const state_type& current_state()const {
@@ -330,11 +332,32 @@ namespace hmLib {
 			state_type nx2;
 		};
 
+		namespace detail {
+			template<typename stepper_>
+			auto make_step_validate_impl(double abs_error_, unsigned int max_binary_trial_, const stepper_& Stepper_, stepper_tag) {
+				using stepper = typename std::decay<typename boost::numeric::odeint::unwrap_reference<stepper_>::type>::type;
+				return step_validate_stepper<stepper>(Stepper_, abs_error_, max_binary_trial_);
+			}
+			template<typename stepper_>
+			auto make_step_validate_impl(double abs_error_, unsigned int max_binary_trial_, const stepper_& Stepper_, controlled_stepper_tag) {
+				using stepper = typename std::decay<typename boost::numeric::odeint::unwrap_reference<stepper_>::type>::type;
+				return step_validate_controlled_stepper<stepper>(Stepper_, abs_error_, max_binary_trial_);
+			}
+			template<typename stepper_>
+			auto make_step_validate_impl(double abs_error_, unsigned int max_binary_trial_, const stepper_& Stepper_, dense_output_stepper_tag) {
+				using stepper = typename std::decay<typename boost::numeric::odeint::unwrap_reference<stepper_>::type>::type;
+				return step_validate_dense_output_stepper<stepper>(Stepper_, abs_error_, max_binary_trial_);
+			}
+			template<typename stepper_>
+			auto make_step_validate_impl(stepper_&& Stepper_, ...) {
+				static_assert(false, "given stepper type is not supported in make_step_validate.");
+			}
+		}
 		template<typename stepper_>
-		auto make_step_validate(stepper_&& st_) {
+		auto make_step_validate(double abs_error_, unsigned int max_binary_trial_, const stepper_& Stepper_ = stepper_()) {
 			using stepper = typename boost::numeric::odeint::unwrap_reference<stepper_>::type;
 			using stepper_category = typename stepper::stepper_category;
-			return step_validate_stepper<stepper, stepper_category>(std::forward<stepper_>(st_));
+			return detail::make_step_validate_impl(abs_error_, max_binary_trial_, Stepper_, stepper_category());
 		}
 	}
 }

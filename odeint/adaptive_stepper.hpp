@@ -23,17 +23,14 @@ namespace hmLib {
 		adaptive_stepper automatically choose optimal dt, so the given dt might be not used.
 		*/
 
-		template<typename base_stepper_, typename stepper_tag_ = typename boost::numeric::odeint::unwrap_reference<base_stepper_>::type::stepper_category>
+		template<typename base_controlled_stepper_>
 		struct adaptive_stepper {
-			static_assert(!std::is_base_of<controlled_stepper_tag, stepper_tag_>::value, "adaptive_stepper can use a stepper whose stepper_category is controlled_stepper_tag as the base_stepper.");
-		};
-		template<typename base_stepper_>
-		struct adaptive_stepper<base_stepper_, controlled_stepper_tag> {
-			using base_stepper = base_stepper_;
+			using base_stepper = base_controlled_stepper_;
 			using state_type = typename base_stepper::state_type;
 			using deriv_type = typename base_stepper::deriv_type;
 			using time_type = typename base_stepper::time_type;
-			using order_type = typename base_stepper::order_type;
+			using algebra_type = typename base_stepper::algebra_type;
+			using operations_type = typename base_stepper::operations_type;
 			using stepper_category = adaptive_stepper_tag;
 		public:
 			adaptive_stepper(base_stepper st_) :st(std::move(st_)) {}
@@ -42,28 +39,38 @@ namespace hmLib {
 				boost::numeric::odeint::failed_step_checker fail_checker;
 				boost::numeric::odeint::controlled_step_result res;
 
-				res = st.try_step(sys, start_state, start_time, dt);
+				res = st.try_step(sys, state, time, dt);
 				if (res == boost::numeric::odeint::success)return false;
 
 				do{
-					res = st.try_step(sys, start_state, start_time, dt);
+					res = st.try_step(sys, state, time, dt);
 					fail_checker();  // check number of failed steps
-				} while (res == fail);
+				} while (res == boost::numeric::odeint::fail);
 				return true;
 			}
 		private:
 			base_stepper st;
 		};
-
-		template<typename base_stepper_>
-		auto make_adaptive(const base_stepper_& stepper = Stepper()) {
-			return adaptive_stepper<base_stepper_>(stepper);
+		namespace detail{
+			template<typename base_stepper_>
+			void make_adaptive_impl(const base_stepper_& stepper, ...) {
+				static_assert(false, "adaptive_stepper require controlled stepper as the base stepper.");
+			}
+			template<typename base_stepper_>
+			auto make_adaptive_impl(const base_stepper_& stepper, controlled_stepper_tag) {
+				return adaptive_stepper<base_stepper_>(stepper);
+			}
+		}
+		template<typename base_controlled_stepper_>
+		auto make_adaptive(const base_controlled_stepper_& stepper = base_controlled_stepper_()) {
+			using stepper_category_ = typename boost::numeric::odeint::unwrap_reference<base_controlled_stepper_>::type::stepper_category;
+			return detail::make_adaptive_impl(stepper, stepper_category_());
 		}		
 		template<typename base_stepper_>
 		auto make_adaptive(
 			typename base_stepper_::value_type abs_error,
 			typename base_stepper_::value_type rel_error,
-			const base_stepper_& stepper = Stepper()) {
+			const base_stepper_& stepper = base_stepper_()) {
 			return make_adaptive(boost::numeric::odeint::make_controlled(abs_error, rel_error, stepper));
 		}
 		template<typename base_stepper_>
@@ -71,7 +78,7 @@ namespace hmLib {
 			typename base_stepper_::value_type abs_error,
 			typename base_stepper_::value_type rel_error,
 			typename base_stepper_::time_type max_dt,
-			const base_stepper_& stepper = Stepper()) {
+			const base_stepper_& stepper = base_stepper_()) {
 			return make_adaptive(boost::numeric::odeint::make_controlled(abs_error, rel_error, max_dt, stepper));
 		}
 	}

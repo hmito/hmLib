@@ -15,7 +15,7 @@ namespace hmLib {
 				Time start_time, Time end_time, Time dt,
 				Observer observer, stepper_tag
 			) {
-				return boost_odeint::integrate_const(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_tag());
+				return boost_odeint::detail::integrate_const(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_const(
@@ -23,7 +23,7 @@ namespace hmLib {
 				Time start_time, Time end_time, Time dt,
 				Observer observer, controlled_stepper_tag
 			) {
-				return boost_odeint::integrate_const(stepper, sys, start_state, start_time, end_time, dt, observer, controlled_stepper_tag());
+				return boost_odeint::detail::integrate_const(stepper, sys, start_state, start_time, end_time, dt, observer, controlled_stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_const(

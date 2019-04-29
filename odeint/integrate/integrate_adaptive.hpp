@@ -14,7 +14,7 @@ namespace hmLib {
 				Time start_time, Time end_time, Time dt,
 				Observer observer, stepper_tag
 			) {
-				return boost_odeint::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_tag());
+				return boost_odeint::detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_adaptive(
@@ -22,7 +22,7 @@ namespace hmLib {
 				Time start_time, Time end_time, Time dt,
 				Observer observer, controlled_stepper_tag
 			) {
-				return boost_odeint::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, controlled_stepper_tag());
+				return boost_odeint::detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, controlled_stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_adaptive(
@@ -30,7 +30,7 @@ namespace hmLib {
 				Time start_time, Time end_time, Time dt,
 				Observer observer, dense_output_stepper_tag
 			) {
-				return boost_odeint::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, dense_output_stepper_tag());
+				return boost_odeint::detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, dense_output_stepper_tag());
 			}
 
 			template< class Stepper, class System, class State, class Time, class Observer >
@@ -45,12 +45,11 @@ namespace hmLib {
 				size_t count = 0;
 				st.initialize(start_state, start_time, dt);
 
-				while (boost_odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step()))
-				{
-					while (boost_odeint::detail::less_eq_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()),
-						end_time,
-						st.current_time_step()))
-					{   //make sure we don't go beyond the end_time
+				while (boost_odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step())){
+					while (boost_odeint::detail::less_eq_with_sign(
+						static_cast<Time>(st.current_time() + st.current_time_step()), end_time, st.current_time_step()
+					)){
+						//make sure we don't go beyond the end_time
 						obs(st.current_state(), st.current_time());
 						st.do_step(system);
 						++count;

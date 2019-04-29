@@ -23,7 +23,7 @@ namespace hmLib {
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
 
 				// check breaker condition with the initial state
-				bool IsBreak = breaker(start_state, start_time));
+				bool IsBreak = breaker(start_state, start_time);
 
 				Time time = start_time;
 				int step = 0;
@@ -41,7 +41,7 @@ namespace hmLib {
 					time = start_time + static_cast<typename boost_odeint::unit_value_type<Time>::type>(step) * dt;
 
 					// check breaker condition
-					IsBreak = breaker(start_state, time));
+					IsBreak = breaker(start_state, time);
 				}
 				obs(start_state, time);
 
@@ -81,7 +81,7 @@ namespace hmLib {
 				while (boost_odeint::detail::less_eq_with_sign(static_cast<Time>(time + time_step), end_time, dt)){
 					obs(start_state, time);
 					// integrate_adaptive_checked uses the given checker to throw if an overflow occurs
-					auto ans = breakable_integrate_adaptive(stepper, sys, breaker, start_state,
+					auto ans = breakable_integrate_adaptive(stepper, sys, start_state,
 						time, static_cast<Time>(time + time_step), dt, breaker,
 						boost_odeint::null_observer(), controlled_stepper_tag());
 
@@ -118,7 +118,7 @@ namespace hmLib {
 
 				st.initialize(start_state, time, dt);
 				obs(start_state, time);
-				bool IsBreak = breaker(start_state, time));
+				bool IsBreak = breaker(start_state, time);
 				bool IsLast = false;
 				if (IsBreak) {
 					return std::make_tuple(true, real_step, time);
@@ -187,7 +187,7 @@ namespace hmLib {
 
 				st.initialize(start_state, time, dt);
 				obs(start_state, time);
-				bool IsBreak = breaker(start_state, time));
+				bool IsBreak = breaker(start_state, time);
 				bool IsLast = false;
 				if (IsBreak) {
 					return std::make_tuple(true, real_step, time);
@@ -272,7 +272,7 @@ namespace hmLib {
 				while (boost_odeint::detail::less_eq_with_sign(static_cast<Time>(time + time_step), end_time, dt)) {
 					obs(start_state, time);
 					// integrate_adaptive_checked uses the given checker to throw if an overflow occurs
-					auto ans = breakable_integrate_adaptive(stepper, sys, breaker, start_state,
+					auto ans = breakable_integrate_adaptive(stepper, sys, start_state,
 						time, static_cast<Time>(time + time_step), dt, breaker,
 						boost_odeint::null_observer(), adaptive_stepper_tag());
 
