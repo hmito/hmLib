@@ -41,11 +41,11 @@ namespace hmLib {
 				boost::numeric::odeint::failed_step_checker fail_checker;
 				boost::numeric::odeint::controlled_step_result res;
 
-				res = st.try_step(system, start_state, start_time, dt);
+				res = st.try_step(sys, start_state, start_time, dt);
 				if (res == boost::numeric::odeint::success)return false;
 
 				do{
-					res = st.try_step(system, start_state, start_time, dt);
+					res = st.try_step(sys, start_state, start_time, dt);
 					fail_checker();  // check number of failed steps
 				} while (res == fail);
 				return true;

@@ -1,42 +1,43 @@
 #ifndef HMLIB_ODEINT_INTEGRATE_INTEGRATEADAPTIVE_INC
 #define HMLIB_ODEINT_INTEGRATE_INTEGRATEADAPTIVE_INC 100
 #
-#include"../stepper_categories.hpp"
 #include<boost/numeric/odeint/integrate/null_observer.hpp>
 #include<boost/numeric/odeint/integrate/integrate_adaptive.hpp>
+#include"../stepper_categories.hpp"
+//#include"integrate_const.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
 			namespace boost_odeint = boost::numeric::odeint;
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_adaptive(
-				Stepper stepper, System system, State& start_state,
+				Stepper stepper, System sys, State& start_state,
 				Time start_time, Time end_time, Time dt,
-				Observer observer, stepper_tag tag
+				Observer observer, stepper_tag
 			) {
-				return boost_odeint::integrate_adaptive(stepper, system, start_state, start_time, end_time, dt, observer, tag);
+				return boost_odeint::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_adaptive(
-				Stepper stepper, System system, State& start_state,
+				Stepper stepper, System sys, State& start_state,
 				Time start_time, Time end_time, Time dt,
-				Observer observer, controlled_stepper_tag tag
+				Observer observer, controlled_stepper_tag
 			) {
-				return boost_odeint::integrate_adaptive(stepper, system, start_state, start_time, end_time, dt, observer, tag);
+				return boost_odeint::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, controlled_stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_adaptive(
-				Stepper stepper, System system, State& start_state,
+				Stepper stepper, System sys, State& start_state,
 				Time start_time, Time end_time, Time dt,
-				Observer observer, dense_output_stepper_tag tag
+				Observer observer, dense_output_stepper_tag
 			) {
-				return boost_odeint::integrate_adaptive(stepper, system, start_state, start_time, end_time, dt, observer, tag);
+				return boost_odeint::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, dense_output_stepper_tag());
 			}
 			template< class Stepper, class System, class State, class Time, class Observer >
 			size_t integrate_adaptive(
-				Stepper stepper, System system, State& start_state,
+				Stepper stepper, System sys, State& start_state,
 				Time start_time, Time end_time, Time dt,
-				Observer observer, adaptive_stepper_tag tag
+				Observer observer, adaptive_stepper_tag
 			) {
 				typename boost_odeint::unwrap_reference< Observer >::type& obs = observer;
 				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
@@ -51,7 +52,7 @@ namespace hmLib {
 						dt = end_time - start_time;
 					}
 					//argument "start_time" will be updated inside of do_step.
-					st.do_step(system, start_state, start_time, dt);
+					st.do_step(sys, start_state, start_time, dt);
 					++count;
 				}
 				obs(start_state, start_time);
@@ -60,15 +61,15 @@ namespace hmLib {
 		}
 
 		template< class Stepper, class System, class State, class Time, class Observer >
-		size_t integrate_adaptive(Stepper stepper, System sys, State& start_state, Time start_time, Time end_time, Time dt, Time time_error, Observer observer) {
+		size_t integrate_adaptive(Stepper stepper, System sys, State& start_state, Time start_time, Time end_time, Time dt, Observer observer) {
 			using stepper_category = typename boost::numeric::odeint::unwrap_reference<Stepper>::type::stepper_category;
-			return detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, time_error, observer, stepper_category());
+			return detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, observer, stepper_category());
 		}
 
 		template< class Stepper, class System, class State, class Time>
-		size_t integrate_adaptive(Stepper stepper, System sys, State& start_state, Time start_time, Time end_time, Time dt, Time time_error) {
+		size_t integrate_adaptive(Stepper stepper, System sys, State& start_state, Time start_time, Time end_time, Time dt) {
 			using stepper_category = typename boost::numeric::odeint::unwrap_reference<Stepper>::type::stepper_category;
-			return detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, time_error, boost::numeric::odeint::null_observer(), stepper_category());
+			return detail::integrate_adaptive(stepper, sys, start_state, start_time, end_time, dt, boost::numeric::odeint::null_observer(), stepper_category());
 		}
 	}
 }
