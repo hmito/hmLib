@@ -9,6 +9,11 @@ namespace hmLib {
 		using controlled_stepper_tag = boost::numeric::odeint::controlled_stepper_tag;
 		using dense_output_stepper_tag = boost::numeric::odeint::dense_output_stepper_tag;
 
+		struct semidense_output_stepper_tag {};
+		//template<typename sys_type>
+		//void calc_state(sys_type sys, time_type t, state_type& x)const
+		//instead of normal calc_state
+
 		struct adaptive_stepper_tag {};
 		//bool do_step(system, &state, &time, &dt);
 		//return: true if step was not same with given dt state, time and next suggested dt can be updated.

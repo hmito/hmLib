@@ -99,7 +99,6 @@ namespace hmLib {
 				return std::make_tuple(IsBreak, step, start_time);
 			}
 
-
 			//integrate adaptive for dense output stepper
 			template< class Stepper, class System, class State, class Time, class Breaker, class Observer >
 			std::tuple<bool, size_t, Time> breakable_integrate_adaptive(
@@ -136,6 +135,41 @@ namespace hmLib {
 				return std::make_tuple(IsBreak, count, st.current_time());
 			}
 
+			//integrate adaptive for dense output stepper
+			template< class Stepper, class System, class State, class Time, class Breaker, class Observer >
+			std::tuple<bool, size_t, Time> breakable_integrate_adaptive(
+				Stepper stepper, System sys, State& start_state,
+				Time start_time, Time end_time, Time dt, Breaker breaker,
+				Observer observer, semidense_output_stepper_tag)
+			{
+				typename boost_odeint::unwrap_reference< Observer >::type& obs = observer;
+				typename boost_odeint::unwrap_reference< Stepper >::type& st = stepper;
+
+				// check breaker condition with the initial state
+				bool IsBreak = breaker(start_state, start_time));
+
+				size_t count = 0;
+				st.initialize(start_state, start_time, dt);
+
+				while (!IsBreak && boost_odeint::detail::less_with_sign(st.current_time(), end_time, st.current_time_step()))
+				{
+					while (!IsBreak && boost_odeint::detail::less_eq_with_sign(static_cast<Time>(st.current_time() + st.current_time_step()),
+						end_time,
+						st.current_time_step()))
+					{   //make sure we don't go beyond the end_time
+						obs(st.current_state(), st.current_time());
+						st.do_step(sys);
+						++count;
+						IsBreak = breaker(st.current_state(), st.current_time());
+					}
+					// calculate time step to arrive exactly at end time
+					st.initialize(st.current_state(), st.current_time(), static_cast<Time>(end_time - st.current_time()));
+				}
+				obs(st.current_state(), st.current_time());
+				// overwrite start_state with the final point
+				boost_odeint::copy(st.current_state(), start_state);
+				return std::make_tuple(IsBreak, count, st.current_time());
+			}
 
 			//integrate adaptive for adaptive stepper
 			template< class Stepper, class System, class State, class Time, class Breaker, class Observer >
