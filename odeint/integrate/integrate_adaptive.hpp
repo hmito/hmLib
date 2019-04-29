@@ -4,7 +4,6 @@
 #include<boost/numeric/odeint/integrate/null_observer.hpp>
 #include<boost/numeric/odeint/integrate/integrate_adaptive.hpp>
 #include"../stepper_categories.hpp"
-//#include"integrate_const.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {

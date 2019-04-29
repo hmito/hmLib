@@ -4,7 +4,6 @@
 #include <boost/numeric/odeint/util/unwrap_reference.hpp>
 #include <boost/numeric/odeint/stepper/controlled_step_result.hpp>
 #include <boost/numeric/odeint/integrate/max_step_checker.hpp>
-#include <boost/numeric/odeint/stepper/controlled_runge_kutta.hpp>
 #include"stepper_categories.hpp"
 namespace hmLib {
 	namespace odeint {
@@ -20,6 +19,8 @@ namespace hmLib {
 			template<typename system_type>
 			bool do_step(system_type sys, state_type& state, time_type& time, time_type& dt)
 		};
+		controlled_stepper just try with given dt, so they always use the given dt although they often fail.
+		adaptive_stepper automatically choose optimal dt, so the given dt might be not used.
 		*/
 
 		template<typename base_stepper_, typename stepper_tag_ = typename boost::numeric::odeint::unwrap_reference<base_stepper_>::type::stepper_category>

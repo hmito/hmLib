@@ -12,8 +12,6 @@
 #include <boost/numeric/odeint/integrate/max_step_checker.hpp>
 #include <boost/numeric/odeint/integrate/null_observer.hpp>
 #include "../stepper_categories.hpp"
-//#include "breakable_integrate_const.hpp"
-
 namespace hmLib {
 	namespace odeint {
 		namespace detail {

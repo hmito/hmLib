@@ -7,7 +7,6 @@
 #include <boost/numeric/odeint/util/detail/less_with_sign.hpp>
 #include <boost/numeric/odeint/integrate/null_observer.hpp>
 #include "../stepper_categories.hpp"
-//#include "breakable_integrate_adaptive.hpp"
 namespace hmLib {
 	namespace odeint {
 		namespace detail {
