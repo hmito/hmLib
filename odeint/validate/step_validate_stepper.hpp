@@ -38,10 +38,14 @@ namespace hmLib {
 						validate_result res = sys.validate(x0, x0, t0, x);
 						t = t0;
 						switch (res) {
+						case validate_result::assigned:
+							try_initialize(st, sys, x, t, dt);
+							break;
 						case validate_result::resized:
 							try_reset(st);
 							break;
 						default:
+							detail::move(std::move(x0), x);
 							try_initialize(st, sys, x, t, dt);
 							break;
 						}
@@ -57,16 +61,17 @@ namespace hmLib {
 
 					for (unsigned int i = 0; i < max_binary_trial; ++i) {
 						detail::copy(x0, x);
-						ndt = (nt2 + nt1 - 2*t) / 2;
-						st.do_step(sys, x, t, ndt);
+						ndt = (nt2 + nt1 - 2*t0) / 2;
+						try_initialize(st, sys, x, t0, ndt);
+						st.do_step(sys, x, t0, ndt);
 
-						if (sys.is_invalid_step(x, t + ndt)) {
-							detail::copy(x, nx1);
-							nt1 = t + ndt;
+						if (sys.is_invalid_step(x, t0 + ndt)) {
+							detail::copy(x, nx2);
+							nt2 = t0 + ndt;
 						}
 						else {
-							detail::copy(x, nx2);
-							nt2 = t + ndt;
+							detail::copy(x, nx1);
+							nt1 = t0 + ndt;
 						}
 
 						//error value check
@@ -77,10 +82,14 @@ namespace hmLib {
 					t = nt1;
 					validate_result res = sys.validate(nx1, nx2, t, x);
 					switch (res) {
+					case validate_result::assigned:
+						try_initialize(st, sys, x, t, dt);
+						break;
 					case validate_result::resized:
 						try_reset(st);
 						break;
 					default:
+						detail::move(std::move(nx2), x);
 						try_initialize(st, sys, x, t, dt);
 						break;
 					}
@@ -142,10 +151,14 @@ namespace hmLib {
 						validate_result res = sys.validate(x0, x0, t0, x);
 						t = t0;
 						switch (res) {
+						case validate_result::assigned:
+							try_initialize(st, sys, x, t, dt);
+							break;
 						case validate_result::resized:
 							try_reset(st);
 							break;
 						default:
+							detail::move(std::move(x0), x);
 							try_initialize(st, sys, x, t, dt);
 							break;
 						}
@@ -161,20 +174,22 @@ namespace hmLib {
 
 					for (unsigned int i = 0; i < max_binary_trial; ++i) {
 						detail::copy(x0, x);
+						t = t0;
 						ndt = (nt2 + nt1 - 2 * t) / 2;
+						try_initialize(st, sys, x, t, ndt);
 						do {
 							tryres = st.try_step(sys, x, t, ndt);
 							fail_checker();  // check number of failed steps
 						} while (tryres == boost::numeric::odeint::controlled_step_result::fail);
 						fail_checker.reset();
 
-						if (sys.is_invalid_step(x, t + ndt)) {
-							detail::copy(x, nx1);
-							nt1 = t + ndt;
+						if (sys.is_invalid_step(x, t)) {
+							detail::copy(x, nx2);
+							nt2 = t;
 						}
 						else {
-							detail::copy(x, nx2);
-							nt2 = t + ndt;
+							detail::copy(x, nx1);
+							nt1 = t;
 						}
 
 						//error value check
@@ -185,10 +200,14 @@ namespace hmLib {
 					t = nt1;
 					validate_result res = sys.validate(nx1, nx2, t, x);
 					switch (res) {
+					case validate_result::assigned:
+						try_initialize(st, sys, x, t, dt);
+						break;
 					case validate_result::resized:
 						try_reset(st);
 						break;
 					default:
+						detail::move(std::move(nx2), x);
 						try_initialize(st, sys, x, t, dt);
 						break;
 					}
@@ -254,7 +273,10 @@ namespace hmLib {
 					//initial state is invalid
 					if (sys.is_invalid_step(nx1, nt1)) {
 						Result = sys.validate(nx1, nx1, nt1, nx);
-						if (Result == validate_result::none)Result = validate_result::assigned;
+						if (Result == validate_result::none) {
+							detail::move(std::move(nx1), nx);
+							Result = validate_result::assigned;
+						}
 						nt = nt1;
 						return std::make_pair(nt,nt);
 					}
@@ -285,8 +307,10 @@ namespace hmLib {
 					//update arguments by new validated state
 					nt = nt1;
 					Result = sys.validate(nx1, nx2, nt, nx);
-					if (Result == validate_result::none)Result = validate_result::assigned;
-
+					if (Result == validate_result::none) {
+						detail::move(std::move(nx2), nx);
+						Result = validate_result::assigned;
+					}
 					step_range.second = nt;
 
 					return step_range;
@@ -311,12 +335,12 @@ namespace hmLib {
 				if (Result != validate_result::none)return nx;
 				return st.current_state();
 			}
-			const time_type& current_time()const {
+			time_type current_time()const{
 				//validated
 				if (Result != validate_result::none)return nt;
 				return st.current_time();
 			}
-			const time_type& current_time_step()const {
+			time_type current_time_step()const {
 				return st.current_time_step();
 			}
 		public:

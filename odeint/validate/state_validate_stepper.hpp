@@ -132,10 +132,10 @@ namespace hmLib {
 				if (Result!=validate_result::none)return nx;
 				return st.current_state();
 			}
-			const time_type& current_time()const {
+			time_type current_time()const {
 				return st.current_time();
 			}
-			const time_type& current_time_step()const {
+			time_type current_time_step()const {
 				return st.current_time_step();
 			}
 		public:
