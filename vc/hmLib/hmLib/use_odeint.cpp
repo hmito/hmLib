@@ -3,6 +3,7 @@
 #include<vector>
 #include<string>
 #include<cmath>
+#include<bitset>
 #include<fstream>
 #include<boost/numeric/odeint.hpp>
 #include"../../../odeint/varray_wrapper.hpp"
@@ -12,11 +13,22 @@
 #include<boost/numeric/odeint/algebra/default_operations.hpp>
 #include"../../../odeint/state_with_appendix.hpp"
 
+template<typename value_type_>
+struct lower_border {
+	using value_type = value_type_;
+public:
+	void operator()(value_type& x) {
+
+	}
+private:
+	value_type val;
+};
 struct circle_dysys {
 	using base_state = hmLib::varray<double, 2>;
-	using state = hmLib::odeint::state_with_appendix<base_state, int>;
+	using state = hmLib::odeint::state_with_appendix<base_state, std::bitset<2>>;
 	using result = hmLib::odeint::validate_result;
 	void operator()(const state& st, state& stdx, double t)const {
+		stdx.ap = st.ap;
 		const base_state& x = st.x;
 		base_state& dx = stdx.x;
 		double r2 = (x[0] - 1.0) * (x[0] - 1.0) + (x[1] - 0.8) * (x[1] - 0.8);
@@ -24,15 +36,21 @@ struct circle_dysys {
 		dx[0] = x[1] - 0.8;
 		dx[1] = -(x[0] - 1.0);
 
-		if (x[0] <= 1e-20)dx[0] = 0.0;
-		if (x[1] <= 1e-20)dx[1] = 0.0;
+		if (st.ap[0])dx[0] = 0.0;
+		if (st.ap[1])dx[1] = 0.0;
 	}
 	bool is_invalid_step(const state& st, double t)const {
 		const base_state& x = st.x;
 
-		if (x[0] < 0 || x[1] < 0)return true;
-		if (x[0] <= 1e-20 && x[1] - 0.8 > 0)return true;
-		if (x[1] <= 1e-20 && -(x[0] - 1.0) > 0)return true;
+		if (!st.ap[0] && !st.ap[1]) {
+			if (x[0] < 0 || x[1] < 0)return true;
+		}
+		if (st.ap[0]) {
+			if (x[1] - 0.8 > 0)return true;
+		}
+		if (st.ap[1]) {
+			if (-(x[0] - 1.0) > 0)return true;
+		}
 		return false;
 	}
 	result validate(const state& st1, const state& st2, double t, state& nst)const {
@@ -41,11 +59,27 @@ struct circle_dysys {
 		base_state& nx = nst.x;
 
 		nx = x2;
-		nx[0] = std::max(0.0, nx[0]);
-		nx[1] = std::max(0.0, nx[1]);
-
-		if (x2[0] <= 1e-20 && x2[1] - 0.8 > 0)nx[0] = 1.1e-20;
-		if (x2[1] <= 1e-20 && -(x2[0] - 1.0) > 0)nx[1] = 1.1e-20;
+		nst.ap = st2.ap;
+		if (!st2.ap[0] && !st2.ap[1]) {
+			if (nx[0] < 0) {
+				nx[0] = 0;
+				nst.ap[0] = true;
+			}
+			if (nx[1] < 0) {
+				nx[1] = 0;
+				nst.ap[1] = true;
+			}
+		}
+		if (st2.ap[0]) {
+			if (x2[1] - 0.8 > 0) {
+				nst.ap[0] = false;
+			}
+		}
+		if (st2.ap[1]) {
+			if (-(x2[0] - 1.0) > 0) {
+				nst.ap[1] = false;
+			}
+		}
 
 		return result::assigned;
 	}

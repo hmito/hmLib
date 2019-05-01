@@ -120,6 +120,15 @@ namespace boost {
 			};
 
 			template<typename state_, typename appendix_>
+			struct copy_impl< hmLib::odeint::state_with_appendix<state_, appendix_>, hmLib::odeint::state_with_appendix<state_, appendix_>>	{
+				static void copy(const hmLib::odeint::state_with_appendix<state_, appendix_>& from, hmLib::odeint::state_with_appendix<state_, appendix_>& to)
+				{
+					to.ap = from.ap;
+					boost::numeric::odeint::copy(from.x, to.x);
+				}
+			};
+
+			template<typename state_, typename appendix_>
 			struct same_size_impl< hmLib::odeint::state_with_appendix<state_, appendix_>, hmLib::odeint::state_with_appendix<state_, appendix_>> {
 				static bool same_size(const  hmLib::odeint::state_with_appendix<state_, appendix_>& v1, const  hmLib::odeint::state_with_appendix<state_, appendix_>& v2) {
 					return boost::numeric::odeint::same_size(v1.x, v2.x);
