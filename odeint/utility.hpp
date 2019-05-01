@@ -178,12 +178,21 @@ namespace hmLib{
 				std::swap(x1,x2);
 			}
 			template<typename state_type>
+			void resize(const state_type& from, state_type& to, boost::true_type) {
+				if (!boost::numeric::odeint::same_size(from, to)) {
+					boost::numeric::odeint::resize(to, from);
+				}
+			}
+			template<typename state_type>
+			void resize(const state_type& from, state_type& to, boost::false_type) {}
+			template<typename state_type>
 			void resize(const state_type& from, state_type& to) {
-				boost::numeric::odeint::adjust_size_by_resizeability(to, from, typename boost::numeric::odeint::is_resizeable<state_type>::type());
+				using is_resizable = typename boost::numeric::odeint::is_resizeable<state_type>::type;
+				resize(from, to, is_resizable());
 			}
 			template<typename state_type>
 			void resize_and_copy(const state_type& from, state_type& to) {
-				boost::numeric::odeint::adjust_size_by_resizeability(to, from, typename boost::numeric::odeint::is_resizeable<state_type>::type());
+				resize(from, to);
 				boost::numeric::odeint::copy(from, to);
 			}
 			template<typename state_type, typename argebra_type, typename operations_type>
@@ -194,7 +203,7 @@ namespace hmLib{
 			template<typename state_type, typename argebra_type, typename operations_type>
 			double maximum_absolute_error(const state_type& v1, const state_type& v2) {
 				state_type err;
-				boost::numeric::odeint::adjust_size_by_resizeability(err, v1, typename boost::numeric::odeint::is_resizeable<state_type>::type());
+				resize(v1, err);
 				return maximum_absolute_error<state_type, argebra_type,operations_type>(err, v1, v2);
 			}
 		}

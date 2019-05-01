@@ -6,6 +6,7 @@
 #include<boost/numeric/odeint/util/resize.hpp>
 #include<boost/numeric/odeint/util/is_resizeable.hpp>
 #include<boost/numeric/odeint/algebra/norm_result_type.hpp>
+#include"utility.hpp"
 namespace hmLib {
 	namespace odeint {
 		template<typename state_, typename appendix_>
@@ -121,30 +122,31 @@ namespace boost {
 
 			template<typename state_, typename appendix_>
 			struct copy_impl< hmLib::odeint::state_with_appendix<state_, appendix_>, hmLib::odeint::state_with_appendix<state_, appendix_>>	{
-				static void copy(const hmLib::odeint::state_with_appendix<state_, appendix_>& from, hmLib::odeint::state_with_appendix<state_, appendix_>& to)
-				{
+				static void copy(const hmLib::odeint::state_with_appendix<state_, appendix_>& from, hmLib::odeint::state_with_appendix<state_, appendix_>& to){
 					to.ap = from.ap;
-					boost::numeric::odeint::copy(from.x, to.x);
+					hmLib::odeint::detail::copy(from.x, to.x);
 				}
 			};
 
 			template<typename state_, typename appendix_>
 			struct same_size_impl< hmLib::odeint::state_with_appendix<state_, appendix_>, hmLib::odeint::state_with_appendix<state_, appendix_>> {
 				static bool same_size(const  hmLib::odeint::state_with_appendix<state_, appendix_>& v1, const  hmLib::odeint::state_with_appendix<state_, appendix_>& v2) {
-					return boost::numeric::odeint::same_size(v1.x, v2.x);
+					return boost::numeric::odeint::same_size(v1.x, v2.x) && v1.ap==v2.ap;
 				}
 			};
 
 			template<typename state_, typename appendix_>
 			struct resize_impl<  hmLib::odeint::state_with_appendix<state_, appendix_>, hmLib::odeint::state_with_appendix<state_, appendix_> > {
 				static void resize(hmLib::odeint::state_with_appendix<state_, appendix_>& v1, const hmLib::odeint::state_with_appendix<state_, appendix_>& v2) {
-					return boost::numeric::odeint::resize(v1.x, v2.x);
+					v1.ap = v2.ap;
+					hmLib::odeint::detail::resize(v2.x, v1.x);
 				}
 			};
 
 			template<typename state_, typename appendix_>
 			struct is_resizeable<  hmLib::odeint::state_with_appendix<state_, appendix_> > {
-				using type = typename is_resizeable<state_>::type;
+//				using type = typename is_resizeable<state_>::type;
+				using type = boost::true_type;
 				static const bool value = type::value;
 			};
 		}
