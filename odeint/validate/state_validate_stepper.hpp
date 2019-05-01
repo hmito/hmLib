@@ -3,12 +3,12 @@
 #
 #include<boost/numeric/odeint/stepper/controlled_step_result.hpp>
 #include<boost/numeric/odeint/util/unwrap_reference.hpp>
+#include<boost/numeric/odeint/util/copy.hpp>
 #include"../utility.hpp"
 #include"../stepper_categories.hpp"
 #include"validate_result.hpp"
 namespace hmLib {
 	namespace odeint{ 
-
 		template<typename base_stepper_>
 		struct state_validate_stepper {
 			using base_stepper = base_stepper_;
