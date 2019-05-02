@@ -56,6 +56,8 @@
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
+    <ClInclude Include="..\..\..\functional\function_ptr.hpp" />
+    <ClInclude Include="..\..\..\functional\share.hpp" />
     <ClInclude Include="..\..\..\gates.hpp" />
     <ClInclude Include="..\..\..\gates\bufgate.hpp" />
     <ClInclude Include="..\..\..\gates\comgate.hpp" />
@@ -101,6 +103,7 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
+    <ClInclude Include="..\..\..\lazy.hpp" />
     <ClInclude Include="..\..\..\lattices\zip_lattice.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
@@ -110,6 +113,7 @@
     <ClInclude Include="..\..\..\math\optimize.hpp" />
     <ClInclude Include="..\..\..\math\plane_root.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
+    <ClInclude Include="..\..\..\math\factorial.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />

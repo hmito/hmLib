@@ -77,6 +77,34 @@ namespace hmLib{
 		using type = std::integral_constant<bool, std::is_assignable<decltype(*std::declval<T>()), typename std::iterator_traits<T>::value_type>::value>;
 		constexpr static bool value = type::value;
 	};
+
+	namespace detail {
+		struct result_of_impl {
+			template < class Result, class ... Args >
+			static Result Func(Result(*)(Args ...));
+			template < class T, class Result, class ... Args >
+			static Result Func(Result(T::*)(Args ...));
+			template < class T, class Result, class ... Args >
+			static Result Func(Result(T::*)(Args ...) const);
+			template < class T, class FuncType = decltype(&T::operator()) >
+			static decltype(Func(std::declval<FuncType>())) Func(T*);
+		};
+	}
+	template < typename Fn >
+	struct result_of {
+		using type = decltype(detail::result_of_impl::Func(std::declval<std::remove_pointer_t<Fn>*>()));
+	};
+
+	template<typename Fn, typename T>
+	struct is_applicable {
+	private:
+		template<typename eFn, typename eT, typename ans_type = decltype(std::declval<eFn>()(std::declval<eT>()))>
+		static auto check(eFn&&, eT&&)->std::true_type;
+		static auto check(...)->std::false_type;
+	public:
+		using type = decltype(check(std::declval<Fn>(), std::declval<T>()));
+		static constexpr const bool value = type::value;
+	};
 }
 #
 #endif
