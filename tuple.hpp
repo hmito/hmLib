@@ -8,18 +8,18 @@
 #include"hash.hpp"
 namespace hmLib {
 	namespace detail {
-		template<unsigned int n, unsigned int r>
-		struct tuple_for_each_impl{
+		template<size_t n, size_t r>
+		struct tuple_transform_impl {
 			template<typename Fn, typename... Tuple>
 			auto operator()(Fn&& f, Tuple&&... t) {
 				return std::tuple_cat(
 					std::tuple<decltype((f(std::get<n>(t)...)))>(f(std::get<n>(t)...)),
-					tuple_for_each_impl<n+1,r-1>()(f, t...)
+					tuple_transform_impl<n+1,r-1>()(f, t...)
 				);
 			}
 		};
-		template<unsigned int n>
-		struct tuple_for_each_impl<n,1>{
+		template<size_t n>
+		struct tuple_transform_impl<n,1>{
 			template<typename Fn, typename... Tuple>
 			auto operator()(Fn&& f, Tuple&&... t) {
 				return std::tuple<decltype((f(std::get<n>(t)...)))>(f(std::get<n>(t)...));
@@ -27,12 +27,64 @@ namespace hmLib {
 		};
 	}
 	template<typename Fn, typename Tuple, typename... OtherTuples>
-	auto tuple_for_each(Fn&& f, Tuple&& t, OtherTuples&&... ot) {
-		return detail::tuple_for_each_impl<0, std::tuple_size<typename std::decay<Tuple>::type>::value>()(
+	auto tuple_transform(Fn&& f, Tuple&& t, OtherTuples&& ... ot) {
+		return detail::tuple_transform_impl<0, std::tuple_size<typename std::decay<Tuple>::type>::value>()(
 			std::forward<Fn>(f),
 			std::forward<Tuple>(t),
 			std::forward<OtherTuples>(ot)...
 		);
+	}
+
+	//old definition
+	template<typename Fn, typename Tuple, typename... OtherTuples>
+	auto tuple_for_each(Fn&& f, Tuple&& t, OtherTuples&&... ot) {
+		return detail::tuple_transform_impl<0, std::tuple_size<typename std::decay<Tuple>::type>::value>()(
+			std::forward<Fn>(f),
+			std::forward<Tuple>(t),
+			std::forward<OtherTuples>(ot)...
+		);
+	}
+
+	namespace detail {
+		template<typename T, size_t n>
+		struct tuple_array_impl {
+			auto operator()(const T& ini) {
+				return std::tuple_cat(
+					std::tuple<T>(ini),
+					tuple_array_impl<T, n-1>()(ini)
+				);
+			}
+		};
+		template<typename T>
+		struct tuple_array_impl<T, 1> {
+			auto operator()(const T& ini) { return std::tuple<T>(ini); }
+		};
+	}
+	template<typename T, size_t n>
+	auto tuple_array(const T& ini) {
+		return detail::tuple_array_impl<T, n>()(ini);
+	}
+
+	namespace detail {
+		template<typename T, size_t n>
+		struct tuple_generate_impl {
+			template<typename Fn>
+			auto operator()(Fn&& f) {
+				return std::tuple_cat(
+					std::tuple<T>(f()),
+					tuple_generate_impl<T, n - 1>()(f)
+				);
+			}
+		};
+		template<typename T>
+		struct tuple_generate_impl<T, 1> {
+			template<typename Fn>
+			auto operator()(Fn&& f) { return std::tuple<T>(f()); }
+		};
+	}
+	template<size_t n, typename Fn>
+	auto tuple_generate(Fn&& f) {
+		return detail::tuple_generate_impl<decltype(f()), n>()(std::forward<Fn>(f));
 	}
 
 	namespace detail {
@@ -62,6 +114,7 @@ namespace hmLib {
 			std::forward<OtherTuples>(ot)...
 		);
 	}
+
 	template<std::size_t n, typename Fn, typename... Tuple>
 	auto tuple_apply_at(Fn f, Tuple... t) {
 		return f(std::get<n>(t)...);
