@@ -73,7 +73,7 @@ namespace hmLib{
 					ans += sout.str();
 					break;
 				case 'd':
-					sout << std::setw(2) << std::setfill('0') << std::right << mSec;
+					sout << std::setw(3) << std::setfill('0') << std::right << mSec;
 					ans += sout.str();
 					break;
 				default:
