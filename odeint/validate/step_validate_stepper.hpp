@@ -52,6 +52,8 @@ namespace hmLib {
 						detail::move(std::move(nx), x.first);
 						try_reset(st);
 						break;
+					default:
+						break;
 					}
 					//after validation nx & x.second should be valid
 					sys.initialize(x.second);
@@ -160,6 +162,8 @@ namespace hmLib {
 					detail::move(std::move(nx1), x.first);
 					try_reset(st);
 					break;
+				default:
+					break;
 				}
 
 				return false;
@@ -208,6 +212,8 @@ namespace hmLib {
 					case validate_result::resized:
 						detail::move(std::move(nx), x.first);
 						try_reset(st);
+						break;
+					default:
 						break;
 					}
 					//after validation nx & ap should be valid
@@ -335,6 +341,8 @@ namespace hmLib {
 					detail::move(std::move(nx1), x.first);
 					try_reset(st);
 					break;
+				default:
+					break;
 				}
 
 				return false;
@@ -387,6 +395,8 @@ namespace hmLib {
 					try_reset(st);
 					st.initialize(nx, nt, st.current_time_step());
 					break;
+				default:
+					break;
 				}
 				Result = validate_result::none;
 
@@ -404,6 +414,8 @@ namespace hmLib {
 					case validate_result::resized:
 						try_reset(st);
 						st.initialize(nx, st.current_time(), st.current_time_step());
+						break;
+					default:
 						break;
 					}
 					//after validation nx & ap should be valid
@@ -570,6 +582,8 @@ namespace hmLib {
 						detail::move(std::move(nx), x);
 						try_reset(st);
 						break;
+					default:
+						break;
 					}
 				}
 
@@ -677,6 +691,8 @@ namespace hmLib {
 					detail::move(std::move(nx1), x);
 					try_reset(st);
 					break;
+				default:
+					break;
 				}
 
 				return false;
@@ -721,6 +737,8 @@ namespace hmLib {
 					case validate_result::resized:
 						detail::move(std::move(nx), x);
 						try_reset(st);
+						break;
+					default:
 						break;
 					}
 				}
@@ -846,6 +864,8 @@ namespace hmLib {
 					detail::move(std::move(nx1), x);
 					try_reset(st);
 					break;
+				default:
+					break;
 				}
 
 				return false;
@@ -895,6 +915,8 @@ namespace hmLib {
 					try_reset(st);
 					st.initialize(nx, nt, st.current_time_step());
 					break;
+				default:
+					break;
 				}
 				Result = validate_result::none;
 
@@ -908,6 +930,8 @@ namespace hmLib {
 					case validate_result::resized:
 						try_reset(st);
 						st.initialize(nx, st.current_time(), st.current_time_step());
+						break;
+					default:
 						break;
 					}
 				}
@@ -1041,7 +1065,7 @@ namespace hmLib {
 			}
 			template<typename appendix_, typename stepper_, typename step_validator_>
 			auto make_step_validate_impl(const stepper_& Stepper_, const step_validator_& StepValidator_, ...) {
-				static_assert(false, "given stepper type is not supported in make_step_validate.");
+				//static_assert(false, "given stepper type is not supported in make_step_validate.");
 			}
 		}
 		template<typename appendix_, typename stepper_>

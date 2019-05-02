@@ -3,8 +3,9 @@
 #
 #include<iterator>
 #include<type_traits>
-#include"iterator.hpp"
+#include"../exceptions.hpp"
 #include"../clone_ptrproxy.hpp"
+#include"iterator.hpp"
 namespace hmLib {
 	namespace iterators {
 		namespace detail {

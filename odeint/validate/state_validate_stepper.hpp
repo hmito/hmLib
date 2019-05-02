@@ -41,6 +41,8 @@ namespace hmLib {
 					detail::move(std::move(nx), x.first);
 					try_reset(st);
 					break;
+				default:
+					break;
 				}
 			}
 		public:
@@ -78,6 +80,8 @@ namespace hmLib {
 				case validate_result::resized:
 					detail::move(std::move(nx), x.first);
 					try_reset(st);
+					break;
+				default:
 					break;
 				}
 				return result;
@@ -120,6 +124,8 @@ namespace hmLib {
 				case validate_result::resized:
 					try_reset(st);
 					st.initialize(nx, st.current_time(), st.current_time_step());
+					break;
+				default:
 					break;
 				}
 				Result = validate_result::none;
@@ -197,6 +203,8 @@ namespace hmLib {
 					detail::move(std::move(nx), x);
 					try_reset(st);
 					break;
+				default:
+					break;
 				}
 			}
 		public:
@@ -231,6 +239,8 @@ namespace hmLib {
 				case validate_result::resized:
 					detail::move(std::move(nx), x);
 					try_reset(st);
+					break;
+				default:
 					break;
 				}
 				return result;
@@ -269,6 +279,8 @@ namespace hmLib {
 				case validate_result::resized:
 					try_reset(st);
 					st.initialize(nx, st.current_time(), st.current_time_step());
+					break;
+				default:
 					break;
 				}
 				auto step_range = st.do_step(sys);
@@ -324,7 +336,7 @@ namespace hmLib {
 			}
 			template<typename appendix_, typename stepper_>
 			auto make_state_validate_impl(const stepper_& Stepper_, ...) {
-				static_assert(false, "given stepper type is not supported in make_state_validate.");
+				//static_assert(false, "given stepper type is not supported in make_state_validate.");
 			}
 		}
 		template<typename appendix_, typename stepper_>

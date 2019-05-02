@@ -54,7 +54,7 @@ namespace hmLib {
 		namespace detail{
 			template<typename base_stepper_>
 			void make_adaptive_impl(const base_stepper_& stepper, ...) {
-				static_assert(false, "adaptive_stepper require controlled stepper as the base stepper.");
+				//static_assert(false, "adaptive_stepper require controlled stepper as the base stepper.");
 			}
 			template<typename base_stepper_>
 			auto make_adaptive_impl(const base_stepper_& stepper, controlled_stepper_tag) {
