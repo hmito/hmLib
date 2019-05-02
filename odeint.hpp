@@ -6,6 +6,7 @@
 #include"odeint/observer/eqstate_break_observer.hpp"
 #include"odeint/observer/iterator_observer.hpp"
 #include"odeint/observer/stream_observer.hpp"
+#include"odeint/stepper_categories.hpp"
 #include"odeint/adaptive_stepper.hpp"
 #include"odeint/validate.hpp"
 #include"odeint/integrate.hpp"

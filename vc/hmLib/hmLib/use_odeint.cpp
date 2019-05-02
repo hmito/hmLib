@@ -11,7 +11,6 @@
 #include"../../../varray.hpp"
 #include<boost/numeric/odeint/algebra/range_algebra.hpp>
 #include<boost/numeric/odeint/algebra/default_operations.hpp>
-#include"../../../odeint/state_with_appendix.hpp"
 
 struct stream_observer {
 private:
@@ -97,19 +96,55 @@ public:
 private:
 	appendix sysap;
 };
+struct circle_dysys2 {
+	using state = hmLib::varray<double, 2>;
+	//using appendix = std::bitset<2>;
+	using result = hmLib::odeint::validate_result;
+public:
+	void operator()(const state& x, state& dx, double t)const {
+
+		double r2 = (x[0] - 1.0) * (x[0] - 1.0) + (x[1] - 0.8) * (x[1] - 0.8);
+
+		dx[0] = x[1] - 0.8;
+		dx[1] = -(x[0] - 1.0);
+	}
+	bool is_invalid_step(const state & x, double t)const {
+		return false;
+	}
+	result validate(const state & x1, const state & x2, double t, state & nx)const {
+		nx = x2;
+
+
+		return result::assigned;
+	}
+	result validate(const state & x, double t, state & nx)const {
+		result res = result::none;
+		if (x[0] < 0 || x[1] < 0) {
+			nx = x;
+			nx[0] = std::max(0.0, nx[0]);
+			nx[1] = std::max(0.0, nx[1]);
+			res = result::assigned;
+		}
+		return res;
+	}
+};
 int main(void) {
 	using dysys = circle_dysys;
 	using state = typename dysys::state;
 	using appendix = typename dysys::appendix;
+	auto State = std::make_pair(state{ 1.0,1.7 }, appendix(0));
+	//auto State = state{ 1.0,1.7 };
 
 	dysys Dysys;
-	auto State = std::make_pair(state{ 1.0,1.7 },appendix(0));
+//	auto Stepper = hmLib::odeint::make_state_validate<appendix>(boost::numeric::odeint::runge_kutta4<state>());
+//	auto Stepper = hmLib::odeint::make_state_validate<appendix>(boost::numeric::odeint::make_controlled(1e-5, 1e-5, boost::numeric::odeint::runge_kutta_dopri5<state>()));
+//	auto Stepper = hmLib::odeint::make_state_validate<appendix>(boost::numeric::odeint::make_dense_output(1e-5, 1e-5, boost::numeric::odeint::runge_kutta_dopri5<state>()));
 //	auto Stepper = hmLib::odeint::make_step_validate<appendix>(0.1, 1e-3, 1e-3, 100, boost::numeric::odeint::runge_kutta4<state>());
 //	auto Stepper = hmLib::odeint::make_step_validate<appendix>(0.1, 1e-3, 1e-3, 100, boost::numeric::odeint::make_controlled(1e-5, 1e-5, boost::numeric::odeint::runge_kutta_dopri5<state>()));
 	auto Stepper = hmLib::odeint::make_step_validate<appendix>(0.1, 1e-3, 1e-3, 100, boost::numeric::odeint::make_dense_output(1e-5, 1e-5, boost::numeric::odeint::runge_kutta_dopri5<state>()));
 //	auto Stepper = boost::numeric::odeint::make_dense_output(0.01, 0.01, boost::numeric::odeint::runge_kutta_dopri5<state>());
 	std::ofstream fout("test3.csv");
-	stream_observer obs(fout);
+	auto obs = hmLib::odeint::make_non_appendix_observer(hmLib::odeint::stream_observer(fout));
 
 	hmLib::odeint::integrate_adaptive(Stepper, Dysys, State, 0.0, 10.0, 0.001, obs);
 
