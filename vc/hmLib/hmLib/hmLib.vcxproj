@@ -113,8 +113,9 @@
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp" />
-    <ClInclude Include="..\..\..\odeint\border\border.hpp" />
-    <ClInclude Include="..\..\..\odeint\border\float_border.hpp" />
+    <ClInclude Include="..\..\..\odeint\border.hpp" />
+    <ClInclude Include="..\..\..\odeint\border\borders.hpp" />
+    <ClInclude Include="..\..\..\odeint\border\element_border.hpp" />
     <ClInclude Include="..\..\..\odeint\integrate.hpp" />
     <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_adaptive.hpp" />
     <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp" />

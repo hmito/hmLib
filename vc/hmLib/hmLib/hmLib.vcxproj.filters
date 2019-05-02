@@ -509,17 +509,20 @@
     <ClInclude Include="..\..\..\odeint\validate\step_validate_stepper.hpp">
       <Filter>hmLib\odeint\validate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\border\border.hpp">
-      <Filter>hmLib\odeint\border</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\border\float_border.hpp">
-      <Filter>hmLib\odeint\border</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\validate\default_step_validator.hpp">
       <Filter>hmLib\odeint\validate</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\validate\non_appendix_observer.hpp">
       <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border\borders.hpp">
+      <Filter>hmLib\odeint\border</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border\element_border.hpp">
+      <Filter>hmLib\odeint\border</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

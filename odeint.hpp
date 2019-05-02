@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_ODEINT_INC
+#ifndef HMLIB_ODEINT_INC
 #define HMLIB_ODEINT_INC 300
 #
 #include"odeint/observer/break_observer.hpp"
@@ -11,5 +11,6 @@
 #include"odeint/validate.hpp"
 #include"odeint/integrate.hpp"
 #include"odeint/varray_wrapper.hpp"
+#include"odeint/border.hpp"
 #
 #endif
