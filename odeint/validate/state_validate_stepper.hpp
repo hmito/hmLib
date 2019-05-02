@@ -89,7 +89,7 @@ namespace hmLib {
 			using time_type = typename base_stepper::time_type;
 			using algebra_type = typename base_stepper::algebra_type;
 			using operations_type = typename base_stepper::operations_type;
-			using stepper_category = semidense_output_stepper_tag;
+			using stepper_category = dense_output_stepper_tag;
 		public:
 			state_validate_dense_output_stepper(base_stepper Stepper_) : Result(validate_result::none), st(std::move(Stepper_)) {}
 			void reset() {

@@ -518,5 +518,8 @@
     <ClInclude Include="..\..\..\odeint\state_with_appendix.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate\default_step_validator.hpp">
+      <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -129,6 +129,7 @@
     <ClInclude Include="..\..\..\odeint\stepper_categories.hpp" />
     <ClInclude Include="..\..\..\odeint\utility.hpp" />
     <ClInclude Include="..\..\..\odeint\validate.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate\default_step_validator.hpp" />
     <ClInclude Include="..\..\..\odeint\validate\state_validate_stepper.hpp" />
     <ClInclude Include="..\..\..\odeint\validate\step_validate_stepper.hpp" />
     <ClInclude Include="..\..\..\odeint\validate\validate_result.hpp" />

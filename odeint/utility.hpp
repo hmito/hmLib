@@ -148,23 +148,45 @@ namespace hmLib{
 		}
 
 		namespace detail {
-			template<typename state, hmLib_static_restrict(has_begin_and_end<state>::value)>
-			double abs_distance(const state& State1, const state& State2) {
-				auto itr1 = State1.begin();
-				auto end1 = State1.end();
-				auto itr2 = State2.begin();
-
-				double Max = 0;
-				for (; itr1 != end1; ++itr1, ++itr2) {
-					Max = std::max(Max, boost::numeric::odeint::vector_space_norm_inf<decltype(*itr1)>()(*itr1 - *itr2));
+			template<typename stepper_, typename system_, typename state_type_, typename time_type_>
+			struct can_extended_calc_state {
+			private:
+				template<typename T>
+				static auto check(T)->decltype(
+					std::declval<T>().calc_state(
+						std::declval<system_&>(),
+						std::declval<time_type_>,
+						std::declval<state_type_&>
+					),
+					std::true_type{}
+				);
+				static auto check(...)->std::false_type;
+			public:
+				using type = decltype(check(std::declval<stepper_>()));
+				static constexpr bool value = type::value;
+			};
+			template<typename stepper_, typename system_, typename state_type_, typename time_type_,
+				bool extend_calc_state = can_extended_calc_state<stepper_, system_, state_type_, time_type_>::value>
+			struct calc_state_impl {
+				template<typename stepper, typename sys, typename state_type, typename time_type>
+				void operator()(stepper& Stepper, sys& Sys,time_type Time, state_type& State) {
+					Stepper.calc_state(Time, State);
 				}
+			};
+			template<typename stepper_, typename system_, typename state_type_, typename time_type_>
+			struct calc_state_impl <stepper_, system_, state_type_, time_type_, true> {
+				template<typename stepper, typename sys, typename state_type, typename time_type>
+				void operator()(stepper& Stepper, sys& Sys, time_type Time, state_type& State) {
+					Stepper.calc_state(Sys,Time, State);
+				}
+			};
+		}
+		template<typename stepper, typename sys, typename time_type, typename state_type>
+		void calc_state(stepper& Stepper, sys& Sys, time_type Time, state_type& State) {
+			detail::calc_state_impl<typename std::decay<stepper>::type, typename std::decay<sys>::type, typename std::decay<state_type>::type, typename std::decay<time_type>::type>()(Stepper, Sys, Time, State);
+		}
 
-				return Max;
-			}
-			template<typename state, hmLib_static_restrict(!has_begin_and_end<state>::value)>
-			double abs_distance(const state& State1, const state& State2) {
-				return boost::numeric::odeint::vector_space_norm_inf<state>()(State1 + (State2 * -1.0));
-			}
+		namespace detail {
 			template<typename state_type>
 			void copy(const state_type& from, state_type& to) {
 				boost::numeric::odeint::copy(from, to);
@@ -193,15 +215,37 @@ namespace hmLib{
 			template<typename state_type>
 			void resize_and_copy(const state_type& from, state_type& to) {
 				resize(from, to);
-				boost::numeric::odeint::copy(from, to);
+				copy(from, to);
+			}
+			template<typename state_type>
+			void resize_and_swap(state_type& from, state_type& to) {
+				resize(from, to);
+				swap(from, to);
+			}
+			template<typename state, hmLib_static_restrict(has_begin_and_end<state>::value)>
+			double abs_distance(const state& State1, const state& State2) {
+				auto itr1 = State1.begin();
+				auto end1 = State1.end();
+				auto itr2 = State2.begin();
+
+				double Max = 0;
+				for (; itr1 != end1; ++itr1, ++itr2) {
+					Max = std::max(Max, boost::numeric::odeint::vector_space_norm_inf<decltype(*itr1)>()(*itr1 - *itr2));
+				}
+
+				return Max;
+			}
+			template<typename state, hmLib_static_restrict(!has_begin_and_end<state>::value)>
+			double abs_distance(const state & State1, const state & State2) {
+				return boost::numeric::odeint::vector_space_norm_inf<state>()(State1 + (State2 * -1.0));
 			}
 			template<typename state_type, typename argebra_type, typename operations_type>
-			double maximum_absolute_error(state_type& err, const state_type& v1, const state_type& v2) {
+			auto maximum_absolute_error(state_type& err, const state_type& v1, const state_type& v2) {
 				argebra_type().for_each3(err, v1, v2, typename operations_type::template scale_sum2<double, double>(1.0, -1.0));
 				return argebra_type().norm_inf(err);
 			}
 			template<typename state_type, typename argebra_type, typename operations_type>
-			double maximum_absolute_error(const state_type& v1, const state_type& v2) {
+			auto maximum_absolute_error(const state_type& v1, const state_type& v2) {
 				state_type err;
 				resize(v1, err);
 				return maximum_absolute_error<state_type, argebra_type,operations_type>(err, v1, v2);

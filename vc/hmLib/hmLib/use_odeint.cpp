@@ -48,7 +48,7 @@ public:
 	bool is_invalid_step(const state& x, double t)const {
 
 		if (!sysap[0] && !sysap[1]) {
-			if (x[0] <= 0 || x[1] <= 0)return true;
+			if (x[0] < 0 || x[1] < 0)return true;
 		}
 		if (sysap[0]) {
 			if (x[1] - 0.8 > 0)return true;
@@ -104,14 +104,14 @@ int main(void) {
 
 	dysys Dysys;
 	auto State = std::make_pair(state{ 1.0,1.7 },appendix(0));
-//	auto Stepper = hmLib::odeint::make_step_validate(0.001, 100, boost::numeric::odeint::runge_kutta_dopri5<state>());
-//	auto Stepper = hmLib::odeint::make_step_validate(0.001, 100, boost::numeric::odeint::make_controlled(0.01, 0.01, boost::numeric::odeint::runge_kutta_dopri5<state>()));
-	auto Stepper = hmLib::odeint::make_step_validate(0.001, 100, boost::numeric::odeint::make_dense_output(0.01, 0.01, boost::numeric::odeint::runge_kutta_dopri5<state>()),appendix(0));
+//	auto Stepper = hmLib::odeint::make_step_validate<appendix>(0.1, 1e-3, 1e-3, 100, boost::numeric::odeint::runge_kutta4<state>());
+//	auto Stepper = hmLib::odeint::make_step_validate<appendix>(0.1, 1e-3, 1e-3, 100, boost::numeric::odeint::make_controlled(1e-5, 1e-5, boost::numeric::odeint::runge_kutta_dopri5<state>()));
+	auto Stepper = hmLib::odeint::make_step_validate<appendix>(0.1, 1e-3, 1e-3, 100, boost::numeric::odeint::make_dense_output(1e-5, 1e-5, boost::numeric::odeint::runge_kutta_dopri5<state>()));
 //	auto Stepper = boost::numeric::odeint::make_dense_output(0.01, 0.01, boost::numeric::odeint::runge_kutta_dopri5<state>());
-	std::ofstream fout("test.csv");
+	std::ofstream fout("test3.csv");
 	stream_observer obs(fout);
 
-	hmLib::odeint::integrate_const(Stepper, Dysys, State, 0.0, 20.0, 0.01, obs);
+	hmLib::odeint::integrate_adaptive(Stepper, Dysys, State, 0.0, 10.0, 0.001, obs);
 
 	return 0;
 }
