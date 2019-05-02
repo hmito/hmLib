@@ -132,7 +132,7 @@ namespace hmLib {
 					}
 
 					//update arguments by new validated state
-					t = nt1;
+					t = nt2;
 					auto Result = sys.validate(nx1, nx2, t, x.first, x.second);
 					switch (Result) {
 					case validate_result::assigned:
@@ -307,7 +307,7 @@ namespace hmLib {
 					}
 
 					//update arguments by new validated state
-					t = nt1;
+					t = nt2;
 					auto Result = sys.validate(nx1, nx2, t, x.first, x.second);
 					switch (Result) {
 					case validate_result::assigned:
@@ -468,7 +468,7 @@ namespace hmLib {
 					}
 
 					//update arguments by new validated state
-					nt = nt1;
+					nt = nt2;
 					prev_ap = ap;
 					Result = sys.validate(nx1, nx2, nt, nx, ap);
 					if (Result == validate_result::none) {
@@ -488,17 +488,27 @@ namespace hmLib {
 				return step_range;
 			}
 			void calc_state(time_type t, state_type& x)const {
-				st.calc_state(t, x.first);
-				x.second = prev_ap;
+				if (boost::numeric::odeint::detail::less_with_sign(t, st.current_time(), st.current_time_step())) {
+					st.calc_state(t, x.first);
+					x.second = prev_ap;
+				} else {
+					detail::copy(nx, x.first);
+					x.second = ap;
+				}
 			}
 			template<typename sys_type>
 			void calc_state(sys_type sys, time_type t, state_type& x) {
-				st.calc_state(t, x.first);
-				x.second = prev_ap;
-				sys.initialize(x.second);
-				auto TmpResult = sys.validate(x.first, t, nx, x.second);
-				if (TmpResult != validate_result::none) {
-					detail::move(std::move(nx),x.first);
+				if (boost::numeric::odeint::detail::less_with_sign(t, st.current_time(), st.current_time_step())) {
+					st.calc_state(t, x.first);
+					x.second = prev_ap;
+					sys.initialize(x.second);
+					auto TmpResult = sys.validate(x.first, t, nx, x.second);
+					if (TmpResult != validate_result::none) {
+						detail::move(std::move(nx), x.first);
+					}
+				} else {
+					detail::copy(nx, x.first);
+					x.second = ap;
 				}
 			}
 			std::pair<const base_state_type&, appendix_type> current_state()const {
