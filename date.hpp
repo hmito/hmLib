@@ -40,6 +40,11 @@ namespace hmLib{
 			mSec = (std::chrono::duration_cast<std::chrono::milliseconds>(Time_.time_since_epoch()).count())%1000;
 		}
 	};
+	inline date current_date() {
+		date Cur;
+		Cur.from_time(std::chrono::system_clock::now());
+		return Cur;
+	}
 }
 #
 #endif
