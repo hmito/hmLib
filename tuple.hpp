@@ -88,7 +88,7 @@ namespace hmLib {
 	}
 
 	namespace detail {
-		template<typename ans_type, unsigned int n, unsigned int r>
+		template<unsigned int n, unsigned int r>
 		struct tuple_apply_at_impl {
 			template<typename Fn, typename... Tuple>
 			decltype(auto) operator()(unsigned int pos, Fn&& f, Tuple&&... v) {
