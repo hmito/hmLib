@@ -273,7 +273,7 @@ namespace hmLib {
 			}
 
 			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::random_access_iterator_tag>::value, "iterator category is incorrect");
-			static_assert(std::is_same<decltype(Range)::iterator::value_type, const int>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, int>::value, "value type is incorrect");
 			static_assert(std::is_same<decltype(Range)::iterator::reference, const int>::value, "reference is incorrect");
 
 			auto itr = Range.begin();
@@ -293,7 +293,7 @@ namespace hmLib {
 			auto Range = hmLib::make_transform_range(Vec.begin(), Vec.end(), [](std::pair<double, int>& p) {return std::make_pair(p.second,p.first); });
 
 			static_assert(std::is_same<decltype(Range)::iterator::iterator_category, std::random_access_iterator_tag>::value, "iterator category is incorrect");
-			static_assert(std::is_same<decltype(Range)::iterator::value_type, const std::pair<int,double>>::value, "value type is incorrect");
+			static_assert(std::is_same<decltype(Range)::iterator::value_type, std::pair<int,double>>::value, "value type is incorrect");
 			static_assert(std::is_same<decltype(Range)::iterator::reference, const std::pair<int, double>>::value, "reference is incorrect");
 
 			auto itr = Range.begin();

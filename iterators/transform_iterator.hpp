@@ -3,21 +3,22 @@
 #
 #include<iterator>
 #include<type_traits>
-#include"iterator.hpp"
+#include"../exceptions.hpp"
 #include"../clone_ptrproxy.hpp"
+#include"iterator.hpp"
 namespace hmLib {
 	namespace iterators {
 		namespace detail {
 			template<typename base_iterator_, typename transform_>
 			struct transform_iterator_category {
 			private:
-				using base_value_type = typename std::iterator_traits<base_iterator_>::value_type;
+				using base_reference = typename std::iterator_traits<base_iterator_>::reference;
 			private:
-				using raw_value_type = typename std::remove_reference<decltype(std::declval<transform_>()(std::declval<base_value_type>()))>::type;
-				using raw_reference = decltype((std::declval<transform_>()(std::declval<base_value_type>())));
+				using raw_value_type = typename std::remove_reference<decltype(std::declval<transform_>()(std::declval<base_reference>()))>::type;
+				using raw_reference = decltype((std::declval<transform_>()(std::declval<base_reference>())));
 			public:
 				static constexpr bool is_reference = std::is_same<raw_value_type&, raw_reference>::value;
-				using value_type = typename std::conditional<is_reference, raw_value_type, const raw_value_type>::type;
+				using value_type = raw_value_type;
 				using reference = typename std::conditional<is_reference, raw_reference, const raw_value_type>::type;
 				using pointer = typename std::conditional<is_reference, raw_value_type*, clone_ptrproxy<raw_value_type> >::type;
 			};

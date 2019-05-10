@@ -21,6 +21,7 @@
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="..\..\..\algorithm\numeric.hpp" />
     <ClInclude Include="..\..\..\algorithm\sampling.hpp" />
+    <ClInclude Include="..\..\..\block_vector.hpp" />
     <ClInclude Include="..\..\..\ccontainer\cdeque.h" />
     <ClInclude Include="..\..\..\ccontainer\cqueue.h" />
     <ClInclude Include="..\..\..\ccontainer\cstack.h" />
@@ -30,6 +31,11 @@
     <ClInclude Include="..\..\..\color.hpp" />
     <ClInclude Include="..\..\..\config_vc.h" />
     <ClInclude Include="..\..\..\coordinates.hpp" />
+    <ClInclude Include="..\..\..\csv.hpp" />
+    <ClInclude Include="..\..\..\csv\csvbase.hpp" />
+    <ClInclude Include="..\..\..\csv\csvline.hpp" />
+    <ClInclude Include="..\..\..\csv\csv_iterator.hpp" />
+    <ClInclude Include="..\..\..\csv\csv_table.hpp" />
     <ClInclude Include="..\..\..\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\date.hpp" />
     <ClInclude Include="..\..\..\debugstream.hpp" />
@@ -50,8 +56,11 @@
     <ClInclude Include="..\..\..\exceptions\io_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\memory_exceptions.hpp" />
     <ClInclude Include="..\..\..\exceptions\numeric_exceptions.hpp" />
+    <ClInclude Include="..\..\..\file_utility.hpp" />
     <ClInclude Include="..\..\..\filterbuf.hpp" />
     <ClInclude Include="..\..\..\functional.hpp" />
+    <ClInclude Include="..\..\..\functional\function_ptr.hpp" />
+    <ClInclude Include="..\..\..\functional\share.hpp" />
     <ClInclude Include="..\..\..\gates.hpp" />
     <ClInclude Include="..\..\..\gates\bufgate.hpp" />
     <ClInclude Include="..\..\..\gates\comgate.hpp" />
@@ -63,6 +72,7 @@
     <ClInclude Include="..\..\..\geometry\segment.hpp" />
     <ClInclude Include="..\..\..\geometry\point.hpp" />
     <ClInclude Include="..\..\..\gps.hpp" />
+    <ClInclude Include="..\..\..\hash.hpp" />
     <ClInclude Include="..\..\..\hmLib_config.h" />
     <ClInclude Include="..\..\..\inquiries.hpp" />
     <ClInclude Include="..\..\..\inquiries\inquiry.hpp" />
@@ -71,7 +81,7 @@
     <ClInclude Include="..\..\..\inquiries\signaled_contact.hpp" />
     <ClInclude Include="..\..\..\inquiries\signal_inquiry.hpp" />
     <ClInclude Include="..\..\..\inquiries\unique_connections.hpp" />
-    <ClInclude Include="..\..\..\iocsv.hpp" />
+    <ClInclude Include="..\..\..\io_utility.hpp" />
     <ClInclude Include="..\..\..\iterators.hpp" />
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp" />
@@ -83,10 +93,11 @@
     <ClInclude Include="..\..\..\iterators\transform_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\zip_iterator.hpp" />
     <ClInclude Include="..\..\..\lattices.hpp" />
+    <ClInclude Include="..\..\..\lattices\block_lattice.hpp" />
     <ClInclude Include="..\..\..\lattices\exceptions.hpp" />
+    <ClInclude Include="..\..\..\lattices\indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\iterator.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice.hpp" />
-    <ClInclude Include="..\..\..\lattices\indexer.hpp" />
     <ClInclude Include="..\..\..\lattices\lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\locator.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_iterator.hpp" />
@@ -94,38 +105,53 @@
     <ClInclude Include="..\..\..\lattices\torus_lattice_view.hpp" />
     <ClInclude Include="..\..\..\lattices\torus_locator.hpp" />
     <ClInclude Include="..\..\..\lattices\utility.hpp" />
+    <ClInclude Include="..\..\..\lattices\zip_lattice.hpp" />
+    <ClInclude Include="..\..\..\lazy.hpp" />
     <ClInclude Include="..\..\..\math.hpp" />
     <ClInclude Include="..\..\..\math\axis.hpp" />
+    <ClInclude Include="..\..\..\math\combinatorics.hpp" />
     <ClInclude Include="..\..\..\math\constants.hpp" />
+    <ClInclude Include="..\..\..\math\histgram.hpp" />
+    <ClInclude Include="..\..\..\math\minima.hpp" />
+    <ClInclude Include="..\..\..\math\multiaxis.hpp" />
     <ClInclude Include="..\..\..\math\optimize.hpp" />
-    <ClInclude Include="..\..\..\math\plane_root.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
-    <ClInclude Include="..\..\..\math\factorial.hpp" />
+    <ClInclude Include="..\..\..\math\static_math.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
-    <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp" />
-    <ClInclude Include="..\..\..\odeint\interfere.hpp" />
-    <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp" />
-    <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp" />
-    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_adaptive.hpp" />
-    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_const.hpp" />
-    <ClInclude Include="..\..\..\odeint\interfere\interfere_type.hpp" />
+    <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp" />
+    <ClInclude Include="..\..\..\odeint\border.hpp" />
+    <ClInclude Include="..\..\..\odeint\border\borders.hpp" />
+    <ClInclude Include="..\..\..\odeint\border\element_border.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_adaptive.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate\integrate_adaptive.hpp" />
+    <ClInclude Include="..\..\..\odeint\integrate\integrate_const.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\break_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\container_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\eqstate_break_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp" />
+    <ClInclude Include="..\..\..\odeint\stepper_categories.hpp" />
     <ClInclude Include="..\..\..\odeint\utility.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate\default_step_validator.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate\non_appendix_observer.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate\state_validate_stepper.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate\step_validate_stepper.hpp" />
+    <ClInclude Include="..\..\..\odeint\validate\validate_result.hpp" />
     <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp" />
     <ClInclude Include="..\..\..\random.hpp" />
     <ClInclude Include="..\..\..\random\pair_normal_distribution.hpp" />
     <ClInclude Include="..\..\..\random\random_bits.hpp" />
     <ClInclude Include="..\..\..\random\random_engine.hpp" />
     <ClInclude Include="..\..\..\random\xorshift.hpp" />
+    <ClInclude Include="..\..\..\recursive.hpp" />
+    <ClInclude Include="..\..\..\recursive\breakable_recurrence.hpp" />
+    <ClInclude Include="..\..\..\recursive\recurrence.hpp" />
+    <ClInclude Include="..\..\..\recursive\stepper.hpp" />
     <ClInclude Include="..\..\..\resource.hpp" />
-    <ClInclude Include="..\..\..\sequence.hpp" />
-    <ClInclude Include="..\..\..\sequence\breakable_progress.hpp" />
-    <ClInclude Include="..\..\..\sequence\progress.hpp" />
     <ClInclude Include="..\..\..\signals.hpp" />
     <ClInclude Include="..\..\..\signals\connect.hpp" />
     <ClInclude Include="..\..\..\signals\unique_connections.hpp" />
@@ -133,14 +159,6 @@
     <ClInclude Include="..\..\..\streambuf_interface.hpp" />
     <ClInclude Include="..\..\..\table.hpp" />
     <ClInclude Include="..\..\..\tuple.hpp" />
-    <ClInclude Include="..\..\..\typemanage.hpp" />
-    <ClInclude Include="..\..\..\typemanage\listup_name.hpp" />
-    <ClInclude Include="..\..\..\typemanage\listup_parameter.hpp" />
-    <ClInclude Include="..\..\..\typemanage\listup_string_build.hpp" />
-    <ClInclude Include="..\..\..\typemanage\parameter.hpp" />
-    <ClInclude Include="..\..\..\typemanage\string_build.hpp" />
-    <ClInclude Include="..\..\..\typemanage\type_manage.hpp" />
-    <ClInclude Include="..\..\..\typemanage\type_name.hpp" />
     <ClInclude Include="..\..\..\type_traits.hpp" />
     <ClInclude Include="..\..\..\utility.hpp" />
     <ClInclude Include="..\..\..\varray.hpp" />
@@ -149,19 +167,19 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>
     <RootNamespace>hmLib</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -186,6 +204,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -198,6 +217,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
