@@ -17,7 +17,7 @@ namespace hmLib {
 		std::ifstream fin(Name_);
 		return fin.is_open();
 	}
-	inline std::pair<std::string, std::string> splite_filepath(std::string FullPath){
+	inline std::pair<std::string, std::string> split_file_path(std::string FullPath){
 		auto FileLength = std::distance(
 			FullPath.rbegin(), 
 			std::find(FullPath.rbegin(), FullPath.rend(), HMLIB_FILEPATH_SEP)
@@ -28,7 +28,7 @@ namespace hmLib {
 			FullPath.substr(SlashPos+1, FileLength)
 		);
 	}
-	inline std::pair<std::string, std::string> splite_fileextension(std::string FullPath){
+	inline std::pair<std::string, std::string> split_file_extension(std::string FullPath){
 		auto ExtLength = std::distance(
 			FullPath.rbegin(), 
 			std::find(FullPath.rbegin(), FullPath.rend(), '.')
