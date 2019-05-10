@@ -180,9 +180,6 @@
     <ClCompile Include="test_odeint.cpp" />
     <ClCompile Include="test_varray.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="test1.csv" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

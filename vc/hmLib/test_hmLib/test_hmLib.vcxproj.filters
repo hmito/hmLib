@@ -63,7 +63,4 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="test1.csv" />
-  </ItemGroup>
 </Project>
