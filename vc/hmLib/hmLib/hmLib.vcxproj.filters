@@ -43,9 +43,6 @@
     <Filter Include="hmLib\odeint\observer">
       <UniqueIdentifier>{e920b87d-d779-4464-a362-9503a938bdd1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="hmLib\odeint\interfere">
-      <UniqueIdentifier>{bfd5b6a4-9c20-462c-a96b-ae482a1d7bbb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="hmLib\iterators">
       <UniqueIdentifier>{72210415-8987-4401-99c7-796733475510}</UniqueIdentifier>
     </Filter>
@@ -66,6 +63,15 @@
     </Filter>
     <Filter Include="hmLib\csv">
       <UniqueIdentifier>{f90a09b8-52b4-4c50-b330-5b5f50932922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\odeint\integrate">
+      <UniqueIdentifier>{62816132-b49b-4f7f-b9f8-3bb9831b73aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\odeint\validate">
+      <UniqueIdentifier>{2104aa61-1021-4948-b058-242fea6b2b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\odeint\border">
+      <UniqueIdentifier>{882f02ea-02ee-4269-b36e-75f96c8a144e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -247,27 +253,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp">
       <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\breakable_integrate.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_adaptive.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\interfere_integrate_const.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\interfere_type.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\float_boundary.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\interfere\boundary.hpp">
-      <Filter>hmLib\odeint\interfere</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\lattices\lattice.hpp">
       <Filter>hmLib\lattices</Filter>
@@ -502,6 +487,54 @@
     </ClInclude>
     <ClInclude Include="..\..\..\block_vector.hpp">
       <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_adaptive.hpp">
+      <Filter>hmLib\odeint\integrate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp">
+      <Filter>hmLib\odeint\integrate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\stepper_categories.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate\integrate_adaptive.hpp">
+      <Filter>hmLib\odeint\integrate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate\integrate_const.hpp">
+      <Filter>hmLib\odeint\integrate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate\state_validate_stepper.hpp">
+      <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate\validate_result.hpp">
+      <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate\step_validate_stepper.hpp">
+      <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate\default_step_validator.hpp">
+      <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate\non_appendix_observer.hpp">
+      <Filter>hmLib\odeint\validate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border\borders.hpp">
+      <Filter>hmLib\odeint\border</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border\element_border.hpp">
+      <Filter>hmLib\odeint\border</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

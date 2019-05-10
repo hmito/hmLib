@@ -56,6 +56,9 @@
     <ClCompile Include="test_lattices.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="test_odeint.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="test_lazy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>

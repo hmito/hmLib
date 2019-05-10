@@ -3,6 +3,7 @@
 #
 #include<iterator>
 #include<type_traits>
+#include"../exceptions.hpp"
 namespace hmLib {
 	namespace iterators {
 		template<typename iterator_, bool is_random_access_iterator_ = std::is_same<typename std::iterator_traits<iterator_>::iterator_category, std::random_access_iterator_tag>::value>
