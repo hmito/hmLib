@@ -12,7 +12,7 @@ namespace hmLib {
 			int get_step()const { return n; }
 			void set_step(int n_) { n = n_; }
 			template<typename sys_t, typename state_t>
-			void operator()(sys_t& Sys, state_t& State, int Step) {
+			void operator()(sys_t& Sys, state_t& State, int& Step) {
 				for(int i = 0; i<n; ++i) {
 					Sys(State, Step++);
 				}
