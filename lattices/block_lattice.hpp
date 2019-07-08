@@ -628,7 +628,7 @@ namespace hmLib {
 				return v2;
 			}
 			friend difference_type operator-(const const_iterator& v1, const const_iterator&  v2) {
-				std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*block_size();
+				return std::distance(v1.BItr->begin(), v1.Itr) - std::distance(v2.BItr->begin(), v2.Itr) + (v1.BItr - v2.BItr)*block_size();
 			}
 			friend bool operator==(const const_iterator& v1, const const_iterator& v2) {
 				return v1.BItr == v2.BItr && v1.Itr == v2.Itr;
