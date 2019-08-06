@@ -7,6 +7,8 @@
 #include "../../../math/root.hpp"
 #include "../../../math/axis.hpp"
 #include "../../../math/multiaxis.hpp"
+#include "../../../math/combinatorics.hpp"
+#include <boost/math/distributions/normal.hpp>
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib {
@@ -37,35 +39,35 @@ namespace hmLib {
 		}
 	};
 	TEST_CLASS(test_math_axis) {
-		TEST_METHOD(make_axis_with_borders) {
-			auto Axis1 = make_axis(0.0, 10.0, 11);
+		TEST_METHOD(make_range_axis_with_borders) {
+			auto Axis1 = make_range_axis(0.0, 10.0, 11);
 			Assert::AreEqual(11u, Axis1.size());
 			Assert::AreEqual( 0.0, Axis1.lower());
 			Assert::AreEqual(10.0, Axis1.upper());
 
-			auto Axis2 = make_axis(0.0, 10.0, 11, math::make_axis_option::none);
+			auto Axis2 = make_range_axis(0.0, 10.0, 11, math::range_axis_option::none);
 			Assert::AreEqual(11u, Axis2.size());
 			Assert::AreEqual(0.0, Axis2.lower());
 			Assert::AreEqual(10.0, Axis2.upper());
 
-			auto Axis3 = make_axis(0.0, 10.0, 9, math::make_axis_option::exclude_boundary);
+			auto Axis3 = make_range_axis(0.0, 10.0, 9, math::range_axis_option::exclude_boundary);
 			Assert::AreEqual(9u, Axis3.size());
 			Assert::AreEqual(1.0, Axis3.lower());
 			Assert::AreEqual(9.0, Axis3.upper());
 
-			auto Axis4 = make_axis(0.0, 10.0, 10, math::make_axis_option::exclude_lower_boundary);
+			auto Axis4 = make_range_axis(0.0, 10.0, 10, math::range_axis_option::exclude_lower_boundary);
 			Assert::AreEqual(10u, Axis4.size());
 			Assert::AreEqual(1.0, Axis4.lower());
 			Assert::AreEqual(10.0, Axis4.upper());
 
-			auto Axis5 = make_axis(0.0, 10.0, 10, math::make_axis_option::exclude_upper_boundary);
+			auto Axis5 = make_range_axis(0.0, 10.0, 10, math::range_axis_option::exclude_upper_boundary);
 			Assert::AreEqual(10u, Axis5.size());
 			Assert::AreEqual(0.0, Axis5.lower());
 			Assert::AreEqual(9.0, Axis5.upper());
 		}
 		TEST_METHOD(axis_grid_index) {
 			{
-				auto Axis = make_axis(0.0, 1.0, 11);
+				auto Axis = make_range_axis(0.0, 1.0, 11);
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
@@ -73,7 +75,7 @@ namespace hmLib {
 				}
 			}
 			{
-				auto Axis = make_axis(0.0, 1.0, 11, math::grid_adjuster<math::grid_policy::floor_grid_tag,-8>());
+				auto Axis = make_range_axis(0.0, 1.0, 11, math::grid_adjuster<math::grid_policy::floor_grid_tag,-8>());
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i+0.04));
@@ -81,7 +83,7 @@ namespace hmLib {
 				}
 			}
 			{
-				auto Axis = make_axis(0.0, 1.0, 11, math::grid_policy::ceil_grid);
+				auto Axis = make_range_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
 				Assert::AreEqual(0.1, Axis.interval());
 				for(unsigned int i = 0; i<Axis.size(); ++i) {
 					Assert::AreEqual<int>(i, Axis.index(0.1*i-0.04));
@@ -91,7 +93,7 @@ namespace hmLib {
 		}
 		TEST_METHOD(axis_flort_index) {
 			{
-				auto Axis = make_axis(0.0, 1.0, 11);
+				auto Axis = make_range_axis(0.0, 1.0, 11);
 
 				Assert::AreEqual(0.0, Axis.float_index(0.00), 1e-5);
 				Assert::AreEqual(0.2, Axis.float_index(0.02), 1e-5);
@@ -100,14 +102,14 @@ namespace hmLib {
 			}
 		}
 		TEST_METHOD(axis_grid_round_range) {
-			auto Axis = make_axis(0.0, 1.0, 11);
+			auto Axis = make_range_axis(0.0, 1.0, 11);
 
 			Assert::AreEqual(0.1, Axis.interval());
 
 			{
 				auto Ans = Axis.weighted_index(0.30-0.04, 0.30+0.04);
 				Assert::AreEqual(1u, Ans.size());
-				Assert::AreEqual(0.8, Ans.weight(),1e-5);
+				Assert::AreEqual(0.8, Ans.volume(),1e-5);
 				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(1.0, Ans.at(0).second, 1e-5);
 
@@ -123,7 +125,7 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30-0.04, 0.30+0.06);
 				Assert::AreEqual(2u, Ans.size());
-				Assert::AreEqual(1.0, Ans.weight(),1e-5);
+				Assert::AreEqual(1.0, Ans.volume(),1e-5);
 				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9 , Ans.at(0).second, 1e-5);
 				Assert::AreEqual(4, Ans.at(1).first);
@@ -144,36 +146,36 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30-0.04, 0.30+0.26);
 				Assert::AreEqual(4u, Ans.size());
-				Assert::AreEqual(3.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3.0, Ans.volume(), 1e-5);
 				Assert::AreEqual(3, Ans.at(0).first);
-				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
+				Assert::AreEqual(0.9/3.0, Ans.at(0).second, 1e-5);
 				Assert::AreEqual(4, Ans.at(1).first);
-				Assert::AreEqual(1.0, Ans.at(1).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, Ans.at(1).second, 1e-5);
 				Assert::AreEqual(5, Ans.at(2).first);
-				Assert::AreEqual(1.0, Ans.at(2).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, Ans.at(2).second, 1e-5);
 				Assert::AreEqual(6, Ans.at(3).first);
-				Assert::AreEqual(0.1, Ans.at(3).second, 1e-5);
+				Assert::AreEqual(0.1/3.0, Ans.at(3).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
 				Assert::AreEqual(3, (*Itr).first);
-				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
+				Assert::AreEqual(0.9/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(4, (*Itr).first);
-				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(5, (*Itr).first);
-				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(6, (*Itr).first);
-				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
+				Assert::AreEqual(0.1/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
 			}
 		}
 		TEST_METHOD(axis_grid_floor_range) {
-			auto Axis = make_axis(0.0, 1.0, 11,math::grid_policy::floor_grid);
+			auto Axis = make_range_axis(0.0, 1.0, 11,math::floor_grid_adjuster<-8>());
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -195,7 +197,7 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30+0.01, 0.30+0.11);
 				Assert::AreEqual(2u, Ans.size());
-				Assert::AreEqual(1.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(1.0, Ans.volume(), 1e-5);
 				Assert::AreEqual(3, Ans.at(0).first);
 				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
 				Assert::AreEqual(4, Ans.at(1).first);
@@ -216,36 +218,36 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.30+0.01, 0.30+0.31);
 				Assert::AreEqual(4u, Ans.size());
-				Assert::AreEqual(3.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3.0, Ans.volume(), 1e-5);
 				Assert::AreEqual(3, Ans.at(0).first);
-				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
+				Assert::AreEqual(0.9/3.0, Ans.at(0).second, 1e-5);
 				Assert::AreEqual(4, Ans.at(1).first);
-				Assert::AreEqual(1.0, Ans.at(1).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, Ans.at(1).second, 1e-5);
 				Assert::AreEqual(5, Ans.at(2).first);
-				Assert::AreEqual(1.0, Ans.at(2).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, Ans.at(2).second, 1e-5);
 				Assert::AreEqual(6, Ans.at(3).first);
-				Assert::AreEqual(0.1, Ans.at(3).second, 1e-5);
+				Assert::AreEqual(0.1/3.0, Ans.at(3).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
 				Assert::AreEqual(3, (*Itr).first);
-				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
+				Assert::AreEqual(0.9/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(4, (*Itr).first);
-				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(5, (*Itr).first);
-				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(6, (*Itr).first);
-				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
+				Assert::AreEqual(0.1/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
 			}
 		}
 		TEST_METHOD(axis_grid_ceil_range) {
-			auto Axis = make_axis(0.0, 1.0, 11, math::grid_policy::ceil_grid);
+			auto Axis = make_range_axis(0.0, 1.0, 11, math::ceil_grid_adjuster<-8>());
 
 			Assert::AreEqual(0.1, Axis.interval());
 
@@ -287,37 +289,37 @@ namespace hmLib {
 			{
 				auto Ans = Axis.weighted_index(0.20+0.01, 0.20+0.31);
 				Assert::AreEqual(4u, Ans.size());
-				Assert::AreEqual(3.0, Ans.weight(), 1e-5);
+				Assert::AreEqual(3.0, Ans.volume(), 1e-5);
 				Assert::AreEqual(3, Ans.at(0).first);
-				Assert::AreEqual(0.9, Ans.at(0).second, 1e-5);
+				Assert::AreEqual(0.9/3.0, Ans.at(0).second, 1e-5);
 				Assert::AreEqual(4, Ans.at(1).first);
-				Assert::AreEqual(1.0, Ans.at(1).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, Ans.at(1).second, 1e-5);
 				Assert::AreEqual(5, Ans.at(2).first);
-				Assert::AreEqual(1.0, Ans.at(2).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, Ans.at(2).second, 1e-5);
 				Assert::AreEqual(6, Ans.at(3).first);
-				Assert::AreEqual(0.1, Ans.at(3).second, 1e-5);
+				Assert::AreEqual(0.1/3.0, Ans.at(3).second, 1e-5);
 
 				auto Itr = Ans.begin();
 				auto End = Ans.end();
 				Assert::IsFalse(Itr==End);
 				Assert::AreEqual(3, (*Itr).first);
-				Assert::AreEqual(0.9, (*Itr).second, 1e-5);
+				Assert::AreEqual(0.9/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(4, (*Itr).first);
-				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(5, (*Itr).first);
-				Assert::AreEqual(1.0, (*Itr).second, 1e-5);
+				Assert::AreEqual(1.0/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::AreEqual(6, (*Itr).first);
-				Assert::AreEqual(0.1, (*Itr).second, 1e-5);
+				Assert::AreEqual(0.1/3.0, (*Itr).second, 1e-5);
 				++Itr;
 				Assert::IsTrue(Itr==End);
 			}
 		}
 		TEST_METHOD(axis_mapping_floor_floor) {
-			auto Axis1 = make_axis(0.2, 0.89, 4, math::grid_policy::floor_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02, 0.74, 7, math::grid_policy::floor_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2, 0.89, 4, math::floor_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02, 0.74, 7, math::floor_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -334,15 +336,15 @@ namespace hmLib {
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
 			Assert::AreEqual(1, WI.at(0).first);
-			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
+			Assert::AreEqual((0.26-0.20)/0.23, WI.at(0).second, 1e-5);
 			Assert::AreEqual(2, WI.at(1).first);
-			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
+			Assert::AreEqual((0.38-0.26)/0.23, WI.at(1).second, 1e-5);
 			Assert::AreEqual(3, WI.at(2).first);
-			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
+			Assert::AreEqual((0.43-0.38)/0.23, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_round) {
-			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::grid_policy::round_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::grid_policy::round_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -359,15 +361,15 @@ namespace hmLib {
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
 			Assert::AreEqual(1, WI.at(0).first);
-			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
+			Assert::AreEqual((0.26-0.20)/0.23, WI.at(0).second, 1e-5);
 			Assert::AreEqual(2, WI.at(1).first);
-			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
+			Assert::AreEqual((0.38-0.26)/0.23, WI.at(1).second, 1e-5);
 			Assert::AreEqual(3, WI.at(2).first);
-			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
+			Assert::AreEqual((0.43-0.38)/0.23, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_ceil_round) {
-			auto Axis1 = make_axis(0.2+0.23, 0.89+0.23, 4, math::grid_policy::ceil_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::grid_policy::round_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2+0.23, 0.89+0.23, 4, math::ceil_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02+0.12/2, 0.74+0.12/2, 7, math::round_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -384,15 +386,15 @@ namespace hmLib {
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
 			Assert::AreEqual(1, WI.at(0).first);
-			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
+			Assert::AreEqual((0.26-0.20)/0.23, WI.at(0).second, 1e-5);
 			Assert::AreEqual(2, WI.at(1).first);
-			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
+			Assert::AreEqual((0.38-0.26)/0.23, WI.at(1).second, 1e-5);
 			Assert::AreEqual(3, WI.at(2).first);
-			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
+			Assert::AreEqual((0.43-0.38)/0.23, WI.at(2).second, 1e-5);
 		}
 		TEST_METHOD(axis_mapping_round_ceil) {
-			auto Axis1 = make_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::grid_policy::round_grid);	//[0.2, 0.43, 0.66, 0.89]
-			auto Axis2 = make_axis(0.02+0.12, 0.74+0.12, 7, math::grid_policy::ceil_grid);	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
+			auto Axis1 = make_range_axis(0.2+0.23/2, 0.89+0.23/2, 4, math::round_grid_adjuster<-8>());	//[0.2, 0.43, 0.66, 0.89]
+			auto Axis2 = make_range_axis(0.02+0.12, 0.74+0.12, 7, math::ceil_grid_adjuster<-8>());	//[0.02, 0.14, 0.26, 0.38, 0.50, 0.62, 0.74]
 
 
 			auto Mapper = hmLib::map_axis(Axis1, Axis2);
@@ -409,310 +411,570 @@ namespace hmLib {
 			auto WI = Mapper.weighted_index(0);
 			Assert::AreEqual(3u, WI.size());
 			Assert::AreEqual(1, WI.at(0).first);
-			Assert::AreEqual((0.26-0.20)/0.12, WI.at(0).second, 1e-5);
+			Assert::AreEqual((0.26-0.20)/0.23, WI.at(0).second, 1e-5);
 			Assert::AreEqual(2, WI.at(1).first);
-			Assert::AreEqual(1.0, WI.at(1).second, 1e-5);
+			Assert::AreEqual((0.38-0.26)/0.23, WI.at(1).second, 1e-5);
 			Assert::AreEqual(3, WI.at(2).first);
-			Assert::AreEqual((0.43-0.38)/0.12, WI.at(2).second, 1e-5);
+			Assert::AreEqual((0.43-0.38)/0.23, WI.at(2).second, 1e-5);
+		}
+		TEST_METHOD(axis_mapping_norm) {
+			auto Axis1 = hmLib::make_range_axis(1.0, 2.0, 101);
+			auto Axis2 = hmLib::make_range_axis(0.5, 2.5, 101);
+
+			auto Dist = boost::math::normal_distribution<double>(1.5, 0.1);
+
+			std::vector<double> Vec1(Axis1.size(), 0.);
+
+
+			for(unsigned int i = 0; i<Axis1.size(); ++i) {
+				Vec1[i] = boost::math::pdf(Dist, Axis1[i])*Axis1.interval();
+			}
+			auto Mapper = Axis1.map_to(Axis2);
+
+			std::vector<double> Vec2(Axis2.size(), 0.);
+			for(unsigned int i = 0; i<Vec1.size(); ++i) {
+				auto wi = Mapper.weighted_index(i);
+				for(auto p:wi) {
+					Vec2[p.first] += p.second*Vec1[i];
+				}
+			}
+
+			auto Sum1 = std::accumulate(Vec1.begin(), Vec1.end(), 0.0);
+			auto Sum2 = std::accumulate(Vec2.begin(), Vec2.end(), 0.0);
+
+			Assert::AreEqual(1.0, Sum1, 1e-3);
+			Assert::AreEqual(Sum1, Sum2, 1e-4);
 		}
 	};
 	TEST_CLASS(test_math_multiaxis) {
-		TEST_METHOD(construct) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,10),
-				make_axis<double>(0,1.5,15),
-				make_axis<double>(0,2.0,20) 
-			};
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
+		TEST_METHOD(test_map) {
+			lattice_axis<double, 2> Axes1;
+			Axes1.axis(0).assign(4.95, 5.05, 101);
+			Axes1.axis(1).assign(0.80, 0.90, 101);
 
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
+			lattice_axis<double, 2> Axes2;
+			Axes2.axis(0).assign(4.90, 5.10, 101);
+			Axes2.axis(1).assign(0.80, 0.90, 101);
 
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(make) {
-			multiaxis<double, 3> Axes = make_multiaxis(
-				varray<double, 3>{0.0,0.0,0.0},
-				varray<double, 3>{1.0,1.5,2.0},
-				varray<std::size_t, 3>{10,15,20}
-			);
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(bind) {
-			multiaxis<double, 3> Axes = bind_axis(
-				make_axis<double>(0, 1.0, 10),
-				make_axis<double>(0, 1.5, 15),
-				make_axis<double>(0, 2.0, 20)
-			);
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(make_assign_axis_each) {
-			multiaxis<double, 3> Axes;
-
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(0, make_axis<double>(0, 1, 10));
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(1, make_axis<double>(0, 1.5, 15));
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(2, make_axis<double>(0, 2, 20));
-			Assert::IsFalse(Axes.empty());
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(make_assign_axis_emplace) {
-			multiaxis<double, 3> Axes;
-
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(0, 0, 1, 10);
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(1, 0, 1.5, 15);
-			Assert::IsTrue(Axes.empty());
-			Axes.assign_axis(2, 0, 2, 20);
-			Assert::IsFalse(Axes.empty());
-
-			auto Lower = Axes.lower();
-			auto Upper = Axes.upper();
-			auto Extent = Axes.extent();
-
-			Assert::AreEqual(0.0, Lower[0], 1e-10);
-			Assert::AreEqual(0.0, Lower[1], 1e-10);
-			Assert::AreEqual(0.0, Lower[2], 1e-10);
-
-			Assert::AreEqual(1.0, Upper[0], 1e-10);
-			Assert::AreEqual(1.5, Upper[1], 1e-10);
-			Assert::AreEqual(2.0, Upper[2], 1e-10);
-
-			Assert::AreEqual(10u, Extent[0]);
-			Assert::AreEqual(15u, Extent[1]);
-			Assert::AreEqual(20u, Extent[2]);
-		}
-		TEST_METHOD(multiaxis_at) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,1.5,16),
-				make_axis<double>(0,2.0,21)
-			};
-			using value_point_type = typename decltype(Axes)::value_point_type;
-
-			for(unsigned int x = 0; x<11; ++x) {
-				for(unsigned int y = 0; y<16; ++y) {
-					for(unsigned int z = 0; z<21; ++z) {
-						auto p = Axes.at(x, y, z);
-						Assert::AreEqual(p[0], x*0.1, 1e-10);
-						Assert::AreEqual(p[1], y*0.1, 1e-10);
-						Assert::AreEqual(p[2], z*0.1, 1e-10);
-					}
+			auto Dist1 = boost::math::normal_distribution<double>(5.00, 0.01);
+			auto Dist2 = boost::math::normal_distribution<double>(0.85, 0.01);
+			lattices::indexer<2> Indexer(lattices::extent_type<2>{101, 101});
+			std::vector<double> Vec1(101*101, 0.0);
+			for(unsigned int i = 0; i<Axes1.axis(0).size(); ++i) {
+				for(unsigned int j = 0; j<Axes1.axis(1).size(); ++j) {
+					Vec1[Indexer.index(lattices::point_type<2>{static_cast<int>(i), static_cast<int>(j)})] = boost::math::pdf(Dist1, Axes1.axis(0)[i])*Axes1.axis(0).interval()
+						* boost::math::pdf(Dist2, Axes1.axis(1)[j])*Axes1.axis(1).interval();
 				}
 			}
-		}
-		TEST_METHOD(multiaxis_ref) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,1.5,16),
-				make_axis<double>(0,2.0,21)
-			};
-			using value_point_type = typename decltype(Axes)::value_point_type;
 
-			for(unsigned int x = 0; x<11; ++x) {
-				for(unsigned int y = 0; y<16; ++y) {
-					for(unsigned int z = 0; z<21; ++z) {
-						auto p = Axes.ref(x, y, z);
-						Assert::AreEqual(p[0], x*0.1, 1e-10);
-						Assert::AreEqual(p[1], y*0.1, 1e-10);
-						Assert::AreEqual(p[2], z*0.1, 1e-10);
-					}
-				}
-			}
-		}
-		TEST_METHOD(iterator_access) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,1.5,16),
-				make_axis<double>(0,2.0,21)
-			};
-
-			auto Itr = Axes.begin();
-			auto End = Axes.end();
-
-			for(unsigned int z = 0; z<21; ++z) {
-				for(unsigned int y = 0; y<16; ++y) {
-					for(unsigned int x = 0; x<11; ++x) {
-						Assert::IsFalse(Itr==End);
-
-						auto p = *Itr;
-						Assert::AreEqual(p[0], x*0.1, 1e-10);
-						Assert::AreEqual(p[1], y*0.1, 1e-10);
-						Assert::AreEqual(p[2], z*0.1, 1e-10);
-
-						++Itr;
-					}
-				}
-			}
-			Assert::IsTrue(Itr==End);
-		}
-		TEST_METHOD(locator_access) {
-			multiaxis<double, 3> Axes{
-				make_axis<double>(0,0.5,6),
-				make_axis<double>(0,0.7,8),
-				make_axis<double>(0,0.9,10)
-			};
-
-			for(unsigned int x = 1; x<5; ++x) {
-				for(unsigned int y = 1; y<7; ++y) {
-					for(unsigned int z = 1; z<9; ++z) {
-						auto ltr = Axes.locate(x, y, z);
-
-						auto q = *ltr;
-						Assert::AreEqual(q[0], x*0.1, 1e-10);
-						Assert::AreEqual(q[1], y*0.1, 1e-10);
-						Assert::AreEqual(q[2], z*0.1, 1e-10);
-
-						for(int dx = -1; dx<=1; ++dx) {
-							for(int dy = -1; dy<=1; ++dy) {
-								for(int dz = -1; dz<=1; ++dz) {
-									auto p = ltr.ref(dx,dy,dz);
-									Assert::AreEqual(p[0], (x+dx)*0.1, 1e-10);
-									Assert::AreEqual(p[1], (y+dy)*0.1, 1e-10);
-									Assert::AreEqual(p[2], (z+dz)*0.1, 1e-10);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		TEST_METHOD(weighted_iterator) {
-			multiaxis<double, 2> Axes{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,2.0,21)
-			};
-
-			auto Weighted = Axes.weighted_point(
-				varray<double, 2>{0.06, 1.07}, varray<double, 2>{0.58, 1.33}
-			);
-			//[1:6,11:13]
-
-			Assert::IsFalse(Weighted.empty());
-			Assert::AreEqual(6u*3u, Weighted.size());
-			Assert::AreEqual(5.2*2.6, Weighted.weight(), 1e-10);
-
-			auto Itr = Weighted.begin();
-			auto End = Weighted.end();
-
-			for(int x = 1; x<=6; ++x) {
-				Assert::IsFalse(Itr==End);
-				auto wp = *Itr;
-				Assert::AreEqual(x, wp.first[0]);
-				Assert::AreEqual(11, wp.first[1]);
-
-				double wx = 1.0;
-				if(x==1) {
-					wx = 0.9;
-				} else if(x==6) {
-					wx = 0.3;
-				}
-				Assert::AreEqual(wx*0.8, wp.second, 1e-10);
-				++Itr;
-			}
-
-			for(int x = 1; x<=6; ++x) {
-				Assert::IsFalse(Itr==End);
-				auto wp = *Itr;
-				Assert::AreEqual(x, wp.first[0]);
-				Assert::AreEqual(12, wp.first[1]);
-
-				double wx = 1.0;
-				if(x==1) {
-					wx = 0.9;
-				} else if(x==6) {
-					wx = 0.3;
-				}
-
-				Assert::AreEqual(wx*1.0, wp.second, 1e-10);
-				++Itr;
-			}
-
-			for(int x = 1; x<=6; ++x) {
-				Assert::IsFalse(Itr==End);
-				auto wp = *Itr;
-				Assert::AreEqual(x, wp.first[0]);
-				Assert::AreEqual(13, wp.first[1]);
-
-				double wx = 1.0;
-				if(x==1) {
-					wx = 0.9;
-				} else if(x==6) {
-					wx = 0.3;
-				}
-				Assert::AreEqual(wx*0.8, wp.second, 1e-10);
-				++Itr;
-			}
-		}
-		TEST_METHOD(self_mapper_check) {
-			multiaxis<double, 2> Axes1{
-				make_axis<double>(0,1.0,11),
-				make_axis<double>(0,2.0,21)
-			};
-			multiaxis<double, 2> Axes2{
-				make_axis<double>(-0.5,1.5,21),
-				make_axis<double>(-1.0,2.0,21)
-			};
-			//x: 5:15
-			//y: 
 			auto Mapper = Axes1.map_to(Axes2);
+			std::vector<double> Vec2(Vec1.size(), 0.);
+			for(unsigned int i = 0; i<Axes1.axis(0).size(); ++i) {
+				for(unsigned int j = 0; j<Axes1.axis(1).size(); ++j) {
+					auto wi = Mapper.weighted_point(lattices::point_type<2>{static_cast<int>(i), static_cast<int>(j)});
+					for(auto p:wi) {
+						Vec2[Indexer.index(p.first)] += p.second*Vec1[Indexer.index(lattices::point_type<2>{static_cast<int>(i), static_cast<int>(j)})];
+					}
+				}
+			}
+
+			auto Sum1 = std::accumulate(Vec1.begin(), Vec1.end(), 0.0);
+			auto Sum2 = std::accumulate(Vec2.begin(), Vec2.end(), 0.0);
+
+			Assert::AreEqual(1.0, Sum1, 1e-3);
+			Assert::AreEqual(Sum1, Sum2, 1e-4);
+
 		}
+	};
+	TEST_CLASS(test_math_combi) {
+		TEST_METHOD(test_combination) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			combination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_combination_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			combination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_combination_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_combination_excp1) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			combination_indexer<> Indexer(N, R,Excp.begin(),Excp.end());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_combination_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_combination_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			combination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(10, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multicombination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multicombination_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(nHr(5, 3), Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(nHr(N-Excp.size(),R), Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multicombination_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			multicombination_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(nHr(5,3), Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			permutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			permutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp1) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_permutation_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			permutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(60, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multipermutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_at) {
+			unsigned int N = 5;
+			unsigned int R = 3;
+			multipermutation_indexer<> Indexer(N, R);
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp1_at) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(std::size_t i = 0; i<Indexer.size(); ++i) {
+					Assert::IsTrue(Indexer[i]<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), Indexer[i])==Excp.end());
+					Val *= 10;
+					Val += Indexer.at(i);
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,4,6 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp2) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 0,3,3,4,6,3,4,0,0,0,6 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+		TEST_METHOD(test_multipermutation_excp3) {
+			unsigned int N = 9;
+			unsigned int R = 3;
+			std::vector<unsigned int> Excp{ 5,6,7,8,9 };
+			multipermutation_indexer<> Indexer(N, R, Excp.begin(), Excp.end());
+			Assert::AreEqual<unsigned long long>(125, Indexer.total_casenum());
+
+			std::vector<unsigned long long> Vec;
+			for(; Indexer.valid(); Indexer.next()) {
+				unsigned long long Val = 0;
+				for(auto Itr = Indexer.begin(); Itr!=Indexer.end(); ++Itr) {
+					Assert::IsTrue(*Itr<N);
+					Assert::IsTrue(std::find(Excp.begin(), Excp.end(), *Itr)==Excp.end());
+					Val *= 10;
+					Val += *Itr;
+				}
+				Vec.push_back(Val);
+			}
+			Assert::AreEqual<unsigned long long>(Indexer.total_casenum(), Vec.size());
+			Assert::IsTrue(std::unique(Vec.begin(), Vec.end())==Vec.end());
+		}
+
 	};
 }

@@ -9,6 +9,8 @@
 #include<type_traits>
 #include"utility.hpp"
 namespace hmLib {
+	//order of varray: same with multiarray
+	// [0,0] < [0,1] < [1,0]
 	template<typename T, std::size_t N>
 	struct varray {
 	private:
@@ -292,28 +294,28 @@ namespace hmLib {
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator<(const varray<T, N>& v1, const varray<U, N>& v2) { 
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]<v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]<v2[i];
 		}
 		return false;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator<=(const varray<T, N>& v1, const varray<U, N>& v2) { 
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]<v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]<v2[i];
 		}
 		return true;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator>(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]>v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]>v2[i];
 		}
 		return false;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator>=(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]>v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]>v2[i];
 		}
 		return true;
 	}

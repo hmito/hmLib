@@ -28,7 +28,7 @@ namespace hmLib{
 		using pointer = typename std::iterator_traits<iterator_base>::pointer;
 	public:
 		using indexer = lattices::indexer<dim_>;
-		using locator = lattices::basic_locator<iterator_base, indexer>;
+		using locator = lattices::basic_sub_locator<iterator_base, indexer>;
 		using iterator = lattices::basic_sub_iterator<iterator_base, indexer>;
 		using view = sublattice_view<iterator_base, dim_>;
 	public:
@@ -80,7 +80,7 @@ namespace hmLib{
 		iterator end() const { return iterator(Begin, OriginalIndexer, Pos, SubIndexer.extent(), SubIndexer.lattice_size()); }
 	public:
 		//!Return locator of given point
-		locator locate(const point_type& Point_)const { return locator(Begin, OriginalIndexer, Pos+Point_); }
+		locator locate(const point_type& Point_)const { return locator(Begin, OriginalIndexer, Pos+Point_,SubIndexer,Pos); }
 		//!Return locator of given point elements
 		template<typename... others>
 		locator locate(index_type Pos_, others... Others_) const { return locate(lattices::point(Pos_, Others_...)); }

@@ -20,9 +20,9 @@ namespace hmLib {
 			auto t = std::make_tuple(0, 5.0, 'c');
 			auto fn = [](auto v)->bool {return v>0; };
 
-			Assert::IsFalse(tuple_apply_at<bool>(0, fn, t));
-			Assert::IsTrue(tuple_apply_at<bool>(1, fn, t));
-			Assert::IsTrue(tuple_apply_at<bool>(2, fn, t));
+			Assert::IsFalse(tuple_apply_at(0, fn, t));
+			Assert::IsTrue(tuple_apply_at(1, fn, t));
+			Assert::IsTrue(tuple_apply_at(2, fn, t));
 		}
 	};
 }

@@ -72,7 +72,7 @@ namespace hmLib {
 						return std::make_pair(b, b);
 					} else if(fa * fb < 0.0) {
 						boost::uintmax_t max_iter = 128;
-						auto ans = boost::math::tools::bisect(Fn, a, b, [error=error](ans_type v1, ans_type v2) {return v2 - v1 < error; });
+						auto ans = boost::math::tools::bisect(Fn, a, b, [error=error](ans_type v1, ans_type v2) {return v2 - v1 < error; },max_iter);
 						start = b;
 						startFnVal = fb;
 						return ans;
