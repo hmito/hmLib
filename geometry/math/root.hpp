@@ -9,13 +9,13 @@ namespace hmLib{
 	namespace plane_geometry{
 		namespace math{
 			template<typename fn, typename T, typename output_iterator>
-			output_iterator search_root_grid(fn Fn, rectangle<T> r, point<unsigned int> div, output_iterator out){
-				axis<T> xaxis(r.lower.x,r.upper.x,div.x+1);
-				axis<T> yaxis(r.lower.y,r.upper.y,div.y+1);
+			output_iterator search_root_rectangle(fn Fn, rectangle<T> Range, point<unsigned int> Div, output_iterator out){
+				range_axis<T> xaxis(Range.lower.x, Range.upper.x,div.x+1);
+				range_axis<T> yaxis(Range.lower.y, Range.upper.y,div.y+1);
 
 				std::vector<unsigned char> Vec(xaxis.size(),0);
 				for(unsigned int ix = 0; ix<xaxis.size(); ++ix) {
-					Vec[ix] = (Fn(xaxis[ix],yaxis[iy])>=0?1:0);
+					Vec[ix] = (Fn(xaxis[ix],yaxis[0])>=0?1:0);
 				}
 
 				for(unsigned int iy = 1; iy<yaxis.size(); ++iy){

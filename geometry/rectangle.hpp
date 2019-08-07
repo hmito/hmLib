@@ -1,18 +1,20 @@
 #ifndef HMLIB_GEOMETRY_RECTANGLE_INC
 #define HMLIB_GEOMETRY_RECTANGLE_INC 100
 #
+#include<type_traits>
+#include"../utility.hpp"
 #include"point.hpp"
 namespace hmLib{
 	namespace plane_geometry {
 		template<typename T>
 		struct rectangle {
 		private:
-			using rectangle = segment<T>;
+			using this_type = rectangle<T>;
 		public:
 			using point_type = point<T>;
 		public:
-			point_type lower;
-			point_type upper;
+			point_type p1;
+			point_type p2;
 		public:
 			rectangle() = default;
 			rectangle(const this_type&) = default;
@@ -20,54 +22,54 @@ namespace hmLib{
 			rectangle(this_type&&) = default;
 			this_type& operator=(this_type&&) = default;
 		public:
-			rectangle(point_type p1_, point_type p2_) : lower(min_element(p1_,p2_)), upper(max_element(p1_,p2_)) {}
-			void set(point_type x_, point_type y_) {
-				lower = min_element(p1_,p2_));
-				upper = max_element(p1_,p2_));
+			rectangle(point_type p1_, point_type p2_) : p1(p1_), p2(p2_) {}
+			void set(point_type p1_, point_type p2_) {
+				p1 = p1_;
+				p2 = p2_;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
-			explicit rectangle(const rectangle<U>& Other) : lower(static_cast<T>(Other.lower)), upper(static_cast<T>(Other.upper)) {}
+			explicit rectangle(const rectangle<U>& Other) : p1(static_cast<T>(Other.p1)), p2(static_cast<T>(Other.p2)) {}
 			template<typename U>
 			operator rectangle<U>()const{
-				return rectangle<U>(lower,upper);
+				return rectangle<U>(p1,p2);
 			}
 		public:
 			rectangle<T> operator+()const { return *this; }
-			rectangle<T> operator-()const { return rectangle<T>(-lower, -upper); }
+			rectangle<T> operator-()const { return rectangle<T>(-p1, -p2); }
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<point_type>() + std::declval<U>()), point_type>::value>::type*& = hmLib::utility::enabler>
 			rectangle<T>& operator+=(const point<U>& p) {
-				lower += p;
-				upper += p;
+				p1 += p;
+				p2 += p;
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<point_type>() - std::declval<U>()), point_type>::value>::type*& = hmLib::utility::enabler>
 			rectangle<T>& operator-=(const point<U>& p) {
-				lower -= p;
-				upper -= p;
+				p1 -= p;
+				p2 -= p;
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<point_type>() * std::declval<U>()), point_type>::value>::type*& = hmLib::utility::enabler>
 			rectangle<T>& operator*=(const point<U>& p) {
-				lower *= p;
-				upper *= p;
+				p1 *= p;
+				p2 *= p;
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<point_type>() / std::declval<U>()), point_type>::value>::type*& = hmLib::utility::enabler>
 			rectangle<T>& operator/=(const point<U>& p) {
-				lower /= p;
-				upper /= p;
+				p1 /= p;
+				p2 /= p;
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<point_type>() * std::declval<U>()), point_type>::value>::type*& = hmLib::utility::enabler>
 			rectangle<T>& operator*=(U val) {
-				lower *= val;
-				upper *= val;
+				p1 *= val;
+				p2 *= val;
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<point_type>() / std::declval<U>()), point_type>::value>::type*& = hmLib::utility::enabler>
 			rectangle<T>& operator/=(U val) {
-				lower /= val;
-				upper /= val;
+				p1 /= val;
+				p2 /= val;
 				return *this;
 			}
 		};
