@@ -70,6 +70,9 @@
     <Filter Include="hmLib\recursive">
       <UniqueIdentifier>{6d223cba-a903-469b-89f2-51e55250a847}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\geometry\math">
+      <UniqueIdentifier>{02107cc8-9520-4bb9-999e-755b9cd02244}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="use_odeint.cpp">
@@ -523,6 +526,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\recursive\recurrence.hpp">
       <Filter>hmLib\recursive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\line.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\rectangle.hpp">
+      <Filter>hmLib\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\geometry\math\root.hpp">
+      <Filter>hmLib\geometry\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

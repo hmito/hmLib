@@ -27,7 +27,7 @@ namespace hmLib {
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
 			explicit segment(const segment<U>& Other) : p1(static_cast<point_type>(Other.p1)), p2(static_cast<point_type>(Other.p2)) {}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+			template<typename U>
 			operator segment<U>()const{
 				return segment<U>(p1, p2);
 			}
@@ -80,10 +80,10 @@ namespace hmLib {
 		bool operator!=(const segment<T>& s1, const segment<U>& s2) {
 			return !(s1 == s2);
 		}
-		template<typename T, typename U>
-		bool is_equal(const segment<T>& s1, const segment<U>& s2) {
-			return (s1.p1 == s2.p1 && s1.p2 == s2.p2) || (s1.p1 == s2.p2 && s1.p2 == s2.p1);
-
+		template<typename T, typename U, typename V = double>
+		bool is_equal(const segment<T>& s1, const segment<U>& s2, const V threshold = 1e-10) {
+			return (norm2(s1.p1 - s2.p1) < threshold * threshold && norm2(s1.p2 - s2.p2) < threshold * threshold)
+				|| (norm2(s1.p1 - s2.p2) < threshold * threshold && norm2(s1.p2 - s2.p1) < threshold * threshold);
 		}
 		template<typename T,typename U>
 		bool is_cross(const segment<T>& s1, const segment<U>& s2) {

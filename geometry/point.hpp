@@ -28,7 +28,7 @@ namespace hmLib{
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
 			explicit point(const point<U>& Other) : x(static_cast<T>(Other.x)), y(static_cast<T>(Other.y)) {}
-			template<typename U, typename std::enable_if<std::is_convertible<U, T>::value && !std::is_same<U,T>::value>::type*& = hmLib::utility::enabler>
+			template<typename U>
 			operator point<U>()const {
 				return point<U>(x,y);
 			}
