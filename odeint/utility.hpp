@@ -209,7 +209,7 @@ namespace hmLib{
 			void resize(const state_type& from, state_type& to, boost::false_type) {}
 			template<typename state_type>
 			void resize(const state_type& from, state_type& to) {
-				using is_resizable = typename boost::numeric::odeint::is_resizeable<state_type>::type;
+				using is_resizable = typename boost::numeric::odeint::template is_resizeable<state_type>::type;
 				resize(from, to, is_resizable());
 			}
 			template<typename state_type>

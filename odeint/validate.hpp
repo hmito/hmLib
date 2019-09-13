@@ -15,12 +15,20 @@ odeint.validate provides soem helper steppers for applying boost.odeint steppers
 to such bounded parameter space.
 
 @section state validate and step validate
-There are two types of validate. 
+There are two types of validate. One is the state_validate, which validate the end point of each step. validate functon is called at each step.
 
 @code
 struct state_validatable_system{
 	void operator(const state_type& x, state_type& dx, time_type t);
 	validate_result validate(const state_type& x, time_type t, state_type& nx);
+};
+@endcod
+
+@code
+struct state_validatable_system{
+	void initialize(appendix_type ap);
+	void operator(const state_type& x, state_type& dx, time_type t);
+	validate_result validate(const state_type& x, time_type t, state_type& nx, appendix_type& ap);
 };
 @endcod
 
@@ -30,14 +38,6 @@ struct step_validatable_system{
 	bool is_invalid_step(const state_type& x, time_type t);
 	validate_result validate(const state_type& x, time_type t, state_type& nx);
 	validate_result validate(const state_type& x1, const state_type& x2, time_type t, state_type& nx);
-};
-@endcod
-
-@code
-struct state_validatable_system{
-	void initialize(appendix_type ap);
-	void operator(const state_type& x, state_type& dx, time_type t);
-	validate_result validate(const state_type& x, time_type t, state_type& nx, appendix_type& ap);
 };
 @endcod
 
