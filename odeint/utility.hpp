@@ -3,6 +3,11 @@
 #
 #include<utility>
 #include<type_traits>
+#include<boost/numeric/odeint/util/copy.hpp>
+#include<boost/numeric/odeint/util/resize.hpp>
+#include<boost/numeric/odeint/util/resizer.hpp>
+#include<boost/numeric/odeint/util/is_resizeable.hpp>
+#include<boost/numeric/odeint/util/same_size.hpp>
 #include<boost/numeric/odeint/algebra/vector_space_algebra.hpp>
 #include"../utility.hpp"
 #include"../type_traits.hpp"
