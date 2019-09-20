@@ -14,7 +14,6 @@ config_vc_v1_01/121204 hmIto
 #		define NOMINMAX
 #	endif
 #	//古いunsafeな関数群使用による警告回避
-#	pragma warning( disable:4996 )
 #	define _CRT_SECURE_NO_WARNINGS
 #	define _AFX_SECURE_NO_WARNINGS
 #	define _ATL_SECURE_NO_WARNINGS
