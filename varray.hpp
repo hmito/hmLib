@@ -447,22 +447,6 @@ namespace hmLib {
 		for(auto& a:Ans)a = std::abs(*(itr++));
 		return Ans;
 	}
-	template<typename T, std::size_t N>
-	decltype(std::sqrt(std::declval<T>()*std::declval<T>())) norm(const varray<T, N>& v) {
-		static_assert(N>0, "norm can be calculated only when N>0.");
-
-		auto Ans = v.front()* v.front();
-		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
-		return std::sqrt(Ans);
-	}
-	template<typename T, std::size_t N>
-	decltype(std::declval<T>()*std::declval<T>()) norm2(const varray<T, N>& v) {
-		static_assert(N>0, "norm can be calculated only when N>0.");
-
-		auto Ans = v.front()* v.front();
-		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
-		return Ans;
-	}
 }
 
 //std namespace:: only for swap
