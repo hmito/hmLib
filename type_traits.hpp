@@ -53,6 +53,17 @@ namespace hmLib{
 		static auto check(U&& x)->decltype(x.begin(), x.end(), std::true_type{});
 		static auto check(...)->std::false_type;
 	public:
+		[[deprecated("please use is_range<T> for detecting the range-like classes.")]] typedef decltype(check(std::declval<typename std::decay<T>::type>())) type;
+		[[deprecated("please use is_range<T> for detecting the range-like classes.")]] constexpr static bool value = type::value;
+	};
+
+	template <typename T>
+	struct is_range {
+	private:
+		template <class U>
+		static auto check(U&& x)->decltype(std::begin(x), std::end(x), std::true_type{});
+		static auto check(...)->std::false_type;
+	public:
 		using type = decltype(check(std::declval<typename std::decay<T>::type>()));
 		constexpr static bool value = type::value;
 	};
