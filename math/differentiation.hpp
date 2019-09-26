@@ -31,8 +31,8 @@ namespace hmLib {
 		template<typename plane_func_type, typename real_type>
 		void plane_derivative(plane_func_type fn, real_type x, real_type y, real_type abserr, real_type relerr,
 			real_type& dx, real_type& dy, real_type& dx2, real_type& dxdy, real_type& dy2) {
-			auto hx = x * relerr + abserr;
-			auto hy = y * relerr + abserr;
+			auto hx = std::abs(x) * relerr + abserr;
+			auto hy = std::abs(y) * relerr + abserr;
 
 			auto v00 = fn(x, y);
 			auto vP0 = fn(x + hx, y);
