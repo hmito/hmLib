@@ -165,8 +165,11 @@ namespace hmLib {
 					std::vector<trait_type> ndir;
 					double maxrate = std::numeric_limits<double>::min();
 					for(unsigned int i = 0; i < ssize; ++i) {
+						//determine step size
 						double xstep = absstep + (relstep * (s[i].second)[0]);
 						double ystep = absstep + (relstep * (s[i].second)[1]);
+						
+						//calculate derivatives
 						double wx = 0;
 						double wy = 0;
 						double wxx = 0;
@@ -174,20 +177,28 @@ namespace hmLib {
 						double wyy = 0;
 						hmLib::math::plane_derivative(fnW, (s[i].second)[0], (s[i].second)[1], absstep, relstep, wx, wy, wxx, wxy, wyy);
 
+						//define lambda function for searching the maximum points
 						auto fn = [=](double theta) {
+							//we consider the fitness on an ellipse (not circle here), i.e., the fitness at {x + xstep*cos(theta), y + ystep*sin(theta)}
+							//this equation comes from the derivative of the fitness on the ellipse with respect to theta, dW/dtheta
 							return -xstep * wx * std::sin(theta) + ystep * wy * std::cos(theta)
 								+ ((ystep * ystep * wyy - xstep * xstep * wxx) / 2 * std::sin(2 * theta) + xstep * ystep * wxy * std::cos(2 * theta));
 						};
+
+						//get the points with maximum fitness by checking dW/dtheta = 0 and dW/dtheta >0 at theta - \delta, dW/dtheta <0 at theta+\delta
 						std::vector<double> theta;
-						theta.reserve(2);
+						theta.reserve(2);						
 						hmLib::math::stable_root_toms748(fn, 0.0, 2 * hmLib::math::pi, 2 * hmLib::math::pi / 72, 2 * hmLib::math::pi / 7200, std::back_inserter(theta));
 						hmLib_assert(theta.size() <= 2, hmLib::exceptions::numeric::incorrect_arithmetic_request<>, "detected more than two cross points.");
 
+						//check whether the fitness at the found points is higher than that for the residents.
 						std::vector<std::pair<double, double>> thetaw;
 						for(auto v : theta) {
+							//calculate fitness
 							double dx = xstep * std::cos(v);
 							double dy = ystep * std::sin(v);
 							double w = (wx * dx + wy * dy + wxx / 2 * dx * dx + wxy * dx * dy + wyy / 2 * dy * dy);
+							//if the fitness is higher than zero = higher than residents, add the point.
 							if(w > 0) {
 								thetaw.emplace_back(v, w);
 							}
@@ -211,16 +222,12 @@ namespace hmLib {
 							//multi direction := branching
 							auto minwitr = hmLib::transform_min_element(thetaw.begin(), thetaw.end(), [](const std::pair<double, double>& v) {return v.second; }).second;
 
+							//add new strains
 							for(auto itr = thetaw.begin(); itr != thetaw.end(); ++itr) {
 								double v = itr->first;
 								ns.emplace_back(0.0, trait_type{ s[i].second[0] + xstep * std::cos(v), s[i].second[1] + ystep * std::sin(v) });
 								ndir.push_back(trait_type{ 0.0, 0.0 });
 							}
-
-							//std::ofstream fout("branch.csv", std::ios::app | std::ios::out);
-							//fout << n << "," << s[i].second[0] << "," << s[i].second[1] << ","
-							//	<< wx << "," << wy << "," << wxx << "," << wxy << "," << wyy << ","
-							//	<< ns[ns.size() - 2][0] << "," << ns[ns.size() - 2][1] << "," << ns[ns.size() - 1][0] << "," << ns[ns.size() - 1][1] << std::endl;
 						}
 					}
 					for(unsigned int i = 0; i < ns.size(); ++i) {
@@ -229,6 +236,7 @@ namespace hmLib {
 
 					//boundary condition
 					for(auto& v : ns) {
+						//both x and y should be positive
 						v.second[0] = std::max(0.0, v.second[0]);
 						v.second[1] = std::max(0.0, v.second[1]);
 					}
