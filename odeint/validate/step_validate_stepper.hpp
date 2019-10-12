@@ -35,7 +35,7 @@ namespace hmLib {
 			}
 			template<typename sys_type>
 			bool do_step(sys_type sys, state_type& x, time_type& t, time_type& dt) {
-				detail::resize_and_copy(x.first, nx1);
+				utility::resize_and_copy(x.first, nx1);
 
 				//system initialize with appendix
 				sys.initialize(x.second);
@@ -45,11 +45,11 @@ namespace hmLib {
 					auto Result = sys.validate(x.first, x.first, t, nx, x.second);
 					switch (Result) {
 					case validate_result::assigned:
-						detail::move(std::move(nx), x.first);
+						utility::move(std::move(nx), x.first);
 						try_initialize(st, sys, x.first, t, dt);
 						break;
 					case validate_result::resized:
-						detail::move(std::move(nx), x.first);
+						utility::move(std::move(nx), x.first);
 						try_reset(st);
 						break;
 					default:
@@ -61,7 +61,7 @@ namespace hmLib {
 
 				//backup inital state
 				time_type t0 = t;
-				detail::resize_and_copy(x.first, nx1);
+				utility::resize_and_copy(x.first, nx1);
 
 				//do step
 				st.do_step(sys, x.first, t, dt);
@@ -76,9 +76,9 @@ namespace hmLib {
 				stvld.setup_dt(nx1, t0, x.first, t);
 				if (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt())) {
 					//setup state
-					detail::resize_and_copy(nx1, nx);
+					utility::resize_and_copy(nx1, nx);
 					do {
-						//detail::copy(nx1, nx);
+						//utility::copy(nx1, nx);
 						time_type nt = nt1;
 						time_type ndt = stvld.dt();
 						try_initialize(st, sys, nx, nt, ndt);
@@ -87,12 +87,12 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::resize_and_swap(nx, nx2);
+							utility::resize_and_swap(nx, nx2);
 							NeedRestep = true;
 							break;
 						}else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 						}
 					} while (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt()));
 				}
@@ -100,35 +100,35 @@ namespace hmLib {
 					if (sys.is_invalid_step(x.first, t)) {
 						NeedRestep = true;
 						nt2 = t;
-						detail::resize_and_swap(x.first, nx2);
+						utility::resize_and_swap(x.first, nx2);
 					}
 				}
 
 				//if restep is required
 				if (NeedRestep) {
-					detail::copy(nx1, nx);
+					utility::copy(nx1, nx);
 					try_initialize(st, sys, nx, nt1, (nt1 + nt2) / 2 - nt1);
 					//start bisection search
 					stvld.reset();
 					while (!stvld(nx1, nt1, nx2, nt2)) {
 						time_type nt = nt1;
 						time_type ndt = (nt1 + nt2) / 2 - nt;
-						//detail::copy(nx1, nx);
+						//utility::copy(nx1, nx);
 						st.do_step(sys, nx, nt, ndt);
 						nt = nt + ndt;
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::move(std::move(nx), nx2);
+							utility::move(std::move(nx), nx2);
 
 							//nx&nt back to nx1
-							detail::resize_and_copy(nx1, nx);
+							utility::resize_and_copy(nx1, nx);
 							//initialize with nx1
 							try_initialize(st, sys, nx, nt1, ndt);
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 							//initialize is not required because stepper is now nx1&nt1
 						}
 					}
@@ -144,7 +144,7 @@ namespace hmLib {
 						try_reset(st);
 						break;
 					default:
-						detail::move(std::move(nx2), x.first);
+						utility::move(std::move(nx2), x.first);
 						try_initialize(st, sys, x.first, t, dt);
 						break;
 					}
@@ -155,11 +155,11 @@ namespace hmLib {
 				validate_result Result = sys.validate(x.first, t, nx1,x.second);
 				switch (Result) {
 				case validate_result::assigned:
-					detail::move(std::move(nx1), x.first);
+					utility::move(std::move(nx1), x.first);
 					try_initialize(st, sys, x.first, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx1), x.first);
+					utility::move(std::move(nx1), x.first);
 					try_reset(st);
 					break;
 				default:
@@ -196,7 +196,7 @@ namespace hmLib {
 			}
 			template<typename sys_type>
 			bool do_step(sys_type sys, state_type& x, time_type& t, time_type& dt) {
-				detail::resize_and_copy(x.first, nx1);
+				utility::resize_and_copy(x.first, nx1);
 
 				//system initialize with appendix
 				sys.initialize(x.second);
@@ -206,11 +206,11 @@ namespace hmLib {
 					auto Result = sys.validate(x.first, x.first, t, nx, x.second);
 					switch (Result) {
 					case validate_result::assigned:
-						detail::move(std::move(nx), x.first);
+						utility::move(std::move(nx), x.first);
 						try_initialize(st, sys, x.first, t, dt);
 						break;
 					case validate_result::resized:
-						detail::move(std::move(nx), x.first);
+						utility::move(std::move(nx), x.first);
 						try_reset(st);
 						break;
 					default:
@@ -222,7 +222,7 @@ namespace hmLib {
 
 				//backup inital state
 				time_type t0 = t;
-				detail::resize_and_copy(x.first, nx1);
+				utility::resize_and_copy(x.first, nx1);
 
 				boost::numeric::odeint::failed_step_checker fail_checker;
 				boost::numeric::odeint::controlled_step_result tryres;
@@ -245,9 +245,9 @@ namespace hmLib {
 				//check step is valid
 				if (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt())) {
 					//setup state
-					detail::resize_and_copy(nx1, nx);
+					utility::resize_and_copy(nx1, nx);
 					do {
-						//detail::copy(nx1, nx);
+						//utility::copy(nx1, nx);
 						time_type nt = nt1;
 						time_type ndt = stvld.dt();
 						try_initialize(st, sys, nx, nt, ndt);
@@ -261,13 +261,13 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::resize_and_swap(nx, nx2);
+							utility::resize_and_swap(nx, nx2);
 							NeedRestep = true;
 							break;
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 						}
 					} while (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt()));
 				}
@@ -275,13 +275,13 @@ namespace hmLib {
 					if (sys.is_invalid_step(x.first, t)) {
 						NeedRestep = true;
 						nt2 = t;
-						detail::resize_and_swap(x.first, nx2);
+						utility::resize_and_swap(x.first, nx2);
 					}
 				}
 
 				//if restep is required
 				if (NeedRestep) {
-					detail::copy(nx1, nx);
+					utility::copy(nx1, nx);
 					try_initialize(st, sys, nx, nt1, (nt1 + nt2) / 2 - nt1);
 					//start bisection search
 					stvld.reset();
@@ -298,16 +298,16 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::move(std::move(nx), nx2);
+							utility::move(std::move(nx), nx2);
 
 							//nx&nt back to nx1
-							detail::resize_and_copy(nx1, nx);
+							utility::resize_and_copy(nx1, nx);
 							//initialize with nx1
 							try_initialize(st, sys, nx, nt1, ndt);
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 							//initialize is not required because stepper is now nx1&nt1
 						}
 					}
@@ -323,7 +323,7 @@ namespace hmLib {
 						try_reset(st);
 						break;
 					default:
-						detail::move(std::move(nx2), x.first);
+						utility::move(std::move(nx2), x.first);
 						try_initialize(st, sys, x.first, t, dt);
 						break;
 					}
@@ -334,11 +334,11 @@ namespace hmLib {
 				validate_result Result = sys.validate(x.first, t, nx1, x.second);
 				switch (Result) {
 				case validate_result::assigned:
-					detail::move(std::move(nx1), x.first);
+					utility::move(std::move(nx1), x.first);
 					try_initialize(st, sys, x.first, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx1), x.first);
+					utility::move(std::move(nx1), x.first);
 					try_reset(st);
 					break;
 				default:
@@ -423,7 +423,7 @@ namespace hmLib {
 				}
 
 				//backup previous state
-				detail::resize_and_copy(st.current_state(), nx1);
+				utility::resize_and_copy(st.current_state(), nx1);
 
 				//do step
 				auto step_range = st.do_step(sys);
@@ -437,19 +437,19 @@ namespace hmLib {
 				stvld.setup_dt(nx1, nt1, st.current_state(), nt2);
 				if (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), nt2, stvld.dt())){
 					//setup state
-					detail::resize(st.current_state(), nx);
+					utility::resize(st.current_state(), nx);
 					do {
 						nt = nt1 + stvld.dt();
 						st.calc_state(nt, nx);
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::resize_and_swap(nx, nx2);
+							utility::resize_and_swap(nx, nx2);
 							NeedRestep = true;
 							break;
 						} else {
 							nt1 = nt;
-							detail::swap(nx, nx1);
+							utility::swap(nx, nx1);
 						}
 					} while (boost::numeric::odeint::detail::less_with_sign(nt, nt2, stvld.dt()));
 				}
@@ -457,7 +457,7 @@ namespace hmLib {
 					if (sys.is_invalid_step(st.current_state(), st.current_time())) {
 						NeedRestep = true;
 						nt2 = st.current_time();
-						detail::resize_and_copy(st.current_state(), nx2);
+						utility::resize_and_copy(st.current_state(), nx2);
 					}
 				}
 
@@ -471,11 +471,11 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::swap(nx2, nx);
+							utility::swap(nx2, nx);
 						}
 						else {
 							nt1 = nt;
-							detail::swap(nx1, nx);
+							utility::swap(nx1, nx);
 						}
 					}
 
@@ -484,7 +484,7 @@ namespace hmLib {
 					prev_ap = ap;
 					Result = sys.validate(nx1, nx2, nt, nx, ap);
 					if (Result == validate_result::none) {
-						detail::move(std::move(nx2), nx);
+						utility::move(std::move(nx2), nx);
 						Result = validate_result::assigned;
 					}
 					step_range.second = nt;
@@ -504,7 +504,7 @@ namespace hmLib {
 					st.calc_state(t, x.first);
 					x.second = prev_ap;
 				} else {
-					detail::copy(nx, x.first);
+					utility::copy(nx, x.first);
 					x.second = ap;
 				}
 			}
@@ -516,10 +516,10 @@ namespace hmLib {
 					sys.initialize(x.second);
 					auto TmpResult = sys.validate(x.first, t, nx, x.second);
 					if (TmpResult != validate_result::none) {
-						detail::move(std::move(nx), x.first);
+						utility::move(std::move(nx), x.first);
 					}
 				} else {
-					detail::copy(nx, x.first);
+					utility::copy(nx, x.first);
 					x.second = ap;
 				}
 			}
@@ -568,18 +568,18 @@ namespace hmLib {
 			}
 			template<typename sys_type>
 			bool do_step(sys_type sys, state_type& x, time_type& t, time_type& dt) {
-				detail::resize_and_copy(x, nx1);
+				utility::resize_and_copy(x, nx1);
 
 				//initial state should be valid
 				if (sys.is_invalid_step(x, t)) {
 					auto Result = sys.validate(x, x, t, nx);
 					switch (Result) {
 					case validate_result::assigned:
-						detail::move(std::move(nx), x);
+						utility::move(std::move(nx), x);
 						try_initialize(st, sys, x, t, dt);
 						break;
 					case validate_result::resized:
-						detail::move(std::move(nx), x);
+						utility::move(std::move(nx), x);
 						try_reset(st);
 						break;
 					default:
@@ -589,7 +589,7 @@ namespace hmLib {
 
 				//backup inital state
 				time_type t0 = t;
-				detail::resize_and_copy(x, nx1);
+				utility::resize_and_copy(x, nx1);
 
 				//do step
 				st.do_step(sys, x, t, dt);
@@ -604,9 +604,9 @@ namespace hmLib {
 				stvld.setup_dt(nx1, t0, x, t);
 				if (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt())) {
 					//setup state
-					detail::resize_and_copy(nx1, nx);
+					utility::resize_and_copy(nx1, nx);
 					do {
-						//detail::copy(nx1, nx);
+						//utility::copy(nx1, nx);
 						time_type nt = nt1;
 						time_type ndt = stvld.dt();
 						try_initialize(st, sys, nx, nt, ndt);
@@ -615,13 +615,13 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::resize_and_swap(nx, nx2);
+							utility::resize_and_swap(nx, nx2);
 							NeedRestep = true;
 							break;
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 						}
 					} while (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt()));
 				}
@@ -629,35 +629,35 @@ namespace hmLib {
 					if (sys.is_invalid_step(x, t)) {
 						NeedRestep = true;
 						nt2 = t;
-						detail::resize_and_swap(x, nx2);
+						utility::resize_and_swap(x, nx2);
 					}
 				}
 
 				//if restep is required
 				if (NeedRestep) {
-					detail::copy(nx1, nx);
+					utility::copy(nx1, nx);
 					try_initialize(st, sys, nx, nt1, (nt1 + nt2) / 2 - nt1);
 					//start bisection search
 					stvld.reset();
 					while (!stvld(nx1, nt1, nx2, nt2)) {
 						time_type nt = nt1;
 						time_type ndt = (nt1 + nt2) / 2 - nt;
-						//detail::copy(nx1, nx);
+						//utility::copy(nx1, nx);
 						st.do_step(sys, nx, nt, ndt);
 						nt = nt + ndt;
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::move(std::move(nx), nx2);
+							utility::move(std::move(nx), nx2);
 
 							//nx&nt back to nx1
-							detail::resize_and_copy(nx1, nx);
+							utility::resize_and_copy(nx1, nx);
 							//initialize with nx1
 							try_initialize(st, sys, nx, nt1, ndt);
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 							//initialize is not required because stepper is now nx1&nt1
 						}
 					}
@@ -673,7 +673,7 @@ namespace hmLib {
 						try_reset(st);
 						break;
 					default:
-						detail::move(std::move(nx2), x);
+						utility::move(std::move(nx2), x);
 						try_initialize(st, sys, x, t, dt);
 						break;
 					}
@@ -684,11 +684,11 @@ namespace hmLib {
 				validate_result Result = sys.validate(x, t, nx1);
 				switch (Result) {
 				case validate_result::assigned:
-					detail::move(std::move(nx1), x);
+					utility::move(std::move(nx1), x);
 					try_initialize(st, sys, x, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx1), x);
+					utility::move(std::move(nx1), x);
 					try_reset(st);
 					break;
 				default:
@@ -724,18 +724,18 @@ namespace hmLib {
 			}
 			template<typename sys_type>
 			bool do_step(sys_type sys, state_type& x, time_type& t, time_type& dt) {
-				detail::resize_and_copy(x, nx1);
+				utility::resize_and_copy(x, nx1);
 
 				//initial state should be valid
 				if (sys.is_invalid_step(x, t)) {
 					auto Result = sys.validate(x, x, t, nx);
 					switch (Result) {
 					case validate_result::assigned:
-						detail::move(std::move(nx), x);
+						utility::move(std::move(nx), x);
 						try_initialize(st, sys, x, t, dt);
 						break;
 					case validate_result::resized:
-						detail::move(std::move(nx), x);
+						utility::move(std::move(nx), x);
 						try_reset(st);
 						break;
 					default:
@@ -745,7 +745,7 @@ namespace hmLib {
 
 				//backup inital state
 				time_type t0 = t;
-				detail::resize_and_copy(x, nx1);
+				utility::resize_and_copy(x, nx1);
 
 				boost::numeric::odeint::failed_step_checker fail_checker;
 				boost::numeric::odeint::controlled_step_result tryres;
@@ -768,9 +768,9 @@ namespace hmLib {
 				//check step is valid
 				if (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt())) {
 					//setup state
-					detail::resize_and_copy(nx1, nx);
+					utility::resize_and_copy(nx1, nx);
 					do {
-						//detail::copy(nx1, nx);
+						//utility::copy(nx1, nx);
 						time_type nt = nt1;
 						time_type ndt = stvld.dt();
 						try_initialize(st, sys, nx, nt, ndt);
@@ -784,13 +784,13 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::resize_and_swap(nx, nx2);
+							utility::resize_and_swap(nx, nx2);
 							NeedRestep = true;
 							break;
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 						}
 					} while (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), t, stvld.dt()));
 				}
@@ -798,13 +798,13 @@ namespace hmLib {
 					if (sys.is_invalid_step(x, t)) {
 						NeedRestep = true;
 						nt2 = t;
-						detail::resize_and_swap(x, nx2);
+						utility::resize_and_swap(x, nx2);
 					}
 				}
 
 				//if restep is required
 				if (NeedRestep) {
-					detail::copy(nx1, nx);
+					utility::copy(nx1, nx);
 					try_initialize(st, sys, nx, nt1, (nt1 + nt2) / 2 - nt1);
 					//start bisection search
 					stvld.reset();
@@ -821,16 +821,16 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::move(std::move(nx), nx2);
+							utility::move(std::move(nx), nx2);
 
 							//nx&nt back to nx1
-							detail::resize_and_copy(nx1, nx);
+							utility::resize_and_copy(nx1, nx);
 							//initialize with nx1
 							try_initialize(st, sys, nx, nt1, ndt);
 						}
 						else {
 							nt1 = nt;
-							detail::copy(nx, nx1);
+							utility::copy(nx, nx1);
 							//initialize is not required because stepper is now nx1&nt1
 						}
 					}
@@ -846,7 +846,7 @@ namespace hmLib {
 						try_reset(st);
 						break;
 					default:
-						detail::move(std::move(nx2), x);
+						utility::move(std::move(nx2), x);
 						try_initialize(st, sys, x, t, dt);
 						break;
 					}
@@ -857,11 +857,11 @@ namespace hmLib {
 				validate_result Result = sys.validate(x, t, nx1);
 				switch (Result) {
 				case validate_result::assigned:
-					detail::move(std::move(nx1), x);
+					utility::move(std::move(nx1), x);
 					try_initialize(st, sys, x, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx1), x);
+					utility::move(std::move(nx1), x);
 					try_reset(st);
 					break;
 				default:
@@ -937,7 +937,7 @@ namespace hmLib {
 				}
 
 				//backup previous state
-				detail::resize_and_copy(st.current_state(), nx1);
+				utility::resize_and_copy(st.current_state(), nx1);
 
 				//do step
 				auto step_range = st.do_step(sys);
@@ -951,20 +951,20 @@ namespace hmLib {
 				stvld.setup_dt(nx1, nt1, st.current_state(), nt2);
 				if (boost::numeric::odeint::detail::less_with_sign(nt1 + stvld.dt(), nt2, stvld.dt())) {
 					//setup state
-					detail::resize(st.current_state(), nx);
+					utility::resize(st.current_state(), nx);
 					do {
 						nt = nt1 + stvld.dt();
 						st.calc_state(nt, nx);
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::resize_and_swap(nx, nx2);
+							utility::resize_and_swap(nx, nx2);
 							NeedRestep = true;
 							break;
 						}
 						else {
 							nt1 = nt;
-							detail::swap(nx, nx1);
+							utility::swap(nx, nx1);
 						}
 					} while (boost::numeric::odeint::detail::less_with_sign(nt, nt2, stvld.dt()));
 				}
@@ -972,7 +972,7 @@ namespace hmLib {
 					if (sys.is_invalid_step(st.current_state(), st.current_time())) {
 						NeedRestep = true;
 						nt2 = st.current_time();
-						detail::resize_and_copy(st.current_state(), nx2);
+						utility::resize_and_copy(st.current_state(), nx2);
 					}
 				}
 
@@ -986,11 +986,11 @@ namespace hmLib {
 
 						if (sys.is_invalid_step(nx, nt)) {
 							nt2 = nt;
-							detail::swap(nx2, nx);
+							utility::swap(nx2, nx);
 						}
 						else {
 							nt1 = nt;
-							detail::swap(nx1, nx);
+							utility::swap(nx1, nx);
 						}
 					}
 
@@ -998,7 +998,7 @@ namespace hmLib {
 					nt = nt1;
 					Result = sys.validate(nx1, nx2, nt, nx);
 					if (Result == validate_result::none) {
-						detail::move(std::move(nx2), nx);
+						utility::move(std::move(nx2), nx);
 						Result = validate_result::assigned;
 					}
 					step_range.second = nt;
@@ -1020,7 +1020,7 @@ namespace hmLib {
 				st.calc_state(t, x);
 				auto TmpResult = sys.validate(x, t, nx);
 				if (TmpResult != validate_result::none) {
-					detail::move(std::move(nx), x);
+					utility::move(std::move(nx), x);
 				}
 			}
 			const state_type& current_state()const {

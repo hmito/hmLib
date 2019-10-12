@@ -34,11 +34,11 @@ namespace hmLib {
 				validate_result res = sys.validate(x.first, t, nx, x.second);
 				switch (res) {
 				case validate_result::assigned:
-					detail::move(std::move(nx), x.first);
+					utility::move(std::move(nx), x.first);
 					try_initialize(st, sys, x.first, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx), x.first);
+					utility::move(std::move(nx), x.first);
 					try_reset(st);
 					break;
 				default:
@@ -74,11 +74,11 @@ namespace hmLib {
 				validate_result res = sys.validate(x.first, t, nx, x.second);
 				switch (res) {
 				case validate_result::assigned:
-					detail::move(std::move(nx), x.first);
+					utility::move(std::move(nx), x.first);
 					try_initialize(st, sys, x.first, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx), x.first);
+					utility::move(std::move(nx), x.first);
 					try_reset(st);
 					break;
 				default:
@@ -152,7 +152,7 @@ namespace hmLib {
 				sys.initialize(x.second);
 				auto Result = sys.validate(x.first, t, nx, x.second);
 				if (Result != validate_result::none) {
-					detail::move(std::move(nx), x.first);
+					utility::move(std::move(nx), x.first);
 				}
 			}
 			std::pair<const base_state_type&, appendix_type> current_state()const {
@@ -196,11 +196,11 @@ namespace hmLib {
 				validate_result res = sys.validate(x, t, nx);
 				switch (res) {
 				case validate_result::assigned:
-					detail::move(std::move(nx), x);
+					utility::move(std::move(nx), x);
 					try_initialize(st, sys, x, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx), x);
+					utility::move(std::move(nx), x);
 					try_reset(st);
 					break;
 				default:
@@ -233,11 +233,11 @@ namespace hmLib {
 				validate_result res = sys.validate(x, t, nx);
 				switch (res) {
 				case validate_result::assigned:
-					detail::move(std::move(nx), x);
+					utility::move(std::move(nx), x);
 					try_initialize(st, sys, x, t, dt);
 					break;
 				case validate_result::resized:
-					detail::move(std::move(nx), x);
+					utility::move(std::move(nx), x);
 					try_reset(st);
 					break;
 				default:
@@ -296,7 +296,7 @@ namespace hmLib {
 				st.calc_state(t, x);
 				auto Result = sys.validate(x, t, nx);
 				if (Result != validate_result::none) {
-					detail::move(nx, x);
+					utility::move(nx, x);
 				}
 			}
 			const state_type& current_state()const {
