@@ -21,13 +21,13 @@ namespace hmLib {
 				, cur_dt(error_dt * 1000) {
 			}
 			void setup_dt(const state_type& x1, time_type t1, const state_type& x2, time_type t2) {
-				cur_dt = 0.9 * (t2 - t1) / (seach_distance / 10 + detail::maximum_absolute_error<state_type, algebra_type, operations_type>(x1, x2)) * seach_distance;
+				cur_dt = 0.9 * (t2 - t1) / (seach_distance / 10 + distance_norm_inf<state_type, algebra_type, operations_type>(x1, x2)) * seach_distance;
 				cur_dt = std::max(cur_dt, (t2 - t1) / 10000);
 			}
 			time_type dt()const { return cur_dt; }
 			bool operator()(const state_type & x1, time_type t1, const state_type & x2, time_type t2) {
 				return (++try_cnt > max_try_num || t1 == t2 ||
-					(detail::maximum_absolute_error<state_type, algebra_type, operations_type>(x1, x2) < error_distance && std::abs(t1 - t2) < error_dt)
+					(distance_norm_inf<state_type, algebra_type, operations_type>(x1, x2) < error_distance && std::abs(t1 - t2) < error_dt)
 				);
 			}
 			void reset() { try_cnt = 0; }

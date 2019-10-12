@@ -237,12 +237,12 @@ namespace hmLib{
 			template<typename algebra_check>
 			struct norm_inf_distance_impl {
 				template<typename state_type,typename algebra_type,typename operations_type>
-				auto operator()(const state_type& v1, const state_type& v2, state_type& out) {
+				auto operator()(const state_type& v1, const state_type& v2, state_type& out, algebra_type, operations_type) {
 					algebra_type().for_each3(out, v1, v2, typename operations_type::template scale_sum2<double, double>(1.0, -1.0));
 					return algebra_type().norm_inf(out);
 				}
 				template<typename state_type, typename algebra_type, typename operations_type>
-				auto operator()(const state_type& v1, const state_type& v2) {
+				auto operator()(const state_type& v1, const state_type& v2, algebra_type, operations_type) {
 					state_type out;
 					utility::resize(v1, out);
 					return operator()<algebra_type, operations_type>(v1, v2, out);
@@ -251,7 +251,7 @@ namespace hmLib{
 			template<>
 			struct norm_inf_distance_impl<boost::numeric::odeint::range_algebra> {
 				template<typename state_type, typename algebra_type, typename operations_type>
-				auto operator()(const state_type& v1, const state_type& v2, state_type& out) {
+				auto operator()(const state_type& v1, const state_type& v2, state_type& out, algebra_type, operations_type) {
 					auto itr1 = boost::begin(v1);
 					auto end1 = boost::end(v1);
 					auto itr2 = boost::begin(v2);
@@ -273,7 +273,7 @@ namespace hmLib{
 					return error;
 				}
 				template<typename state_type, typename algebra_type, typename operations_type>
-				auto operator()(const state_type& v1, const state_type& v2) {
+				auto operator()(const state_type& v1, const state_type& v2, algebra_type, operations_type) {
 					auto itr1 = boost::begin(v1);
 					auto end1 = boost::end(v1);
 					auto itr2 = boost::begin(v2);
@@ -297,14 +297,14 @@ namespace hmLib{
 		template<typename state_type,
 			typename algebra_type = typename boost::numeric::odeint::algebra_dispatcher<state_type>::algebra_type,
 			typename operations_type = typename boost::numeric::odeint::operations_dispatcher<state_type>::operations_type>
-		auto distance_norm_inf(const state_type & v1, const state_type & v2, state_type & out) {
-			return detail::norm_inf_distance_impl<algebra_type>()(v1, v2, out);
+		auto distance_norm_inf(const state_type& v1, const state_type& v2, state_type & out) {
+			return detail::norm_inf_distance_impl<algebra_type>()(v1, v2, out, algebra_type(), operations_type());
 		}
 		template<typename state_type,
 			typename algebra_type = typename boost::numeric::odeint::algebra_dispatcher<state_type>::algebra_type,
 			typename operations_type = typename boost::numeric::odeint::operations_dispatcher<state_type>::operations_type>
-		auto distance_norm_inf(const state_type & v1, const state_type & v2) {
-			return detail::norm_inf_distance_impl<algebra_type>()(v1, v2);
+		auto distance_norm_inf(const state_type& v1, const state_type& v2) {
+			return detail::norm_inf_distance_impl<algebra_type>()(v1, v2, algebra_type(), operations_type());
 		}
 	}
 }
