@@ -200,13 +200,13 @@ namespace hmLib{
 			}
 			template<typename state_type>
 			void move(state_type&& from, state_type& to) {
-				using std::move;
-				to = move(from);
+				//using std::move;
+				to = std::move(from);
 			}
 			template<typename state_type>
 			void swap(state_type& x1, state_type& x2) {
-				using std::swap;
-				swap(x1, x2);
+				//using std::swap;
+				std::swap(x1, x2);
 			}
 			template<typename state_type>
 			void resize(const state_type& from, state_type& to, boost::true_type) {
