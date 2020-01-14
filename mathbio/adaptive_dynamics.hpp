@@ -31,7 +31,7 @@ namespace hmLib {
 	namespace mathbio {
 		namespace AD {
 			template<typename pair_game, typename trait_input_iterator, typename frequency_output_iterator>
-			frequency_output_iterator solveEqFreq_by_matrix(pair_game&& Game, trait_input_iterator sBeg, trait_input_iterator sEnd, frequency_output_iterator fOut) {
+			bool solveEqFreq_by_matrix(pair_game&& Game, trait_input_iterator sBeg, trait_input_iterator sEnd, frequency_output_iterator fOut) {
 				namespace ub = boost::numeric::ublas;
 				unsigned int len = static_cast<unsigned int>(std::distance(sBeg, sEnd));
 				unsigned int snum = len;
@@ -67,9 +67,10 @@ namespace hmLib {
 					//calculate fitness from inverse matrix
 					boost::numeric::ublas::matrix<double> IW;
 					while(hmLib::ublas::invert(W, IW)) {
-						for(unsigned int i = 0; i < snum; ++i) {
-							W(i, i) *= 0.99;
-						}
+//						for(unsigned int i = 0; i < snum; ++i) {
+//							W(i, i) *= 0.99;
+//						}
+						return true;
 					}
 					boost::numeric::ublas::vector<double> Freq = boost::numeric::ublas::prod(IW, boost::numeric::ublas::vector<double>(snum, 1));
 					Freq /= std::accumulate(Freq.begin(), Freq.end(), 0.0);
@@ -96,7 +97,7 @@ namespace hmLib {
 								++ino;
 							}
 						}
-						return fOut;
+						return false;
 					}
 
 					//exctinction occur
@@ -128,7 +129,7 @@ namespace hmLib {
 					}
 				}
 
-				return fOut;
+				return false;
 			}
 
 			template<typename pair_game_>
