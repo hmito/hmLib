@@ -12,7 +12,7 @@
 #include"../../../varray.hpp"
 #include<boost/numeric/odeint/algebra/range_algebra.hpp>
 #include<boost/numeric/odeint/algebra/default_operations.hpp>
-
+#include"../../../csv/csvbase.hpp"
 struct stream_observer {
 private:
 	std::ostream& out;

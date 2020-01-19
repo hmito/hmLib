@@ -75,7 +75,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\hmIto\Documents\Projects;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects;C:\Users\hmito\Storage\boost\boost_1_71_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -95,6 +95,7 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,6 +171,7 @@
     </ClCompile>
     <ClCompile Include="test_algorithm.cpp" />
     <ClCompile Include="test_circular.cpp" />
+    <ClCompile Include="test_csv.cpp" />
     <ClCompile Include="test_geometry.cpp" />
     <ClCompile Include="test_iterators.cpp" />
     <ClCompile Include="test_lazy.cpp" />

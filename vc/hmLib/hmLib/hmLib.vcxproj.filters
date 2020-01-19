@@ -338,9 +338,6 @@
     <ClInclude Include="..\..\..\csv.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\csv_iterator.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\date.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
@@ -523,6 +520,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\recursive\recurrence.hpp">
       <Filter>hmLib\recursive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\csv\iocsv.hpp">
+      <Filter>hmLib\csv</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -34,9 +34,9 @@
     <ClInclude Include="..\..\..\csv.hpp" />
     <ClInclude Include="..\..\..\csv\csvbase.hpp" />
     <ClInclude Include="..\..\..\csv\csvline.hpp" />
+    <ClInclude Include="..\..\..\csv\iocsv.hpp" />
     <ClInclude Include="..\..\..\csv\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\csv\csv_table.hpp" />
-    <ClInclude Include="..\..\..\csv_iterator.hpp" />
     <ClInclude Include="..\..\..\date.hpp" />
     <ClInclude Include="..\..\..\debugstream.hpp" />
     <ClInclude Include="..\..\..\either.hpp" />
@@ -194,7 +194,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\Labuser\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\hmito\Storage\boost\boost_1_71_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Users\hmIto\Documents\Projects\hmLib;C:\Users\Labuser\Documents\Projects\hmLib;$(IncludePath)</IncludePath>
