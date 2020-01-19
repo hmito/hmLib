@@ -1,6 +1,7 @@
 #ifndef HMLIB_CSV_IOCSV_INC
 #define HMLIB_CSV_IOCSV_INC 100
 #
+#include"csvbase.hpp"
 namespace hmLib {
 	template<typename csv_traits_>
 	class icsv_base {
@@ -9,9 +10,9 @@ namespace hmLib {
 		using string_type = typename csv_traits_::string_type;
 	public:
 		template<typename output_iterator>
-		void read_cell(output_iterator out);
-		template<typename output_iterator>
-		void read_line(output_iterator out);
+		void read(output_iterator out) {
+			csv::cell_next()
+		}
 	};
 	template<typename csv_traits_>
 	class ocsv_base {

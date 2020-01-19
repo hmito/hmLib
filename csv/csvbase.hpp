@@ -3,8 +3,10 @@
 #
 #include<string>
 #include<string_view>
+#include<type_traits>
 #include<iostream>
 #include"../exceptions.hpp"
+#include"../utility.hpp"
 #include"../iterators/range.hpp"
 namespace hmLib {
 	//exceptions
@@ -134,7 +136,7 @@ namespace hmLib {
 				return encode_state{ encode_mode::none, false };
 			}
 		}
-		template<typename forward_iterator,typename csv_traits>
+		template<typename forward_iterator, typename csv_traits, typename std::enable_if<std::is_convertible<typename std::iterator_traits<forward_iterator>::iterator_category,std::forward_iterator_tag>::value>::type*& = hmLib::utility::enabler>
 		std::pair<forward_iterator, encode_state> cell_next(forward_iterator Beg, forward_iterator End, csv_traits Traits, bool NotEncoded = false) {
 			if (!NotEncoded && *(Beg) == Traits.esc()) {
 				//escape mode: control character can be used with esc.
@@ -176,6 +178,55 @@ namespace hmLib {
 					if (*Beg == Traits.end() || *Beg == Traits.sep())break;
 				}
 				return std::make_pair(Beg, encode_state{ encode_mode::none, false });
+			}
+		}
+		template<typename input_iterator, typename output_iterator, typename csv_traits>
+		std::tuple<input_iterator, output_iterator, encode_state> cell_advance(input_iterator Beg, input_iterator End, output_iterator Out, csv_traits Traits, bool NotEncoded = false) {
+			if (!NotEncoded && *(Beg) == Traits.esc()) {
+				//escape mode: control character can be used with esc.
+				++Beg;
+				bool IsEsc = false;
+				bool FindEsc = false;
+				bool FindCtr = false;
+				for (; Beg != End; ++Beg) {
+					if (IsEsc) {
+						if (*Beg == Traits.esc()) {
+							IsEsc = false;
+							FindEsc = true;
+							FindCtr = true;
+							*(Out++) = *Beg;
+						} else if (*Beg == Traits.sep() || *Beg == Traits.end()) {
+							//Find End of Cell
+							return std::make_tuple(Beg, Out, encode_state{ (FindEsc ? encode_mode::full : encode_mode::simple), FindCtr });
+						} else {
+							//ERROR: single escape found inside of the field
+							return std::make_tuple(Beg, Out, encode_state{ encode_mode::none, true });
+						}
+					} else {
+						if (*Beg == Traits.esc()) {
+							IsEsc = true;
+						} else {
+							if (*Beg == Traits.sep() || *Beg == Traits.end()) {
+								FindCtr = true;
+							}
+							*(Out++) = *Beg;
+						}
+					}
+				}
+				if (!IsEsc) {
+					//ERROR: closing escape is not found
+					return std::make_tuple(Beg, Out, encode_state{ encode_mode::none, true });
+				}
+				//finish without error
+				return std::make_tuple(Beg, Out, encode_state{ (FindEsc ? encode_mode::full : encode_mode::simple), FindCtr });
+			} else {
+				//non-escape mode: control character cannot be used.
+				for (; Beg != End; ++Beg) {
+					if (*Beg == Traits.esc())return std::make_tuple(Beg, Out, encode_state{ encode_mode::none, true });
+					if (*Beg == Traits.end() || *Beg == Traits.sep())break;
+					*(Out++) = *Beg;
+				}
+				return std::make_tuple(Beg, Out, encode_state{ encode_mode::none, false });
 			}
 		}
 		template<typename input_iterator, typename output_iterator, typename csv_traits>
