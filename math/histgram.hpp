@@ -67,12 +67,12 @@ namespace hmLib {
 	};
 
 	template<typename T, typename grid_adjuster>
-	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_adjuster GridAdjuster, math::make_axis_option Opt = math::make_axis_option::none) {
+	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_adjuster GridAdjuster, math::range_axis_option Opt = math::range_axis_option::none) {
 		using value_type = typename std::decay<T>::type;
-		return histgram<value_type, grid_adjuster>(make_axis(Lower,Upper,Size, GridAdjuster, Opt));
+		return histgram<value_type, grid_adjuster>(make_range_axis(Lower,Upper,Size, GridAdjuster, Opt));
 	}
 	template<typename T>
-	auto make_histgram(T Lower, T Upper, unsigned int Size, math::make_axis_option Opt = math::make_axis_option::none) {
+	auto make_histgram(T Lower, T Upper, unsigned int Size, math::range_axis_option Opt = math::range_axis_option::none) {
 		return make_histgram(Lower, Upper, Size, math::default_grid_adjuster(), Opt);
 	}
 }
