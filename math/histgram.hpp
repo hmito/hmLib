@@ -15,7 +15,8 @@ namespace hmLib {
 		unsigned int Underflow;
 		unsigned int Overflow;
 	public:
-		using iterator = std::vector<unsigned int>::const_iterator;
+		using iterator = std::vector<unsigned int>::iterator;
+		using const_iterator = std::vector<unsigned int>::const_iterator;
 	public:
 		histgram() = default;
 		histgram(value_type Min_, value_type Max_, unsigned int SepNum_):Axis(Min_,Max_,SepNum_){
@@ -56,11 +57,23 @@ namespace hmLib {
 			}
 		}
 	public:
-		iterator begin()const { return Vec.begin(); }
-		iterator end()const { return Vec.end(); }
-		unsigned int underflow()const { return Underflow; }
-		unsigned int overflow()const { return Overflow; }
-		unsigned int size()const { return Axis.size(); }
+		unsigned int& operator[](unsigned int n){return Vec[n];}
+		const unsigned int& operator[](unsigned int n)const{return Vec[n];}
+		unsigned int& at(unsigned int n){return Vec.at(n);}
+		const unsigned int& at(unsigned int n)const{return Vec.at(n);}
+		unsigned int& underflow() { return Underflow; }
+		const unsigned int& underflow()const { return Underflow; }
+		unsigned int& overflow() { return Overflow; }
+		const unsigned int& overflow()const { return Overflow; }
+		iterator begin() { return Vec.begin(); }
+		iterator end() { return Vec.end(); }
+		const_iterator begin()const { return cbegin(); }
+		const_iterator end()const { return cend(); }
+		const_iterator cbegin()const { return Vec.begin(); }
+		const_iterator cend()const { return Vec.end(); }
+		unsigned int size()const { return Vec.size(); }
+		const std::vector<unsigned int>& data()&{return Vec;}
+		std::vector<unsigned int>&& data()&&{return Vec;}
 		value_type lower()const { return Axis.lower(); }
 		value_type upper()const { return Axis.upper(); }
 		const axis_t& axis()const { return Axis; }
