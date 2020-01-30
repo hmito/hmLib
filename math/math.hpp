@@ -9,7 +9,7 @@ namespace hmLib{
 		if (exp & 1)result *= base;
 		exp >>= 1;
 
-		while(!exp){
+		while(exp){
 			base *= base;
 			if (exp & 1)result *= base;
 			exp >>= 1;
