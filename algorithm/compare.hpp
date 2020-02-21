@@ -2,7 +2,6 @@
 #define HMLIB_ALGORITHM_COMPARE_INC 201
 #
 /*===algorithm::compare===
-大小関係のアルゴリズムを提供
 algorithm::compare v2_00/170207 hmIto
 	sort_value is now renamed to sorting_swap
 algorithm::compare v2_01/170207 hmIto
