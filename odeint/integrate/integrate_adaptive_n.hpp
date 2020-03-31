@@ -22,6 +22,7 @@ namespace hmLib {
 				for (size_t step = 0; step < step_num; ++step) {
 					observer(start_state, start_time);
 					st.do_step(sys, start_state, start_time, dt);
+					start_time += dt;
 				}
 				observer(start_state, start_time);
 				return start_time;

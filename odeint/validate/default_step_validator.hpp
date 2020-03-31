@@ -22,6 +22,10 @@ namespace hmLib {
 			}
 			void setup_dt(const state_type& x1, time_type t1, const state_type& x2, time_type t2) {
 				cur_dt = 0.9 * (t2 - t1) / (seach_distance / 10 + distance_norm_inf<state_type, algebra_type, operations_type>(x1, x2)) * seach_distance;
+				//basic idea is (t2-t1) * search_distance / ||x1 - x2||
+				//   search distance is the maximum checking step
+				//||x1-x2|| can be zero, so add 0.1 in denominator
+				//0.9 is safe mergin.
 				cur_dt = std::max(cur_dt, (t2 - t1) / 10000);
 			}
 			time_type dt()const { return cur_dt; }

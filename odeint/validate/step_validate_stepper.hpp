@@ -15,6 +15,8 @@
 #include"default_step_validator.hpp"
 namespace hmLib {
 	namespace odeint {
+		//step_validator control the step check interval.
+		//	if the next step is far from t0+step_validator::dt(), each step is divided by dt() and check valid or not; i.e., step_validator::dt() is the minimum gurantied checked step.
 		template<typename base_stepper_, typename step_validator_, typename appendix_type_>
 		struct step_validate_stepper{
 			using base_stepper = base_stepper_;

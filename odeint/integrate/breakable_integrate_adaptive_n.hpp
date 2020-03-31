@@ -27,6 +27,7 @@ namespace hmLib {
 				for (;!IsBreak && step < step_num; ++step) {
 					observer(start_state, start_time);
 					st.do_step(sys, start_state, start_time, dt);
+					start_time += dt;
 
 					// check breaker condition
 					IsBreak = breaker(start_state, start_time);
