@@ -245,7 +245,7 @@ namespace hmLib{
 				auto operator()(const state_type& v1, const state_type& v2, algebra_type, operations_type) {
 					state_type out;
 					utility::resize(v1, out);
-					return operator()<algebra_type, operations_type>(v1, v2, out);
+					return operator()<state_type, algebra_type, operations_type>(v1, v2, out, algebra_type(), operations_type());
 				}
 			};
 			template<>

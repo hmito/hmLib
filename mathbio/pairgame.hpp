@@ -9,6 +9,8 @@
 #include<boost/numeric/ublas/matrix.hpp>
 #include<boost/optional.hpp>
 #include"../ublas.hpp"
+#include"../odeint/validate.hpp"
+#include"../odeint/integrate.hpp"
 namespace hmLib {
 	namespace mathbio {
 		/*
@@ -40,7 +42,8 @@ namespace hmLib {
 					}
 				}
 			}
-			//return mean payoff if success to calculate fitness, none if extinction occur or fail to calculate inverse matrix
+			//return mean payoff if success to calculate fitness, none if fail to calculate inverse matrix
+			//ignore even if derived fraction is negative
 			template<typename frequency_output_iterator>
 			boost::optional<double> solve_freq_by_matrix(const payoff_matrix& Mx, freq_vector& Freq) {
 				//check monomorphic case
@@ -61,6 +64,9 @@ namespace hmLib {
 				Freq /= meanw;
 				return meanw;
 			}
+			//return mean payoff if success to calculate fitness, none if multiple extinction occur or fail to calculate inverse matrix
+			//fraction is kept larger than MinFreq
+			//Recursive flag allow extinction of multiple strains
 			template<typename frequency_output_iterator>
 			boost::optional<double> solve_freq_by_matrix(const payoff_matrix& Mx, freq_vector& Freq, double MinFreq, bool Recursive = false) {
 				std::vector<unsigned int> Exist;
@@ -124,9 +130,72 @@ namespace hmLib {
 				Freq[Exist[0]] = 1.0;
 				return Mx(Exist[0], Exist[0]);
 			}
+
+			namespace detail {
+				struct freq_csys {
+					using state_type = freq_vector;
+					using time_type = double;
+					using validate_result = hmLib::odeint::validate_result;
+				private:
+					const payoff_matrix& Mx;
+				public:
+					freq_csys(const payoff_matrix& Mx_) :Mx(Mx_) {}
+					void operator()(const state_type& f, state_type& df, time_type t) {
+						state_type w = boost::numeric::ublas::prod(Mx, f);
+						double sumf = std::accumulate(f.begin(), f.end(), 0.0);
+						double meanw = 0.0;
+						for (unsigned int i = 0; i < f.size(); ++i) {
+							meanw += w[i] * f[i] / sumf;
+						}
+
+						df = state_type(f.size(), 0.0);
+						for (unsigned int i = 0; i < f.size(); ++i) {
+							df[i] = (w[i] - meanw) * f[i] / sumf;
+						}
+					}
+					bool is_invalid_step(const state_type& x, time_type t) {
+						return std::any_of(x.begin(), x.end(), [](double v) {return v < 0.0; });
+					}
+					validate_result validate(const state_type& x, time_type t, state_type& nx) {
+						if (is_invalid_step(x, t)) {
+							nx = x;
+							for (auto& v : nx) {
+								v = std::max(0.0, v);
+							}
+							nx /= std::accumulate(nx.begin(), nx.end(), 0.0);
+							return validate_result::assigned;
+						}
+						if (std::abs(std::accumulate(x.begin(), x.end(), 0.0) - 1.0) > 0.001) {
+							nx = x;
+							nx /= std::accumulate(nx.begin(), nx.end(), 0.0);
+							return validate_result::assigned;
+						}
+						return validate_result::none;
+					}
+					validate_result validate(const state_type& x1, const state_type& x2, time_type t, state_type& nx) {
+						nx = x2;
+						for (auto& v : nx) {
+							v = std::max(0.0, v);
+						}
+						nx /= std::accumulate(nx.begin(), nx.end(), 0.0);
+						return validate_result::assigned;
+					}
+				};
+			}
 			template<typename pair_game, typename trait_input_iterator, typename frequency_forward_iterator>
 			double solve_freq_by_ode(const payoff_matrix& Mx, freq_vector& Freq){
+				if (Freq.size() != Mx.size1()) {
+					Freq = freq_vector(Mx.size1(), 1.0 / Mx.size1());
+				}
 
+				auto Stepper = hmLib::odeint::make_step_validate<void, boost::numeric::odeint::runge_kutta_dopri5<freq_vector>>(1e-3, 1e-3, 1e-10, 100);
+
+				detail::freq_csys Sys(Mx);
+				double t = 0;
+				double dt = 0.01;
+				for (unsigned int i = 0; i < 1000; ++i) {
+					Stepper.do_step(Sys, Freq, t, dt);
+				}
 			}
 		}
 
