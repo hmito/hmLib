@@ -4,7 +4,7 @@
 #include<utility>
 #include<vector>
 #include<cmath>
-#include<optional>
+#include<boost/optional.hpp>
 #include"../tuple.hpp"
 #include"../algorithm/sampling.hpp"
 #include"../random.hpp"
@@ -143,11 +143,10 @@ namespace hmLib {
 		template<typename trait>
 		struct osi_step_result {
 			bool success;
-			double meanw;
 			double dt;
-			std::optional<trait> branch;
+			boost::optional<trait> branch;
 			osi_step_result() = default;
-			osi_step_result(bool success_, double dt_) :success(success_), dt(dt_), branch(std::nullopt) {}
+			osi_step_result(bool success_, double dt_) :success(success_), dt(dt_), branch(boost::none) {}
 			osi_step_result(bool success_, double dt_, trait x) :success(success_), dt(dt_), branch(std::move(x)) {}
 		};
 
@@ -162,8 +161,8 @@ namespace hmLib {
 				: OSIPolicy(std::move(OSIPolicy_)), MaxMutationTrial(MaxMutationTrial_) {
 			}
 			void reset() { OSIPolicy.reset(); }
-			template<typename strainfitness, typename mutate, typename trait_iterator, typename frac_iterator>
-			osi_step_result<decltype(*std::declval<trait_iterator>())> operator()(strainfitness&& Fitness, mutate&& Mutate, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend, double& meanw) {
+			template<typename strainfitness, typename mutate, typename trait_iterator, typename frac_iterator,typename URBG>
+			auto operator()(strainfitness&& Fitness, mutate&& Mutate, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend, double& meanw, URBG&& Engine) {
 				hmLib_assert(std::distance(xbeg, xend) == std::distance(fbeg, fend), hmLib::numeric_exceptions::incorrect_arithmetic_request, "distance of two iterator pairs are different.");
 
 				//make sampler following frequency of each strain
@@ -178,10 +177,10 @@ namespace hmLib {
 				//try to find successful invasion
 				for (unsigned int MTrial = 0; MTrial < MaxMutationTrial; ++MTrial) {
 					//select strain producing mutant
-					auto sxitr = Sampler(hmLib::random::default_engine());
+					auto sxitr = Sampler(Engine);
 
 					//create mutant
-					Mutate(*sxitr, mutant);
+					mutant = Mutate(*sxitr, Engine);
 					double w = Fitness(mutant, xbeg, xend, fbeg, fend);
 
 					//calc current trial num with updating maxf
@@ -196,20 +195,19 @@ namespace hmLib {
 					std::swap(*sxitr, mutant);
 
 					//Update fraction with mutant
-					auto optmeanw = Fitness.solve(xbeg, xend, fbeg, fend);
-					if (!optmeanw.has_value())continue;
-					meanw = *optmeanw;
+					double nmeanw = Fitness.solve(xbeg, xend, fbeg, fend);
 
 					//calculate fitness for pre-resident
-					w = Fitness(mutant, xbeg, xend, fbeg, fend);
+					double nw = Fitness(mutant, xbeg, xend, fbeg, fend);
 
 					//reverse invasion is possible
-					if (OSIPolicy.can_invade(w, meanw)) {
+					if (OSIPolicy.can_invade(nw, nmeanw)) {
 						//swap trait value again (so mutant is now back to mutant)
 						std::swap(*sxitr, mutant);
-						meanw = (Fitness.solve(xbeg, xend, fbeg, fend)).value();
+						meanw = Fitness.solve(xbeg, xend, fbeg, fend);
 						return osi_step_result<decltype(mutant)>{ true, dt, mutant };
 					} else {
+						meanw = nmeanw;
 						return osi_step_result<decltype(mutant)>{ true, dt };
 					}
 				}
@@ -232,49 +230,50 @@ namespace hmLib {
 			strainfitness Fitness;
 			mutate Mutate;
 			osi_stepper<osi_policy_> Stepper;
-			double Threshold;
+			double ThrFreq;
 		public:
-			pairgame_osi_dsystem(pair_game Game_, mutate Mutate_, osi_policy OSIPolicy_, double Threshold_ = 1e-6)
-				: Fitness(std::move(Game_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_), Threshold(Threshold_) {
+			pairgame_osi_dsystem(pair_game Game_, mutate Mutate_, osi_policy OSIPolicy_, double ThrFreq_ = 1e-6)
+				: Fitness(std::move(Game_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_), ThrFreq(ThrFreq_) {
 			}
 			void operator()(state_type& s, double& t) {
 				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
 				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
-				auto Result = Stepper(Fitness, Mutate, xrange.begin(), xrange.end(), frange.begin(), frange.end(), s.meanw);
 
-				if (!Result.success) {
-					s.meanw = (Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end())).value();
-				}
-
+				auto Result = Stepper(Fitness, Mutate, xrange.begin(), xrange.end(), frange.begin(), frange.end(), s.meanw, hmLib::random::default_engine());
 				t += Result.dt;
 
 				//add new strain
 				if (Result.branch) {
-					s.strains.emplace_back(std::move(Result.branch).value(), Threshold);
+					s.strains.emplace_back(std::move(Result.branch).value(), ThrFreq);
 					auto xrange2 = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
 					auto frange2 = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
 
-					auto optmeanw = Fitness.solve(xrange2.begin(), xrange2.end(), frange2.begin(), frange2.end());
-					if (!optmeanw.has_value()) {
-						s.strains.pop_back();
-					} else {
-						s.meanw = *optmeanw;
-					}
+					s.meanw = Fitness.solve(xrange2.begin(), xrange2.end(), frange2.begin(), frange2.end());
 				}
 
 				//remove extinction
-				auto ssend = std::remove_if(s.strains.begin(), s.strains.end(), [=](const auto& v) {return v.second < Threshold; });
+				auto ssend = std::remove_if(s.strains.begin(), s.strains.end(), [=](const auto& v) {return v.second < ThrFreq/2; });
 				s.strains.erase(ssend, s.strains.end());
 			}
-			void reset() { Solver.reset(); }
-			void initialize_state(state_type& s, bool solve_fraction = false) {
+			void reset() { Stepper.reset(); }
+			template<typename trait_iterator>
+			state_type make_state(trait_iterator Beg, trait_iterator End) {
+				state_type s;
+				for (; Beg != End; ++Beg){
+					s.strains.emplace_back(*Beg, 0.0);
+				}
 				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
 				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
-				if (solve_fraction) {
-					s.meanw = (Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end())).value();
-				} else {
-					s.meanw = Fitness(xrange.begin(), xrange.end(), frange.begin(), frange.end());
-				}
+				s.meanw = Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end());
+				return s;
+			}
+			state_type make_state(trait_type Trait) {
+				state_type s;
+				s.strains.emplace_back(std::move(Trait), 1.0);
+				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
+				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
+				s.meanw = Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end());
+				return s;
 			}
 		};
 	}

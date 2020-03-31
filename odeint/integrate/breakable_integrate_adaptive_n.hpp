@@ -80,6 +80,7 @@ namespace hmLib {
 				// check breaker condition with the initial state
 				bool IsBreak = breaker(start_state, start_time);
 
+				st.initialize(start_state, start_time, dt);
 				size_t step = 0;
 				for (; !IsBreak && step < step_num; ++step) {
 					obs(st.current_state(), st.current_time());
@@ -108,7 +109,6 @@ namespace hmLib {
 				bool IsBreak = breaker(start_state, start_time);
 
 				size_t step = 0;
-				st.initialize(start_state, start_time, dt);
 				for (; !IsBreak && step < step_num; ++step) {
 					obs(start_state, start_time);
 					st.do_step(sys, start_state, start_time, dt);
