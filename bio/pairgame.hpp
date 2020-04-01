@@ -11,6 +11,7 @@
 #include"../ublas.hpp"
 #include"../odeint/validate.hpp"
 #include"../odeint/integrate.hpp"
+#include"../odeint/breaker/overflow_breaker.hpp"
 namespace hmLib {
 	namespace bio {
 		/*
@@ -190,8 +191,6 @@ namespace hmLib {
 				auto Stepper = hmLib::odeint::make_step_validate<void>(1e-1, ThrFreq, 1e-6, 100, boost::numeric::odeint::make_dense_output(ThrFreq/10, 1e-4, boost::numeric::odeint::runge_kutta_dopri5<freq_vector>()));
 
 				detail::freq_csys Sys(Mx,ThrFreq);
-				double t = 0;
-				double dt = 0.01;
 
 				hmLib::odeint::time_overflow_breaker<> Brk(1e50);
 				hmLib::odeint::breakable_integrate_adaptive_n(Stepper, Sys, Freq, 0.0, 0.001, stepnum, Brk);
