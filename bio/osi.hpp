@@ -217,6 +217,11 @@ namespace hmLib {
 			}
 		};
 
+		template<typename trait_type>
+		struct pairgame_osi_state {
+			std::vector<std::pair<trait_type, double>> strains;
+			double meanw;
+		};
 		template<typename pair_game_, typename mutate_, typename osi_policy_>
 		struct pairgame_osi_dsystem {
 			using pair_game = pair_game_;
@@ -224,10 +229,7 @@ namespace hmLib {
 			using trait_type = typename pair_game::trait_type;
 			using mutate = mutate_;
 			using osi_policy = osi_policy_;
-			struct state_type {
-				std::vector<std::pair<trait_type, double>> strains;
-				double meanw;
-			};
+			using state_type = pairgame_osi_state<trait_type>;
 		private:
 			strainfitness Fitness;
 			mutate Mutate;
