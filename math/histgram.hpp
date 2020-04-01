@@ -19,18 +19,19 @@ namespace hmLib {
 		using const_iterator = std::vector<unsigned int>::const_iterator;
 	public:
 		histgram() = default;
-		histgram(value_type Min_, value_type Max_, unsigned int SepNum_):Axis(Min_,Max_,SepNum_){
+		histgram(value_type Min_, value_type Max_, unsigned int SepNum_):Axis(Min_,Max_,SepNum_+1){
 			clear();
 		}
 		explicit histgram(axis_t Axis_):Axis(std::move(Axis_)) {
 			clear();
 		}
 		void clear() {
-			Vec.assign(Axis.size(), 0u);
+			if (Axis.empty())return;
+			Vec.assign(Axis.size()-1, 0u);
 			Underflow = 0;
 			Overflow = 0;
 		}
-		void reset(value_type Min_, value_type Max_, unsigned int SepNum_) {
+		void reset(value_type Min_, value_type Max_, unsigned int SepNum_+1) {
 			Axis.assign(Min_, Max_, SepNum_);
 			clear();
 		}
@@ -82,7 +83,7 @@ namespace hmLib {
 	template<typename T, typename grid_adjuster>
 	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_adjuster GridAdjuster, math::range_axis_option Opt = math::range_axis_option::none) {
 		using value_type = typename std::decay<T>::type;
-		return histgram<value_type, grid_adjuster>(make_range_axis(Lower,Upper,Size, GridAdjuster, Opt));
+		return histgram<value_type, grid_adjuster>(make_range_axis(Lower,Upper,Size+1, GridAdjuster, Opt));
 	}
 	template<typename T>
 	auto make_histgram(T Lower, T Upper, unsigned int Size, math::range_axis_option Opt = math::range_axis_option::none) {
