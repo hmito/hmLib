@@ -31,8 +31,8 @@ namespace hmLib {
 			Underflow = 0;
 			Overflow = 0;
 		}
-		void reset(value_type Min_, value_type Max_, unsigned int SepNum_+1) {
-			Axis.assign(Min_, Max_, SepNum_);
+		void reset(value_type Min_, value_type Max_, unsigned int SepNum_) {
+			Axis.assign(Min_, Max_, SepNum_+1);
 			clear();
 		}
 		void reset(const axis_t& Axis_) {
