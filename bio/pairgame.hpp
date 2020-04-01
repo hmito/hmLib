@@ -1,5 +1,5 @@
-#ifndef HMLIB_MATHBIO_PAIRGAME_INC
-#define HMLIB_MATHBIO_PAIRGAME_INC 100
+#ifndef HMLIB_BIO_PAIRGAME_INC
+#define HMLIB_BIO_PAIRGAME_INC 100
 #
 #include<iterator>
 #include<utility>
@@ -12,7 +12,7 @@
 #include"../odeint/validate.hpp"
 #include"../odeint/integrate.hpp"
 namespace hmLib {
-	namespace mathbio {
+	namespace bio {
 		/*
 		struct pair_game_pattern{
 			//payoff of pair game between x1 and x2 (first: for x1, second: for x2)

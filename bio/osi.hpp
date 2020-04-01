@@ -1,5 +1,5 @@
-#ifndef HMLIB_MATHBIO_OSI_INC
-#define HMLIB_MATHBIO_OSI_INC 100
+#ifndef HMLIB_BIO_OSI_INC
+#define HMLIB_BIO_OSI_INC 100
 #
 #include<utility>
 #include<vector>
@@ -11,7 +11,7 @@
 #include"../exceptions.hpp"
 #include"pairgame.hpp"
 namespace hmLib {
-	namespace mathbio {
+	namespace bio {
 		namespace osi {
 			// birth rate: b = rate*(w/meanw)
 			// daeth rate: d = rate
@@ -161,6 +161,8 @@ namespace hmLib {
 				: OSIPolicy(std::move(OSIPolicy_)), MaxMutationTrial(MaxMutationTrial_) {
 			}
 			void reset() { OSIPolicy.reset(); }
+			//return value is osi_step_result with the focal trait type
+			//[fbeg,fend) and meanw is changed inside of the function
 			template<typename strainfitness, typename mutate, typename trait_iterator, typename frac_iterator,typename URBG>
 			auto operator()(strainfitness&& Fitness, mutate&& Mutate, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend, double& meanw, URBG&& Engine) {
 				hmLib_assert(std::distance(xbeg, xend) == std::distance(fbeg, fend), hmLib::numeric_exceptions::incorrect_arithmetic_request, "distance of two iterator pairs are different.");
