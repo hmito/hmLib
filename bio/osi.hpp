@@ -112,7 +112,7 @@ namespace hmLib {
 						}
 					} else {
 						//aproximate by normal distribution
-						if (f < 0 || std::pow(1 - f, trial) > hmLib::random::uniform_real(0.0, 1.0)) {
+						if (f <= 0 || std::pow(1 - f, trial) > hmLib::random::uniform_real(0.0, 1.0)) {
 							//fail to invade
 							do {
 								dt = -hmLib::random::normal(-1.0 * trial, std::sqrt(trial));
@@ -230,14 +230,23 @@ namespace hmLib {
 			using mutate = mutate_;
 			using osi_policy = osi_policy_;
 			using state_type = pairgame_osi_state<trait_type>;
+			using this_type = pairgame_osi_dsystem<pair_game, mutate, osi_policy>;
+			struct failtrial_breaker {
+			private:
+				const this_type& Ref;
+			public:
+				failtrial_breaker(const this_type& Ref_) :Ref(Ref_) {}
+				bool operator()(const state_type&, double t)const {return Ref.FailTrial;}
+			};
 		private:
 			strainfitness Fitness;
 			mutate Mutate;
 			osi_stepper<osi_policy_> Stepper;
 			double ThrFreq;
+			bool FailTrial;
 		public:
-			pairgame_osi_dsystem(pair_game Game_, mutate Mutate_, osi_policy OSIPolicy_, double ThrFreq_ = 1e-6)
-				: Fitness(std::move(Game_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_), ThrFreq(ThrFreq_) {
+			pairgame_osi_dsystem(pair_game Game_, mutate Mutate_, osi_policy OSIPolicy_, unsigned int MaxTrial_ = 10000, double ThrFreq_ = 1e-6)
+				: Fitness(std::move(Game_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_, MaxTrial_), ThrFreq(ThrFreq_), FailTrial(false){
 			}
 			void operator()(state_type& s, double& t) {
 				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
@@ -245,6 +254,7 @@ namespace hmLib {
 
 				auto Result = Stepper(Fitness, Mutate, xrange.begin(), xrange.end(), frange.begin(), frange.end(), s.meanw, hmLib::random::default_engine());
 				t += Result.dt;
+				FailTrial = !Result.success;
 
 				//add new strain
 				if (Result.branch) {
@@ -279,6 +289,7 @@ namespace hmLib {
 				s.meanw = Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end());
 				return s;
 			}
+			failtrial_breaker make_failtrial_breaker()const {return failtrial_breaker(*this);}
 		};
 	}
 }
