@@ -44,14 +44,14 @@ namespace hmLib{
 		}
 		template<typename system_type, typename state_type, typename time_type>
 		void recurrence_increment(system_type& System, state_type& State, time_type StartTime, time_type EndTime) {
-			for(; StartTime != EndTime; ++StartTime) {
-				System(State, StartTime);
+			while(StartTime < EndTime) {
+				System(State, StartTime++);
 			}
 		}
 		template<typename system_type, typename state_type, typename time_type, typename observer>
 		void recurrence_increment(system_type& System, state_type& State, time_type StartTime, time_type EndTime, observer Observer) {
-			for(; StartTime != EndTime; ++StartTime) {
-				System(State, StartTime);
+			while (StartTime < EndTime) {
+				System(State, StartTime++);
 				Observer(State, StartTime);
 			}
 		}

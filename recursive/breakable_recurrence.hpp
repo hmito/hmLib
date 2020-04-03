@@ -59,21 +59,21 @@ namespace hmLib{
 		}
 		template<typename system_type, typename state_type, typename time_type, typename breaker_type>
 		std::pair<bool, size_t> breakable_recurrence_increment(system_type& System, state_type& State, time_type StartTime, time_type EndTime, breaker_type Breaker) {
-			for (; StartTime != EndTime; ++StartTime) {
+			while(StartTime < EndTime) {
 				if (Breaker(State, StartTime)) {
 					return std::make_pair(true, StartTime);
 				}
-				System(State, StartTime);
+				System(State, StartTime++);
 			}
 			return std::make_pair(Breaker(State, StartTime), StartTime);
 		}
 		template<typename system_type, typename state_type, typename time_type, typename breaker_type, typename observer>
 		std::pair<bool, size_t> breakable_recurrence_increment(system_type& System, state_type& State, time_type StartTime, time_type EndTime, breaker_type Breaker, observer Observer) {
-			for (; StartTime != EndTime; ++StartTime) {
+			while (StartTime < EndTime) {
 				if (Breaker(State, StartTime)) {
 					return std::make_pair(true, StartTime);
 				}
-				System(State, StartTime);
+				System(State, StartTime++);
 				Observer(State, StartTime);
 			}
 			return std::make_pair(Breaker(State, StartTime), StartTime);
