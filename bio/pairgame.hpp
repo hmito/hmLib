@@ -188,7 +188,7 @@ namespace hmLib {
 					Freq = freq_vector(Mx.size1(), 1.0 / Mx.size1());
 				}
 
-				auto Stepper = hmLib::odeint::make_step_validate<void>(1e-1, ThrFreq, 1e-6, 100, boost::numeric::odeint::make_dense_output(ThrFreq/10, 1e-4, boost::numeric::odeint::runge_kutta_dopri5<freq_vector>()));
+				auto Stepper = hmLib::odeint::make_step_validate<void>(1e-2, ThrFreq/10, 1e-2, 100, boost::numeric::odeint::make_dense_output(ThrFreq/100, 1e-3, boost::numeric::odeint::runge_kutta_dopri5<freq_vector>()));
 
 				detail::freq_csys Sys(Mx,ThrFreq);
 
@@ -226,12 +226,12 @@ namespace hmLib {
 				pairgame::freq_vector Freq;
 				pairgame::payoff_matrix Mx;
 				pairgame::calc_payoff_matrix(Mx, Game, xbeg, xend);
-				//auto Result = pairgame::solve_freq_by_matrix(Mx, Freq);			
-				//if (Result && std::all_of(Freq.begin(), Freq.end(), [](double v) {return v >= 0.0; })) {
-				//	std::copy(Freq.begin(), Freq.end(), fbeg);
-				//	return *Result;
-				//}
-
+				auto Result = pairgame::solve_freq_by_matrix(Mx, Freq);			
+				if (Result && std::all_of(Freq.begin(), Freq.end(), [](double v) {return v >= 0.0; })) {
+					std::copy(Freq.begin(), Freq.end(), fbeg);
+					return *Result;
+				}
+				
 				Freq.resize(Mx.size1(), false);
 				std::copy(fbeg, fend, Freq.begin());
 				double meanw = pairgame::solve_freq_by_ode(Mx, Freq, StepNum, ThrFreq);
