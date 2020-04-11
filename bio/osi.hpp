@@ -217,20 +217,31 @@ namespace hmLib {
 			}
 		};
 
+
+		/*strain fitness 
+		struct strainfitness_pattern{
+			using trait_type = hoge;
+		public:
+			template<typename trait_iterator, typename frac_iterator>
+			double solve(trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend);
+			template<typename trait_iterator, typename frac_iterator>
+			double operator()(const trait_type& x, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend);
+		};
+		*/
 		template<typename trait_type>
-		struct pairgame_osi_state {
-			std::vector<std::pair<trait_type, double>> strains;
+		struct osi_state {
+			//trait, frequency, strain_no
+			std::vector<std::tuple<trait_type, double, unsigned int>> strains;
 			double meanw;
 		};
-		template<typename pair_game_, typename mutate_, typename osi_policy_>
-		struct pairgame_osi_dsystem {
-			using pair_game = pair_game_;
-			using strainfitness = pairgame_strainfitness<pair_game>;
-			using trait_type = typename pair_game::trait_type;
+		template<typename strainfitness_, typename mutate_, typename osi_policy_>
+		struct osi_dsystem {
+			using strainfitness = strainfitness_;
+			using trait_type = typename strainfitness::trait_type;
 			using mutate = mutate_;
 			using osi_policy = osi_policy_;
-			using state_type = pairgame_osi_state<trait_type>;
-			using this_type = pairgame_osi_dsystem<pair_game, mutate, osi_policy>;
+			using state_type = osi_state<trait_type>;
+			using this_type = osi_dsystem<strainfitness, mutate, osi_policy>;
 			struct failtrial_breaker {
 			private:
 				const this_type& Ref;
@@ -242,11 +253,12 @@ namespace hmLib {
 			strainfitness Fitness;
 			mutate Mutate;
 			osi_stepper<osi_policy_> Stepper;
+			unsigned int StrainNo;
 			double ThrFreq;
 			bool FailTrial;
 		public:
-			pairgame_osi_dsystem(pair_game Game_, mutate Mutate_, osi_policy OSIPolicy_, unsigned int MaxTrial_ = 10000, double ThrFreq_ = 1e-6)
-				: Fitness(std::move(Game_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_, MaxTrial_), ThrFreq(ThrFreq_), FailTrial(false){
+			osi_dsystem(strainfitness Fitness_, mutate Mutate_, osi_policy OSIPolicy_, unsigned int MaxTrial_ = 10000, double ThrFreq_ = 1e-6)
+				: Fitness(std::move(Fitness_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_, MaxTrial_), StrainNo(0), ThrFreq(ThrFreq_), FailTrial(false){
 			}
 			void operator()(state_type& s, double& t) {
 				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
@@ -258,7 +270,7 @@ namespace hmLib {
 
 				//add new strain
 				if (Result.branch) {
-					s.strains.emplace_back(std::move(Result.branch).value(), ThrFreq);
+					s.strains.emplace_back(std::move(Result.branch).value(), ThrFreq*2, StrainNo++);
 					auto xrange2 = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
 					auto frange2 = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
 
@@ -266,15 +278,15 @@ namespace hmLib {
 				}
 
 				//remove extinction
-				auto ssend = std::remove_if(s.strains.begin(), s.strains.end(), [=](const auto& v) {return v.second < ThrFreq/2; });
+				auto ssend = std::remove_if(s.strains.begin(), s.strains.end(), [=](const auto& v) {return std::get<1>(v) < ThrFreq; });
 				s.strains.erase(ssend, s.strains.end());
 			}
-			void reset() { Stepper.reset(); }
+			void reset() { Stepper.reset(); StrainNo = 0; }
 			template<typename trait_iterator>
 			state_type make_state(trait_iterator Beg, trait_iterator End) {
 				state_type s;
 				for (; Beg != End; ++Beg){
-					s.strains.emplace_back(*Beg, 0.0);
+					s.strains.emplace_back(*Beg, 0.0, StrainNo++);
 				}
 				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
 				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
@@ -283,7 +295,7 @@ namespace hmLib {
 			}
 			state_type make_state(trait_type Trait) {
 				state_type s;
-				s.strains.emplace_back(std::move(Trait), 1.0);
+				s.strains.emplace_back(std::move(Trait), 1.0, StrainNo++);
 				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
 				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
 				s.meanw = Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end());

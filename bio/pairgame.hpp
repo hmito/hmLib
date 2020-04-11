@@ -8,6 +8,7 @@
 #include<boost/numeric/odeint.hpp>
 #include<boost/numeric/ublas/matrix.hpp>
 #include<boost/optional.hpp>
+#include"../exceptions/exception.hpp"
 #include"../ublas.hpp"
 #include"../odeint/validate.hpp"
 #include"../odeint/integrate.hpp"
@@ -215,11 +216,11 @@ namespace hmLib {
 			using trait_type = typename game::trait_type;
 		private:
 			game Game;
-			unsigned int StepNum;
 			double ThrFreq;
+			unsigned int StepNum;
 		public:
-			explicit pairgame_strainfitness(game Game_, unsigned int StepNum_ = 100, double ThrFreq_ = 1e-6) 
-				:Game(std::move(Game_)), StepNum(StepNum_), ThrFreq(ThrFreq_){
+			explicit pairgame_strainfitness(game Game_, double ThrFreq_, unsigned int TryStepNum_)
+				:Game(std::move(Game_)), ThrFreq(ThrFreq_), StepNum(TryStepNum_){
 			}
 			template<typename trait_iterator, typename frac_iterator>
 			double solve(trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend) {
@@ -230,7 +231,9 @@ namespace hmLib {
 				if (Result && std::all_of(Freq.begin(), Freq.end(), [](double v) {return v >= 0.0; })) {
 					std::copy(Freq.begin(), Freq.end(), fbeg);
 					return *Result;
-				}
+				}// else {
+				//	hmLib_throw(hmLib::exceptions::exception,"fail to calc inverse matrix");
+				//}
 				
 				Freq.resize(Mx.size1(), false);
 				std::copy(fbeg, fend, Freq.begin());
