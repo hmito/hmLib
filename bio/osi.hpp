@@ -95,14 +95,16 @@ namespace hmLib {
 
 					//Success of invasion flag
 					if (trial < max_trial) {
-						//if trial number is enough small, just try 5 times.
+						//if trial number is enough small, just try trial times.
 						//	this is because approximation by normal distribution is less precious in small trial number.
 						if (f <= 0) {
+							//fail to invade
 							for (unsigned int i = 0; i < trial; ++i) {
 								dt += -std::log(hmLib::random::uniform_real(0.0, 1.0));
 							}
 						} else {
 							for (unsigned int i = 0; i < trial; ++i) {
+								//might success to invade (not always)
 								dt += -std::log(hmLib::random::uniform_real(0.0, 1.0));
 								if (f > hmLib::random::uniform_real(0.0, 1.0)) {
 									Success = true;
