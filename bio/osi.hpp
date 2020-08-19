@@ -13,8 +13,8 @@
 namespace hmLib {
 	namespace bio {
 		namespace osi {
-			// birth rate: b = rate*(w/meanw)
-			// daeth rate: d = rate
+			// birth rate: b = rate*w
+			// daeth rate: d = rate*meanw (because b=d at stable pop size)
 			// w > 0 and meanw > 0 are requried.
 			struct birth_ratio_invasion_fitness {
 				// birth rate: b = rate*(w/meanw)
