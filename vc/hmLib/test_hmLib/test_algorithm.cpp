@@ -289,7 +289,6 @@ namespace hmLib{
 			Assert::AreEqual(-7, *Itr++);
 		}
 	};
-
 	TEST_CLASS(test_basic_algorithms) {
 	private:
 		void test_unstable_remove_if_impl(std::vector<int> Vec, int AnsNum) {

@@ -12,6 +12,7 @@ namespace hmLib {
 			ub::matrix<T> tmp(a);
 			ub::permutation_matrix<> pm(tmp.size1());
 
+			//fail to factorize
 			if(ub::lu_factorize(tmp, pm) != 0) return true;
 
 			b = ub::identity_matrix<T>(tmp.size1());

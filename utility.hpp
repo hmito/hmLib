@@ -8,6 +8,8 @@ namespace hmLib{
 	}
 }
 #define hmLib_static_restrict(condition) typename std::enable_if<condition>::type*& = hmLib::utility::enabler
+
+#define hmLib_unused(expr) do{(void)(expr);}while(0)
 namespace hmLib{
 	template<typename T, typename U>
 	T exchange(T& obj, U&& new_val) {

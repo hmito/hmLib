@@ -1,27 +1,28 @@
-﻿#ifndef HMLIB_ALGORITHM_COMPARE_INC
+#ifndef HMLIB_ALGORITHM_COMPARE_INC
 #define HMLIB_ALGORITHM_COMPARE_INC 201
 #
 /*===algorithm::compare===
-大小関係のアルゴリズムを提供
 algorithm::compare v2_00/170207 hmIto
 	sort_value is now renamed to sorting_swap
+algorithm::compare v2_01/170207 hmIto
+	Rename sort_value to sorting_swap
 algorithm::compare v2_00/160509 hmIto
-	min,maxを多変数版、min_value, max_valueに変更
-	swap_sortをsort_valueに変更
+	Rename min/max with multiple arguments to min_value/max_value
+	Rename swap_sort to sort_value
 algorithm::compare v1_00/130328 hmIto
-	algorthmから分離
+	Indepdendent from algorithm.hpp
 */
 #include<algorithm>
-
+#include<array>
 namespace hmLib{
-	//非コンテナ引数をソートする
+	//sort non-container variables
 	template<typename T>
 	inline void sorting_swap(T& val1,T& val2){
 		if(val1>val2)std::swap(val1,val2);
 	}
-	//非コンテナ引数をソートする
+	//sort non-container variables (three arguments)
 	template<typename T>
-	inline void sorting_swap(T& val1,T& val2,T& val3){
+	inline void sorting_swap(T& val1,T& val2, T& val3){
 		if(val1>val2){
 			if(val2>val3){
 				//val3 < val2 < val1
@@ -45,7 +46,7 @@ namespace hmLib{
 			}else return;
 		}
 	}
-	//3要素のmedian
+	//median value of three arguments
 	template<class T>
 	inline constexpr T median(T val1,T val2,T val3){
 		if(val1>val2){
@@ -59,7 +60,7 @@ namespace hmLib{
 		}
 	}
 
-	//3要素のmedian
+	//clamp value by lower and upper
 	template<class T>
 	inline constexpr T clamp(T val, T lower, T upper) {
 		return std::min(std::max(lower, val), upper);

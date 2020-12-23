@@ -163,7 +163,6 @@ namespace hmLib {
 	insert_iterator<container, iterator> inserter(container& Container, iterator Itr) {
 		return insert_iterator<container, iterator>(Container, Itr);
 	}
-
 }
 # 
 #endif 

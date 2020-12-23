@@ -2,6 +2,7 @@
 #define HMLIB_ODEINT_ADAPTIVESTEPPER_INC 100
 #
 #include <boost/numeric/odeint/util/unwrap_reference.hpp>
+#include <boost/numeric/odeint/stepper/generation.hpp>
 #include <boost/numeric/odeint/stepper/controlled_step_result.hpp>
 #include <boost/numeric/odeint/integrate/max_step_checker.hpp>
 #include"stepper_categories.hpp"

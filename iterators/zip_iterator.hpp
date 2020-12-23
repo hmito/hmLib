@@ -7,7 +7,6 @@
 #include"../tuple.hpp"
 #include"../clone_ptrproxy.hpp"
 namespace hmLib {
-
 	namespace iterators {
 		template<typename... iterators>
 		struct zip_iterator_traits {
@@ -18,198 +17,199 @@ namespace hmLib {
 			using pointer = std::tuple<typename std::iterator_traits<iterators>::pointer...>;
 			using iterator_category = typename std::common_type<typename std::iterator_traits<iterators>::iterator_category...>::type;
 		};
-		template<typename iterator_category_, unsigned int order_iterator_pos_, typename... iterators_>
-		struct zip_iterator_impl;
-		template<unsigned int order_iterator_pos_, typename... iterators_>
-		struct zip_iterator_impl<std::input_iterator_tag, order_iterator_pos_, iterators_...> {
-		private:
-			using this_type = zip_iterator_impl<std::input_iterator_tag, order_iterator_pos_, iterators_...>;
-			using iterator_traits = zip_iterator_traits<iterators_...>;
-		public:
-			using iterator_pack = std::tuple<iterators_...>;
-			using value_type = typename iterator_traits::value_type;
-			using difference_type = typename iterator_traits::difference_type;
-			using reference = typename iterator_traits::reference;
-			using pointer = clone_ptrproxy<reference>;
-			using iterator_category = std::input_iterator_tag;
-			constexpr static std::size_t static_size() { return sizeof...(iterators_); }
-		public:
-			zip_iterator_impl() = default;
-			explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
-			template<typename... other_iterators_>
-			zip_iterator_impl(other_iterators_... Itrs_):Itrs(Itrs_...){}
-			reference operator*() { return hmLib::tuple_for_each([](auto& itr) ->auto&{return *itr; }, Itrs); }
-			pointer operator->() { return pointer(operator*()); }
-			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
-			this_type operator++(int) {
-				this_type Prev = *this;
-				operator++();
-				return Prev;
-			}
-			const iterator_pack& pack()const { return Itrs; }
-			friend bool operator==(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator!=(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)!=std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-		private:
-			iterator_pack Itrs;
-		};
-		template<unsigned int order_iterator_pos_, typename... iterators_>
-		struct zip_iterator_impl<std::forward_iterator_tag, order_iterator_pos_, iterators_...> {
-		private:
-			using this_type = zip_iterator_impl<std::forward_iterator_tag, order_iterator_pos_, iterators_...>;
-			using iterator_traits = zip_iterator_traits<iterators_...>;
-		public:
-			using iterator_pack = std::tuple<iterators_...>;
-			using value_type = typename iterator_traits::value_type;
-			using difference_type = typename iterator_traits::difference_type;
-			using reference = typename iterator_traits::reference;
-			using pointer = clone_ptrproxy<reference>;
-			using iterator_category = std::forward_iterator_tag;
-			constexpr static std::size_t static_size() { return sizeof...(iterators_); }
-		public:
-			zip_iterator_impl() = default;
-			explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
-			template<typename... other_iterators_>
-			zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			reference operator*() { return hmLib::tuple_for_each([](auto& itr)->auto& {return *itr; }, Itrs); }
-			pointer operator->() { return pointer(operator*()); }
-			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
-			this_type operator++(int) {
-				this_type Prev = *this;
-				operator++();
-				return Prev;
-			}
-			const iterator_pack& pack()const { return Itrs; }
-			friend bool operator==(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator!=(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)!=std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-		private:
-			iterator_pack Itrs;
-		};
-		template<unsigned int order_iterator_pos_, typename... iterators_>
-		struct zip_iterator_impl<std::bidirectional_iterator_tag, order_iterator_pos_, iterators_...> {
-		private:
-			using this_type = zip_iterator_impl<std::bidirectional_iterator_tag, order_iterator_pos_, iterators_...>;
-			using iterator_traits = zip_iterator_traits<iterators_...>;
-		public:
-			using iterator_pack = std::tuple<iterators_...>;
-			using value_type = typename iterator_traits::value_type;
-			using difference_type = typename iterator_traits::difference_type;
-			using reference = typename iterator_traits::reference;
-			using pointer = clone_ptrproxy<reference>;
-			using iterator_category = std::bidirectional_iterator_tag;
-			constexpr static std::size_t static_size() { return sizeof...(iterators_); }
-		public:
-			zip_iterator_impl() = default;
-			explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
-			template<typename... other_iterators_>
-			zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			reference operator*() { return hmLib::tuple_for_each([](auto& itr)->auto& {return *itr; }, Itrs); }
-			pointer operator->() { return pointer(operator*()); }
-			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
-			this_type operator++(int) {
-				this_type Prev = *this;
-				operator++();
-				return Prev;
-			}
-			this_type& operator--() { hmLib::tuple_for_each([](auto& itr) {return --itr; }, Itrs); return *this; }
-			this_type operator--(int) {
-				this_type Prev = *this;
-				operator--();
-				return Prev;
-			}
-			const iterator_pack& pack()const { return Itrs; }
-			friend bool operator==(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator!=(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)!=std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-		private:
-			iterator_pack Itrs;
-		};
-		template<unsigned int order_iterator_pos_, typename... iterators_>
-		struct zip_iterator_impl<std::random_access_iterator_tag, order_iterator_pos_, iterators_...> {
-		private:
-			using this_type = zip_iterator_impl<std::random_access_iterator_tag, order_iterator_pos_, iterators_...>;
-			using iterator_traits = zip_iterator_traits<iterators_...>;
-		public:
-			using iterator_pack = std::tuple<iterators_...>;
-			using value_type = typename iterator_traits::value_type;
-			using difference_type = typename iterator_traits::difference_type;
-			using reference = typename iterator_traits::reference;
-			using pointer = clone_ptrproxy<reference>;
-			using iterator_category = std::random_access_iterator_tag;
-			constexpr static std::size_t static_size() { return sizeof...(iterators_); }
-		public:
-			zip_iterator_impl() = default;
-			explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
-			template<typename... other_iterators_>
-			zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-			reference operator*() { return hmLib::tuple_for_each([](auto& itr)->decltype((*itr)) {return *itr; }, Itrs); }
-			reference operator[](difference_type n) { return hmLib::tuple_for_each([n](auto& itr)->decltype((*itr)) {return itr[n]; }, Itrs); }
-			pointer operator->() { return pointer(operator*()); }
-			this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
-			this_type operator++(int) {
-				this_type Prev = *this;
-				operator++();
-				return Prev;
-			}
-			this_type& operator--() { hmLib::tuple_for_each([](auto& itr) {return --itr; }, Itrs); return *this; }
-			this_type operator--(int) {
-				this_type Prev = *this;
-				operator--();
-				return Prev;
-			}
-			this_type& operator+=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr += n; }, Itrs); return *this; }
-			this_type& operator-=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr -= n; }, Itrs); return *this; }
-			const iterator_pack& pack()const { return Itrs; }
-			friend this_type operator+(const this_type& itr, difference_type n) {
-				auto ans = itr;
-				ans += n;
-				return ans;
-			}
-			friend this_type operator+(difference_type n, const this_type& itr) {
-				auto ans = itr;
-				ans += n;
-				return ans;
-			}
-			friend this_type operator-(const this_type& itr, difference_type n) {
-				auto ans = itr;
-				ans -= n;
-				return ans;
-			}
-			friend difference_type operator-(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)-std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator==(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)==std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator!=(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)!=std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator>(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)>std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator<(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)<std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator>=(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)>=std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-			friend bool operator<=(const this_type& itr1, const this_type& itr2) {
-				return std::get<order_iterator_pos_>(itr1.Itrs)<=std::get<order_iterator_pos_>(itr2.Itrs);
-			}
-		private:
-			iterator_pack Itrs;
-		};
 		namespace detail {
+			template<typename iterator_category_, unsigned int order_iterator_pos_, typename... iterators_>
+			struct zip_iterator_impl;
+			template<unsigned int order_iterator_pos_, typename... iterators_>
+			struct zip_iterator_impl<std::input_iterator_tag, order_iterator_pos_, iterators_...> {
+			private:
+				using this_type = zip_iterator_impl<std::input_iterator_tag, order_iterator_pos_, iterators_...>;
+				using iterator_traits = zip_iterator_traits<iterators_...>;
+			public:
+				using iterator_pack = std::tuple<iterators_...>;
+				using value_type = typename iterator_traits::value_type;
+				using difference_type = typename iterator_traits::difference_type;
+				using reference = typename iterator_traits::reference;
+				using pointer = clone_ptrproxy<reference>;
+				using iterator_category = std::input_iterator_tag;
+				constexpr static std::size_t static_size() { return sizeof...(iterators_); }
+			public:
+				zip_iterator_impl() = default;
+				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
+				template<typename... other_iterators_>
+				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
+				reference operator*() { return hmLib::tuple_for_each([](auto& itr) ->auto & {return *itr; }, Itrs); }
+				pointer operator->() { return pointer(operator*()); }
+				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type operator++(int) {
+					this_type Prev = *this;
+					operator++();
+					return Prev;
+				}
+				const iterator_pack& pack()const { return Itrs; }
+				friend bool operator==(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) == std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator!=(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) != std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+			private:
+				iterator_pack Itrs;
+			};
+			template<unsigned int order_iterator_pos_, typename... iterators_>
+			struct zip_iterator_impl<std::forward_iterator_tag, order_iterator_pos_, iterators_...> {
+			private:
+				using this_type = zip_iterator_impl<std::forward_iterator_tag, order_iterator_pos_, iterators_...>;
+				using iterator_traits = zip_iterator_traits<iterators_...>;
+			public:
+				using iterator_pack = std::tuple<iterators_...>;
+				using value_type = typename iterator_traits::value_type;
+				using difference_type = typename iterator_traits::difference_type;
+				using reference = typename iterator_traits::reference;
+				using pointer = clone_ptrproxy<reference>;
+				using iterator_category = std::forward_iterator_tag;
+				constexpr static std::size_t static_size() { return sizeof...(iterators_); }
+			public:
+				zip_iterator_impl() = default;
+				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
+				template<typename... other_iterators_>
+				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
+				reference operator*() { return hmLib::tuple_for_each([](auto& itr)->auto & {return *itr; }, Itrs); }
+				pointer operator->() { return pointer(operator*()); }
+				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type operator++(int) {
+					this_type Prev = *this;
+					operator++();
+					return Prev;
+				}
+				const iterator_pack& pack()const { return Itrs; }
+				friend bool operator==(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) == std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator!=(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) != std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+			private:
+				iterator_pack Itrs;
+			};
+			template<unsigned int order_iterator_pos_, typename... iterators_>
+			struct zip_iterator_impl<std::bidirectional_iterator_tag, order_iterator_pos_, iterators_...> {
+			private:
+				using this_type = zip_iterator_impl<std::bidirectional_iterator_tag, order_iterator_pos_, iterators_...>;
+				using iterator_traits = zip_iterator_traits<iterators_...>;
+			public:
+				using iterator_pack = std::tuple<iterators_...>;
+				using value_type = typename iterator_traits::value_type;
+				using difference_type = typename iterator_traits::difference_type;
+				using reference = typename iterator_traits::reference;
+				using pointer = clone_ptrproxy<reference>;
+				using iterator_category = std::bidirectional_iterator_tag;
+				constexpr static std::size_t static_size() { return sizeof...(iterators_); }
+			public:
+				zip_iterator_impl() = default;
+				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
+				template<typename... other_iterators_>
+				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
+				reference operator*() { return hmLib::tuple_for_each([](auto& itr)->auto & {return *itr; }, Itrs); }
+				pointer operator->() { return pointer(operator*()); }
+				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type operator++(int) {
+					this_type Prev = *this;
+					operator++();
+					return Prev;
+				}
+				this_type& operator--() { hmLib::tuple_for_each([](auto& itr) {return --itr; }, Itrs); return *this; }
+				this_type operator--(int) {
+					this_type Prev = *this;
+					operator--();
+					return Prev;
+				}
+				const iterator_pack& pack()const { return Itrs; }
+				friend bool operator==(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) == std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator!=(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) != std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+			private:
+				iterator_pack Itrs;
+			};
+			template<unsigned int order_iterator_pos_, typename... iterators_>
+			struct zip_iterator_impl<std::random_access_iterator_tag, order_iterator_pos_, iterators_...> {
+			private:
+				using this_type = zip_iterator_impl<std::random_access_iterator_tag, order_iterator_pos_, iterators_...>;
+				using iterator_traits = zip_iterator_traits<iterators_...>;
+			public:
+				using iterator_pack = std::tuple<iterators_...>;
+				using value_type = typename iterator_traits::value_type;
+				using difference_type = typename iterator_traits::difference_type;
+				using reference = typename iterator_traits::reference;
+				using pointer = clone_ptrproxy<reference>;
+				using iterator_category = std::random_access_iterator_tag;
+				constexpr static std::size_t static_size() { return sizeof...(iterators_); }
+			public:
+				zip_iterator_impl() = default;
+				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
+				template<typename... other_iterators_>
+				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
+				reference operator*() { return hmLib::tuple_for_each([](auto& itr)->decltype((*itr)) {return *itr; }, Itrs); }
+				reference operator[](difference_type n) { return hmLib::tuple_for_each([n](auto& itr)->decltype((*itr)) {return itr[n]; }, Itrs); }
+				pointer operator->() { return pointer(operator*()); }
+				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type operator++(int) {
+					this_type Prev = *this;
+					operator++();
+					return Prev;
+				}
+				this_type& operator--() { hmLib::tuple_for_each([](auto& itr) {return --itr; }, Itrs); return *this; }
+				this_type operator--(int) {
+					this_type Prev = *this;
+					operator--();
+					return Prev;
+				}
+				this_type& operator+=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr += n; }, Itrs); return *this; }
+				this_type& operator-=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr -= n; }, Itrs); return *this; }
+				const iterator_pack& pack()const { return Itrs; }
+				friend this_type operator+(const this_type& itr, difference_type n) {
+					auto ans = itr;
+					ans += n;
+					return ans;
+				}
+				friend this_type operator+(difference_type n, const this_type& itr) {
+					auto ans = itr;
+					ans += n;
+					return ans;
+				}
+				friend this_type operator-(const this_type& itr, difference_type n) {
+					auto ans = itr;
+					ans -= n;
+					return ans;
+				}
+				friend difference_type operator-(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) - std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator==(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) == std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator!=(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) != std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator>(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) > std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator<(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) < std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator>=(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) >= std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+				friend bool operator<=(const this_type& itr1, const this_type& itr2) {
+					return std::get<order_iterator_pos_>(itr1.Itrs) <= std::get<order_iterator_pos_>(itr2.Itrs);
+				}
+			private:
+				iterator_pack Itrs;
+			};
+
 			template<unsigned int n>
 			struct zip_iterator_shorten_distance{
 				template<typename iterator>
@@ -230,7 +230,7 @@ namespace hmLib {
 		}
 	}
 	template<typename... iterators_>
-	using zip_iterator = iterators::zip_iterator_impl<
+	using zip_iterator = iterators::detail::zip_iterator_impl<
 		typename iterators::zip_iterator_traits<iterators_...>::iterator_category, 0, iterators_...
 	>;
 	template<typename... iterators_>

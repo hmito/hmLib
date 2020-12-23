@@ -32,7 +32,7 @@ namespace hmLib{
 					Beg += IgnoreNum;
 
 					for(auto Itr = Beg; Itr != End; ++Itr){
-						if(hmLib::odeint::detail::abs_distance(x, Itr->second) < Error){
+						if(hmLib::odeint::distance_norm_inf(x, Itr->second) < Error){
 							return true;
 						}
 					}
