@@ -74,7 +74,7 @@ namespace hmLib {
 		const_iterator cend()const { return Vec.end(); }
 		unsigned int size()const { return Vec.size(); }
 		const std::vector<unsigned int>& data()&{return Vec;}
-		std::vector<unsigned int>&& data()&&{return Vec;}
+		std::vector<unsigned int>&& data()&&{return std::move(Vec);}
 		value_type lower()const { return Axis.lower(); }
 		value_type upper()const { return Axis.upper(); }
 		const axis_t& axis()const { return Axis; }
