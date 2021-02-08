@@ -1,32 +1,32 @@
-#ifndef HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC
-#define HMLIB_ODEINT_EQSTATEBREAKOBSERVER_INC 100
+#ifndef HMLIB_ODEINT_STATEBREAKOBSERVER_INC
+#define HMLIB_ODEINT_STATEBREAKOBSERVER_INC 100
 #
 #include <array>
-#include <boost/geometry.hpp>
-#include "container_observer.hpp"
-#include "break_observer.hpp"
 #include "../utility.hpp"
 namespace hmLib{
 	namespace odeint{
+		//not ready for use: should be changed from old-style breaker (breakable-observer) to separated breaker, but have not changed as container reference style.
+		/* 
 		namespace detail{
-			template<typename state_, typename time_>
-			struct eqstate_breaker{
+			template<typename state_container_>
+			struct same_state_breaker{
 			public:
-				using state = state_;
-				using time = time_;
+				using state_container = state_container_;
 			private:
+				state_container& Container;
 				unsigned int Cnt;
 				unsigned int Interval;
 				unsigned int IgnoreNum;
 				double Error;
 			public:
-				eqstate_breaker(unsigned int Interval_,unsigned int IgnoreNum_, double Error_) :Cnt(0), Interval(Interval_), IgnoreNum(IgnoreNum_), Error(Error_){}
-				bool operator()(const state& x, time t, container_observer<state,time>& Observer){
+				same_state_breaker(state_container& Container, unsigned int Interval_,unsigned int IgnoreNum_, double Error_) :Cnt(0), Interval(Interval_), IgnoreNum(IgnoreNum_), Error(Error_){}
+				template<typename state_type,typename time_type>
+				bool operator()(const state_type& x, time_type t){
 					if(++Cnt < Interval)return false;
 					Cnt = 0;
 
-					auto Beg = Observer.rbegin();
-					auto End = Observer.rend();
+					auto Beg = std::rbegin(Container);
+					auto End = std::rend(Container);
 
 					if(End - Beg <= IgnoreNum)return false;
 					Beg += IgnoreNum;
@@ -40,15 +40,13 @@ namespace hmLib{
 					return false;
 				}
 			};
-			template<typename time_>
-			struct eqstate_breaker < std::array<double, 2> , time_>{
-				using state = std::array<double, 2>;
-				using time = time_;
+			struct cross_state_breaker{
 			private:
 				unsigned int Cnt;
 				unsigned int Interval;
 			private:
-				bool is_cross_segment(std::array<double, 2> a1, std::array<double, 2> a2, std::array<double, 2> b1, std::array<double, 2> b2){
+				template<typename state>
+				bool is_cross_segment(const state& a1, const state& a2, const state& b1, const state& b2){
 					if(a1[0] >= a2[0]){
 						if((a1[0] < b1[0] && a1[0] < b2[0]) || (a2[0] > b1[0] && a2[0] > b2[0])){
 							return false;
@@ -79,8 +77,9 @@ namespace hmLib{
 					return true;
 				}
 			public:
-				eqstate_breaker(unsigned int Interval_):Cnt(0),Interval(Interval_){}
-				bool operator()(const state& x, time t, container_observer<state, time>& Observer){
+				cross_state_breaker(unsigned int Interval_):Cnt(0),Interval(Interval_){}
+				template<typename state_type, typename time_type>
+				bool operator()(const state_type& x, time_type t){
 					if(++Cnt < Interval)return false;
 					Cnt = 0;
 
@@ -99,8 +98,7 @@ namespace hmLib{
 				}
 			};
 		}
-		template<typename state_, typename time_=double>
-		using eqstate_break_observer = observer_based_break_observer<container_observer<state_, time_>, detail::eqstate_breaker<state_,time_> >;
+		*/
 	}
 }
 #
