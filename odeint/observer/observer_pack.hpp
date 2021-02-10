@@ -12,7 +12,8 @@ namespace hmLib{
 		private:
 			pack Pack;
 		public:
-			observer_pack(observer&& Obs, others&&... Others) :Pack(std::forward<observer>(Obs), std::forward<others>(Others)...) {}
+			template<typename observer_, typename... others_>
+			observer_pack(observer_&& Obs, others_&&... Others) :Pack(std::forward<observer_>(Obs), std::forward<others_>(Others)...) {}
 			template<typename state_type, typename time_type>
 			void operator()(const state_type& State, time_type Time) {
 				hmLib::tuple_foreach(Pack, [x = &State, t = &Time](auto& obs) {obs(x, t); });
