@@ -5,6 +5,11 @@
 #include <boost/numeric/odeint.hpp>
 #include "../../../varray.hpp"
 #include "../../../odeint.hpp"
+#include "../../../odeint/observer/null_observer.hpp"
+#include "../../../odeint/observer/stream_observer.hpp"
+#include "../../../odeint/observer/iterator_observer.hpp"
+#include "../../../odeint/observer/histgoram_observer.hpp"
+#include "../../../odeint/observer/observer_pack.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -22,15 +27,6 @@ namespace hmLib{
 			unsigned int region(const state&, double){ return 1; }
 		};
 	public:
-		TEST_METHOD(container_observer){
-			boost_odeint::euler<test_system::state> Stepper;
-			test_system System;
-			test_system::state State{0.0,1.0};
-
-			odeint::container_observer<test_system::state> Observer;
-
-			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-		}
 		TEST_METHOD(stream_observer){
 			boost_odeint::euler<test_system::state> Stepper;
 			test_system System;
@@ -70,16 +66,6 @@ namespace hmLib{
 			auto Observer = odeint::make_pair_iterator_observer(std::back_inserter(Log));
 
 			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-		}
-		TEST_METHOD(break_observer){
-			boost_odeint::euler<test_system::state> Stepper;
-			test_system System;
-			test_system::state State{0.0,1.0};
-
-			std::vector<std::pair<double, test_system::state> > Log;
-			auto Observer = odeint::make_break_observer([](const test_system::state& State, double)->bool{return State[0] > 1.0; });
-
-			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, Observer);
 		}
 	};
 	TEST_CLASS(test_segment_cross){

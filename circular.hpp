@@ -17,7 +17,8 @@ namespace hmLib{
 			unsigned char* End;
 		public:
 			aligned_array()
-				: Begin(Array + ((sizeof(T) - static_cast<unsigned int>(reinterpret_cast<unsigned long long>(Array) % sizeof(T))) % sizeof(T)))
+				: Array()
+				, Begin(Array + ((sizeof(T) - static_cast<unsigned int>(reinterpret_cast<unsigned long long>(Array) % sizeof(T))) % sizeof(T)))
 				, End(Begin + sizeof(T)*Size_){}
 		private:
 			aligned_array(const aligned_array<T, Size_>&);
@@ -187,7 +188,7 @@ namespace hmLib{
 			}
 		};
 		template<typename this_circular>
-		struct circular_const_iterator : public std::iterator<std::random_access_iterator_tag, typename this_circular::value_type, typename this_circular::difference_type, typename this_circular::const_pointer, typename this_circular::const_reference>{
+		struct circular_const_iterator{
 			friend struct circular_const_iterator<this_circular>;
 		private:
 			typedef circular_const_iterator<this_circular> this_type;

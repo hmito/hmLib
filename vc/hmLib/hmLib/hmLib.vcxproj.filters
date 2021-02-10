@@ -75,11 +75,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_odeint.cpp">
-      <Filter>ソースファイル</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
@@ -531,6 +526,9 @@
       <Filter>hmLib\odeint\breaker</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\breaker\state_breaker.hpp">
+      <Filter>hmLib\odeint\breaker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\breaker\breaker_pack.hpp">
       <Filter>hmLib\odeint\breaker</Filter>
     </ClInclude>
   </ItemGroup>

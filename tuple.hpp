@@ -14,7 +14,7 @@ namespace hmLib {
 			T operator()(Tuple&& t, T Ini, Fn&& f)const {
 				Ini = f(Ini, std::get<n>(t));
 				return tuple_reduce_impl<n + 1, std::tuple_size<typename std::decay<Tuple>::type>::value == n + 1>()(
-					std::forward<Tuple>(t), Ini, std::forward<Fn>(f))
+					std::forward<Tuple>(t), Ini, std::forward<Fn>(f)
 				);
 			}
 		};
@@ -36,7 +36,7 @@ namespace hmLib {
 	namespace detail {
 		template<unsigned int n, bool is_end>
 		struct tuple_foreach_impl {
-			template<typename Tuple, typename T, typename Fn>
+			template<typename Tuple, typename Fn>
 			void operator()(Tuple&& t, Fn&& f)const {
 				f(std::get<n>(t));
 				tuple_foreach_impl<n + 1, std::tuple_size<typename std::decay<Tuple>::type>::value == n + 1>()(std::forward<Tuple>(t), std::forward<Fn>(f));
@@ -44,7 +44,7 @@ namespace hmLib {
 		};
 		template<unsigned int n>
 		struct tuple_foreach_impl<n, true> {
-			template<typename Tuple, typename T, typename Fn>
+			template<typename Tuple, typename Fn>
 			void operator()(Tuple&& t, Fn&& f)const {
 				return;
 			}
@@ -110,7 +110,7 @@ namespace hmLib {
 			std::forward<Tuple1>(t1),
 			std::forward<Tuple2>(t2),
 			std::forward<Fn>(f)
-			);
+		);
 	}
 
 	namespace detail {
@@ -130,19 +130,21 @@ namespace hmLib {
 	namespace detail {
 		template<size_t n, bool is_end>
 		struct tuple_invoke_impl {
-			template<typename... Tuple, typename Fn>
-			auto operator()(Fn&& f, Tuple&&... t) {
-				std::tuple<decltype((f(std::get<n>(t)...)))> eval(f(std::get<n>(t)...)); 
+			template<typename Fn, typename Tuple, typename... OtherTuples>
+			auto operator()(Fn&& f, Tuple&& t, OtherTuples&&... ot) {
+				std::tuple<decltype((f(std::get<n>(t),std::get<n>(ot)...)))> eval(f(std::get<n>(t), std::get<n>(ot)...));
 				return std::tuple_cat(
 					std::move(eval),
-					tuple_invoke_impl<n + 1, std::tuple_size<typename std::decay<Tuple>::type>::value == n + 1>()(std::forward<Fn>(f), std::forward<Tuple>(t)...)
+					tuple_invoke_impl<n + 1, std::tuple_size<typename std::decay<Tuple>::type>::value == n + 1>()(
+						std::forward<Fn>(f), std::forward<Tuple>(t), std::forward<Tuple>(ot)...
+					)
 				);
 			}
 		};
 		template<size_t n>
 		struct tuple_invoke_impl<n, true> {
-			template<typename Fn, typename... Tuple>
-			auto operator()(Fn&& f, Tuple&&... t) {
+			template<typename Fn, typename Tuple, typename... OtherTuples>
+			auto operator()(Fn&& f, Tuple&& t, OtherTuples&&... ot) {
 				return std::tuple<>();
 			}
 		};
@@ -159,26 +161,27 @@ namespace hmLib {
 	namespace detail {
 		template<unsigned int n, bool is_end>
 		struct tuple_invoke_at_impl {
-			template<typename Fn, typename... Tuple>
-			decltype(auto) operator()(unsigned int pos, Fn&& f, Tuple&&... v) {
+			template<typename Fn, typename Tuple, typename... OtherTuples>
+			decltype(auto) operator()(unsigned int pos, Fn&& f, Tuple&& t, OtherTuples&&... ot) {
 				if (n == pos) {
-					return f(std::get<n>(v)...);
+					return f(std::get<n>(t),std::get<n>(ot)...);
 				}
-				return tuple_invoke_at_impl<n + 1, std::tuple_size<typename std::decay<Tuple>::type>::value == n + 1>()(pos, std::forward<Fn>(f), std::forward<Tuple>(v)...);
+				return tuple_invoke_at_impl<n + 1, std::tuple_size<typename std::decay<Tuple>::type>::value == n + 1>()(
+					pos, std::forward<Fn>(f), std::forward<Tuple>(t), std::forward<OtherTuples>(ot)...);
 			}
 		};
 		template<unsigned int n>
 		struct tuple_invoke_at_impl<n, true> {
-			template<typename Fn, typename... Tuple>
-			decltype(auto) operator()(unsigned int pos, Fn&& f, Tuple&&... v) {
+			template<typename Fn, typename Tuple, typename... OtherTuples>
+			decltype(auto) operator()(unsigned int pos, Fn&& f, Tuple&& t, OtherTuples&&... ot) {
 				hmLib_throw(hmLib::access_exceptions::out_of_range_access, "tuple_invoke_at index is out of range.");
-				return f(std::get<0>(v)...);
+				return f(std::get<0>(t), std::get<0>(ot)...);
 			}
 		};
 	}
 	template<typename Fn, typename Tuple, typename... OtherTuples>
 	decltype(auto) tuple_invoke_at(unsigned int n, Fn&& f, Tuple&& t, OtherTuples&&... ot) {
-		return detail::tuple_apply_at_impl<0, std::tuple_size<typename std::decay<Tuple>::type>::value==0>()(n,
+		return detail::tuple_invoke_at_impl<0, std::tuple_size<typename std::decay<Tuple>::type>::value==0>()(n,
 			std::forward<Fn>(f),
 			std::forward<Tuple>(t),
 			std::forward<OtherTuples>(ot)...
