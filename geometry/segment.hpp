@@ -9,7 +9,8 @@ namespace hmLib {
 		private:
 			using this_type = segment<T>;
 		public:
-			using point_type = point<T>;
+			using value_type = T;
+			using point_type = point<value_type>;
 		public:
 			point_type p1;
 			point_type p2;
@@ -86,6 +87,10 @@ namespace hmLib {
 				return point<U>(static_cast<U>(x), static_cast<U>(y));
 			}
 		};
+		template<typename T,typename U>
+		auto make_segment(const point<T>& p, const point<U>& q) {
+			return segment<decltype(std::declval<T>() + std::declval<U>())>(p, q);
+		}
 		template<typename T, typename U>
 		bool operator==(const segment<T>& s1, const segment<U>& s2) {
 			return(s1.p1 == s2.p1 && s1.p2 == s2.p2);

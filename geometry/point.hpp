@@ -3,6 +3,8 @@
 #include<cmath>
 #include<type_traits>
 #include"../utility.hpp"
+#include"../type_traits.hpp"
+#include"../exceptions.hpp"
 #include"../algorithm/compare.hpp"
 namespace hmLib{
 	namespace plane_geometry {
@@ -11,8 +13,9 @@ namespace hmLib{
 		private:
 			using this_type = point<T>;
 		public:
-			T x;
-			T y;
+			using value_type = T;
+			value_type x;
+			value_type y;
 		public:
 			point():x(0),y(0) {}
 			point(const this_type&) = default;
@@ -45,16 +48,16 @@ namespace hmLib{
 				}
 			}
 		public:
-			point<T> operator+()const { return *this; }
-			point<T> operator-()const { return point<T>(-x, -y); }
+			this_type operator+()const { return *this; }
+			this_type operator-()const { return point<T>(-x, -y); }
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() + std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
-			point<T>& operator+=(const point<U>& Other) {
+			this_type& operator+=(const point<U>& Other) {
 				x += Other.x;
 				y += Other.y;
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() - std::declval<U>()), T>::value>::type*& = hmLib::utility::enabler>
-			point<T>& operator-=(const point<U>& Other) {
+			this_type& operator-=(const point<U>& Other) {
 				x -= Other.x;
 				y -= Other.y;
 				return *this;
@@ -177,6 +180,18 @@ namespace hmLib{
 		}
 		using pint = point<int>;
 		using pdouble = point<double>;
+		template<typename T>
+		auto make_point(T&& x, T&& y) {
+			return point<typename std::decay<T>::type>(std::forward<T>(x), std::forward<T>(y));
+		}
+		template<typename Container, hmLib_static_restrict(hmLib::is_range<Container>::value)>
+		auto make_point(Container&& C) {
+			auto Beg = std::begin(C);
+			hmLib_assert(Beg != std::end(C), hmLib::access_exceptions::out_of_range_access, "plane_geometry::make_point cannot make from empty container.");
+			auto Nxt = std::next(Beg);
+			hmLib_assert(Nxt != std::end(C), hmLib::access_exceptions::out_of_range_access, "plane_geometry::make_point cannot make from container with only one element.");
+			return point<typename std::decay<decltype(*Beg)>::type>(*Beg,*Nxt);
+		}
 	}
 }
 #endif
