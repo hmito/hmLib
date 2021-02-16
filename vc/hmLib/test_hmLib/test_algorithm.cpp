@@ -48,11 +48,11 @@ namespace hmLib{
 			int val = 0;
 			std::generate(Con.begin(), Con.end(), [&](){return val++; });
 
-			auto Ans = hmLib::roulette_sample(Con.begin(), Con.end(), [](int val){return 1.0 / (1+val); }, hmLib::random::default_engine());
+			auto Ans = hmLib::roulette_sample(Con.begin(), Con.end(), [](int val){return 1.0 / (1.0+val); }, hmLib::random::default_engine());
 
-			hmLib::roulette_sample(Con.begin(), Con.end(), [](int val){return 1.0 / (1 + val); }, Con2.begin(), Con2.end(), hmLib::random::default_engine());
+			hmLib::roulette_sample(Con.begin(), Con.end(), [](int val){return 1.0 / (1.0 + val); }, Con2.begin(), Con2.end(), hmLib::random::default_engine());
 
-			auto itr = hmLib::roulette_sample(Con.begin(), Con.end(), [](int val){return 1.0 / (1 + val); }, Con2.begin(), Con2.size(), hmLib::random::default_engine());
+			auto itr = hmLib::roulette_sample(Con.begin(), Con.end(), [](int val){return 1.0 / (1.0 + val); }, Con2.begin(), Con2.size(), hmLib::random::default_engine());
 		}
 		TEST_METHOD(roulette_sampler){
 			using container = std::vector<int>;
