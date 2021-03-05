@@ -6,6 +6,7 @@
 #include<boost/iterator/iterator_facade.hpp>
 #include"../../../random.hpp"
 #include "../../../lattices.hpp"
+#include "../../../lattices/block_lattice.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{

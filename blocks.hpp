@@ -3,31 +3,32 @@
 #include<functional>
 #include<unordered_map>
 #include<optional>
+#include"exceptions.hpp"
 namespace hmLib {
-	template<std::size_t block_bits, typename key_type, std::enable_if_t<std::is_integral_v<key_type>, nullptr_t> = nullptr>
+	template<std::size_t block_bits, typename index_type, std::enable_if_t<std::is_integral_v<index_type>, nullptr_t> = nullptr>
 	struct default_block_hasher {
 		static constexpr std::size_t block_size() { return std::size_t(1) << block_bits; }
-		std::pair<std::size_t, std::size_t> operator()(key_type index)const {
+		std::pair<std::size_t, std::size_t> operator()(index_type index)const {
 			return std::make_pair(
 				index >> block_bits,
-				static_cast<std::size_t>(index & (~((~key_type(0)) << block_bits)))
+				static_cast<std::size_t>(index & (~((~index_type(0)) << block_bits)))
 			);
 		}
-		key_type operator()(std::size_t first, std::size_t second)const {
+		index_type operator()(std::size_t first, std::size_t second)const {
 			return (first << block_bits) + second;
 		}
 	};
-	template<typename T, typename key_type_ = int, typename block_hasher_ = default_block_hasher<6, key_type_>>
+	template<typename T, typename index_type_ = int, typename block_hasher_ = default_block_hasher<6, index_type_>>
 	struct blocks{
 	private:
-		using this_type = blocks<T, key_type_, block_hasher_>;
+		using this_type = blocks<T, index_type_, block_hasher_>;
 	public:
 		using value_type = T;
 		using reference = value_type&;
 		using const_reference = const value_type&;
 		using pointer = value_type*;
 		using const_pointer = const value_type*;
-		using key_type = key_type_;
+		using index_type = index_type_;
 		using size_type = std::size_t;
 		using block_hasher = block_hasher_;
 	private:
@@ -83,7 +84,7 @@ namespace hmLib {
 			friend bool operator!=(const const_iterator& v1, const const_iterator& v2) {
 				return !(v1==v2);
 			}
-			key_type key()const { 
+			index_type index()const { 
 				block_hasher bh;  
 				if (!eitropt) {
 					eitropt = bitr->second.begin();
@@ -154,7 +155,7 @@ namespace hmLib {
 			friend bool operator!=(const iterator& v1, const iterator& v2) {
 				return !(v1 == v2);
 			}
-			key_type key()const {
+			index_type index()const {
 				block_hasher bh;
 				if (!eitropt) {
 					eitropt = bitr->second.begin();
@@ -215,7 +216,7 @@ namespace hmLib {
 		}
 	public:
 		//!Return reference of the elemtn at the given point with range check
-		reference at(key_type n) {
+		reference at(index_type n) {
 			block_hasher Hasher;
 			auto block_pos = Hasher(n);
 			auto Itr = Blocks.find(block_pos.first);
@@ -223,7 +224,7 @@ namespace hmLib {
 			return Itr->second.at(block_pos.second);
 		}
 		//!Return const_reference of the elemtn at the given point with range check
-		const_reference at(key_type n)const {
+		const_reference at(index_type n)const {
 			block_hasher Hasher;
 			auto block_pos = Hasher(n);
 			auto Itr = Blocks.find(block_pos.first);
@@ -231,7 +232,7 @@ namespace hmLib {
 			return Itr->second.at(block_pos.second);
 		}
 		//!Return reference of the elemtn at the given point without range check
-		reference ref(key_type n) {
+		reference ref(index_type n) {
 			block_hasher Hasher;
 			auto block_pos = Hasher(n);
 			auto Itr = Blocks.find(block_pos.first);
@@ -242,19 +243,19 @@ namespace hmLib {
 			return Itr->second.at(block_pos.second);
 		}
 		//!Return reference of the elemtn at the given point without range check
-		reference operator[](key_type n) {
+		reference operator[](index_type n) {
 			return ref(n);
 		}
-		//!Return iterator with the key
-		iterator find(key_type n) {
+		//!Return iterator with the index
+		iterator find(index_type n) {
 			block_hasher Hasher;
 			auto block_pos = Hasher(n);
 			auto bitr = Blocks.find(block_pos.first);
 			if (bitr == Blocks.end())return iterator(bitr);
 			return iterator(bitr, std::next(bitr->second.begin(),block_pos.second));
 		}
-		//!Return iterator with the key in const
-		const_iterator find(key_type n)const{
+		//!Return iterator with the index in const
+		const_iterator find(index_type n)const{
 			block_hasher Hasher;
 			auto block_pos = Hasher(n);
 			auto bitr = Blocks.find(block_pos.first);
