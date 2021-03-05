@@ -195,3 +195,5 @@ hmLib_config\.h
 *.db
 
 *.opendb
+
+*.manifest

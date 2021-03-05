@@ -72,11 +72,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_odeint.cpp">
-      <Filter>ソースファイル</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp">
       <Filter>hmLib\algorithm</Filter>
     </ClInclude>
@@ -524,5 +519,13 @@
     <ClInclude Include="..\..\..\recursive\recurrence.hpp">
       <Filter>hmLib\recursive</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\blocks.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\use_blocks.cpp">
+      <Filter>ソースファイル</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
