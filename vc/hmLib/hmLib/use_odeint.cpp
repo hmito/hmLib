@@ -6,12 +6,12 @@
 #include<bitset>
 #include<fstream>
 #include<boost/numeric/odeint.hpp>
+#include<boost/numeric/odeint/algebra/range_algebra.hpp>
+#include<boost/numeric/odeint/algebra/default_operations.hpp>
 #include"../../../odeint/observer/stream_observer.hpp"
 #include"../../../odeint/varray_wrapper.hpp"
 #include"../../../odeint.hpp"
 #include"../../../varray.hpp"
-#include<boost/numeric/odeint/algebra/range_algebra.hpp>
-#include<boost/numeric/odeint/algebra/default_operations.hpp>
 
 struct stream_observer {
 private:

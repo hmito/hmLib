@@ -97,6 +97,7 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -178,6 +179,7 @@
     <ClCompile Include="test_math.cpp" />
     <ClCompile Include="test_lattices.cpp" />
     <ClCompile Include="test_resource.cpp" />
+    <ClCompile Include="test_tuple.cpp" />
     <ClCompile Include="test_type_traits.cpp" />
     <ClCompile Include="test_odeint.cpp" />
     <ClCompile Include="test_varray.cpp" />
