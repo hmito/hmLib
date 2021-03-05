@@ -202,7 +202,7 @@ namespace hmLib {
 		void block_erase_if(block_condition_ BlockCondition) {
 			auto itr = Blocks.begin();
 			while(itr != Blocks.end()) {
-				if (BlockCondition(*itr)) {
+				if (BlockCondition(itr->second)) {
 					itr = Blocks.erase(itr);
 				} else {
 					++itr;

@@ -333,7 +333,7 @@ namespace hmLib{
 			element_iterator Itr;
 		};
 	public:
-		block_vector()noexcept:block_vector(size_type(10)) {}
+		block_vector()noexcept:block_vector(size_type(16)) {}
 		explicit block_vector(size_type BlockSize_)noexcept
 			: Blocks()
 			, BlockNum(0)

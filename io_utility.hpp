@@ -64,26 +64,65 @@ namespace hmLib{
 			}
 		}
 	}
-	class progress_bar{
+	template<typename time_type>
+	class progress_bar {
+	private:
+		unsigned int cur_cnt;
+		time_type prev_t;
+		time_type end_t;
+		time_type strt_t;
+	public:
+		progress_bar() = default;
+		progress_bar(time_type end_t_, time_type strt_t_ = 0.0) { reset(end_t_, strt_t_); }
+		void reset(time_type end_t_, time_type strt_t_) {
+			cur_cnt = 0;
+			end_t = end_t_;
+			strt_t = strt_t_;
+		}
+		void operator()(std::ostream& out, time_type t) {
+			unsigned int num = static_cast<unsigned int>(std::round(50 * static_cast<double>(t - strt_t) / end_t)) + 1;
+			if ((cur_cnt & 1) == 0) {
+				if (cur_cnt == 0) {
+					out << "0----1----2----3----4----5----6----7----8----9----X" << std::endl;
+					prev_t = t;
+					cur_cnt = 1;
+				} else if (cur_cnt < num * 2) {
+					cur_cnt = 1;
+					prev_t = t;
+				}
+			} else {
+				out << "\r";
+
+				cur_cnt = 0;
+				while (cur_cnt < num * 2) {
+					out << "*";
+					cur_cnt += 2;
+				}
+				out << std::flush;
+			}
+		}
+	};
+	template<typename time_type>
+	class estimate_progress_bar{
 		using clock = std::chrono::system_clock;
 		using time_point = clock::time_point;
 	private:
 		time_point strt_time;
 		time_point prev_time;
 		unsigned int cur_cnt;
-		double prev_t;
-		double strt_t;
-		double end_t;
+		time_type prev_t;
+		time_type strt_t;
+		time_type end_t;
 	public:
-		progress_bar()=default;
-		progress_bar(double end_t_,double strt_t_ = 0.0){reset(end_t_, strt_t_);}
-		void reset(double end_t_,double strt_t_){
+		estimate_progress_bar()=default;
+		estimate_progress_bar(time_type end_t_, time_type strt_t_ = 0.0){reset(end_t_, strt_t_);}
+		void reset(time_type end_t_, time_type strt_t_){
 			cur_cnt = 0;
 			strt_t= strt_t_;
 			end_t = end_t_;
 		}
-		void operator()(std::ostream& out, double t){
-			unsigned int num = static_cast<unsigned int>(std::round(50*t/end_t))+1;
+		void operator()(std::ostream& out, time_type t){
+			unsigned int num = static_cast<unsigned int>(std::round(50* static_cast<double>(t - strt_t) /end_t))+1;
 			if((cur_cnt&1)==0){
 				if(cur_cnt==0){
 					out<<"0----1----2----3----4----5----6----7----8----9----X"<<std::endl;
@@ -106,8 +145,8 @@ namespace hmLib{
 				}
 				auto cur_time = clock::now();
 				out<<" "<<duration_format(cur_time-strt_time)
-				   <<"+"<<duration_format((cur_time-strt_time)*(end_t-t)/(t-strt_t)) 
-				   <<"(+"<<duration_format((cur_time-prev_time)*(end_t-t)/(t - prev_t)) << ")" ;
+				   <<"+"<<duration_format((cur_time-strt_time)*static_cast<double>(end_t-t)/(t-strt_t)) 
+				   <<"(+"<<duration_format((cur_time-prev_time)* static_cast<double>(end_t-t)/(t - prev_t)) << ")" ;
 				out<<std::flush;
 			}
 		}
