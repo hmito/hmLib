@@ -21,7 +21,7 @@ namespace hmLib{
 		};
 		template<typename observer, typename... others>
 		auto make_observer_pack(observer&& Obs, others&&... Others) {
-			return observer_pack<observer, others...>(std::forward<observer>(Obs),std::forward<others>(Others)...);
+			return observer_pack<typename std::decay<observer>::type, typename std::decay<others>::type...>(std::forward<observer>(Obs),std::forward<others>(Others)...);
 		}
 	}
 }
