@@ -9,7 +9,18 @@ namespace hmLib{
 			bool operator()(const state_type& v1,const state_type& v2){return v1.first < v2.first;}
 		};
 	public:
-		nelder_mead_minima_stepper(value_type step_, int bits_):step(step_), bits(bits_) {}
+		nelder_mead_minima_stepper()
+			: alpha(1)
+			, gamma(2)
+			, rho(0.5)
+			, sigma(0.5){
+		}
+		nelder_mead_minima_stepper(double alpha_, double gamma_, double rho_, double sigma_)
+			: alpha(alpha_)
+			, gamma(gamma_)
+			, rho(rho_)
+			, sigma(sigma_){
+		}
 		template<typename fn, typename value_type, typename error_type>
 		state_type make_state(fn Fn, const value_type& start,error_type abs_value=0.0001, error_type rel_value=0.05) {
 			std::size_t size = std::distance(start.begin(),start.end());
@@ -23,33 +34,36 @@ namespace hmLib{
 			return V;
 		}
 		value_type state_to_value(const state_type& State){
-			return std::max_element(State.begin(),State.end(),vertex_compare())->second;
+			return std::min_element(State.begin(),State.end(),vertex_compare())->second;
 		}
 		template<typename fn, typename ans_type>
 		void operator()(fn Fn, state_type& State) {
 			std::size_t n = State.size()-1;
 
+			//sort by the order of the function
 			std::sort(State.begin(),State.end(),vertex_compare());
-			vertex_type Center = State.front();
+
+			//calculate centroid of all points except State[n]
+			vertex_type Center = State[0];
 			for(std::size_t i=0; i < n; ++i){
-				for(std::size_t j = 1; j < n+1; ++j){
+				for(std::size_t j = 1; j < n; ++j){
 					Center.second[i] += State[j].second[i];
 				}
 				Center.second[i] /= n;
 			}
 			Center.first = Fn(Center.second);
 
+			//calculate rerected point, which is located on the opposite side of the Center from the worst point
 			auto Refrect = Center;
 			for(std::size_t i=0; i < n; ++i){
-				Refrect.second[i] += alpha*(Refrect.second[i] - State[n].second[i]);
+				Refrect.second[i] += alpha*(Center.second[i] - State[n].second[i]);
 			}
 			Refrect.first = Fn(Refrect.second);
 			
-			if(State[0].first <= Center.first && Center.first < State[n-1].first){
-				//refrection
-				State[n] = Center;
-			}else if(Center.first < State[0].first){
-				//expansion
+			if(Refrect.first < State[0].first){
+				//if the rerected point is best, calculate expanded point,
+				//	try another type of point: expanded point, which is farer than the refrected point from the center
+				//	(gamma > 1 for this purpose)
 				auto Expand = Center;
 				for(std::size_t i=0; i < n; ++i){
 					Expand.second[i] += gamma*(Refrect.second[i] - Center.second[i]);
@@ -57,20 +71,29 @@ namespace hmLib{
 				Expand.first = Fn(Expand.second);
 
 				if(Expand.first < Refrect.first){
-					State[n] = Center;
+					//if the expanded point is best,
+					//	replace the worst point by the expanded point
+					State[n] = Expand;
 				}else{
+					//otherwise, replace the worst point by the expanded point
 					State[n] = Refrect;
 				}
+			}else if(State[0].first <= Refrect.first && Refrect.first < State[n-1].first){
+				//if the refrected point is not best but better than worst point
+				State[n] = Refrect;
 			}else{
-				//shrink
-				Shrink = Center;
+				//if the refrected point is the worst
+				//	try another type of point: contracted point, which is located between the worst point and the center
+				auto Contracted = Center;
 				for(std::size_t i=0; i < n; ++i){
-					Shrink.second[i] += rho*(State[n].second[i] - Center.second[i]);
+					Contracted.second[i] += rho*(State[n].second[i] - Center.second[i]);
 				}				
-				Shrink.first = Fn(Shrink.second);
-				if(Shrink.first < State[n].first){
-					State[n] = Shrink;
+				Contracted.first = Fn(Contracted.second);
+				if(Contracted.first < State[n].first){
+					//if the contracted point is better than the worst, replace
+					State[n] = Contracted;
 				}else{
+					//otherwise, all points shrink to the best point.
 					for(std::size_t j = 1; j < n+1; ++j){
 						for(std::size_t i=0; i < n; ++i){
 							State[j].second[i] = State[0].second[i] + sigma*(State[j].second[i] - State[0].second[i]);
