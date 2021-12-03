@@ -6,33 +6,144 @@
 #include<boost/math/tools/minima.hpp>
 namespace hmLib {
 	namespace math {
-		template<typename value_type_ =double>
-		struct tolerance_breaker{
+		struct range_precision_controller{
+
+		};
+		template<typename value_type_>
+		struct range_precision_controller{
+			//following functions should be callable;
+			// state_type::lower() : return lower value of the range
+			// state_type::upper() : return upper value of the range
+			// state_type::value() : return optimal value of the range
 			using value_type = value_type_;
 		public:
-			precision_breaker() = delete;
-			explict precision_breaker(value_type relative_error_)
+			range_precision_breaker() = delete;
+			explict range_precision_breaker(value_type relative_error_)
 				: relerr(relative_error_)
 				, abserr(relative_error_/4){
 			}
-			precision_breaker(value_type relative_error_, value_type absolute_error_)
+			range_precision_breaker(value_type relative_error_, value_type absolute_error_)
 				: relerr(relative_error_)
 				, abserr(absolute_error_){
 			}
 			T precision(T best)const{
 				return relerr * std::abs(best) + abserr / 4;
 			}
-			bool operator()(T lower, T upper)const{
-				if((upper - lower) / 2 <= precision((upper + lower) / 2) * 2 )return true;
-			}
-			bool operator()(T lower, T upper, T best)const{
-				if(std::abs(best - (upper + lower) / 2) + (upper - lower) / 2 <= precision(best) * 2 )return true;
+			template<typename state_type, typename time_type>
+			bool operator()(const state_type& x, time_type)const{
+				return std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision(x.value()) * 2 ;
 			}
 		private:
-			value_type relerr;
 			value_type abserr;
+			value_type relerr;
 		};
+
 		template<typename T>
+		struct golden_section_minima_stepper{
+			struct state{
+				friend struct golden_section_minima_stepper<T>;
+			private:
+				//min and max value of the searching range.
+				T lower;
+				T upper;
+				T val1;
+				T val2;
+				T val3;
+				T fval1;
+				T fval2;
+				T fval3;
+			public:
+				state() = default;
+				template<typename fn>
+				state(fn f, T lower_, T upper_)
+					: lower(lower_)
+					, upper(upper_)
+					, val1(upper)
+					, val2(upper)
+					, val3(upper)
+					, fval1(f(upper))
+					, fval2(f(upper))
+					, fval3(f(upper)){
+				}
+				const T& value()const{return val1;}
+				const T& fvalue()const{return fval1;}
+				const T& lower()const{return lower;}
+				const T& upper()const{return upper;}
+			};
+			explicit golden_section_minima_stepper(T relerr_):relerr(relerr_),abserr(relerr_/4){}
+			golden_section_minima_stepper(T relerr_, T abserr_):relerr(relerr_),abserr(abserr_){}
+			template<typename fn>
+			state make_state(fn f, T lower, T upper)const{
+				return state(f, lower, upper)
+			}
+			template<typename fn>
+			bool operator()(fn f, state& x){
+				static const T golden_ratio = 0.3819660113;
+
+				// midpoint
+				T midval = (x.upper + x.lower) / 2;
+
+				//calculate required precision
+				T precision = relerr * std::abs(x.val1) + abserr;
+
+				//end if the current range is enough for the precision 
+				if(std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision * 2){
+					return true;
+				}
+
+				// golden section
+				T delta = golden_ratio * ((x.val1 >= midval) ? x.lower - x.val1: x.upper - x.val1);
+
+				// okey, let's try another point.
+				T tryval = x.val1;
+				if(std::abs(delta) >= precision){
+					 tryval += delta;
+				}else if(delta > 0){
+					tryval += precision;
+				}else{
+					tryval += -precision;
+				}
+				T ftryval = f(tryval);
+
+				if(ftryval <= x.fval1){
+					//if tried point is the best
+
+					//update min/max by the previous best
+					if(tryval >= x.val1) x.lower = x.val1;
+					else x.upper = x.val1;
+
+					// update holding points
+					x.val3 = x.val2;
+					x.val2 = x.val1;
+					x.val1 = tryval;
+					x.fval3 = x.fval2;
+					x.fval2 = x.fval1;
+					x.fval1 = ftryval;
+				}else{
+					//if the tried point is not the best (but should be better than one of vals)
+					
+					//update min/max by the tryval
+					if(tryval < x.val1) x.lower = tryval;
+					else x.upper = tryval;
+
+					if((ftryval <= x.fval2) || (x.val2 == x.val1)){
+						// tried point is the second best
+						x.val3 = x.val2;
+						x.val2 = tryval;
+						x.fval3 = x.fval2;
+						x.fval2 = ftryval;
+					} else if((ftryval <= x.fval3) || (x.val3 == x.val1) || (x.val3  == x.val2)){
+						// tried point is the third best
+						x.val3 = tryval;
+						x.fval3 = ftryval;
+					}
+				}
+			}
+		private:
+			T abserr;
+			T relerr;
+		};
+		template<typename T, typename precision_controller>
 		struct brent_minima_stepper{
 			struct state{
 				friend struct brent_minima_stepper<T>;
@@ -68,18 +179,26 @@ namespace hmLib {
 				const T& lower()const{return lower;}
 				const T& upper()const{return upper;}
 			};
-			brent_minima_stepper():tolerance(1e-6){}
-			explicit brent_minima_stepper(T tolerance_):tolerance(tolerance_){}
+			explicit brent_minima_stepper(T relerr_):relerr(relerr_),abserr(relerr_/4){}
+			brent_minima_stepper(T relerr_, T abserr_):relerr(relerr_),abserr(abserr_){}
 			template<typename fn>
 			state make_state(fn f, T lower, T upper)const{
 				return state(f, lower, upper)
 			}
 			template<typename fn>
-			bool operator()(fn f, state& x, T precision){
+			bool operator()(fn f, state& x){
 				static const T golden_ratio = 0.3819660113;
 
 				// midpoint
 				T midval = (x.upper + x.lower) / 2;
+
+				//calculate required precision
+				T precision = relerr * std::abs(x.val1) + abserr;
+
+				//end if the current range is enough for the precision 
+				if(std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision * 2){
+					return true;
+				}
 
 				//whether we should try parabolic fit or not?
 				if(std::abs(x.pdelta) > precision){
@@ -156,116 +275,26 @@ namespace hmLib {
 						x.fval3 = ftryval;
 					}
 				}
+
 				return false;
 			}
 		private:
-			T tolerance;
+			T abserr;
+			T relerr;
 		};
-		template<typename T>
-		struct golden_section_minima_stepper{
-			struct state{
-				friend struct brent_minima_stepper<T>;
-			private:
-				//min and max value of the searching range.
-				T lower;
-				T upper;
-				T val1;
-				T val2;
-				T val3;
-				T fval1;
-				T fval2;
-				T fval3;
-			public:
-				state() = default;
-				template<typename fn>
-				state(fn f, T lower_, T upper_)
-					: lower(lower_)
-					, upper(upper_)
-					, val1(upper)
-					, val2(upper)
-					, val3(upper)
-					, fval1(f(upper))
-					, fval2(f(upper))
-					, fval3(f(upper)){
-				}
-				const T& value()const{return val1;}
-				const T& fvalue()const{return fval1;}
-				const T& lower()const{return lower;}
-				const T& upper()const{return upper;}
-			};
-			golden_section_minima_stepper():tolerance(1e-6){}
-			explicit golden_section_minima_stepper(T tolerance_):tolerance(tolerance_){}
-			template<typename fn>
-			state make_state(fn f, T lower, T upper)const{
-				return state(f, lower, upper)
-			}
-			template<typename fn>
-			bool operator()(fn f, state& x, T precision){
-				static const T golden_ratio = 0.3819660113;
-
-				// midpoint
-				T midval = (x.upper + x.lower) / 2;
-
-				// golden section
-				T delta = golden_ratio * ((x.val1 >= midval) ? x.lower - x.val1: x.upper - x.val1);
-
-				// okey, let's try another point.
-				T tryval = x.val1;
-				if(std::abs(delta) >= precision){
-					 tryval += delta;
-				}else if(delta > 0){
-					tryval += precision;
-				}else{
-					tryval += -precision;
-				}
-				T ftryval = f(tryval);
-
-				if(ftryval <= x.fval1){
-					//if tried point is the best
-
-					//update min/max by the previous best
-					if(tryval >= x.val1) x.lower = x.val1;
-					else x.upper = x.val1;
-
-					// update holding points
-					x.val3 = x.val2;
-					x.val2 = x.val1;
-					x.val1 = tryval;
-					x.fval3 = x.fval2;
-					x.fval2 = x.fval1;
-					x.fval1 = ftryval;
-				}else{
-					//if the tried point is not the best (but should be better than one of vals)
-					
-					//update min/max by the tryval
-					if(tryval < x.val1) x.lower = tryval;
-					else x.upper = tryval;
-
-					if((ftryval <= x.fval2) || (x.val2 == x.val1)){
-						// tried point is the second best
-						x.val3 = x.val2;
-						x.val2 = tryval;
-						x.fval3 = x.fval2;
-						x.fval2 = ftryval;
-					} else if((ftryval <= x.fval3) || (x.val3 == x.val1) || (x.val3  == x.val2)){
-						// tried point is the third best
-						x.val3 = tryval;
-						x.fval3 = ftryval;
-					}
-				}
-				return false;
-			}
-		private:
-			T tolerance;
-		};
-
 		
+		template<typename minima_stepper, typename fn, typename state,typename breaker>
+		void minima(minima_stepper Stepper, fn Fn, state State, breaker Breaker){
+			auto State = Stepper.make_state(Fn,lower,upper);
+			while(!Breaker(State,0)){
+				if(Stepper(Fn, State))break;
+			}
+		}
 		template <class F, class T>
-		inline std::pair<T, T> brent_find_minima(F f, T min, T max, int digits){
+		inline std::pair<T, T> find_minima(F f, T min, T max, int digits){
 			boost::uintmax_t m = (std::numeric_limits<boost::uintmax_t>::max)();
 			return brent_find_minima(f, min, max, digits, m);
 		}
-
 
 		template<typename T>
 		struct brent_minima_stepper {

@@ -97,6 +97,9 @@
         "locale": "cpp",
         "stack": "cpp",
         "memory_resource": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "map": "cpp",
+        "queue": "cpp",
+        "variant": "cpp"
     }
 }
