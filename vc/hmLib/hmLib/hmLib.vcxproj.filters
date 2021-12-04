@@ -73,6 +73,9 @@
     <Filter Include="hmLib\odeint\breaker">
       <UniqueIdentifier>{46448f91-6639-48e0-9a60-368e944b42ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="hmLib\minima">
+      <UniqueIdentifier>{f5d42eca-4215-40bd-a7de-c01d301dac52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp">
@@ -532,6 +535,27 @@
       <Filter>hmLib\odeint\breaker</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\blocks.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\brent_minima.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\golden_section_minima.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\minima_result.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\nelder_mead_minima.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\range_precision_breaker.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\simplex_precision_breaker.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
   </ItemGroup>

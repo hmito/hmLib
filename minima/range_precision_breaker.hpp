@@ -13,7 +13,7 @@ namespace hmLib{
 			using value_type = value_type_;
 		public:
 			range_precision_breaker() = delete;
-			explict range_precision_breaker(value_type relative_error_)
+			explicit range_precision_breaker(value_type relative_error_)
 				: relerr(relative_error_)
 				, abserr(relative_error_/4){
 			}
@@ -27,7 +27,7 @@ namespace hmLib{
 			}
 			template<typename state_type>
 			bool operator()(const state_type& x)const{
-				return std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision(x.value()) * 2 ;
+				return std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision(x) * 2 ;
 			}
 		private:
 			value_type relerr;

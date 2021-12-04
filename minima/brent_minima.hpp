@@ -12,8 +12,8 @@ namespace hmLib{
 				friend struct brent_minima_stepper<value_type>;
 			private:
 				//min and max value of the searching range.
-				value_type lower;
-				value_type upper;
+				value_type lowerval;
+				value_type upperval;
 				value_type val1;
 				value_type val2;
 				value_type val3;
@@ -25,38 +25,38 @@ namespace hmLib{
 			public:
 				state() = default;
 				template<typename fn>
-				state(fn f, value_type lower_, value_type upper_)
-					: lower(lower_)
-					, upper(upper_)
-					, val1(upper)
-					, val2(upper)
-					, val3(upper)
-					, fval1(f(upper))
-					, fval2(f(upper))
-					, fval3(f(upper))
+				state(fn f, value_type lowerval_, value_type upperval_)
+					: lowerval(lowerval_)
+					, upperval(upperval_)
+					, val1(upperval)
+					, val2(upperval)
+					, val3(upperval)
+					, fval1(f(upperval))
+					, fval2(f(upperval))
+					, fval3(f(upperval))
 					, delta(0)
 					, pdelta(0){
 				}
 				const value_type& value()const{return val1;}
 				const fvalue_type& fvalue()const{return fval1;}
-				const value_type& lower()const{return lower;}
-				const value_type& upper()const{return upper;}
+				const value_type& lower()const{return lowerval;}
+				const value_type& upper()const{return upperval;}
 			};
 			template<typename fn>
-			state make_state(fn f, value_type lower, value_type upper)const{
-				return state(f, lower, upper)
+			state make_state(fn f, value_type lowerval, value_type upperval)const{
+				return state(f, lowerval, upperval);
 			}
 			template<typename fn,typename error_type>
-			void operator()(fn f, state& x, error_type precision){
+			void operator()(fn f, state& x, error_type precision)const {
 				static const value_type golden_ratio = 0.3819660113;
 
 				// midpoint
-				value_type midval = (x.upper + x.lower) / 2;
+				value_type midval = (x.upperval + x.lowerval) / 2;
 
 				//whether we should try parabolic fit or not?
 				if(std::abs(x.pdelta) > precision){
-					value_type r = (x.val1 - x.val2) * (x.fval1 - x.fval2);
-					value_type q = (x.val1 - x.val3) * (x.fval1 - x.fval1);
+					value_type r = (x.val1 - x.val2) * (x.fval1 - x.fval3);
+					value_type q = (x.val1 - x.val3) * (x.fval1 - x.fval2);
 					value_type p = (x.val1 - x.val3) * q - (x.val1 - x.val2) * r;
 					q = 2 * (q - r);
 
@@ -64,9 +64,9 @@ namespace hmLib{
 					else q = -q;
 
 					// check the accuracy of parabolic fit
-					if((std::abs(p) >= std::abs(q * x.pdelta / 2)) || (p <= q * (x.lower - x.val1)) || (p >= q * (x.upper - x.val1))){
+					if((std::abs(p) >= std::abs(q * x.pdelta / 2)) || (p <= q * (x.lowerval - x.val1)) || (p >= q * (x.upperval - x.val1))){
 						// bad; golden section instead
-						x.pdelta = (x.val1 >= midval) ? x.midval - x.val1 : x.upper - x.val1;
+						x.pdelta = (x.val1 >= midval) ? midval - x.val1 : x.upperval - x.val1;
 						x.delta = golden_ratio * x.pdelta;
 					}else{
 						// good; paraboratic fit
@@ -74,13 +74,13 @@ namespace hmLib{
 						x.delta = p / q;
 
 						value_type newval = x.val1 + x.delta;
-						if((newval - x.minv) < 2*precision || (x.maxv- newval) < 2*precision){
+						if((newval - x.lowerval) < 2*precision || (x.upperval- newval) < 2*precision){
 							x.delta = (midval - x.val1) < 0 ? static_cast<value_type>(-std::abs(precision)) : static_cast<value_type>(std::abs(precision));
 						}
 					}
 				}else{
 					// golden section
-					x.pdelta = (x.val1 >= midval) ? x.lower - x.val1: x.upper - x.val1;
+					x.pdelta = (x.val1 >= midval) ? x.lowerval - x.val1: x.upperval - x.val1;
 					x.delta = golden_ratio * x.pdelta;
 				}
 
@@ -99,8 +99,8 @@ namespace hmLib{
 					//if tried point is the best
 
 					//update min/max by the previous best
-					if(tryval >= x.val1) x.lower = x.val1;
-					else x.upper = x.val1;
+					if(tryval >= x.val1) x.lowerval = x.val1;
+					else x.upperval = x.val1;
 
 					// update holding points
 					x.val3 = x.val2;
@@ -113,8 +113,8 @@ namespace hmLib{
 					//if the tried point is not the best (but should be better than one of vals)
 					
 					//update min/max by the tryval
-					if(tryval < x.val1) x.lower = tryval;
-					else x.upper = tryval;
+					if(tryval < x.val1) x.lowerval = tryval;
+					else x.upperval = tryval;
 
 					if((ftryval <= x.fval2) || (x.val2 == x.val1)){
 						// tried point is the second best
@@ -131,20 +131,20 @@ namespace hmLib{
 			}
 		};
 		template<typename fn, typename value_type, typename precision_breaker>
-		auto brent_minima(fn Fn, value_type lower, value_type upper, unsigned int maxitr, precision_breaker pbrk){
+		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
 			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
-			auto State = Stepper.make_state(Fn, lower, upper);
+			auto State = Stepper.make_state(Fn, lowerval, upperval);
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(pbrk(State))return make_minima_result(true, i, State.value(),State.fvalue());
-				Stepper(Fn,State,pbrk.precision(State.value()));
+				Stepper(Fn,State,pbrk.precision(State));
 			}
 
 			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
 		}
 		template<typename fn, typename value_type, typename error_type>
-		auto brent_minima(fn Fn, value_type lower, value_type upper, unsigned int maxitr, error_type relerr, error_type abserr){
-			return brent_minima(Fn, lower, upper, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return brent_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
 		}
     }
 }

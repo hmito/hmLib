@@ -115,6 +115,13 @@
     <ClInclude Include="..\..\..\math\optimize.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
     <ClInclude Include="..\..\..\math\static_math.hpp" />
+    <ClInclude Include="..\..\..\minima.hpp" />
+    <ClInclude Include="..\..\..\minima\brent_minima.hpp" />
+    <ClInclude Include="..\..\..\minima\golden_section_minima.hpp" />
+    <ClInclude Include="..\..\..\minima\minima_result.hpp" />
+    <ClInclude Include="..\..\..\minima\nelder_mead_minima.hpp" />
+    <ClInclude Include="..\..\..\minima\range_precision_breaker.hpp" />
+    <ClInclude Include="..\..\..\minima\simplex_precision_breaker.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp" />

@@ -2,6 +2,7 @@
 #define HMLIB_MINIMA_SIMPLEXPRECISIONBREAKER_INC 100
 #
 #include<cmath>
+#include<iterator>
 namespace hmLib{
 	namespace minima{
  		template<typename value_type_>
@@ -13,7 +14,7 @@ namespace hmLib{
 			using value_type = value_type_;
 		public:
 			simplex_precision_breaker() = delete;
-			explict simplex_precision_breaker(value_type relative_error_)
+			explicit simplex_precision_breaker(value_type relative_error_)
 				: relerr(relative_error_)
 				, abserr(relative_error_/4){
 			}
@@ -23,18 +24,18 @@ namespace hmLib{
 			}
 			template<typename state_type>
 			bool operator()(const state_type& x)const{
-				unsigned int size = x.size()-1;
-				for(unsigned int i = 0; i< size, ++i){
+				unsigned int size = std::distance(x.begin(), x.end()) - 1;
+				for (unsigned int i = 0; i < size; ++i) {
 					auto nitr = x.begin(); 
-					auto lower = (*nitr)[i];
-					auto upper = (*nitr)[i];
+					auto lower = (*nitr).value()[i];
+					auto upper = (*nitr).value()[i];
 					++nitr;
 					for(;nitr != x.end(); ++nitr){
-						lower = std::min(lower,(*nitr)[i]);
-						upper = std::max(upper,(*nitr)[i]);
+						lower = std::min(lower,(*nitr).value()[i]);
+						upper = std::max(upper,(*nitr).value()[i]);
 					}
 
-					if(std::abs(x.value()[i] - (upper + lower) / 2) + (upper - lower) / 2 > (relerr * std::abs(x.value()) + abserr / 4) * 2){
+					if(std::abs(x.value()[i] - (upper + lower) / 2) + (upper - lower) / 2 > (relerr * std::abs(x.value()[i]) + abserr / 4) * 2){
 						return false;
 					}
 				}
