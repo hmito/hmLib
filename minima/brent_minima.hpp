@@ -37,6 +37,19 @@ namespace hmLib{
 					, delta(0)
 					, pdelta(0){
 				}
+				template<typename fn>
+				state(fn f, value_type lowerval_, value_type upperval_, value_type inival_)
+					: lowerval(lowerval_)
+					, upperval(upperval_)
+					, val1(inival_)
+					, val2(inival_)
+					, val3(inival_)
+					, fval1(f(inival_))
+					, fval2(f(inival_))
+					, fval3(f(inival_))
+					, delta(0)
+					, pdelta(0){
+				}
 				const value_type& value()const{return val1;}
 				const fvalue_type& fvalue()const{return fval1;}
 				const value_type& lower()const{return lowerval;}
@@ -45,6 +58,10 @@ namespace hmLib{
 			template<typename fn>
 			state make_state(fn f, value_type lowerval, value_type upperval)const{
 				return state(f, lowerval, upperval);
+			}
+			template<typename fn>
+			state make_state(fn f, value_type lowerval, value_type upperval, value_type inival)const{
+				return state(f, lowerval, upperval, inival);
 			}
 			template<typename fn,typename error_type>
 			void operator()(fn f, state& x, error_type precision)const {
@@ -131,7 +148,7 @@ namespace hmLib{
 			}
 		};
 		template<typename fn, typename value_type, typename precision_breaker>
-		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
+		auto brent_minima_breaker(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
 			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
 			auto State = Stepper.make_state(Fn, lowerval, upperval);
 
@@ -142,9 +159,25 @@ namespace hmLib{
 
 			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
 		}
+		template<typename fn, typename value_type, typename precision_breaker>
+		auto brent_minima_breaker(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker pbrk){
+			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
+			auto State = Stepper.make_state(Fn, lowerval, upperval, inival);
+
+			for(unsigned int i = 0; i<maxitr; ++i){
+				if(pbrk(State))return make_minima_result(true, i, State.value(),State.fvalue());
+				Stepper(Fn,State,pbrk.precision(State));
+			}
+
+			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
+		}
 		template<typename fn, typename value_type, typename error_type>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return brent_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+			return brent_minima_breaker(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+		}
+		template<typename fn, typename value_type, typename error_type>
+		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, error_type relerr, error_type abserr){
+			return brent_minima_breaker(Fn, lowerval, upperval, inival, maxitr,range_precision_breaker<error_type>(relerr,abserr));
 		}
     }
 }
