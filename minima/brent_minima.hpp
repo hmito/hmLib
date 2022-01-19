@@ -148,7 +148,7 @@ namespace hmLib{
 			}
 		};
 		template<typename fn, typename value_type, typename precision_breaker>
-		auto brent_minima_breaker(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
+		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
 			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
 			auto State = Stepper.make_state(Fn, lowerval, upperval);
 
@@ -160,7 +160,7 @@ namespace hmLib{
 			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
 		}
 		template<typename fn, typename value_type, typename precision_breaker>
-		auto brent_minima_breaker(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker pbrk){
+		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker pbrk){
 			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
 			auto State = Stepper.make_state(Fn, lowerval, upperval, inival);
 
@@ -173,11 +173,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return brent_minima_breaker(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,make_range_precision_breaker(relerr,abserr));
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, error_type relerr, error_type abserr){
-			return brent_minima_breaker(Fn, lowerval, upperval, inival, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+			return breakable_brent_minima(Fn, lowerval, upperval, inival, maxitr,make_range_precision_breaker(relerr,abserr));
 		}
     }
 }
