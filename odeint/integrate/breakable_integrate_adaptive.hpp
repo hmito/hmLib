@@ -81,7 +81,7 @@ namespace hmLib {
 						dt = end_time - start_time;
 					}
 
-					boost_odeint::controlled_step_result res;
+					boost_odeint::controlled_step_result res(boost_odeint::controlled_step_result::success);
 					do
 					{
 						res = st.try_step(sys, start_state, start_time, dt);

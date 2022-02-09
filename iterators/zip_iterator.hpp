@@ -38,9 +38,9 @@ namespace hmLib {
 				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
 				template<typename... other_iterators_>
 				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-				reference operator*() { return hmLib::tuple_for_each([](auto& itr) ->auto & {return *itr; }, Itrs); }
+				reference operator*() { return hmLib::tuple_transform(Itrs, [](auto& itr) ->auto & {return *itr; }); }
 				pointer operator->() { return pointer(operator*()); }
-				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type& operator++() { hmLib::tuple_foreach(Itrs, [](auto& itr) {return ++itr; }); return *this; }
 				this_type operator++(int) {
 					this_type Prev = *this;
 					operator++();
@@ -74,9 +74,9 @@ namespace hmLib {
 				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
 				template<typename... other_iterators_>
 				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-				reference operator*() { return hmLib::tuple_for_each([](auto& itr)->auto & {return *itr; }, Itrs); }
+				reference operator*() { return hmLib::tuple_transform(Itrs, [](auto& itr)->auto & {return *itr; }); }
 				pointer operator->() { return pointer(operator*()); }
-				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type& operator++() { hmLib::tuple_foreach(Itrs, [](auto& itr) {return ++itr; }); return *this; }
 				this_type operator++(int) {
 					this_type Prev = *this;
 					operator++();
@@ -110,15 +110,15 @@ namespace hmLib {
 				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
 				template<typename... other_iterators_>
 				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-				reference operator*() { return hmLib::tuple_for_each([](auto& itr)->auto & {return *itr; }, Itrs); }
+				reference operator*() { return hmLib::tuple_transform(Itrs,[](auto& itr)->auto & {return *itr; }); }
 				pointer operator->() { return pointer(operator*()); }
-				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type& operator++() { hmLib::tuple_foreach(Itrs,[](auto& itr) {return ++itr; }); return *this; }
 				this_type operator++(int) {
 					this_type Prev = *this;
 					operator++();
 					return Prev;
 				}
-				this_type& operator--() { hmLib::tuple_for_each([](auto& itr) {return --itr; }, Itrs); return *this; }
+				this_type& operator--() { hmLib::tuple_foreach(Itrs,[](auto& itr) {return --itr; }); return *this; }
 				this_type operator--(int) {
 					this_type Prev = *this;
 					operator--();
@@ -152,23 +152,23 @@ namespace hmLib {
 				explicit zip_iterator_impl(iterator_pack Itrs_):Itrs(Itrs_) {}
 				template<typename... other_iterators_>
 				zip_iterator_impl(other_iterators_... Itrs_) : Itrs(Itrs_...) {}
-				reference operator*() { return hmLib::tuple_for_each([](auto& itr)->decltype((*itr)) {return *itr; }, Itrs); }
-				reference operator[](difference_type n) { return hmLib::tuple_for_each([n](auto& itr)->decltype((*itr)) {return itr[n]; }, Itrs); }
+				reference operator*() { return hmLib::tuple_transform(Itrs, [](auto& itr)->decltype((*itr)) {return *itr; }); }
+				reference operator[](difference_type n) { return hmLib::tuple_transform(Itrs, [n](auto& itr)->decltype((*itr)) {return itr[n]; }); }
 				pointer operator->() { return pointer(operator*()); }
-				this_type& operator++() { hmLib::tuple_for_each([](auto& itr) {return ++itr; }, Itrs); return *this; }
+				this_type& operator++() { hmLib::tuple_foreach(Itrs,[](auto& itr) {return ++itr; }); return *this; }
 				this_type operator++(int) {
 					this_type Prev = *this;
 					operator++();
 					return Prev;
 				}
-				this_type& operator--() { hmLib::tuple_for_each([](auto& itr) {return --itr; }, Itrs); return *this; }
+				this_type& operator--() { hmLib::tuple_foreach(Itrs,[](auto& itr) {return --itr; }); return *this; }
 				this_type operator--(int) {
 					this_type Prev = *this;
 					operator--();
 					return Prev;
 				}
-				this_type& operator+=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr += n; }, Itrs); return *this; }
-				this_type& operator-=(difference_type n) { hmLib::tuple_for_each([n](auto& itr) {return itr -= n; }, Itrs); return *this; }
+				this_type& operator+=(difference_type n) { hmLib::tuple_foreach(Itrs, [n](auto& itr) {return itr += n; }); return *this; }
+				this_type& operator-=(difference_type n) { hmLib::tuple_foreach(Itrs, [n](auto& itr) {return itr -= n; }); return *this; }
 				const iterator_pack& pack()const { return Itrs; }
 				friend this_type operator+(const this_type& itr, difference_type n) {
 					auto ans = itr;

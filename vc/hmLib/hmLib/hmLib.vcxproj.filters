@@ -67,14 +67,15 @@
     <Filter Include="hmLib\odeint\border">
       <UniqueIdentifier>{882f02ea-02ee-4269-b36e-75f96c8a144e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="hmLib\recursive">
-      <UniqueIdentifier>{6d223cba-a903-469b-89f2-51e55250a847}</UniqueIdentifier>
+    <Filter Include="hmLib\odeint\recursive">
+      <UniqueIdentifier>{ae6724d1-ecf9-4d84-8ef8-fa19d14bd1f5}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="use_odeint.cpp">
-      <Filter>ソースファイル</Filter>
-    </ClCompile>
+    <Filter Include="hmLib\odeint\breaker">
+      <UniqueIdentifier>{46448f91-6639-48e0-9a60-368e944b42ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hmLib\minima">
+      <UniqueIdentifier>{f5d42eca-4215-40bd-a7de-c01d301dac52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\algorithm\nonrepeat_random_integrals.hpp">
@@ -182,27 +183,6 @@
     <ClInclude Include="..\..\..\signals\unique_connections.hpp">
       <Filter>hmLib\signals</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\eqstate_break_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\break_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\container_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\utility.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\gates\comgate\winrs.hpp">
       <Filter>hmLib\gates\comgate</Filter>
     </ClInclude>
@@ -281,23 +261,11 @@
     <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp">
       <Filter>hmLib\odeint\integrate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\validate.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\stepper_categories.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\integrate\integrate_adaptive.hpp">
       <Filter>hmLib\odeint\integrate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp">
-      <Filter>hmLib\odeint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\integrate\integrate_const.hpp">
       <Filter>hmLib\odeint\integrate</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\integrate.hpp">
-      <Filter>hmLib\odeint</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\validate\state_validate_stepper.hpp">
       <Filter>hmLib\odeint\validate</Filter>
@@ -316,9 +284,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\border\borders.hpp">
       <Filter>hmLib\odeint\border</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\border.hpp">
-      <Filter>hmLib\odeint</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\odeint\border\element_border.hpp">
       <Filter>hmLib\odeint\border</Filter>
@@ -402,9 +367,6 @@
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\random.hpp">
-      <Filter>hmLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\recursive.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\resource.hpp">
@@ -515,14 +477,91 @@
     <ClInclude Include="..\..\..\math\histgram.hpp">
       <Filter>hmLib\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\recursive\stepper.hpp">
-      <Filter>hmLib\recursive</Filter>
+    <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\recursive\breakable_recurrence.hpp">
-      <Filter>hmLib\recursive</Filter>
+    <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\recursive\recurrence.hpp">
-      <Filter>hmLib\recursive</Filter>
+    <ClInclude Include="..\..\..\odeint\observer\histgoram_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\odeint\validate.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\varray_wrapper.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\border.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\integrate.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\stepper_categories.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\utility.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\recursive\recurrence.hpp">
+      <Filter>hmLib\odeint\recursive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\recursive\breakable_recurrence.hpp">
+      <Filter>hmLib\odeint\recursive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\recursive\time_update_checker.hpp">
+      <Filter>hmLib\odeint\recursive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\recursive.hpp">
+      <Filter>hmLib\odeint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\null_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\observer_pack.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\breaker\time_overflow_breaker.hpp">
+      <Filter>hmLib\odeint\breaker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\breaker\state_breaker.hpp">
+      <Filter>hmLib\odeint\breaker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\breaker\breaker_pack.hpp">
+      <Filter>hmLib\odeint\breaker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\blocks.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\brent_minima.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\golden_section_minima.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\minima_result.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\nelder_mead_minima.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\range_precision_breaker.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima\simplex_precision_breaker.hpp">
+      <Filter>hmLib\minima</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\minima.hpp">
+      <Filter>hmLib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\use_blocks.cpp">
+      <Filter>ソースファイル</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
