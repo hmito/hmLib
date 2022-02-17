@@ -5,24 +5,20 @@
 #include<type_traits>
 namespace hmLib{
 	namespace detail{
-		template<typename T, unsigned int Size_>
-		struct aligned_array{
-			typedef T& reference;
-			typedef T* pointer;
-			typedef T* iterator;
-			typedef const T* const_iterator;
+		template<typename T, unsigned int N>
+		struct aligned_heap{
+			using pointer = T*;
+			using const_pointer = const T*;
 		private:
-			unsigned char Array[sizeof(T)*(Size_ + 1)];
-			unsigned char* Begin;
-			unsigned char* End;
+			alighas(alighof(T)) unsigned char Buffer[sizeof(T)*N];
 		public:
-			aligned_array()
-				: Array()
-				, Begin(Array + ((sizeof(T) - static_cast<unsigned int>(reinterpret_cast<unsigned long long>(Array) % sizeof(T))) % sizeof(T)))
-				, End(Begin + sizeof(T)*Size_){}
+			aligned_buffer(): Buffer(){}
 		private:
-			aligned_array(const aligned_array<T, Size_>&);
-			aligned_array<T, Size_>& operator=(const aligned_array<T, Size_>&);
+			//copy and move are not permitted
+			aligned_static_buffer(aligned_static_buffer<T, Size_>&&);
+			aligned_static_buffer<T, Size_>& operator=(const aligned_static_buffer<T, Size_>&);
+			aligned_static_buffer(const aligned_static_buffer<T, Size_>&);
+			aligned_static_buffer<T, Size_>& operator=(const aligned_static_buffer<T, Size_>&);
 		public:
 			unsigned int size(){ return Size_; }
 			reference operator[](int pos){ return begin()[pos]; }
