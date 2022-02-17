@@ -3,324 +3,15 @@
 #
 #include<iterator>
 #include<type_traits>
+#include "aligned_heap.hpp"
+#include "algorithm/compare.hpp"
+#include "exception.hpp"
+#include "exceptions/access_exceptions.hpp"
 namespace hmLib{
-	namespace detail{
-		template<typename T, unsigned int N>
-		struct aligned_heap{
-			using pointer = T*;
-			using const_pointer = const T*;
-		private:
-			alighas(alighof(T)) unsigned char Buffer[sizeof(T)*N];
-		public:
-			aligned_buffer(): Buffer(){}
-		private:
-			//copy and move are not permitted
-			aligned_static_buffer(aligned_static_buffer<T, Size_>&&);
-			aligned_static_buffer<T, Size_>& operator=(const aligned_static_buffer<T, Size_>&);
-			aligned_static_buffer(const aligned_static_buffer<T, Size_>&);
-			aligned_static_buffer<T, Size_>& operator=(const aligned_static_buffer<T, Size_>&);
-		public:
-			unsigned int size(){ return Size_; }
-			reference operator[](int pos){ return begin()[pos]; }
-			reference at(int pos){ return begin()[pos]; }
-			iterator begin(){ return reinterpret_cast<iterator>(Begin); }
-			iterator end(){ return reinterpret_cast<iterator>(End); }
-			const reference operator[](int pos)const{ return begin()[pos]; }
-			const reference at(int pos)const{ return begin()[pos]; }
-			const_iterator begin()const{ return reinterpret_cast<const_iterator>(Begin); }
-			const_iterator end()const{ return reinterpret_cast<const_iterator>(End); }
-		};
-		template<typename this_circular>
-		struct circular_const_iterator;
-		template<typename this_circular>
-		struct circular_iterator{
-			friend struct circular_const_iterator<this_circular>;
-		private:
-			typedef circular_iterator<this_circular> this_type;
-		public:
-			using iterator_category = std::random_access_iterator_tag;
-			using value_type = typename this_circular::value_type;
-			using difference_type = typename this_circular::difference_type;
-			using pointer = typename this_circular::pointer;
-			using const_pointer = typename this_circular::const_pointer;
-			using reference = typename this_circular::reference;
-			using const_reference = typename this_circular::const_reference;
-		private:
-			using base_iterator = typename this_circular::base_iterator ;
-			using base_const_iterator = typename this_circular::base_const_iterator ;
-		private:
-			base_iterator Cur;
-			const this_circular* Ptr;
-		public:
-			circular_iterator()
-				: Cur()
-				, Ptr(nullptr){}
-			circular_iterator(base_iterator Cur_, const this_circular& Ref_)
-				: Cur(Cur_)
-				, Ptr(&Ref_){}
-			circular_iterator(base_const_iterator Cur_, const this_circular& Ref_)
-				: Cur(const_cast<base_iterator>(Cur_))
-				, Ptr(&Ref_){}
-		public:
-			base_iterator base()const{ return Cur; }
-			this_type& operator++(){
-				if(Cur == Ptr->buffer_last())Cur = const_cast<base_iterator>(Ptr->buffer_first());
-				else ++Cur;
-				return *this;
-			}
-			this_type operator++(int){
-				auto Prev = *this;
-				operator++();
-				return Prev;
-			}
-			this_type& operator--(){
-				if(Cur == Ptr->buffer_first())Cur = const_cast<base_iterator>(Ptr->buffer_last());
-				else --Cur;
-				return *this;
-			}
-			this_type operator--(int){
-				auto Prev = *this;
-				operator--();
-				return Prev;
-			}
-			this_type& operator+=(difference_type dif){
-				if(dif < 0){
-					if(std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) < -dif){
-						Cur = const_cast<base_iterator>(Ptr->buffer_last()) - (-dif - std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) - 1);
-					} else{
-						Cur += dif;
-					}
-				} else{
-					if(std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) < dif){
-						Cur = const_cast<base_iterator>(Ptr->buffer_first()) + (dif - std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) - 1);
-					} else{
-						Cur += dif;
-					}
-				}
-				return *this;
-			}
-			this_type& operator-=(difference_type dif){
-				return operator+=(-dif);
-			}
-			reference operator*(){ return *Cur; }
-			const_reference operator*()const{ return *Cur; }
-			pointer operator->(){ return Cur; }
-			const_pointer operator->()const{ return Cur; }
-			reference operator[](difference_type dif){
-				if(dif < 0){
-					if(std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) < -dif){
-						return const_cast<base_iterator>(Ptr->buffer_last()) [- (-dif - std::distance<base_const_iterator>(Ptr->buffer_first(), Cur) - 1)];
-					} else{
-						return Cur[dif];
-					}
-				} else{
-					if(std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) < dif){
-						return const_cast<base_iterator>(Ptr->buffer_first())[ + (dif - std::distance<base_const_iterator>(Cur, Ptr->buffer_last()) - 1)];
-					} else{
-						return Cur[dif];
-					}
-				}
-			}
-			const_reference operator[](difference_type dif)const{
-				if(dif < 0){
-					if(std::distance(Ptr->buffer_first(), Cur) < -dif){
-						return Cur[Ptr->buffer_last() - (-dif - std::distance(Ptr->buffer_first(), Cur) - 1)];
-					} else{
-						return Cur[dif];
-					}
-				} else{
-					if(std::distance(Cur, Ptr->buffer_last()) < dif){
-						return Cur[Ptr->buffer_first() + (dif - std::distance(Cur, Ptr->buffer_last()) - 1)];
-					} else{
-						return Cur[dif];
-					}
-				}
-			}
-			friend this_type operator+(const this_type& Itr, difference_type dif){
-				auto Ans = Itr;
-				Ans += dif;
-				return Ans;
-			}
-			friend this_type operator+(difference_type dif, const this_type& Itr){
-				return operator+(Itr, dif);
-			}
-			friend this_type operator-(const this_type& Itr, difference_type dif){
-				return operator+(Itr, -dif);
-			}
-			friend difference_type operator-(const this_type& Itr1, this_type Itr2){
-				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
-					//1<=E<2
-					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first())+1;
-				} else if(Itr2.Cur <= Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
-					//2<=E<1
-					return - (Itr1.Ptr->buffer_last() - Itr1.Cur) - (Itr2.Cur - Itr2.Ptr->buffer_first())-1;
-				}
-				return Itr1.Cur - Itr2.Cur;
-			}
-			friend bool operator==(const this_type& Itr1, const this_type& Itr2){
-				return Itr1.Cur == Itr2.Cur;
-			}
-			friend bool operator!=(const this_type& Itr1, const this_type& Itr2){
-				return !(Itr1 == Itr2);
-			}
-			friend bool operator<(const this_type& Itr1, const this_type& Itr2){
-				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
-					//1<=E<2
-					return false;
-				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
-					//2<=E<1
-					return true;
-				}
-				return Itr1.Cur < Itr2.Cur;
-			}
-			friend bool operator>(const this_type& Itr1, const this_type& Itr2){
-				return Itr2 < Itr1;
-			}
-			friend bool operator<=(const this_type& Itr1, const this_type& Itr2){
-				return Itr1 == Itr2 || Itr1 < Itr2;
-			}
-			friend bool operator>=(const this_type& Itr1, const this_type& Itr2){
-				return Itr1 == Itr2 || Itr1 > Itr2;
-			}
-		};
-		template<typename this_circular>
-		struct circular_const_iterator{
-			friend struct circular_const_iterator<this_circular>;
-		private:
-			typedef circular_const_iterator<this_circular> this_type;
-		public:
-			using iterator_category = std::random_access_iterator_tag;
-			using value_type = typename this_circular::value_type;
-			using difference_type = typename this_circular::difference_type;
-			using pointer = typename this_circular::const_pointer;
-			using const_pointer = pointer;
-			using reference = typename this_circular::const_reference;
-			using const_reference = reference;
-		private:
-			using base_const_iterator = typename this_circular::base_const_iterator;
-		private:
-			base_const_iterator Cur;
-			const this_circular* Ptr;
-		public:
-			circular_const_iterator()
-				: Cur()
-				, Ptr(nullptr){}
-			circular_const_iterator(base_const_iterator Cur_, const this_circular& Ref_)
-				: Cur(Cur_)
-				, Ptr(&Ref_){
-			}
-			circular_const_iterator(circular_iterator<this_circular> Itr_)
-				: Cur(Itr_.Cur)
-				, Ptr(Itr_.Ptr){}
-		public:
-			base_const_iterator base()const{ return Cur; }
-			this_type& operator++(){
-				if(Cur == Ptr->buffer_last())Cur = Ptr->buffer_first();
-				else ++Cur;
-				return *this;
-			}
-			this_type operator++(int){
-				auto Prev = *this;
-				operator++();
-				return Prev;
-			}
-			this_type& operator--(){
-				if(Cur == Ptr->buffer_first())Cur = Ptr->buffer_last();
-				else --Cur;
-			}
-			this_type operator--(int){
-				auto Prev = *this;
-				operator--();
-				return Prev;
-			}
-			this_type& operator+=(difference_type dif){
-				if(dif < 0){
-					if(std::distance(Ptr->buffer_first(), Cur) < -dif){
-						Cur = Ptr->buffer_last() - (-dif - std::distance(Ptr->buffer_first(), Cur) - 1);
-					} else{
-						Cur += dif;
-					}
-				} else{
-					if(std::distance(Cur, Ptr->buffer_last()) < dif){
-						Cur = Ptr->buffer_first() + (dif - std::distance(Cur, Ptr->buffer_last()) - 1);
-					} else{
-						Cur += dif;
-					}
-				}
-				return *this;
-			}
-			this_type& operator-=(difference_type dif){
-				return operator+=(-dif);
-			}
-			reference operator*()const{ return *Cur; }
-			pointer operator->()const{ return Cur; }
-			reference operator[](difference_type dif)const{
-				if(dif < 0){
-					if(std::distance(Ptr->buffer_first(), Cur) < -dif){
-						return Cur[Ptr->buffer_last() - (-dif - std::distance(Ptr->buffer_first(), Cur) - 1)];
-					} else{
-						return Cur[dif];
-					}
-				} else{
-					if(std::distance(Cur, Ptr->buffer_last()) < dif){
-						return Cur[Ptr->buffer_first() + (dif - std::distance(Cur, Ptr->buffer_last()) - 1)];
-					} else{
-						return Cur[dif];
-					}
-				}
-			}
-			friend this_type operator+(const this_type& Itr, difference_type dif){
-				auto Ans = Itr;
-				Ans += dif;
-				return Ans;
-			}
-			friend this_type operator+(difference_type dif, const this_type& Itr){
-				return operator+(Itr, dif);
-			}
-			friend this_type operator-(const this_type& Itr, difference_type dif){
-				return operator+(Itr, -dif);
-			}
-			friend difference_type operator-(const this_type& Itr1, const this_type& Itr2){
-				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
-					//1<=E<2
-					return (Itr2.Ptr->buffer_last() - Itr2.Cur) + (Itr1.Cur - Itr1.Ptr->buffer_first()) + 1;
-				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
-					//2<=E<1
-					return -(Itr1.Ptr->buffer_last() - Itr1.Cur) - (Itr2.Cur - Itr2.Ptr->buffer_first()) - 1;
-				}
-				return Itr1.Cur - Itr2.Cur;
-			}
-			friend bool operator==(const this_type& Itr1, const this_type& Itr2){
-				return Itr1.Cur == Itr2.Cur;
-			}
-			friend bool operator!=(const this_type& Itr1, const this_type& Itr2){
-				return !(Itr1 == Itr2);
-			}
-			friend bool operator<(const this_type& Itr1, const this_type& Itr2){
-				if(Itr1.Cur <= Itr1.Ptr->end().base() && Itr2.Ptr->end().base() < Itr2.Cur){
-					//1<=E<2
-					return false;
-				} else if(Itr2.Cur < Itr2.Ptr->end().base() && Itr1.Ptr->end().base() < Itr1.Cur){
-					//2<=E<1
-					return true;
-				}
-				return Itr1.Cur < Itr2.Cur;
-			}
-			friend bool operator>(const this_type& Itr1, const this_type& Itr2){
-				return Itr2 < Itr1;
-			}
-			friend bool operator<=(const this_type& Itr1, const this_type& Itr2){
-				return Itr1 == Itr2 || Itr1 < Itr2;
-			}
-			friend bool operator>=(const this_type& Itr1, const this_type& Itr2){
-				return Itr1 == Itr2 || Itr1 > Itr2;
-			}
-		};
-	}
-	template<typename T, unsigned int Size_>
+	template<typename T, unsigned int MaxSize>
 	struct circular{
 	private:
-		using this_type = circular<T, Size_> ;
+		using this_type = circular<T, MaxSize> ;
 	public:
 		using value_type = T ;
 		using reference = typename std::add_lvalue_reference<T>::type;
@@ -329,295 +20,404 @@ namespace hmLib{
 		using const_pointer = typename std::add_pointer<typename std::add_const<T>::type>::type;
 		using size_type =  std::size_t;
 		using difference_type = int;
-	public:
-		static constexpr size_type static_size() { return Size_; }
 	private:
-		using base_array =  detail::aligned_array<T, Size_ + 1> ;
-	public:
-		using base_iterator = typename base_array::iterator;
-		using base_const_iterator = typename base_array::const_iterator;
-	public:
-		using iterator = detail::circular_iterator<this_type>;
-		using const_iterator = detail::circular_const_iterator<this_type>;
-	private:
-		base_array Array;
-		iterator Beg;
-		iterator End;
-		unsigned int Size;
-	public:
-		base_const_iterator buffer_first()const{ return Array.begin(); }
-		base_const_iterator buffer_last()const{ return Array.end() - 1; }
-	public:
-		circular()
-			: Beg(Array.begin(), *this)
-			, End(Array.begin(), *this)
-			, Size(0){
-		}
-		circular(const this_type& Other)
-			: Beg(Array.begin(), *this)
-			, End(Array.begin(), *this)
-			, Size(0){
-			insert(begin(), Other.cbegin(), Other.cend());
-		}
-		this_type& operator=(const this_type& Other){
-			if(&Other != this){
-				clear();
-				insert(begin(), Other.cbegin(), Other.cend());
+		struct base_type{
+		public:
+			using value_type = typename this_type::value_type;
+			using reference = typename this_type::reference;
+			using const_reference =typename this_type::const_reference;
+			using pointer = typename this_type::pointer;
+			using const_pointer = typename this_type::const_pointer;
+			using size_type =  typename this_type::size_type;
+			using difference_type = typename this_type::difference_type;
+		public:
+			base_type():BegPos(0),LasPos(0),Size(0){}
+			base_type(const base_type&) = delete;
+			const base_type& operator=(const base_type&) = delete;
+			base_type(base_type&&) = delete;
+			const base_type& operator=(base_type&&) = delete;
+			~base_type(){clear();}
+		public:
+			constexpr static size_type buffer_size(){return MaxSize+1;}
+			pointer buffer_begin(){return static_cast<pointer>(static_cast<void*>(Buf));}
+			const_pointer buffer_begin()const{return static_cast<pointer>(static_cast<void*>(Buf));}
+			pointer buffer_end(){return buffer_begin()+buffer_size();}
+			const_pointer buffer_end()const{return buffer_begin()+buffer_size();}
+		public:
+			size_type index_to_pos(difference_type n){return hmLib::euclidean_mod(BegPos+n,MaxSize+1);}
+			reference reference_by_pos(size_type Pos){ return buffer_begin()[Pos]; }
+			const_reference reference_by_pos(size_type Pos)const{ return buffer_begin()[Pos]; }
+			pointer pointer_by_pos(size_type Pos){ return buffer_begin()+Pos; }
+			const_pointer pointer_by_pos(size_type Pos)const{ return buffer_begin()+Pos; }
+			reference front(){ return buffer_begin()[BegPos]; }
+			const_reference front()const{ return buffer_begin()[BegPos]; }
+			reference back(){ return buffer_begin()[LasPos]; }
+			const_reference back()const{ return buffer_begin()[LasPos]; }
+			bool empty()const{ return Size == 0; }
+			bool full()const{ return Size == max_size(); }
+			size_type size()const{ return Size; }
+			static constexpr size_type max_size()const { return MaxSize; }
+			size_type remain()const{ return max_size() - size(); }
+		public:
+			void clear(){
+				while(!empty())pop_back();
+			}	
+			bool push_back(const_reference Value){
+				if(full())return true;
+				++LasPos;
+				if(LasPos==max_size())LasPos=0;
+				++Size;
+				::new(buffer_begin()+LasPos) value_type(Value);
+				return false;
 			}
-			return *this;
-		}
-		template<typename input_iterator>
-		circular(input_iterator Begin_, input_iterator End_)
-			: Beg(Array.begin(), *this)
-			, End(Array.begin(), *this)
-			, Size(0){
-			insert(begin(), Begin_, End_);
-		}
-		~circular(){
-			clear();
-		}
+			bool push_front(const_reference Value){
+				if(full())return true;
+				if(BegPos==0)BegPos=max_size();
+				--BegPos;
+				++Size;
+				::new(buffer_begin()+BegPos) value_type(Value);
+				return false;
+			}
+			void pop_back(){
+				if(empty())return;
+				(buffer_begin()+LasPos)->~value_type();
+				if(LasPos==0)LasPos=max_size();
+				--LasPos;
+				--Size;
+			}
+			void pop_front(){
+				if(empty())return;
+				(buffer_begin()+BegPos)->~value_type();
+				++BegPos;
+				if(BegPos==max_size())BegPos=0;
+				--Size;
+			}
+			bool rotete_back(const_reference Value) {
+				if(full()) {
+					(buffer_begin()+BegPos)->~value_type();
+					++BegPos;
+					if(BegPos==max_size())BegPos=0;
+					++LasPos;
+					if(LasPos==max_size())LasPos=0;
+					::new(buffer_begin()+LasPos) value_type(Value);
+					return true;
+				} else {
+					++LasPos;
+					if(LasPos==max_size())LasPos=0;
+					::new(buffer_begin()+LasPos) value_type(Value);
+					return false;
+				}
+			}
+			bool rotete_front(const_reference Value) {
+				if(full()) {
+					(buffer_begin()+LasPos)->~value_type();
+					if(LasPos==0)LasPos=max_size();
+					--LasPos;
+					if(BegPos==0)BegPos=max_size();
+					--BegPos;
+					::new(buffer_begin()+BegPos) value_type(Value);
+					return true;
+				} else {
+					if(BegPos==0)BegPos=max_size();
+					--BegPos;
+					++Size;
+					::new(buffer_begin()+BegPos) value_type(Value);
+					return false;
+				}
+			}
+			bool insert_by_pos(size_type Pos, const_reference Value){
+				if(full())return true;
+
+				auto FromPos = LasPos;
+				++LasPos;
+				if(LasPos==max_size())LasPos=0;
+				++Size;
+				auto ToPos = LasPos;
+
+				if(Pos==ToPos){
+					::new(buffer_begin()+ToPos) value_type(Value);
+				}else{
+					::new(buffer_begin()+ToPos) value_type(std::move(*(buffer_begin()+FromPos)));
+
+					while(Pos!=ToPos){
+						ToPos = FromPos;
+						if(FromPos==0)FromPos = max_size();
+						--FromPos;
+						*(buffer_begin()+ToPos) = std::move(*(buffer_begin()+FromPos));
+					}
+
+					*(buffer_begin()+ToPos) = Value;
+				}
+				return false;
+			}
+			void erase_by_pos(size_type Pos){
+				if(empty())return;
+
+				auto ToPos = Pos;
+				++Pos;
+				if(Pos==max_size())Pos=0;
+				auto FromPos = Pos;
+
+				while(ToPos != LasPos){
+					*(buffer_begin()+ToPos) = std::move(*(buffer_begin()+FromPos));
+
+					ToPos = FromPos;
+					++FromPos;
+					if(FromPos==max_size())FromPos=0;
+				}
+				(buffer_begin()+LasPos)->~value_type();
+				if(LasPos==0)LasPos=max_size();
+				--LasPos;
+				--Size;
+			}
+		private:
+			alignas(alignof(T)) unsigned char Buf[sizeof(T)*(MaxSize+1)];
+			size_type BegPos;
+			size_type LasPos;
+			unsigned int Size;
+		};
 	public:
-		reference at(difference_type pos){ return Beg[pos]; }
-		const_reference at(difference_type pos)const{ return Beg[pos]; }
-		reference operator[](difference_type pos){ return Beg[pos]; }
-		const_reference operator[](difference_type pos)const{ return Beg[pos]; }
-		reference front(){ return *Beg; }
-		const_reference front()const{ return *Beg; }
-		reference back(){ return End[-1]; }
-		const_reference back()const{ return End[-1]; }
+		struct const_iterator{
+		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = typename this_type::value_type;
+			using difference_type = typename this_type::difference_type;
+			using pointer = typename this_type::const_pointer;
+			using reference = typename this_type::const_reference;
+		private:
+			size_type Pos;
+			const base_type* Base;
+		public:
+			const_iterator()=default;
+			const_iterator(size_type Pos_, const base_type* Base_): Pos(Pos_), Base(Base_){}
+		public:
+			const_iterator& operator++(){
+				++Pos;
+				if(Pos == this_type::max_size()) Pos = 0;
+				return *this;
+			}
+			const_iterator operator++(int){
+				auto Prv = *this;
+				operator++();
+				return Prv;
+			}
+			const_iterator& operator--(){
+				if(Pos == 0) Pos = this_type::max_size();
+				--Pos;
+				return *this;
+			}
+			const_iterator operator--(int){
+				auto Prv = *this;
+				operator--();
+				return Prv;
+			}
+			const_iterator& operator+=(difference_type n){
+				Pos = hmLib::euclidean_mod(Pos + n, Base->buffer_size());
+				return *this;
+			}
+			const_iterator& operator-=(difference_type n){
+				Pos = hmLib::euclidean_mod(Pos - n, Base->buffer_size());
+				return *this;
+			}
+			reference operator*(){ return Base->reference_by_pos(Pos); }
+			pointer operator->(){ return Base->pointer_by_pos(Pos); }
+			reference operator[](difference_type n){
+				return Base->reference_by_pos(hmLib::euclidean_mod(Pos + n, Base->buffer_size()));
+			}
+			friend const_iterator operator+(const const_iterator& Itr, difference_type n){
+				auto Ans = Itr;
+				Ans += n;
+				return Ans;
+			}
+			friend const_iterator operator+(difference_type n, const const_iterator& Itr){
+				return operator+(Itr, n);
+			}
+			friend const_iterator operator-(const const_iterator& Itr, difference_type n){
+				auto Ans = Itr;
+				Ans -= n;
+				return Ans;
+			}
+			friend difference_type operator-(const const_iterator& itr1, const_iterator itr2){
+				difference_type pos1 = itr1.Pos + (*(itr1.pBegPos) > itr1.Pos ? (itr1.End-itr1.Beg) : 0 ) - *(itr1.pBegPos);
+				difference_type pos2 = itr2.Pos + (*(itr2.pBegPos) > itr2.Pos ? (itr2.End-itr2.Beg) : 0 ) - *(itr2.pBegPos);
+				return pos1 - pos2;
+			}
+			friend bool operator==(const this_type& itr1, const this_type& itr2){
+				return itr1.Pos == itr2.Pos;
+			}
+			friend bool operator!=(const this_type& itr1, const this_type& itr2){
+				return !(itr1.Pos == itr2.Pos);
+			}
+			friend bool operator<(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 < 0
+			}
+			friend bool operator>(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 > 0
+			}
+			friend bool operator<=(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 <= 0
+			}
+			friend bool operator>=(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 >= 0
+			}
+		};
+		struct iterator{
+		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = typename this_type::value_type;
+			using difference_type = typename this_type::difference_type;
+			using pointer = typename this_type::pointer;
+			using reference = typename this_type::reference;
+		private:
+			size_type Pos;
+			base_type* Base;
+		public:
+			iterator()=default;
+			iterator(size_type Pos_, base_type* Base_): Pos(Pos_), Base(Base_){}
+			operator const_iterator()const{return const_iterator(Pos,Base);}
+		public:
+			iterator& operator++(){
+				++Pos;
+				if(Pos == this_type::max_size()) Pos = 0;
+				return *this;
+			}
+			iterator operator++(int){
+				auto Prv = *this;
+				operator++();
+				return Prv;
+			}
+			iterator& operator--(){
+				if(Pos == 0) Pos = this_type::max_size();
+				--Pos;
+				return *this;
+			}
+			iterator operator--(int){
+				auto Prv = *this;
+				operator--();
+				return Prv;
+			}
+			iterator& operator+=(difference_type n){
+				Pos = hmLib::euclidean_mod(Pos + n, Base->buffer_size());
+				return *this;
+			}
+			iterator& operator-=(difference_type n){
+				Pos = hmLib::euclidean_mod(Pos - n, Base->buffer_size());
+				return *this;
+			}
+			reference operator*(){ return Base->reference_by_pos(Pos); }
+			pointer operator->(){ return Base->pointer_by_pos(Pos); }
+			reference operator[](difference_type n){
+				return Base->reference_by_pos(hmLib::euclidean_mod(Pos + n, Base->buffer_size()));
+			}
+			friend iterator operator+(const iterator& Itr, difference_type n){
+				auto Ans = Itr;
+				Ans += n;
+				return Ans;
+			}
+			friend iterator operator+(difference_type n, const iterator& Itr){
+				return operator+(Itr, n);
+			}
+			friend iterator operator-(const iterator& Itr, difference_type n){
+				auto Ans = Itr;
+				Ans -= n;
+				return Ans;
+			}
+			friend difference_type operator-(const iterator& itr1, iterator itr2){
+				difference_type pos1 = itr1.Pos + (*(itr1.pBegPos) > itr1.Pos ? (itr1.End-itr1.Beg) : 0 ) - *(itr1.pBegPos);
+				difference_type pos2 = itr2.Pos + (*(itr2.pBegPos) > itr2.Pos ? (itr2.End-itr2.Beg) : 0 ) - *(itr2.pBegPos);
+				return pos1 - pos2;
+			}
+			friend bool operator==(const this_type& itr1, const this_type& itr2){
+				return itr1.Pos == itr2.Pos;
+			}
+			friend bool operator!=(const this_type& itr1, const this_type& itr2){
+				return !(itr1.Pos == itr2.Pos);
+			}
+			friend bool operator<(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 < 0
+			}
+			friend bool operator>(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 > 0
+			}
+			friend bool operator<=(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 <= 0
+			}
+			friend bool operator>=(const this_type& itr1, const this_type& itr2){
+				return itr1 - itr2 >= 0
+			}
+		};
+	private:
+		std::unique_ptr<base_type> Base;
+	public:
+		reference at(difference_type n){ 
+			hmLib_assert(n<size(), hmLib::exceptions::access::out_of_range_access, "circular access error: out of range.");
+			return Base->reference_by_pos(Base->index_to_pos(n)); 
+		}
+		const_reference at(difference_type n)const{
+			hmLib_assert(n<size(), hmLib::exceptions::access::out_of_range_access, "circular access error: out of range.");
+			return Base->reference_by_pos(Base->index_to_pos(n)); 
+		}
+		reference operator[](difference_type pos)noexcept{
+			return Base->reference_by_pos(Base->index_to_pos(n)); 
+		}
+		const_reference operator[](difference_type pos)const noexcept{
+			return Base->reference_by_pos(Base->index_to_pos(n)); 
+		}
+		reference front(){ return Base->front(); }
+		const_reference front()const{ return Base->front(); }
+		reference back(){ return Base->back(); }
+		const_reference back()const{ return Base->back(); }
+		bool empty()const{ return (!static_cast<bool>(Base)) || Base->empty();}
+		bool full()const{ return static_cast<bool>(Base) && Base->full(); }
+		size_type size()const{ if(!static_cast<bool>(Base)) return 0; return Base->size(); }
+		static constexpr size_type max_size() { return MaxSize; }
+		static constexpr size_type static_size() { return MaxSize; }
+		size_type remain()const{ return max_size() - size(); }
 	public:
 		bool push_back(const_reference Value){
-			if(full())return true;
-			::new(End.base()) value_type(Value);
-			++End;
-			++Size;
-			return false;
-		}
-		bool rotete_back(const_reference Value) {
-			if(full()) {
-				(*Beg).~value_type();
-				++Beg;
-				::new(End.base()) value_type(Value);
-				++End;
-				return true;
-			} else {
-				::new(End.base()) value_type(Value);
-				++End;
-				++Size;
-				return false;
-			}
-		}
-		void pop_back(){
-			if(empty())return;
-			End[-1].~value_type();
-			--End;
-			--Size;
+			if(!Base)Base = std::make_unique<base_type>();
+			return Base->push_back(Value);
 		}
 		bool push_front(const_reference Value){
-			if(full())return true;
-			::new((Beg - 1).base()) value_type(Value);
-			--Beg;
-			++Size;
-			return false;
+			if(!Base)Base = std::make_unique<base_type>();
+			return Base->push_front(Value);
 		}
-		bool rotete_front(const_reference Value) {
-			if(full()) {
-				End[-1].~value_type();
-				--End;
-				::new((Beg - 1).base()) value_type(Value);
-				--Beg;
-				return true;
-			} else {
-				::new((Beg - 1).base()) value_type(Value);
-				--Beg;
-				++Size;
-				return false;
-			}
+		void pop_back(){
+			if(Base)Base->pop_back(Value);
 		}
 		void pop_front(){
-			if(empty())return;
-			(*Beg).~value_type();
-			++Beg;
-			--Size;
+			if(Base)Base->pop_back(Value);
+		}
+		bool rotete_back(const_reference Value) {
+			if(!Base)Base = std::make_unique<base_type>();
+			return Base->rotete_back(Value);
+		}
+		bool rotete_front(const_reference Value) {
+			if(!Base)Base = std::make_unique<base_type>();
+			return Base->rotete_front(Value);
 		}
 		void clear(){
-			iterator Itr = Beg;
-			while(Itr != End){
-				pointer Ptr = &(*Itr);
-				Ptr->~value_type();
-				++Itr;
-			}
-			Beg = End;
-			Size = 0;
+			if(Base)Base->clear();
 		}
+	public:
+		iterator begin(){ return Beg; }
+		iterator end(){ return End; }
+		const_iterator begin()const{ return Beg; }
+		const_iterator end()const{ return End; }
+		const_iterator cbegin()const{ return Beg; }
+		const_iterator cend()const{ return End; }
+	public:
 		iterator insert(const_iterator Itr, const_reference Value){
-			if(full())return End;
-
-			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
-				//insert_front
-				iterator From = Beg;
-				iterator To = Beg - 1;
-
-				if(Beg == Itr){
-					::new(To.base()) value_type(Value);
-				} else{
-					::new(To.base()) value_type(*From);
-
-					++From;
-					++To;
-
-					while(To != Itr){
-						*To = *From;
-
-						++From;
-						++To;
-					}
-
-					*To = Value;
-				}
-
-				--Beg;
-				++Size;
-				return To;
-			} else{
-				//insert_back
-				iterator From = End - 1;
-				iterator To = End;
-
-				if(Itr == End){
-					::new(To.base()) value_type(Value);
-				} else{
-					::new(To.base()) value_type(*From);
-
-					--From;
-					--To;
-
-					while(To != Itr){
-						*To = *From;
-
-						--From;
-						--To;
-					}
-
-					*To = Value;
-				}
-
-				++End;
-				++Size;
-				return To;
-			}
+			if(!Base)Base = std::make_unique<base_type>();
+			Base->insert_by_pos(Itr.Pos,Value);
 		}
 		template<typename input_iterator>
-		iterator insert(const_iterator Itr, input_iterator Begin_, input_iterator End_){
-			int N = std::distance(Begin_, End_);
-			if(static_cast<int>(remain() )< N || N == 0)return End;
-
-			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
-				//insert_front
-				iterator From = Beg;
-				iterator To = Beg - N;
-
-				int n = N;
-				while(To != Itr){
-					if(n > 0){
-						::new(To.base()) value_type(*From);
-						--n;
-					} else{
-						*To = *From;
-					}
-
-					++From;
-					++To;
-				}
-
-				To = From;
-				for(; Begin_ != End_; ++Begin_){
-					if(n > 0){
-						::new(To.base()) value_type(*Begin_);
-						--n;
-					} else{
-						*To = *Begin_;
-					}
-					++To;
-				}
-
-				Beg -= N;
-				Size += N;
-
-				return From;
-			} else{
-				//insert_back
-				iterator From = End;
-				iterator To = From + N;
-
-				int n = N;
-				while(From != Itr){
-					--From;
-					--To;
-
-					if(n > 0){
-						::new(To.base()) value_type(*From);
-						--n;
-					} else{
-						*To = *From;
-					}
-				}
-
-				n = N - n;
-				To = From;
-				for(; Begin_ != End_; ++Begin_){
-					if(n > 0){
-						*To = *Begin_;
-						--n;
-					} else{
-						::new(To.base()) value_type(*Begin_);
-					}
-					++To;
-				}
-
-				End += N;
-				Size += N;
-
-				return From;
-			}
+		iterator insert(const_iterator Itr, input_iterator Begin, input_iterator End){
+			if(!Base)Base = std::make_unique<base_type>();
+			Base->insert_by_pos(Itr.Pos,Begin,End);
 		}
 		iterator erase(const_iterator Itr){
-			if(empty())return End;
-			if(Itr == cend())return End;
 
-			if(std::distance<const_iterator>(Beg, Itr) < static_cast<int>(size() / 2)){
-				//erase_front
-				iterator To(Itr.base(), *this);
-				iterator From = To - 1;
-
-				while(To != Beg){
-					*To = *From;
-
-					--From;
-					--To;
-				}
-
-				Beg->~value_type();
-				++Beg;
-				--Size;
-				return iterator(Itr.base(), *this) + 1;
-			} else{
-				//erase_back
-				iterator To(Itr.base(), *this);
-				iterator From = To + 1;
-
-				while(From != End){
-					*To = *From;
-
-					++From;
-					++To;
-				}
-
-				To->~value_type();
-				--End;
-				--Size;
-				return iterator(Itr.base(), *this);
-			}
 		}
 		iterator erase(const_iterator Begin_, const_iterator End_){
 			int N = std::distance(Begin_, End_);
@@ -677,19 +477,6 @@ namespace hmLib{
 			}
 
 		}
-	public:
-		iterator begin(){ return Beg; }
-		iterator end(){ return End; }
-		const_iterator begin()const{ return Beg; }
-		const_iterator end()const{ return End; }
-		const_iterator cbegin()const{ return Beg; }
-		const_iterator cend()const{ return End; }
-	public:
-		bool empty()const{ return Size == 0; }
-		bool full()const{ return Size == max_size(); }
-		size_type size()const{ return Size; }
-		constexpr size_type max_size()const { return Size_; }
-		size_type remain()const{ return max_size() - size(); }
 	};
 }
 #
