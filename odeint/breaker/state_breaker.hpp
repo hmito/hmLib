@@ -6,6 +6,38 @@
 #include "../../geometry.hpp"
 namespace hmLib{
 	namespace odeint{
+		template<typename state_type_, unsigned int container_size_>
+		struct converging_steps_breaker {
+			using state = state_type_;
+		private:
+			std::array<state, container_size_>;
+			unsigned int Cnt;
+			unsigned int Interval;
+			state x1;
+			state x2;
+			double dis1;
+			double dis2;
+			double dis1L;
+			double converging_rate;
+		public:
+			converging_steps_breaker(unsigned int Interval_, state_range_accessor Accessor_, double Tolerance_) :Cnt(0), Interval(Interval_), Accessor(Accessor_), Tolerance(Tolerance_){}
+			template<typename state_type, typename time_type>
+			bool operator()(const state_type& x, time_type t) {
+				dis1 += hmLib::odeint::distance_norm_inf(x, x1); 
+				dis2 += hmLib::odeint::distance_norm_inf(x, x2);
+
+				if(Cnt==Interval){
+					if(dis1L*converging_rate > dis2 & dis1*converging_rate > dis2)return true;
+					dis1L = dis1;
+					x2 = std::move(x1);
+					x1 = x;
+					Cnt = 0;
+				}
+
+				++Cnt;
+				return false;
+			}
+		};
 		template<typename state_range_accessor_>
 		struct equal_state_breaker {
 		public:
