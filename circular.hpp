@@ -5,13 +5,13 @@
 #include<type_traits>
 #include "aligned_heap.hpp"
 #include "algorithm/compare.hpp"
-#include "exception.hpp"
+#include "exceptions.hpp"
 #include "exceptions/access_exceptions.hpp"
 namespace hmLib{
 	namespace detail{
 		template<std::size_t Size,typename integral_type_ = std::size_t>
 		struct circular_integral{
-			using this_type = circular_integral<Size>;
+			using this_type = circular_integral<Size,integral_type_>;
 			using integral_type = integral_type_;
 			using size_type = std::size_t;
 			using difference_type = decltype(std::declval<integral_type>() - std::declval<integral_type>());
@@ -20,7 +20,7 @@ namespace hmLib{
 			integral_type idx;
 		public:
 			circular_integral()=default;
-			explicit circular_integral(size_type idx_)noexcepts:idx(idx_%static_size()){}
+			explicit circular_integral(size_type idx_)noexcept:idx(idx_%static_size()){}
 			circular_integral(const this_type&)=default;
 			this_type& operator=(const this_type&)=default;
 			circular_integral(this_type&&)=default;
@@ -59,17 +59,17 @@ namespace hmLib{
 			difference_type advance_to(const this_type& target)const{
 				return target.advance_from(*this);
 			}
-			friend static this_type operator+(const this_type& my, difference_type n)noexcept{
+			friend this_type operator+(const this_type& my, difference_type n)noexcept{
 				auto ans = my;
 				my+=n;
 				return ans;
 			}
-			friend static this_type operator+(difference_type n, const this_type& my)noexcept{
+			friend this_type operator+(difference_type n, const this_type& my)noexcept{
 				auto ans = my;
 				my+=n;
 				return ans;
 			}
-			friend static this_type operator-(const this_type& my, difference_type n)noexcept{
+			friend this_type operator-(const this_type& my, difference_type n)noexcept{
 				auto ans = my;
 				my-=n;
 				return ans;
@@ -133,9 +133,9 @@ namespace hmLib{
 				Idx-=n;
 				return *this;
 			}
-			reference operator*(){ return *(Base->ptr(Idx)); }
-			pointer operator->(){ return Base->ptr(Idx); }
-			reference operator[](difference_type n){return *(Base->ptr(Idx+n));}
+			reference operator*(){ return *(This->ptr(Idx)); }
+			pointer operator->(){ return This->ptr(Idx); }
+			reference operator[](difference_type n){return *(This->ptr(Idx+n));}
 			friend this_type operator+(const this_type& Itr, difference_type n){
 				auto Ans = Itr;
 				Ans += n;
@@ -152,8 +152,8 @@ namespace hmLib{
 				return Ans;
 			}
 			friend difference_type operator-(const this_type& itr1, this_type itr2){
-				difference_type pos1 = itr1.Base->begin_index().advance_to(itr1.Idx);
-				difference_type pos2 = itr2.Base->begin_index().advance_to(itr2.Idx);
+				difference_type pos1 = itr1.This->begin_index().advance_to(itr1.Idx);
+				difference_type pos2 = itr2.This->begin_index().advance_to(itr2.Idx);
 				return pos1 - pos2;
 			}
 			friend bool operator==(const this_type& itr1, const this_type& itr2){
@@ -217,9 +217,9 @@ namespace hmLib{
 				Idx-=n;
 				return *this;
 			}
-			reference operator*(){ return *(Base->ptr(Idx)); }
-			pointer operator->(){ return Base->ptr(Idx); }
-			reference operator[](difference_type n){return *(Base->ptr(Idx+n));}
+			reference operator*(){ return *(This->ptr(Idx)); }
+			pointer operator->(){ return This->ptr(Idx); }
+			reference operator[](difference_type n){return *(This->ptr(Idx+n));}
 			friend this_type operator+(const this_type& Itr, difference_type n){
 				auto Ans = Itr;
 				Ans += n;
@@ -236,8 +236,8 @@ namespace hmLib{
 				return Ans;
 			}
 			friend difference_type operator-(const this_type& itr1, this_type itr2){
-				difference_type pos1 = itr1.Base->begin_index().advance_to(itr1.Idx);
-				difference_type pos2 = itr2.Base->begin_index().advance_to(itr2.Idx);
+				difference_type pos1 = itr1.This->begin_index().advance_to(itr1.Idx);
+				difference_type pos2 = itr2.This->begin_index().advance_to(itr2.Idx);
 				return pos1 - pos2;
 			}
 			friend bool operator==(const this_type& itr1, const this_type& itr2){
@@ -260,7 +260,7 @@ namespace hmLib{
 			}
 		};
 	public:
-		circular():BegIdx(0),EndIdx(0),Size(0){}
+		circular():BegIdx(0),EndIdx(0){}
 		circular(size_type n, const_reference val):circular(){
 			assign(n,val);
 		}
@@ -268,7 +268,6 @@ namespace hmLib{
 		circular(input_iterator first, input_iterator last):circular(){
 			assign(first,last);
 		}
-		circular():BegIdx(0),EndIdx(0),Size(0){}
 		circular(const this_type& my):circular(){
 			assign(my.begin(),my.end());
 		}
@@ -319,10 +318,10 @@ namespace hmLib{
 	public:
 		iterator begin(){return iterator(BegIdx,this);}
 		iterator end(){return iterator(EndIdx,this);}
-		const_iterator begin(){return const_iterator(BegIdx,this);}
-		const_iterator end(){return const_iterator(EndIdx,this);}
-		const_iterator cbegin(){return const_iterator(BegIdx,this);}
-		const_iterator cend(){return const_iterator(EndIdx,this);}
+		const_iterator begin()const{return const_iterator(BegIdx,this);}
+		const_iterator end()const{return const_iterator(EndIdx,this);}
+		const_iterator cbegin()const{return const_iterator(BegIdx,this);}
+		const_iterator cend()const{return const_iterator(EndIdx,this);}
 		reference front(){return *ptr(BegIdx);}
 		const_reference front()const{return *ptr(BegIdx);}
 		reference back(){return *ptr(EndIdx-1);}
@@ -499,7 +498,7 @@ namespace hmLib{
 		}
 		iterator insert(const_iterator itr, size_type n, const_reference val){
 			auto Num = n;
-			if(remain() < Num) return end_index();
+			if(remain() < Num) return end();
 
 			auto From = EndIdx;
 			--From;
@@ -535,7 +534,7 @@ namespace hmLib{
 		template<typename input_iterator>
 		iterator insert(const_iterator itr, input_iterator first, input_iterator last){
 			auto Num = std::distance(first,last);
-			if(remain() < Num) return end_index();
+			if(remain() < Num) return end();
 
 			auto From = EndIdx;
 			--From;
@@ -543,7 +542,7 @@ namespace hmLib{
 			auto To = EndIdx;
 			--To;
 
-			auto LasIdx = itr.index() + (n-1);
+			auto LasIdx = itr.index() + (Num-1);
 			auto NewNum = Num;
 			while(To!=LasIdx){
 				if(NewNum>0){
@@ -606,7 +605,7 @@ namespace hmLib{
 			return iterator( first.index(), this);
 		}
 	private:
-		alignas(alignof(T)) unsigned char Buf[sizeof(T)*buffer_size()];
+		alignas(alignof(T)) unsigned char Buf[sizeof(T)*index_type::static_size()];
 		index_type BegIdx;
 		index_type EndIdx;
 	};
