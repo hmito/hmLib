@@ -1,41 +1,60 @@
 #ifndef HMLIB_ODEINT_STATEBREAKOBSERVER_INC
 #define HMLIB_ODEINT_STATEBREAKOBSERVER_INC 100
 #
-#include <array>
-#include "../utility.hpp"
+#include <vector>
+#include "../../statistics/linear_regression.hpp"
+#include "../../circular.hpp"
 #include "../../geometry.hpp"
+#include "../../iterators/integer_iterator.hpp"
+#include "../utility.hpp"
 namespace hmLib{
 	namespace odeint{
-		template<typename state_type_, unsigned int container_size_>
+		template<typename state_type_, std::size_t container_size_>
 		struct converging_steps_breaker {
+			static_assert(container_size_>2);
 			using state = state_type_;
 		private:
-			std::array<state, container_size_>;
+			hmLib::circular<state, container_size_> Buf;
 			unsigned int Cnt;
 			unsigned int Interval;
-			state x1;
-			state x2;
-			double dis1;
-			double dis2;
-			double dis1L;
-			double converging_rate;
+			double distance_torelance;
+			double slope_torelance;
 		public:
-			converging_steps_breaker(unsigned int Interval_, state_range_accessor Accessor_, double Tolerance_) :Cnt(0), Interval(Interval_), Accessor(Accessor_), Tolerance(Tolerance_){}
+			converging_steps_breaker(unsigned int Interval_, double Tolerance_) 
+				: Cnt(0)
+				, Interval(Interval_)
+				, Accessor(Accessor_)
+				, Tolerance(Tolerance_){
+			}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& x, time_type t) {
-				dis1 += hmLib::odeint::distance_norm_inf(x, x1); 
-				dis2 += hmLib::odeint::distance_norm_inf(x, x2);
+				if(++Cnt < Interval)return false;
+				Cnt = 0;
 
-				if(Cnt==Interval){
-					if(dis1L*converging_rate > dis2 & dis1*converging_rate > dis2)return true;
-					dis1L = dis1;
-					x2 = std::move(x1);
-					x1 = x;
-					Cnt = 0;
+				bool EndFlag = true;
+				if(Buf.size() > 1){
+					std::vector<double> Nrm;
+					for(const auto& px: Buf){
+						auto dis = hmLib::odeint::distance_norm_inf(x, px);
+						if(dis >= distance_torelance){
+							EndFlag = false;
+							break;
+						}
+						Nrm.push_back(dis);
+					}
+
+					if(EndFlag && Nrm.size()>1){
+						auto xrange = hmLib::make_integer_range(0,Nrm.size());
+						auto prm = hmLib::statistics::linaer_regression(xrange.begin(),xrange.end(),Nrm.begin());
+
+						if(std::abs(prm.first) >= slope_torelance){
+							EndFlag = false;
+						}
+					}
 				}
+				Buf.rotate_back(x);
 
-				++Cnt;
-				return false;
+				return EndFlag;
 			}
 		};
 		template<typename state_range_accessor_>
