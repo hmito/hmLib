@@ -199,3 +199,5 @@ hmLib_config\.h
 *.manifest
 
 .DS_Store
+
+*.testlog
