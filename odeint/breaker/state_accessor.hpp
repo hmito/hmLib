@@ -26,7 +26,7 @@ namespace hmLib{
 		public:
 			recent_range_accessor(const container& ref_, std::size_t n_):ref(ref_),n(n_){}
 			auto operator()()const{
-				return hmLib::make_range(std::next(ref.begin(),std::min<int>(0,std::distance(ref.begin(),ref.end())-n)),ref.end());
+				return hmLib::make_range(std::next(ref.begin(),std::max<int>(0,std::distance(ref.begin(),ref.end())-n)),ref.end());
 			}		
 		};
 		template<typename container>
