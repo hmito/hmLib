@@ -9,32 +9,28 @@
 #include "../utility.hpp"
 namespace hmLib{
 	namespace odeint{
-		template<typename state_type_, std::size_t container_size_>
-		struct converging_steps_breaker {
-			static_assert(container_size_>2);
-			using state = state_type_;
+		template<typename state_range_accessor_>
+		struct converging_step_breaker {
+		public:
+			using state_range_accessor = state_range_accessor_;
 		private:
-			hmLib::circular<state, container_size_> Buf;
-			unsigned int Cnt;
-			unsigned int Interval;
+			state_range_accessor accessor;
 			double distance_torelance;
 			double slope_torelance;
 		public:
-			converging_steps_breaker(unsigned int Interval_, double Tolerance_) 
-				: Cnt(0)
-				, Interval(Interval_)
-				, Accessor(Accessor_)
-				, Tolerance(Tolerance_){
+			converging_step_breaker(state_range_accessor accessor_, double distance_torelance_, double slope_torelance_) 
+				: accessor(std::move(accessor_))
+				, distance_torelance(distance_torelance_)
+				, slope_torelance(slope_torelance_){
 			}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& x, time_type t) {
-				if(++Cnt < Interval)return false;
-				Cnt = 0;
-
 				bool EndFlag = true;
-				if(Buf.size() > 1){
+
+				auto Range = accessor();
+				if(std::distance(Range.begin(), Range.end()) > 1){
 					std::vector<double> Nrm;
-					for(const auto& px: Buf){
+					for(const auto& px: Range){
 						auto dis = hmLib::odeint::distance_norm_inf(x, px);
 						if(dis >= distance_torelance){
 							EndFlag = false;
@@ -44,7 +40,7 @@ namespace hmLib{
 					}
 
 					if(EndFlag && Nrm.size()>1){
-						auto xrange = hmLib::make_integer_range(0,Nrm.size());
+						auto xrange = hmLib::make_integer_range<std::size_t>(0,Nrm.size());
 						auto prm = hmLib::statistics::linaer_regression(xrange.begin(),xrange.end(),Nrm.begin());
 
 						if(std::abs(prm.first) >= slope_torelance){
@@ -52,64 +48,66 @@ namespace hmLib{
 						}
 					}
 				}
-				Buf.rotate_back(x);
-
 				return EndFlag;
 			}
 		};
+		template<typename state_range_accessor_>
+		auto make_converging_step_breaker(state_range_accessor_ accessor_, double distance_torelance_, double slope_torelance_) {
+			return converging_step_breaker<state_range_accessor_>(accessor_, distance_torelance_, slope_torelance_);
+		}
 		template<typename state_range_accessor_>
 		struct equal_state_breaker {
 		public:
 			using state_range_accessor = state_range_accessor_;
 		private:
-			unsigned int Cnt;
-			unsigned int Interval;
-			state_range_accessor Accessor;
-			double Tolerance;
+			state_range_accessor accessor;
+			double distance_torelance;
 		public:
-			equal_state_breaker(unsigned int Interval_, state_range_accessor Accessor_, double Tolerance_) :Cnt(0), Interval(Interval_), Accessor(Accessor_), Tolerance(Tolerance_){}
+			equal_state_breaker(state_range_accessor accessor_, double distance_torelance_) 
+				: accessor(accessor_)
+				, distance_torelance(distance_torelance_){
+			}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& x, time_type t) {
-				if (++Cnt < Interval)return false;
-				Cnt = 0;
-
-				auto Range = Accessor();
+				auto Range = accessor();
 				for (const auto& sx: Range) {
-					if (hmLib::odeint::distance_norm_inf(x, sx) < Tolerance) {
+					if (hmLib::odeint::distance_norm_inf(x, sx) < distance_torelance) {
 						return true;
 					}
 				}
-
 				return false;
 			}
 		};
 		template<typename state_range_accessor_>
-		struct cross_state_breaker {
+		auto make_equal_state_breaker(state_range_accessor_ accessor_, double distance_torelance_){
+			return equal_state_breaker<state_range_accessor_>(accessor_, distance_torelance_);
+		}
+		template<typename state_range_accessor_>
+		struct cross_step_breaker {
 		public:
 			using state_range_accessor = state_range_accessor_;
 		private:
-			unsigned int Cnt;
-			unsigned int Interval;
-			state_range_accessor Accessor;
+			state_range_accessor accessor;
 		public:
-			cross_state_breaker(unsigned int Interval_, state_range_accessor Accessor_) :Cnt(0), Interval(Interval_), Accessor(Accessor_){}
+			explicit cross_step_breaker(state_range_accessor accessor_) :accessor(accessor_){}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& x, time_type t) {
-				if (++Cnt < Interval)return false;
-				Cnt = 0;
-
-				auto Range = Accessor();
-				auto Last = std::next(std::begin(Range), std::distance(std::begin(), std::end()) - 1);
+				auto Range = accessor();
+				auto Last = std::next(std::begin(Range), std::distance(std::begin(Range), std::end(Range)) - 1);
 				auto Prev = std::begin(Range);
-				auto s1 = hmLib::plane_geometry::make_semgnet(hmLib::plane_geometry::make_point(x), hmLib::plane_geometry::make_point(*Last));
+				auto s1 = hmLib::plane_geometry::make_segment(hmLib::plane_geometry::make_point(x), hmLib::plane_geometry::make_point(*Last));
 				for (auto Itr = std::next(Prev); Prev != Last; ++Itr, ++Prev) {
-					auto s2 = hmLib::plane_geometry::make_semgnet(hmLib::plane_geometry::make_point(*Itr), hmLib::plane_geometry::make_point(*Prev));
+					auto s2 = hmLib::plane_geometry::make_segment(hmLib::plane_geometry::make_point(*Itr), hmLib::plane_geometry::make_point(*Prev));
 
 					if(hmLib::plane_geometry::is_cross(s1, s2))return true;
 				}
 				return false;
 			}
 		};
+		template<typename state_range_accessor_>
+		auto make_cross_step_breakerr(state_range_accessor_ accessor_){
+			return cross_step_breaker<state_range_accessor_>(accessor_); 
+		}
 	}
 }
 #
