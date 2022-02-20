@@ -25,30 +25,20 @@ namespace hmLib{
 			}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& x, time_type t) {
-				bool EndFlag = true;
-
 				auto Range = accessor();
-				if(std::distance(Range.begin(), Range.end()) > 1){
-					std::vector<double> Nrm;
-					for(const auto& px: Range){
-						auto dis = hmLib::odeint::distance_norm_inf(x, px);
-						if(dis >= distance_torelance){
-							EndFlag = false;
-							break;
-						}
-						Nrm.push_back(dis);
-					}
+				if (std::distance(Range.begin(), Range.end()) <= 1)return false;
 
-					if(EndFlag && Nrm.size()>1){
-						auto xrange = hmLib::make_integer_range<std::size_t>(0,Nrm.size());
-						auto prm = hmLib::statistics::linaer_regression(xrange.begin(),xrange.end(),Nrm.begin());
-
-						if(std::abs(prm.first) >= slope_torelance){
-							EndFlag = false;
-						}
-					}
+				std::vector<double> Nrm;
+				for(const auto& px: Range){
+					auto dis = hmLib::odeint::distance_norm_inf(x, px);
+					if (dis >= distance_torelance)return false;
+					Nrm.push_back(dis);
 				}
-				return EndFlag;
+
+				auto xrange = hmLib::make_integer_range<std::size_t>(0,Nrm.size());
+				auto prm = hmLib::statistics::linaer_regression(xrange.begin(),xrange.end(),Nrm.begin());
+
+				return (std::abs(prm.first) < slope_torelance);
 			}
 		};
 		template<typename state_range_accessor_>
