@@ -165,20 +165,37 @@ namespace hmLib{
 			double sigma;
 		};
 		template<typename fn, typename value_type, typename precision_breaker>
-		auto nelder_mead_minima(fn Fn, value_type ini, unsigned int maxitr, precision_breaker pbrk){
+		auto breakable_nelder_mead_minima(fn Fn, value_type ini, unsigned int maxitr, precision_breaker Brk){
 			nelder_mead_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
 			auto State = Stepper.make_state(Fn, ini, 0.2, 0.001);
 
 			for(unsigned int i = 0; i<maxitr; ++i){
-				if(pbrk(State))return make_minima_result(true, i, State.value(),State.fvalue());
+				if(Brk(State))return make_minima_result(true, i, State.value(),State.fvalue());
 				Stepper(Fn,State);
 			}
 
-			return make_minima_result(pbrk(State), maxitr,State.value(),State.fvalue());
+			return make_minima_result(Brk(State), maxitr,State.value(),State.fvalue());
+		}
+		template<typename fn, typename value_type, typename precision_breaker,typename observer>
+		auto breakable_nelder_mead_minima(fn Fn, value_type ini, unsigned int maxitr, precision_breaker Brk, observer Obs){
+			nelder_mead_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
+			auto State = Stepper.make_state(Fn, ini, 0.2, 0.001);
+
+			for(unsigned int i = 0; i<maxitr; ++i){
+				if(Brk(State))return make_minima_result(true, i, State.value(),State.fvalue());
+				Stepper(Fn,State);
+				Obs(State,i);
+			}
+
+			return make_minima_result(Brk(State), maxitr,State.value(),State.fvalue());
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto nelder_mead_minima(fn Fn, value_type ini, unsigned int maxitr, error_type relerr, error_type abserr){
-			return nelder_mead_minima(Fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr));
+			return breakable_nelder_mead_minima(Fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr));
+		}
+		template<typename fn, typename value_type, typename error_type,typename observer>
+		auto nelder_mead_minima(fn Fn, value_type ini, unsigned int maxitr, error_type relerr, error_type abserr, observer obs){
+			return breakable_nelder_mead_minima(Fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr), obs);
 		}
 	}
 }
