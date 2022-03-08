@@ -3,7 +3,6 @@
 #
 #include <vector>
 #include "../../statistics/linear_regression.hpp"
-#include "../../circular.hpp"
 #include "../../geometry.hpp"
 #include "../../iterators/integer_iterator.hpp"
 #include "../utility.hpp"

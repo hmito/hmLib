@@ -87,7 +87,7 @@ namespace hmLib{
 	private:
 		using this_type = circular<T,MaxSize>;
 	public:
-		using value_type = T ;
+		using value_type = T;
 		using reference = typename std::add_lvalue_reference<T>::type;
 		using rval_reference = typename std::add_rvalue_reference<T>::type;
 		using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
