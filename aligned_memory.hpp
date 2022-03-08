@@ -2,30 +2,62 @@
 #define HMLIB_ALIGNEDMEMORY_INC 100
 #include<memory>
 namespace hmLib{
-	template<typename T>
-	struct aligned_memory final{
+	template<typename T, std::size_t StackSize>
+	struct aligned_stack final{
+		using this_type = aligned_stack<T,StackSize>;
 		using pointer = T*;
 		using const_pointer = const T*;
-	private:
-		unsigned char* Ptr;
-		T* Beg;
-		T* End;
 	public:
-		aligned_memory():Ptr(nullptr),Beg(nullptr),End(nullptr){}
-		explicit aligned_memory(std::size_t n):aligned_memory(){
+		aligned_stack() = default;
+		aligned_stack(this_type&&) = delete;
+		this_type& operator=(this_type&&) = delete;
+		aligned_stack(const this_type&) = delete;
+		this_type& operator=(const this_type&) = delete;
+		~aligned_stack() = default;
+	public: //common functions for aligned memory classes
+		operator bool()const{return true;}
+		pointer begin(){return static_cast<pointer>(static_cast<void*>(Buf));}
+		pointer end(){return static_cast<pointer>(static_cast<void*>(Buf))+StackSize;}
+		const_pointer begin()const{return cbegin();}
+		const_pointer end()const{return cend();}
+		const_pointer cbegin()const{return static_cast<pointer>(static_cast<void*>(Buf));}
+		const_pointer cend()const{return static_cast<pointer>(static_cast<void*>(Buf))+StackSize;}
+		std::size_t size()const{return static_size();}
+	public:
+		static std::size_t static_size(){return StackSize;}
+	private:
+		alignas(alignof(T)) unsigned char Buf[sizeof(T)*StackSize];
+	};
+	template<typename T>
+	struct aligned_heap final{
+		using this_type = aligned_heap<T>;
+		using pointer = T*;
+		using const_pointer = const T*;
+	public:
+		aligned_heap()noexcept:Ptr(nullptr),Beg(nullptr),End(nullptr){}
+		explicit aligned_heap(std::size_t n):aligned_heap(){
 			allocate(n);
 		}
-		aligned_memory(aligned_memory<T>&& other):aligned_memory(){
+		aligned_heap(this_type&& other):aligned_heap(){
 			swap(other);
 		}
-		aligned_memory<T>& operator=(aligned_memory<T>&& other){
+		this_type& operator=(this_type&& other){
 			if(this != &other){
 				swap(other);
 			}			
 		}
-		aligned_memory(const aligned_memory<T>&)=delete;
-		aligned_memory<T>& operator=(const aligned_memory<T>&)=delete;
-		~aligned_memory(){deallocate();}
+		aligned_heap(const this_type&)=delete;
+		this_type& operator=(const this_type&)=delete;
+		~aligned_heap()noexcept{deallocate();}
+	public: //common functions for aligned memory classes
+		operator bool()const{return Beg!=nullptr;}
+		pointer begin(){return Beg;}
+		pointer end(){return End;}
+		const_pointer begin()const{return cbegin();}
+		const_pointer end()const{return cend();}
+		const_pointer cbegin()const{return Beg;}
+		const_pointer cend()const{return End;}
+		std::size_t size()const{return End-Beg;}
 	public:
 		void allocate(unsigned int n){
 			deallocate();
@@ -35,10 +67,10 @@ namespace hmLib{
             
             void* vPtr = Ptr;
             std::align(alignof(T), sizeof(T), vPtr,bufsize);
-			Beg = static_cast<T*>(vPtr);
+			Beg = static_cast<pointer>(vPtr);
 			if(Beg)End = Beg + n;
 		}
-		void deallocate(){
+		void deallocate()noexcept{
 			if(Ptr){
 				delete[] Ptr;
 				Ptr = nullptr;
@@ -46,102 +78,97 @@ namespace hmLib{
 				End = nullptr;
 			}
 		}
-		void swap(aligned_memory<T>& other){
+		void swap(this_type& other){
 			std::swap(Ptr, other.Ptr);
 			std::swap(Beg, other.Beg);
 			std::swap(End, other.End);
 		}
-		operator bool()const{return Beg!=nullptr;}
-		T* begin(){return Beg;}
-		T* end(){return End;}
-		std::size_t size()const{return End-Beg;}
-	};
-	template<typename T, unsigned int Size>
-	struct soo_aligned_memory final{
-		static_assert(std::is_trivial_copyable<T>::value, "sooaligned_memory can use only for a trivial-copyable class.")
-		using pointer = T*;
-		using const_pointer = const T*;
 	private:
 		unsigned char* Ptr;
-		alignof(T) unsigned char Buf[sizeof(T)*Size];
-		T* Beg;
-		T* End;
+		pointer Beg;
+		pointer End;
+	};
+	template<typename T, unsigned int SOOSize>
+	struct aligned_soo final{
+		using this_type = aligned_soo<T,SOOSize>;
+		using pointer = T*;
+		using const_pointer = const T*;
 	public:
-		soo_aligned_memory():Ptr(nullptr),Beg(nullptr),End(nullptr){}
-		explicit soo_aligned_memory(std::size_t n):soo_aligned_memory(){
+		aligned_soo()noexcept:Ptr(nullptr),Beg(nullptr),End(nullptr){}
+		explicit aligned_soo(std::size_t n):soo_aligned_memory(){
 			allocate(n);
 		}
-		soo_aligned_memory(soo_aligned_memory<T>&& other):soo_aligned_memory(){
-			if(other.ptr){
-				if(other.Ptr!=static_cast<unsigned char*>(other.Buf)){
-					Ptr = other.Ptr;
-					Beg = other.Beg;
-					End = other.End;
-				}else{
-					Ptr = Buf;
-					std::memcpy(Buf, other.Buf, sizeof(T)*other.size());
-					Beg = static_cast<T*>(static_cast<void*>(Ptr));
-					End = Beg + n;
-				}
-				other.Ptr = nullptr;
-				other.Beg = nullptr;
-				other.End = nullptr;
-			}
-		}
-		soo_aligned_memory<T>& operator=(soo_aligned_memory<T>&& other){
-			if(this != &other){
-				if(Ptr){
-					if(Ptr==Buf){
-
-					}
-				}
-			}			
-		}
-		soo_aligned_memory(const soo_aligned_memory<T>&)=delete;
-		soo_aligned_memory<T>& operator=(const soo_aligned_memory<T>&)=delete;
+		aligned_soo(this_type&&) = delete;
+		this_type& operator=(this_type&&) = delete;
+		soo_aligned_memory(const this_type&) = delete;
+		this_type& operator=(const this_type&) = delete;
 		~soo_aligned_memory(){deallocate();}
+	public: //common functions for aligned memory classes
+		operator bool()const{return Beg!=nullptr;}
+		pointer begin(){return Beg;}
+		pointer end(){return End;}
+		const_pointer begin()const{return cbegin();}
+		const_pointer end()const{return cend();}
+		const_pointer cbegin()const{return Beg;}
+		const_pointer cend()const{return End;}
+		std::size_t size()const{return End-Beg;}
 	public:
 		void allocate(unsigned int n){
-			deallocate();
+			if(on_heap()){
+				delete[] Ptr;
+				Ptr = nullptr;
+			}
 
-			if(n>Size){
+			if(n>soo_size()){
 				std::size_t bufsize = sizeof(T)*n + alignof(T);
 				Ptr = new unsigned char[bufsize];
 				
 				void* vPtr = Ptr;
 				std::align(alignof(T), sizeof(T), vPtr,bufsize);
-				Beg = static_cast<T*>(vPtr);
+				Beg = static_cast<pointer>(vPtr);
 				if(Beg)End = Beg + n;
 			}else{
-				Ptr = Buf;
-				Beg = static_cast<T*>(static_cast<void*>(Ptr));
+				Beg = static_cast<pointer>(static_cast<void*>(Ptr));
 				End = Beg + n;
 			}
 		}
-		void deallocate(){
-			if(Ptr){
-				if(Ptr!=Buf) delete[] Ptr;
+		void deallocate()noexcept{
+			if(on_heap()){
+				delete[] Ptr;
 				Ptr = nullptr;
-				Beg = nullptr;
-				End = nullptr;
 			}
+			Beg = nullptr;
+			End = nullptr;
 		}
-		void swap(soo_aligned_memory<T>& other){
-			if(Ptr!=static_cast<unsigned char*>(Buf)){
-				std::swap(Ptr, other.Ptr);
-				std::swap(Beg, other.Beg);
-				std::swap(End, other.End);
-			}else{
-				Ptr = static_cast<unsigned char*>(Buf);
-				std::memcpy(Buf, other.Buf, Size);
-				Beg = static_cast<T*>(static_cast<void*>(Ptr));
-				End = Beg + n;
-			}
+		bool try_move(this_type&& other)noexcept{
+			if(!other.on_heap()) return true;
+	
+			if(on_heap())delete[] Ptr;
+			Ptr = other.Ptr;
+			Beg = other.Beg;
+			End = other.End;
+			other.Ptr = nullptr;
+			other.Beg = nullptr;
+			other.End = nullptr;
+
+			return false;
 		}
-		operator bool()const{return Beg!=nullptr;}
-		T* begin(){return Beg;}
-		T* end(){return End;}
-		std::size_t size()const{return End-Beg;}
+		bool try_swap(this_type& other)noexcept{
+			if(!on_heap() || !other.on_heap()) return true;
+
+			std::swap(Ptr, other.Ptr);
+			std::swap(Beg, other.Beg);
+			std::swap(End, other.End);
+
+			return false;
+		}
+		bool on_heap()noexcept const{return Ptr!=nullptr;}
+		static std::size_t soo_size(){return SOOSize;}
+	private:
+		alignas(alignof(T)) unsigned char Buf[sizeof(T)*SOOSize];
+		unsigned char* Ptr;
+		pointer Beg;
+		pointer End;
 	};
 }
 #
