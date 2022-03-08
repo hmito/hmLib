@@ -11,7 +11,6 @@
 #include "iterators/overflow_iterator.hpp"
 //#include "iterators/plane_pos_iterator.hpp"
 #include "iterators/range.hpp"
-#include "iterators/rotate_iterator.hpp"
 #include "iterators/transform_iterator.hpp"
 #include "iterators/zip_iterator.hpp"
 #
