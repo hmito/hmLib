@@ -4,6 +4,7 @@
 #include<cmath>
 #include"minima_result.hpp"
 #include"range_precision_breaker.hpp"
+#include"../odeint/observer/null_observer.hpp"
 namespace hmLib{
     namespace minima{
 		template<typename value_type,typename fvalue_type = value_type>
@@ -25,19 +26,6 @@ namespace hmLib{
 			public:
 				state() = default;
 				template<typename fn>
-				state(fn f, value_type lowerval_, value_type upperval_)
-					: lowerval(lowerval_)
-					, upperval(upperval_)
-					, val1(upperval)
-					, val2(upperval)
-					, val3(upperval)
-					, fval1(f(upperval))
-					, fval2(f(upperval))
-					, fval3(f(upperval))
-					, delta(0)
-					, pdelta(0){
-				}
-				template<typename fn>
 				state(fn f, value_type lowerval_, value_type upperval_, value_type inival_)
 					: lowerval(lowerval_)
 					, upperval(upperval_)
@@ -55,10 +43,6 @@ namespace hmLib{
 				const value_type& lower()const{return lowerval;}
 				const value_type& upper()const{return upperval;}
 			};
-			template<typename fn>
-			state make_state(fn f, value_type lowerval, value_type upperval)const{
-				return state(f, lowerval, upperval);
-			}
 			template<typename fn>
 			state make_state(fn f, value_type lowerval, value_type upperval, value_type inival)const{
 				return state(f, lowerval, upperval, inival);
@@ -147,33 +131,34 @@ namespace hmLib{
 				}
 			}
 		};
-		template<typename fn, typename value_type, typename precision_breaker>
-		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
-			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
-			auto State = Stepper.make_state(Fn, lowerval, upperval);
-
-			for(unsigned int i = 0; i<maxitr; ++i){
-				if(pbrk(State))return make_minima_result(true, i, State.value(),State.fvalue());
-				Stepper(Fn,State,pbrk.precision(State));
-			}
-
-			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
-		}
-		template<typename fn, typename value_type, typename precision_breaker>
-		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker pbrk){
+		template<typename fn, typename value_type, typename precision_breaker, typename observer>
+		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker Brk, observer Obs){
 			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
 			auto State = Stepper.make_state(Fn, lowerval, upperval, inival);
 
 			for(unsigned int i = 0; i<maxitr; ++i){
-				if(pbrk(State))return make_minima_result(true, i, State.value(),State.fvalue());
-				Stepper(Fn,State,pbrk.precision(State));
+				if(Brk(State,i))return make_minima_result(true, i, State.value(),State.fvalue());
+				Stepper(Fn,State,Brk.precision(State));
+				Obs(State,i);
 			}
 
-			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
+			return make_minima_result(Brk(State,maxitr), maxitr, State.value(),State.fvalue());
 		}
-		template<typename fn, typename value_type, typename error_type>
-		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,make_range_precision_breaker(relerr,abserr));
+		template<typename fn, typename value_type, typename precision_breaker>
+		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker Brk){
+			brent_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
+			auto State = Stepper.make_state(Fn, lowerval, upperval, inival);
+
+			for(unsigned int i = 0; i<maxitr; ++i){
+				if(Brk(State,i))return make_minima_result(true, i, State.value(),State.fvalue());
+				Stepper(Fn,State,Brk.precision(State));
+			}
+
+			return make_minima_result(Brk(State,maxitr), maxitr, State.value(),State.fvalue());
+		}
+		template<typename fn, typename value_type, typename error_type, typename observer>
+		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_brent_minima(Fn, lowerval, upperval, inival, maxitr,make_range_precision_breaker(relerr,abserr),Obs);
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, error_type relerr, error_type abserr){

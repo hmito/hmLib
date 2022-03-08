@@ -23,15 +23,15 @@ namespace hmLib{
 			public:
 				state() = default;
 				template<typename fn>
-				state(fn f, value_type lowerval_, value_type upperval_)
+				state(fn f, value_type lowerval_, value_type upperval_, value_type inival_)
 					: lowerval(lowerval_)
 					, upperval(upperval_)
-					, val1(upperval)
-					, val2(upperval)
-					, val3(upperval)
-					, fval1(f(upperval))
-					, fval2(f(upperval))
-					, fval3(f(upperval)){
+					, val1(inival_)
+					, val2(inival_)
+					, val3(inival_)
+					, fval1(f(inival_))
+					, fval2(f(inival_))
+					, fval3(f(inival_)){
 				}
 				const value_type& value()const{return val1;}
 				const fvalue_type& fvalue()const{return fval1;}
@@ -39,8 +39,8 @@ namespace hmLib{
 				const value_type& upper()const{return upperval;}
 			};
 			template<typename fn>
-			state make_state(fn f, value_type lowerval, value_type upperval)const{
-				return state(f, lowerval, upperval);
+			state make_state(fn f, value_type lowerval, value_type upperval, value_type inival)const{
+				return state(f, lowerval, upperval, inival);
 			}
 			template<typename fn,typename error_type>
 			void operator()(fn f, state& x, error_type precision)const {
@@ -99,22 +99,39 @@ namespace hmLib{
 			}
 		};
 		template<typename fn, typename value_type, typename precision_breaker>
-		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker pbrk){
+		auto breakable_golden_section_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker Brk){
 			golden_section_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
-			auto State = Stepper.make_state(Fn, lowerval, upperval);
+			auto State = Stepper.make_state(Fn, lowerval, upperval, inival);
 
 			for(unsigned int i = 0; i<maxitr; ++i){
-				if(pbrk(State))return make_minima_result(true, i, State.value(),State.fvalue());
-				Stepper(Fn,State,pbrk.precision(State));
+				if(Brk(State,i))return make_minima_result(true, i, State.value(),State.fvalue());
+				Stepper(Fn,State,Brk.precision(State));
 			}
 
-			return make_minima_result(pbrk(State), maxitr, State.value(),State.fvalue());
+			return make_minima_result(pbrk(State,maxitr), maxitr, State.value(),State.fvalue());
+		}
+		template<typename fn, typename value_type, typename precision_breaker, typename observer>
+		auto breakable_golden_section_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, precision_breaker Brk, observer Obs){
+			golden_section_minima_stepper<value_type,decltype(std::declval<fn>()(std::declval<value_type>()))> Stepper;
+			auto State = Stepper.make_state(Fn, lowerval, upperval, inival);
+
+			for(unsigned int i = 0; i<maxitr; ++i){
+				if(Brk(State,i))return make_minima_result(true, i, State.value(),State.fvalue());
+				Stepper(Fn,State,Brk.precision(State));
+				Obs(State,i);
+			}
+
+			return make_minima_result(pbrk(State,maxitr), maxitr, State.value(),State.fvalue());
 		}
 		template<typename fn, typename value_type, typename error_type>
-		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return golden_section_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_golden_section_minima(Fn, lowerval, upperval, inival, maxitr,range_precision_breaker<error_type>(relerr,abserr));
 		}
-    }
+ 		template<typename fn, typename value_type, typename error_type,typename observer>
+		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, value_type inival, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_golden_section_minima(Fn, lowerval, upperval, inival, maxitr,range_precision_breaker<error_type>(relerr,abserr), Obs);
+		}
+   }
 }
 #
 #endif

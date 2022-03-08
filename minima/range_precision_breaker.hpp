@@ -25,8 +25,8 @@ namespace hmLib{
 			auto precision(const state_type& x)const{
 				return relerr * std::abs(x.value()) + abserr / 4;
 			}
-			template<typename state_type>
-			bool operator()(const state_type& x)const{
+			template<typename state_type, typename step_type>
+			bool operator()(const state_type& x, step_type)const{
 				return std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision(x) * 2 ;
 			}
 		private:
