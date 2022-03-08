@@ -3,7 +3,6 @@
 #
 #include<iterator>
 #include<type_traits>
-#include "aligned_heap.hpp"
 #include "algorithm/compare.hpp"
 #include "exceptions.hpp"
 #include "exceptions/access_exceptions.hpp"
@@ -275,7 +274,7 @@ namespace hmLib{
 		circular(const this_type& my):circular(){
 			assign(my.begin(),my.end());
 		}
-		circular& operator=(const this_type& my){
+		circular<T,MaxSize>& operator=(const this_type& my){
 			if(this!=&my){
 				assign(my.begin(),my.end());
 			}
@@ -284,7 +283,7 @@ namespace hmLib{
 		circular(circular&& my):circular(){
 			assign(my.begin(),my.end());
 		}
-		circular& operator=(circular&& my){
+		circular<T,MaxSize>& operator=(this_type&& my){
 			if(this!=&my){
 				assign(my.begin(),my.end());
 			}
