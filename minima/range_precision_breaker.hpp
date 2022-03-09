@@ -33,14 +33,6 @@ namespace hmLib{
 			value_type relerr;
 			value_type abserr;
 		};
-		template<typename value_type>
-		auto make_range_precision_breaker(value_type relative_error_){
-			return range_precision_breaker<typename std::decay<value_type>::type>(relative_error_);
-		}
-		template<typename value_type>
-		auto make_range_precision_breaker(value_type relative_error_, value_type absolute_error_){
-			return range_precision_breaker<typename std::decay<value_type>::type>(relative_error_, absolute_error_);
-		}
 	}
 }
 #

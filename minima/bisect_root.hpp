@@ -62,37 +62,35 @@ namespace hmLib{
 				return std::make_pair(min, max);
 			}
 		}
-		template<typename value_type,typename eval_type>
-		struct pair_state{
-		public:
-			//min and max value of the searching range.
-			value_type vfirst;
-			value_type vsecond;
-			fvalue_type ffirst;
-			fvalue_type fsecond;
-		public:
-			pair_state() = delete;
-			pair_state(value_type vfirst_, value_type vsecond_, fvalue_type ffirst_, fvalue_type fsecond_)
-				: vfirst(vfirst_), vsecond(vsecond_)
-				, ffirst(ffirst_), fsecond(fsecond_){
-			}
-			template<typename fn>
-			pair_state(value_type vfirst_, value_type vsecond_, fn f)
-				: vfirst(vfirst_), vsecond(vsecond_)
-				, ffirst(f(vfirst_)), fsecond(f(vsecond_)){
-			}
-			void replace_first(value_type value_, fvalue_type fvalue_){
-				vfirst = value_;
-				ffirst = fvalue_;
-			}
-			void replace_second(value_type value_, fvalue_type fvalue_){
-				vsecond = value_;
-				fsecond = fvalue_;					
-			}
-		};
+		template<typename value_type,typename fvalue_type = value_type>
 		struct bisect_stepper{
-			template<typename value_type,typename fvalue_type>
-			using state = pair_state<value_type,fvalue_type>
+			struct state{
+			public:
+				//min and max value of the searching range.
+				value_type val1;
+				value_type val2;
+				fvalue_type fval1;
+				fvalue_type fval2;
+			public:
+				state() = delete;
+				state(value_type val1_, value_type val2_, fvalue_type fval1_, fvalue_type fval2_)
+					: val1(val1_), val2(val2_)
+					, fval1(fval1_), fval2(fval2_){
+				}
+				template<typename fn>
+				state(fn f, value_type val1_, value_type val2_)
+					: val1(val1_), val2(val2_)
+					, fval1(f(val1_)), fval2(f(val2_)){
+				}
+				void replace_first(value_type value_, fvalue_type fvalue_){
+					vfirst = value_;
+					ffirst = fvalue_;
+				}
+				void replace_second(value_type value_, fvalue_type fvalue_){
+					vsecond = value_;
+					fsecond = fvalue_;					
+				}
+			};
 		public:
 			template<typename fn, typename value_type, typename fvalue_type>
 			void initialize(state<value_type, fvalue_type>& x){
