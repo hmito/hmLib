@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_CIRCULAR_INC
+#ifndef HMLIB_CIRCULAR_INC
 #define HMLIB_CIRCULAR_INC 100
 #
 #include<iterator>
@@ -614,8 +614,9 @@ namespace hmLib{
 		index_type EndIdx;
 	};
 
-		template<typename container>
+	template<typename container>
 	struct back_rotate_iterator{
+		using this_type = back_rotate_iterator<container>;
 		using container_type = container;
 		using value_type = void;
 		using pointer = void;
@@ -624,23 +625,24 @@ namespace hmLib{
 		using iterator_category = std::output_iterator_tag;
 	public:
 		back_rotate_iterator() = delete;
-		back_rotate_iterator(container& x):ptr(std::addressof(x)){}
-		back_rotate_iterator& operator*(){return *this;}
-		back_rotate_iterator& operator=(const typename container::value_type& value){
+		explicit back_rotate_iterator(container& x):ptr(std::addressof(x)){}
+		this_type& operator*(){return *this;}
+		this_type& operator=(const typename container::value_type& value){
 			ptr->rotate_back(value);
 			return *this;
 		}
-		back_rotate_iterator& operator=(typename container::value_type&& value){
+		this_type& operator=(typename container::value_type&& value){
 			ptr->rotate_back(std::move(value));
 			return *this;
 		}
-		insert_iterator& operator++(){return *this;}
-		insert_iterator& operator++(int){return *this;}
+		this_type& operator++(){return *this;}
+		this_type& operator++(int){return *this;}
 	private:
 		container* ptr;
 	};
 	template<typename container>
 	struct forward_rotate_iterator{
+		using this_type = forward_rotate_iterator<container>;
 		using container_type = container;
 		using value_type = void;
 		using pointer = void;
@@ -649,18 +651,18 @@ namespace hmLib{
 		using iterator_category = std::output_iterator_tag;
 	public:
 		forward_rotate_iterator() = delete;
-		forward_rotate_iterator(container& x):ptr(std::addressof(x)){}
-		forward_rotate_iterator& operator*(){return *this;}
-		forward_rotate_iterator& operator=(const typename container::value_type& value){
+		explicit forward_rotate_iterator(container& x):ptr(std::addressof(x)){}
+		this_type& operator*(){return *this;}
+		this_type& operator=(const typename container::value_type& value){
 			ptr->rotate_forward(value);
 			return *this;
 		}
-		forward_rotate_iterator& operator=(typename container::value_type&& value){
+		this_type& operator=(typename container::value_type&& value){
 			ptr->rotate_forward(std::move(value));
 			return *this;
 		}
-		forward_rotate_iterator& operator++(){return *this;}
-		forward_rotate_iterator& operator++(int){return *this;}
+		this_type& operator++(){return *this;}
+		this_type& operator++(int){return *this;}
 	private:
 		container* ptr;
 	};
