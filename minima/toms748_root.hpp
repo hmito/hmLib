@@ -2,213 +2,208 @@
 #define HMLIB_MINIMA_TOMS748ROOT_INC 100
 #
 #include<utility>
+#include "../exceptions.hpp"
+#include "../math/math.hpp"
+#include "../math/sign.hpp"
 namespace hmLib{
 	namespace minima{
+		template<typename T>
+		struct vfpair{
+			using value_type = T;
+			T v;
+			T f;
+		public:
+			vfpair()=default;
+			explict vfpair(T x_):x(x_),f(){}
+			vfpair(T x_, T f_):x(x_),f(f_){}
+			template<typename F>
+			vfpair<T>& eval(F fn){f=fn(v); return *this;}
+		};
+		template<typename F>
+		auto make_vfpair(T x, F fn){
+			return vfpair<decltype(x * fn(x))>(x,fn(x));
+		}
 		namespace detail{
-			template <class F, class T>
-			void bracket(F f, T& a, T& b, T c, T& fa, T& fb, T& d, T& fd){
-			//
-			// Given a point c inside the existing enclosing interval
-			// [a, b] sets a = c if f(c) == 0, otherwise finds the new 
-			// enclosing interval: either [a, c] or [c, b] and sets
-			// d and fd to the point that has just been removed from
-			// the interval.  In other words d is the third best guess
-			// to the root.
-			//
-			T tol = tools::epsilon<T>() * 2;
-			//
-			// If the interval [a,b] is very small, or if c is too close 
-			// to one end of the interval then we need to adjust the
-			// location of c accordingly:
-			//
-			if((b - a) < 2 * tol * a)
-			{
-				c = a + (b - a) / 2;
+			template <typename value_type>
+			inline value_type bisect_interpolate(const vfpair<value_type>& a, const vfpair<value_type>& b){
+				return a.v + (b.v - a.v) / 2;
 			}
-			else if(c <= a + fabs(a) * tol)
-			{
-				c = a + fabs(a) * tol;
-			}
-			else if(c >= b - fabs(b) * tol)
-			{
-				c = b - fabs(b) * tol;
-			}
-			//
-			// OK, lets invoke f(c):
-			//
-			T fc = f(c);
-			//
-			// if we have a zero then we have an exact solution to the root:
-			//
-			if(fc == 0)
-			{
-				a = c;
-				fa = 0;
-				d = 0;
-				fd = 0;
-				return;
-			}
-			//
-			// Non-zero fc, update the interval:
-			//
-			if(boost::math::sign(fa) * boost::math::sign(fc) < 0)
-			{
-				d = b;
-				fd = fb;
-				b = c;
-				fb = fc;
-			}
-			else
-			{
-				d = a;
-				fd = fa;
-				a = c;
-				fa= fc;
-			}
-			}
+			template <typename value_type>
+			inline value_type secant_interpolate(const vfpair<value_type>& a, const vfpair<value_type>& b){
+				using std::abs;
 
-			template <class T>
-			inline T safe_div(T num, T denom, T r)
-			{
-			//
-			// return num / denom without overflow,
-			// return r if overflow would occur.
-			//
-			BOOST_MATH_STD_USING  // For ADL of std math functions
+				//secant calculation
+				auto x = a.v - (a.f / (b.f - a.f)) * (b.v - a.v);
 
-			if(fabs(denom) < 1)
-			{
-				if(fabs(denom * tools::max_value<T>()) <= fabs(num))
-					return r;
+				auto tol = std::numeric_limits<value_type>::epsilon() * 5;
+				if((a.v + abs(a.v) * tol.v < x) && (x < b.v - abs(b.v) * tol)) return x;
+				
+				//secant faild; return bisect
+				return bisect_interpolate(a,b);
 			}
-			return num / denom;
-			}
+			template<typename value_type>
+			inline value_type double_secant_interpolate(const vfpair<value_type>& a, const vfpair<value_type>& b){
+				using std::abs;
+				if(std::abs(a.f) < std::abs(b.f)){
+					auto z = a.v - 2 * (a.f / (b.f - a.f)) * (b.v - a.v);
+					if(abs(z - a.v) < (b.v - a.v) / 2)return z;
+				}else{
+					auto z = b.v - 2 * (b.f / (b.f - a.f)) * (b.v - a.v);
+					if(abs(z - b.v) < (b.v - a.v) / 2)return z;
+				}
 
-			template <class T>
-			inline T secant_interpolate(const T& a, const T& b, const T& fa, const T& fb)
-			{
-			//
-			// Performs standard secant interpolation of [a,b] given
-			// function evaluations f(a) and f(b).  Performs a bisection
-			// if secant interpolation would leave us very close to either
-			// a or b.  Rationale: we only call this function when at least
-			// one other form of interpolation has already failed, so we know
-			// that the function is unlikely to be smooth with a root very
-			// close to a or b.
-			//
-			BOOST_MATH_STD_USING  // For ADL of std math functions
+				//double secant faild; return bisect
+				return bisect_interpolate(a,b);
+			}
+			template <typename value_type>
+			inline value_type quadratic_interpolate(const vfpair<value_type>& a, const vfpair<value_type>& b, const vfpair<value_type>& c, unsigned int count){
+				//coeffcients of quadratic
+				auto B = div_or<value_type>(b.f - a.f, b.v - a.v, std::numeric_limits<value_type>::max());
+				auto C = div_or<value_type>(c.f - b.f, c.v - b.v, std::numeric_limits<value_type>::max());
+				auto A = div_or<value_type>(B - C, c.v - a.v, value_type(0));
 
-			T tol = tools::epsilon<T>() * 5;
-			T c = a - (fa / (fb - fa)) * (b - a);
-			if((c <= a + fabs(a) * tol) || (c >= b - fabs(b) * tol))
-				return (a + b) / 2;
-			return c;
-			}
+				if(A == 0){
+					//cannot use quadratic; try secant
+					return secant_interpolate(a, b);
+				}
 
-			template <class T>
-			T quadratic_interpolate(const T& a, const T& b, T const& d,
-									const T& fa, const T& fb, T const& fd, 
-									unsigned count)
-			{
-			//
-			// Performs quadratic interpolation to determine the next point,
-			// takes count Newton steps to find the location of the
-			// quadratic polynomial.
-			//
-			// Point d must lie outside of the interval [a,b], it is the third
-			// best approximation to the root, after a and b.
-			//
-			// Note: this does not guarantee to find a root
-			// inside [a, b], so we fall back to a secant step should
-			// the result be out of range.
-			//
-			// Start by obtaining the coefficients of the quadratic polynomial:
-			//
-			T B = safe_div(T(fb - fa), T(b - a), tools::max_value<T>());
-			T A = safe_div(T(fd - fb), T(d - b), tools::max_value<T>());
-			A = safe_div(T(A - B), T(d - a), T(0));
+				value_type x;
+				if(hmLib::math::sign(A) * hmLib::math::sign(a.f) == hmLib::math::sign::positive){
+					x = a.v;
+				}else{
+					x = b.v;
+				}
 
-			if(A == 0)
-			{
-				// failure to determine coefficients, try a secant step:
-				return secant_interpolate(a, b, fa, fb);
-			}
-			//
-			// Determine the starting point of the Newton steps:
-			//
-			T c;
-			if(boost::math::sign(A) * boost::math::sign(fa) > 0)
-			{
-				c = a;
-			}
-			else
-			{
-				c = b;
-			}
-			//
-			// Take the Newton steps:
-			//
-			for(unsigned i = 1; i <= count; ++i)
-			{
-				//c -= safe_div(B * c, (B + A * (2 * c - a - b)), 1 + c - a);
-				c -= safe_div(T(fa+(B+A*(c-b))*(c-a)), T(B + A * (2 * c - a - b)), T(1 + c - a));
-			}
-			if((c <= a) || (c >= b))
-			{
-				// Oops, failure, try a secant step:
-				c = secant_interpolate(a, b, fa, fb);
-			}
-			return c;
-			}
+				// Newton steps
+				for(unsigned i = 0; i < count; ++i){
+					x -= div_or<value_type>(a.f+(B+A*(x-b.v))*(x-a.v), B + A * (2 * x - a.v - b.v), 1 + x - a.v);
+				}
 
-			template <class T>
-			T cubic_interpolate(const T& a, const T& b, const T& d, 
-								const T& e, const T& fa, const T& fb, 
-								const T& fd, const T& fe)
-			{
-			//
-			// Uses inverse cubic interpolation of f(x) at points 
-			// [a,b,d,e] to obtain an approximate root of f(x).
-			// Points d and e lie outside the interval [a,b]
-			// and are the third and forth best approximations
-			// to the root that we have found so far.
-			//
-			// Note: this does not guarantee to find a root
-			// inside [a, b], so we fall back to quadratic
-			// interpolation in case of an erroneous result.
-			//
-			BOOST_MATH_INSTRUMENT_CODE(" a = " << a << " b = " << b
-				<< " d = " << d << " e = " << e << " fa = " << fa << " fb = " << fb 
-				<< " fd = " << fd << " fe = " << fe);
-			T q11 = (d - e) * fd / (fe - fd);
-			T q21 = (b - d) * fb / (fd - fb);
-			T q31 = (a - b) * fa / (fb - fa);
-			T d21 = (b - d) * fd / (fd - fb);
-			T d31 = (a - b) * fb / (fb - fa);
-			BOOST_MATH_INSTRUMENT_CODE(
-				"q11 = " << q11 << " q21 = " << q21 << " q31 = " << q31
-				<< " d21 = " << d21 << " d31 = " << d31);
-			T q22 = (d21 - q11) * fb / (fe - fb);
-			T q32 = (d31 - q21) * fa / (fd - fa);
-			T d32 = (d31 - q21) * fd / (fd - fa);
-			T q33 = (d32 - q22) * fa / (fe - fa);
-			T c = q31 + q32 + q33 + a;
-			BOOST_MATH_INSTRUMENT_CODE(
-				"q22 = " << q22 << " q32 = " << q32 << " d32 = " << d32
-				<< " q33 = " << q33 << " c = " << c);
+				if(a.v < x && x < b.v) return x;
 
-			if((c <= a) || (c >= b))
-			{
-				// Out of bounds step, fall back to quadratic interpolation:
-				c = quadratic_interpolate(a, b, d, fa, fb, fd, 3);
-			BOOST_MATH_INSTRUMENT_CODE(
-				"Out of bounds interpolation, falling back to quadratic interpolation. c = " << c);
+				//quadratic faild; try secant
+				return secant_interpolate(a, b);
 			}
+			template <typename value_type>
+			inline value_type cubic_interpolate(const vfpair<value_type>& a,const vfpair<value_type>& b,const vfpair<value_type>& c, const vfpair<value_type>& d, unsigned int count){
+				auto min_diff = std::numeric_limits<value_type>::min() * 32;
+				bool nocubic = (std::abs(a.f - b.f) < min_diff) || (std::abs(a.f - c.f) < min_diff) || (std::abs(a.f - d.f) < min_diff) || (std::abs(b.f - c.f) < min_diff) || (std::abs(b.f - d.f) < min_diff) || (std::abs(c.f - d.f) < min_diff);
 
-			return c;
+				if(nocubic){
+					//cannot use cubic; try quadratic
+					return quadratic_interpolate(a, b, c, count);
+				}
+
+				//coeffcients of cubic
+				value_type q11 = (c.v - d.v) * c.f / (d.f - c.f);
+				value_type q21 = (b.v - c.v) * b.f / (c.f - b.f);
+				value_type q31 = (a.v - b.v) * a.f / (b.f - a.f);
+				value_type d21 = (b.v - c.v) * c.f / (c.f - b.f);
+				value_type d31 = (a.v - b.v) * b.f / (b.f - a.f);
+
+				value_type q22 = (d21 - q11) * b.f / (d.f - b.f);
+				value_type q32 = (d31 - q21) * a.f / (c.f - a.f);
+				value_type d32 = (d31 - q21) * c.f / (c.f - a.f);
+				value_type q33 = (d32 - q22) * a.f / (d.f - a.f);
+
+				value_type x = q31 + q32 + q33 + a;
+
+				if(a.v < x && x < b.v) return x;
+
+				//cubic failed; try quadratic
+				return quadratic_interpolate(a, b, c, count);
 			}
+		} 
+		
+		struct toms748_stepper{
+			template<typename value_type>
+			struct state{
+			private:
+				vfpair<value_type> a;
+				vfpair<value_type> b;
+				vfpair<value_type> p;
+				vfpair<value_type> q;
+			public:
+				template<typename T>
+				state(F fn, T lower, T upper){
+					hmLib_assert(lower < upper, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748::state require lower < upper.");
 
-		} // namespace detail
+					a = make_vfpair(lower, fn);
+					b = make_vfpair(upper, fn);
+
+					hmLib_assert(hmLib::math::sign(a.f) * hmLib::math::sign(b.f) == hmLib::math::sign::negative, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748::state require fn(lower) * fn(upper) < 0.");
+
+					if(a.f == 0 || b.f == 0){
+						if(a.f == 0)b = a;
+						else if(b.f == 0)a = b;
+						return;
+					}
+
+					// dummy value for d.f, e and e.f:
+					e.f = e.v = d.f = 1e5F;
+
+					bracket(secant_interpolate(), fn, false);
+					if(count && (a.f != 0) && !tol(a, b)){
+						bracket(quadratic_interpolate(2), fn, true);
+					}
+				}
+				template<typename state_value_type, typename value_type, typename fn>
+				void bracket(value_type x, fn F, bool cube_update){
+					if(cube_update) q = p
+						
+					auto tol = std::numeric_limits<T>::epsilon() * 2;
+
+					if((b.v - a.v) < 2 * tol * a.v){
+						x = a.v + (s.b.v - a.v) / 2;
+					}else if(x <= s.a + std::abs(a.v) * tol){
+						x = a.v + std::abs(a.v) * tol;
+					}else if(x >= s.b - std::abs(b.v) * tol){
+						x = b.v - std::abs(b.v) * tol;
+					}
+
+					auto fx = F(x);
+
+					if(fx == 0){
+						a = typename state<state_value_type>::mypair(x,fx);
+						p = typename state<state_value_type>::mypair(0,0);
+					}else if(hmLib::math::sign(a.f)*hmLib::math::sign(fx) == hmLib::math::sign::negative){
+						p = b;
+						b = typename state<state_value_type>::mypair(x,fx);
+					}else{
+						p = a;
+						a = typename state<state_value_type>::mypair(x,fx);
+					}
+				}
+			};
+		public:
+			template<typename F, typename T>
+			auto make_state(F fn, T lower, T upper){
+				return state<decltype(lower * fn(lower)>(fn,lower,upper);
+			}
+			template<typename value_type>
+			void operator()(F fn, state<value_type>& x){
+				// save our brackets:
+				auto dist = x.b - x.a;
+				
+				// re-bracket, and check for termination:
+				x.bracket(x.interpolate(2),fn, true);
+				if((a.f == 0) || tol(a, b))break;
+
+				// Bracket again, and check termination condition, update e:
+				x.bracket(x.interpolate(3), fn, false);
+				if((a.f == 0) || tol(a, b))break;
+
+				// Now we take a double-length secant step:
+				x.bracket(x.double_secant_interpolate(),fn,true);
+
+				// If convergence of above three processes are worse than bisect method, just try bisect
+				if((b.v - a.v) >= 0.5*dist){
+					x.bracket(x.bisect_interpolate(),fn,true);
+				}
+			}
+		};
+
+		// namespace detail
 		template <class F, class T, class Tol, class Policy>
 		std::pair<T, T> toms748_solve(F f, const T& ax, const T& bx, const T& fax, const T& fbx, Tol tol, boost::uintmax_t& max_iter, const Policy& pol){
 			//
@@ -217,49 +212,49 @@ namespace hmLib{
 			if (max_iter == 0)return std::make_pair(ax, bx);
 
 			boost::uintmax_t count = max_iter;
-			T a, b, fa, fb, c, u, fu, a0, b0, d, fd, e, fe;
+			T a, b, a.f, b.f, c, u, fu, a0, b0, d, d.f, e, e.f;
 			static const T mu = 0.5f;
 
-			// initialise a, b and fa, fb:
+			// initialise a, b and a.f, b.f:
 			a = ax;
 			b = bx;
 			if(a >= b)return policies::raise_domain_error("Parameters a and b out of order: a=%1%", a, pol));
-			fa = fax;
-			fb = fbx;
+			a.f = fax;
+			b.f = fbx;
 
-			if(tol(a, b) || (fa == 0) || (fb == 0)){
+			if(tol(a, b) || (a.f == 0) || (b.f == 0)){
 				max_iter = 0;
-				if(fa == 0)b = a;
-				else if(fb == 0)a = b;
+				if(a.f == 0)b = a;
+				else if(b.f == 0)a = b;
 				return std::make_pair(a, b);
 			}
 
-			if(boost::math::sign(fa) * boost::math::sign(fb) > 0)return policies::raise_domain_error("Parameters a and b do not bracket the root: a=%1%", a, pol));
+			if(boost::math::sign(a.f) * boost::math::sign(b.f) > 0)return policies::raise_domain_error("Parameters a and b do not bracket the root: a=%1%", a, pol));
 			
-			// dummy value for fd, e and fe:
-			fe = e = fd = 1e5F;
+			// dummy value for d.f, e and e.f:
+			e.f = e = d.f = 1e5F;
 
-			if(fa != 0){
+			if(a.f != 0){
 				//
 				// On the first step we take a secant step:
 				//
-				c = detail::secant_interpolate(a, b, fa, fb);
-				detail::bracket(f, a, b, c, fa, fb, d, fd);
+				c = detail::secant_interpolate(a, b, a.f, b.f);
+				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
 				--count;
 
-				if(count && (fa != 0) && !tol(a, b)){
+				if(count && (a.f != 0) && !tol(a, b)){
 					//
 					// On the second step we take a quadratic interpolation:
 					//
-					c = detail::quadratic_interpolate(a, b, d, fa, fb, fd, 2);
+					c = detail::quadratic_interpolate(a, b, d, a.f, b.f, d.f, 2);
 					e = d;
-					fe = fd;
-					detail::bracket(f, a, b, c, fa, fb, d, fd);
+					e.f = d.f;
+					detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
 					--count;
 				}
 			}
 
-			while(count && (fa != 0) && !tol(a, b)){
+			while(count && (a.f != 0) && !tol(a, b)){
 				// save our brackets:
 				a0 = a;
 				b0 = b;
@@ -268,55 +263,55 @@ namespace hmLib{
 				// Starting with the third step taken
 				// we can use either quadratic or cubic interpolation.
 				// Cubic interpolation requires that all four function values
-				// fa, fb, fd, and fe are distinct, should that not be the case
+				// a.f, b.f, d.f, and e.f are distinct, should that not be the case
 				// then variable prof will get set to true, and we'll end up
 				// taking a quadratic step instead.
 				//
 				T min_diff = tools::min_value<T>() * 32;
-				bool prof = (fabs(fa - fb) < min_diff) || (fabs(fa - fd) < min_diff) || (fabs(fa - fe) < min_diff) || (fabs(fb - fd) < min_diff) || (fabs(fb - fe) < min_diff) || (fabs(fd - fe) < min_diff);
+				bool prof = (fabs(a.f - b.f) < min_diff) || (fabs(a.f - d.f) < min_diff) || (fabs(a.f - e.f) < min_diff) || (fabs(b.f - d.f) < min_diff) || (fabs(b.f - e.f) < min_diff) || (fabs(d.f - e.f) < min_diff);
 				if(prof){
-					c = detail::quadratic_interpolate(a, b, d, fa, fb, fd, 2);
+					c = detail::quadratic_interpolate(a, b, d, a.f, b.f, d.f, 2);
 					//("Can't take cubic step!!!!");
 				}else{
-					c = detail::cubic_interpolate(a, b, d, e, fa, fb, fd, fe);
+					c = detail::cubic_interpolate(a, b, d, e, a.f, b.f, d.f, e.f);
 				}
 				//
 				// re-bracket, and check for termination:
 				//
 				e = d;
-				fe = fd;
-				detail::bracket(f, a, b, c, fa, fb, d, fd);
-				if((0 == --count) || (fa == 0) || tol(a, b))break;
+				e.f = d.f;
+				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
+				if((0 == --count) || (a.f == 0) || tol(a, b))break;
 
 				//
 				// Now another interpolated step:
 				//
-				prof = (fabs(fa - fb) < min_diff) || (fabs(fa - fd) < min_diff) || (fabs(fa - fe) < min_diff) || (fabs(fb - fd) < min_diff) || (fabs(fb - fe) < min_diff) || (fabs(fd - fe) < min_diff);
+				prof = (fabs(a.f - b.f) < min_diff) || (fabs(a.f - d.f) < min_diff) || (fabs(a.f - e.f) < min_diff) || (fabs(b.f - d.f) < min_diff) || (fabs(b.f - e.f) < min_diff) || (fabs(d.f - e.f) < min_diff);
 				if(prof){
-					c = detail::quadratic_interpolate(a, b, d, fa, fb, fd, 3);
+					c = detail::quadratic_interpolate(a, b, d, a.f, b.f, d.f, 3);
 					//("Can't take cubic step!!!!");
 				}else{
-					c = detail::cubic_interpolate(a, b, d, e, fa, fb, fd, fe);
+					c = detail::cubic_interpolate(a, b, d, e, a.f, b.f, d.f, e.f);
 				}
 
 				//
 				// Bracket again, and check termination condition, update e:
 				//
-				detail::bracket(f, a, b, c, fa, fb, d, fd);
-				if((0 == --count) || (fa == 0) || tol(a, b))break;
+				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
+				if((0 == --count) || (a.f == 0) || tol(a, b))break;
 
 				//
 				// Now we take a double-length secant step:
 				//
-				if(fabs(fa) < fabs(fb)){
+				if(fabs(a.f) < fabs(b.f)){
 					u = a;
-					fu = fa;
+					fu = a.f;
 				}else{
 					u = b;
-					fu = fb;
+					fu = b.f;
 				}
 
-				c = u - 2 * (fu / (fb - fa)) * (b - a);
+				c = u - 2 * (fu / (b.f - a.f)) * (b - a);
 				if(fabs(c - u) > (b - a) / 2){
 					c = a + (b - a) / 2;
 				}
@@ -325,11 +320,11 @@ namespace hmLib{
 				// Bracket again, and check termination condition:
 				//
 				e = d;
-				fe = fd;
+				e.f = d.f;
 
-				detail::bracket(f, a, b, c, fa, fb, d, fd);
+				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
 
-				if((0 == --count) || (fa == 0) || tol(a, b))break;
+				if((0 == --count) || (a.f == 0) || tol(a, b))break;
 				//
 				// And finally... check to see if an additional bisection step is 
 				// to be taken, we do this if we're not converging fast enough:
@@ -339,15 +334,15 @@ namespace hmLib{
 				// bracket again on a bisection:
 				//
 				e = d;
-				fe = fd;
-				detail::bracket(f, a, b, T(a + (b - a) / 2), fa, fb, d, fd);
+				e.f = d.f;
+				detail::bracket(f, a, b, T(a + (b - a) / 2), a.f, b.f, d, d.f);
 				--count;
 			} // while loop
 
 			max_iter -= count;
-			if(fa == 0){
+			if(a.f == 0){
 				b = a;
-			}else if(fb == 0){
+			}else if(b.f == 0){
 				a = b;
 			}
 
