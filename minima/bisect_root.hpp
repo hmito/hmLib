@@ -6,62 +6,6 @@
 #include<utility>
 namespace hmLib{
 	namespace minima{
-		namespace detail{
-			template <class F, class T, class Tol, class Policy>
-			std::pair<T, T> bisect(F f, T min, T max, Tol tol, unsigned int max_iter, const Policy& pol){
-				T fmin = f(min);
-				T fmax = f(max);
-				if(fmin == 0){
-					max_iter = 2;
-					return std::make_pair(min, min);
-				}
-				if(fmax == 0){
-					max_iter = 2;
-					return std::make_pair(max, max);
-				}
-
-				//
-				// Error checking:
-				//
-				static const char* function = "boost::math::tools::bisect<%1%>";
-				if(min >= max){
-					return boost::math::detail::pair_from_single(policies::raise_evaluation_error(function,
-						"Arguments in wrong order in boost::math::tools::bisect (first arg=%1%)", min, pol));
-				}
-				if(fmin * fmax >= 0){
-					return boost::math::detail::pair_from_single(policies::raise_evaluation_error(function,
-						"No change of sign in boost::math::tools::bisect, either there is no root to find, or there are multiple roots in the interval (f(min) = %1%).", fmin, pol));
-				}
-
-				//
-				// Three function invocations so far:
-				//
-				boost::uintmax_t count = max_iter;
-				if(count < 3) count = 0;
-				else count -= 3;
-
-				while(count && (0 == tol(min, max))){
-					T mid = (min + max) / 2;
-					T fmid = f(mid);
-					if((mid == max) || (mid == min))break;
-					if(fmid == 0){
-						min = max = mid;
-						break;
-					}else if(sign(fmid) * sign(fmin) < 0){
-						max = mid;
-						fmax = fmid;
-					}else{
-						min = mid;
-						fmin = fmid;
-					}
-					--count;
-				}
-
-				max_iter -= count;
-
-				return std::make_pair(min, max);
-			}
-		}
 		template<typename value_type,typename fvalue_type = value_type>
 		struct bisect_stepper{
 			struct state{
