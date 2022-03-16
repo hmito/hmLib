@@ -115,239 +115,102 @@ namespace hmLib{
 			}
 		} 
 		
-		struct toms748_stepper{
-			template<typename value_type>
-			struct state{
-			private:
-				vfpair<value_type> a;
-				vfpair<value_type> b;
-				vfpair<value_type> p;
-				vfpair<value_type> q;
-			public:
-				template<typename T>
-				state(F fn, T lower, T upper){
-					hmLib_assert(lower < upper, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748::state require lower < upper.");
+		template<typename T>
+		struct range_state{
+			vfpair<T> lower;
+			vfpair<T> upper;
+			template<typename T>
+			state(F fn, T lowerval, T upperval):lower(lowerval),upper(upperval){
+				hmLib_assert(lower.v < upper.v, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748::state require lower < upper.");
 
-					a = make_vfpair(lower, fn);
-					b = make_vfpair(upper, fn);
+				lower.eval(fn);
+				upper.eval(fn);
 
-					hmLib_assert(hmLib::math::sign(a.f) * hmLib::math::sign(b.f) == hmLib::math::sign::negative, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748::state require fn(lower) * fn(upper) < 0.");
+				hmLib_assert(hmLib::math::sign(upper.f) * hmLib::math::sign(lower.f) == hmLib::math::sign::negative, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748::state require fn(lower) * fn(upper) < 0.");
 
-					if(a.f == 0 || b.f == 0){
-						if(a.f == 0)b = a;
-						else if(b.f == 0)a = b;
-						return;
-					}
-
-					// dummy value for d.f, e and e.f:
-					e.f = e.v = d.f = 1e5F;
-
-					bracket(secant_interpolate(), fn, false);
-					if(count && (a.f != 0) && !tol(a, b)){
-						bracket(quadratic_interpolate(2), fn, true);
-					}
-				}
-				template<typename state_value_type, typename value_type, typename fn>
-				void bracket(value_type x, fn F, bool cube_update){
-					if(cube_update) q = p
-						
-					auto tol = std::numeric_limits<T>::epsilon() * 2;
-
-					if((b.v - a.v) < 2 * tol * a.v){
-						x = a.v + (s.b.v - a.v) / 2;
-					}else if(x <= s.a + std::abs(a.v) * tol){
-						x = a.v + std::abs(a.v) * tol;
-					}else if(x >= s.b - std::abs(b.v) * tol){
-						x = b.v - std::abs(b.v) * tol;
-					}
-
-					auto fx = F(x);
-
-					if(fx == 0){
-						a = typename state<state_value_type>::mypair(x,fx);
-						p = typename state<state_value_type>::mypair(0,0);
-					}else if(hmLib::math::sign(a.f)*hmLib::math::sign(fx) == hmLib::math::sign::negative){
-						p = b;
-						b = typename state<state_value_type>::mypair(x,fx);
-					}else{
-						p = a;
-						a = typename state<state_value_type>::mypair(x,fx);
-					}
-				}
-			};
-		public:
-			template<typename F, typename T>
-			auto make_state(F fn, T lower, T upper){
-				return state<decltype(lower * fn(lower)>(fn,lower,upper);
-			}
-			template<typename value_type>
-			void operator()(F fn, state<value_type>& x){
-				// save our brackets:
-				auto dist = x.b - x.a;
-				
-				// re-bracket, and check for termination:
-				x.bracket(x.interpolate(2),fn, true);
-				if((a.f == 0) || tol(a, b))break;
-
-				// Bracket again, and check termination condition, update e:
-				x.bracket(x.interpolate(3), fn, false);
-				if((a.f == 0) || tol(a, b))break;
-
-				// Now we take a double-length secant step:
-				x.bracket(x.double_secant_interpolate(),fn,true);
-
-				// If convergence of above three processes are worse than bisect method, just try bisect
-				if((b.v - a.v) >= 0.5*dist){
-					x.bracket(x.bisect_interpolate(),fn,true);
+				if(lower.f == 0 || upper.f == 0){
+					if(lower.f == 0)upper = lower;
+					else if(upper.f == 0)lower = upper;
 				}
 			}
 		};
-
-		// namespace detail
-		template <class F, class T, class Tol, class Policy>
-		std::pair<T, T> toms748_solve(F f, const T& ax, const T& bx, const T& fax, const T& fbx, Tol tol, boost::uintmax_t& max_iter, const Policy& pol){
-			//
-			// Sanity check - are we allowed to iterate at all?
-			//
-			if (max_iter == 0)return std::make_pair(ax, bx);
-
-			boost::uintmax_t count = max_iter;
-			T a, b, a.f, b.f, c, u, fu, a0, b0, d, d.f, e, e.f;
-			static const T mu = 0.5f;
-
-			// initialise a, b and a.f, b.f:
-			a = ax;
-			b = bx;
-			if(a >= b)return policies::raise_domain_error("Parameters a and b out of order: a=%1%", a, pol));
-			a.f = fax;
-			b.f = fbx;
-
-			if(tol(a, b) || (a.f == 0) || (b.f == 0)){
-				max_iter = 0;
-				if(a.f == 0)b = a;
-				else if(b.f == 0)a = b;
-				return std::make_pair(a, b);
+		template<typename T>
+		struct toms748_stepper{
+			using pair = vfpair<T>;
+			using state =range_state<T>
+		public:
+			toms748_stepper():Stage(0){}
+			template<typename F>
+			void initialize(F, state&)noexcept{
+				Stage = 0;
 			}
-
-			if(boost::math::sign(a.f) * boost::math::sign(b.f) > 0)return policies::raise_domain_error("Parameters a and b do not bracket the root: a=%1%", a, pol));
-			
-			// dummy value for d.f, e and e.f:
-			e.f = e = d.f = 1e5F;
-
-			if(a.f != 0){
-				//
-				// On the first step we take a secant step:
-				//
-				c = detail::secant_interpolate(a, b, a.f, b.f);
-				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
-				--count;
-
-				if(count && (a.f != 0) && !tol(a, b)){
-					//
-					// On the second step we take a quadratic interpolation:
-					//
-					c = detail::quadratic_interpolate(a, b, d, a.f, b.f, d.f, 2);
-					e = d;
-					e.f = d.f;
-					detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
-					--count;
+			template<typename F>
+			void operator()(F fn, state& x){
+				switch(Stage++){
+				case 1:
+					bracket(x, quadratic_interpolate(x.lower,x.upper,p,2), fn, true);
+					break;
+				case 2:
+					Dist = x.upper.v - x.lower.v;			
+					bracket(x, cubic_interpolate(x.lower,x.upper,p,q,2),fn, true);
+				case 3:
+					bracket(x, cubic_interpolate(x.lower,x.upper,p,q,3), fn, false);
+					break;
+				case 4:
+					bracket(x, double_secant_interpolate(x.lower,x.upper),fn,true);
+					break;
+				case 5:
+					if(x.upper.v - x.lower.v >= 0.5*Dist){
+						// If convergence of above three processes are worse than bisect method, just try bisect
+						bracket(x, bisect_interpolate(x.lower,x.upper),fn,true);
+						Stage = 2;
+					}else{
+						//otherwise just try additional interpolate
+						Dist = x.upper.v - x.lower.v;			
+						bracket(x, cubic_interpolate(x.lower,x.upper,2),fn, true);
+						Stage = 3;
+					}
+					break;
+				default://start from here
+					bracket(x, secant_interpolate(x.lower,x.upper), fn, false);
+					Stage = 1; //reset stage number
+					break;
 				}
 			}
+		private:
+			template<typename F>
+			void bracket(state& x, T z, F fn, bool cube_update){
+				if(cube_update) q = p;
+					
+				auto tol = std::numeric_limits<T>::epsilon() * 2;
+				if((x.upper.v - x.lower.v) < 2 * tol * x.lower.v){
+					z = detail::bisect_interpolate(x.lower,x.upper);
+				}else if(z <= x.lower.a + std::abs(x.lower.v) * tol){
+					z = x.lower.v + std::abs(x.lower.v) * tol;
+				}else if(z >= x.upper.b - std::abs(x.upper.v) * tol){
+					z = x.upper.v - std::abs(x.upper.v) * tol;
+				}
 
-			while(count && (a.f != 0) && !tol(a, b)){
-				// save our brackets:
-				a0 = a;
-				b0 = b;
-				
-				//
-				// Starting with the third step taken
-				// we can use either quadratic or cubic interpolation.
-				// Cubic interpolation requires that all four function values
-				// a.f, b.f, d.f, and e.f are distinct, should that not be the case
-				// then variable prof will get set to true, and we'll end up
-				// taking a quadratic step instead.
-				//
-				T min_diff = tools::min_value<T>() * 32;
-				bool prof = (fabs(a.f - b.f) < min_diff) || (fabs(a.f - d.f) < min_diff) || (fabs(a.f - e.f) < min_diff) || (fabs(b.f - d.f) < min_diff) || (fabs(b.f - e.f) < min_diff) || (fabs(d.f - e.f) < min_diff);
-				if(prof){
-					c = detail::quadratic_interpolate(a, b, d, a.f, b.f, d.f, 2);
-					//("Can't take cubic step!!!!");
+				auto fz = fn(z);
+
+				if(fz == 0){
+					p = pair(0,0);
+					x.lower = pair(z,fz);
+					x.upper = pair(z,fz);
+				}else if(hmLib::math::sign(a.f)*hmLib::math::sign(fx) == hmLib::math::sign::negative){
+					p = x.upper;
+					x.upper = pair(z,fz);
 				}else{
-					c = detail::cubic_interpolate(a, b, d, e, a.f, b.f, d.f, e.f);
+					p = x.lower;
+					x.lower = pair(z,fz);
 				}
-				//
-				// re-bracket, and check for termination:
-				//
-				e = d;
-				e.f = d.f;
-				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
-				if((0 == --count) || (a.f == 0) || tol(a, b))break;
-
-				//
-				// Now another interpolated step:
-				//
-				prof = (fabs(a.f - b.f) < min_diff) || (fabs(a.f - d.f) < min_diff) || (fabs(a.f - e.f) < min_diff) || (fabs(b.f - d.f) < min_diff) || (fabs(b.f - e.f) < min_diff) || (fabs(d.f - e.f) < min_diff);
-				if(prof){
-					c = detail::quadratic_interpolate(a, b, d, a.f, b.f, d.f, 3);
-					//("Can't take cubic step!!!!");
-				}else{
-					c = detail::cubic_interpolate(a, b, d, e, a.f, b.f, d.f, e.f);
-				}
-
-				//
-				// Bracket again, and check termination condition, update e:
-				//
-				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
-				if((0 == --count) || (a.f == 0) || tol(a, b))break;
-
-				//
-				// Now we take a double-length secant step:
-				//
-				if(fabs(a.f) < fabs(b.f)){
-					u = a;
-					fu = a.f;
-				}else{
-					u = b;
-					fu = b.f;
-				}
-
-				c = u - 2 * (fu / (b.f - a.f)) * (b - a);
-				if(fabs(c - u) > (b - a) / 2){
-					c = a + (b - a) / 2;
-				}
-
-				//
-				// Bracket again, and check termination condition:
-				//
-				e = d;
-				e.f = d.f;
-
-				detail::bracket(f, a, b, c, a.f, b.f, d, d.f);
-
-				if((0 == --count) || (a.f == 0) || tol(a, b))break;
-				//
-				// And finally... check to see if an additional bisection step is 
-				// to be taken, we do this if we're not converging fast enough:
-				//
-				if((b - a) < mu * (b0 - a0))continue;
-				//
-				// bracket again on a bisection:
-				//
-				e = d;
-				e.f = d.f;
-				detail::bracket(f, a, b, T(a + (b - a) / 2), a.f, b.f, d, d.f);
-				--count;
-			} // while loop
-
-			max_iter -= count;
-			if(a.f == 0){
-				b = a;
-			}else if(b.f == 0){
-				a = b;
 			}
-
-			return std::make_pair(a, b);
-		}
+		private:
+			int Stage;
+			T Dist;
+			vfpair<T> p;
+			vfpair<T> q;
+		};
 	}
 }
 #
