@@ -8,7 +8,7 @@
 #include "../../../odeint/observer/null_observer.hpp"
 #include "../../../odeint/observer/stream_observer.hpp"
 #include "../../../odeint/observer/iterator_observer.hpp"
-#include "../../../odeint/observer/histgoram_observer.hpp"
+#include "../../../odeint/observer/histogram_stream_observer.hpp"
 #include "../../../odeint/observer/observer_pack.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

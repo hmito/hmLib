@@ -3,9 +3,10 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include"../../../numeric.hpp"
 #include "../../../algorithm.hpp"
 #include "../../../random.hpp"
-#include"../../../iterators/index_access_iterator.hpp"
+#include"../../../iterators/ordered_access_iterator.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
@@ -278,7 +279,7 @@ namespace hmLib{
 			Assert::AreEqual(6u, Keeper.size());
 			Assert::AreEqual(6, std::distance(Keeper.begin(), Keeper.end()));
 
-			auto Range = hmLib::make_index_access_range(Con.begin(), Keeper.begin(), Keeper.end());
+			auto Range = hmLib::make_ordered_itr_access_range(Con.begin(), Keeper.begin(), Keeper.end());
 			auto Itr = Range.begin();
 
 			Assert::AreEqual(-1, *Itr++);

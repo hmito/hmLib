@@ -1,7 +1,7 @@
 #ifndef HMLIB_ITERATORS_INC
 #define HMLIB_ITERATORS_INC 100
 #
-#include "iterators/access_order_iterator.hpp"
+#include "iterators/ordered_access_iterator.hpp"
 //#include "iterators/any_iterator.hpp"
 #include "iterators/circular_iterator.hpp"
 #include "iterators/index_access_iterator.hpp"
