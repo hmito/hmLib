@@ -1,9 +1,9 @@
-#ifndef HMLIB_MINIMA_RANGEPRECISIONBREAKER_INC
-#define HMLIB_MINIMA_RANGEPRECISIONBREAKER_INC 100
+#ifndef HMLIB_NUMERIC_RANGEPRECISIONBREAKER_INC
+#define HMLIB_NUMERIC_RANGEPRECISIONBREAKER_INC 100
 #
 #include<cmath>
 namespace hmLib{
-	namespace minima{
+	namespace numeric{
  		template<typename value_type_>
 		struct range_precision_breaker{
 			//following functions should be callable;

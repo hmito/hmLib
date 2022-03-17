@@ -1,10 +1,10 @@
-#ifndef HMLIB_MINIMA_SIMPLEXPRECISIONBREAKER_INC
-#define HMLIB_MINIMA_SIMPLEXPRECISIONBREAKER_INC 100
+#ifndef HMLIB_NUMERIC_SIMPLEXPRECISIONBREAKER_INC
+#define HMLIB_NUMERIC_SIMPLEXPRECISIONBREAKER_INC 100
 #
 #include<cmath>
 #include<iterator>
 namespace hmLib{
-	namespace minima{
+	namespace numeric{
  		template<typename value_type_>
 		struct simplex_precision_breaker{
 			//following functions should be callable;
