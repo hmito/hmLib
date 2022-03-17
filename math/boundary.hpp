@@ -35,9 +35,9 @@ namespace hmLib{
 		fvalue_type operator()(const value_type& x)const{
 			if(x<=lower+inner_width){
 				if(x>lower){
-					return (1-cos((x-lower)/inner_width*math::pi()))/2*f(x);
+					return (1-cos((x-lower)/inner_width*math::pi<value_type>()))/2*f(x);
 				}else if(x>lower-outer_width){
-					return (1-cos((x-lower)/outer_width*math::pi()))/2*outer_strength;
+					return (1-cos((x-lower)/outer_width*math::pi<value_type>()))/2*outer_strength;
 				}else{
 					return outer_strength;
 				}
@@ -75,9 +75,9 @@ namespace hmLib{
 		fvalue_type operator()(const value_type& x)const{
 			if(x>=upper-inner_width){
 				if(x<upper){
-					return (1-cos((x-upper)/inner_width*math::pi()))/2*f(x);
+					return (1-cos((x-upper)/inner_width*math::pi<value_type>()))/2*f(x);
 				}else if(x<upper+outer_width){
-					return -(1-cos((x-upper)/outer_width*math::pi()))/2*outer_strength;
+					return -(1-cos((x-upper)/outer_width*math::pi<value_type>()))/2*outer_strength;
 				}else{
 					return -outer_strength;
 				}
@@ -120,9 +120,9 @@ namespace hmLib{
 		fvalue_type operator()(const value_type& x)const{
 			if(x>=upper-inner_width){
 				if(x<upper){
-					return (1-cos((x-upper)/inner_width*math::pi()))/2*f(x);
+					return (1-cos((x-upper)/inner_width*math::pi<value_type>()))/2*f(x);
 				}else if(x<upper+outer_width){
-					return -(1-cos((x-upper)/outer_width*math::pi()))/2*outer_strength;
+					return -(1-cos((x-upper)/outer_width*math::pi<value_type>()))/2*outer_strength;
 				}else{
 					return -outer_strength;
 				}
@@ -130,9 +130,9 @@ namespace hmLib{
 
 			if(x<=lower+inner_width){
 				if(x>lower){
-					return (1-cos((x-lower)/inner_width*math::pi()))/2*f(x);
+					return (1-cos((x-lower)/inner_width*math::pi<value_type>()))/2*f(x);
 				}else if(x>lower-outer_width){
-					return (1-cos((x-lower)/outer_width*math::pi()))/2*outer_strength;
+					return (1-cos((x-lower)/outer_width*math::pi<value_type>()))/2*outer_strength;
 				}else{
 					return outer_strength;
 				}
