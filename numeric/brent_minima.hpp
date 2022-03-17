@@ -12,7 +12,7 @@ namespace hmLib{
     namespace numeric{
 		template<typename T>
 		struct brent_minima_stepper{
-			using stepper_tag = precision_stepper;
+//			using stepper_tag = precision_stepper;
 			using state = guess_evalrange<T>;
 		public:
 			brent_minima_stepper():IsFirst(true){}

@@ -11,7 +11,7 @@ namespace hmLib{
     namespace numeric{
 		template<typename T>
 		struct golden_section_minima_stepper{
-			using stepper_tag = precision_stepper;
+//			using stepper_tag = precision_stepper;
 			using state = guess_evalrange<T>;
 			template<typename F,typename error_type>
 			void operator()(F fn, state& x, error_type precision)const {

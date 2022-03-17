@@ -5,6 +5,7 @@
 #include"../math/sign.hpp"
 #include"../exceptions/exception.hpp"
 #include"../exceptions/numeric_exceptions.hpp"
+#include"evalpair.hpp"
 #include"numeric_result.hpp"
 namespace hmLib{
 	namespace numeric{

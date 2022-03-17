@@ -11,7 +11,7 @@ namespace hmLib{
 			T f;
 		public:
 			evalpair()=default;
-			explict evalpair(T x_)noexcept:x(x_),f(){}
+			explicit evalpair(T x_)noexcept:x(x_),f(){}
 			evalpair(T x_, T f_)noexcept:x(x_),f(f_){}
 			template<typename F>
 			evalpair(F fn, T x_):x(x_),f(fn(x_)){}
