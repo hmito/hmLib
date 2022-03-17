@@ -48,7 +48,7 @@ namespace hmLib{
 					}else{
 						//otherwise just try additional interpolate
 						Dist = x.upper.v - x.lower.v;			
-						bracket(x, detail::cubic_interpolate(x.lower,x.upper,2),fn, true);
+						bracket(x, detail::cubic_interpolate(x.lower,x.upper,p,q,2),fn, true);
 						Stage = 3;
 					}
 					break;
@@ -63,7 +63,7 @@ namespace hmLib{
 						x.lower=x.upper;
 						return;
 					}
-					bracket(x, secant_interpolate(x.lower,x.upper), fn, false);
+					bracket(x, detail::secant_interpolate(x.lower,x.upper), fn, false);
 					Stage = 1; //reset stage number
 					break;
 				}
@@ -76,19 +76,19 @@ namespace hmLib{
 				auto tol = std::numeric_limits<T>::epsilon() * 2;
 				if((x.upper.v - x.lower.v) < 2 * tol * x.lower.v){
 					zv = detail::bisect_interpolate(x.lower,x.upper);
-				}else if(z <= x.lower.v + std::abs(x.lower.v) * tol){
+				}else if(zv <= x.lower.v + std::abs(x.lower.v) * tol){
 					zv = x.lower.v + std::abs(x.lower.v) * tol;
-				}else if(z >= x.upper.v - std::abs(x.upper.v) * tol){
+				}else if(zv >= x.upper.v - std::abs(x.upper.v) * tol){
 					zv = x.upper.v - std::abs(x.upper.v) * tol;
 				}
 
 				pair z(fn,zv);
 
 				if(hmLib::math::sign(z.f) == hmLib::math::sign::zero){
-					p = pair(0,0);
+					p = pair(0.,0.);
 					x.lower = z;
 					x.upper = z;
-				}else if(hmLib::math::sign(a.f)*hmLib::math::sign(z.f) == hmLib::math::sign::negative){
+				}else if(hmLib::math::sign(x.lower.f)*hmLib::math::sign(z.f) == hmLib::math::sign::negative){
 					p = x.upper;
 					x.upper = z;
 				}else{

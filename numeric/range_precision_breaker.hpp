@@ -2,6 +2,7 @@
 #define HMLIB_NUMERIC_RANGEPRECISIONBREAKER_INC 100
 #
 #include<cmath>
+#include"evalpair.hpp"
 namespace hmLib{
 	namespace numeric{
  		template<typename value_type_>
@@ -21,13 +22,25 @@ namespace hmLib{
 				: relerr(relative_error_)
 				, abserr(absolute_error_){
 			}
-			template<typename state_type>
-			auto precision(const state_type& x)const{
-				return relerr * std::abs(x.value()) + abserr / 4;
+			template<typename T>
+			auto precision(const evalrange<T>& x)const{
+				using std::abs;
+				return relerr * abs((x.upper.v + x.lower.v) / 2) + abserr / 4;
 			}
-			template<typename state_type, typename step_type>
-			bool operator()(const state_type& x, step_type)const{
-				return std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision(x) * 2 ;
+			template<typename T, typename step_type>
+			bool operator()(const evalrange<T>& x, step_type)const{
+				using std::abs;
+				return (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
+			}
+			template<typename T>
+			auto precision(const guess_evalrange<T>& x)const {
+				using std::abs;
+				return relerr * std::abs(x.guess.v) + abserr / 4;
+			}
+			template<typename T, typename step_type>
+			bool operator()(const guess_evalrange<T>& x, step_type)const {
+				using std::abs;
+				return abs(x.guess.v - (x.upper.v + x.lower.v) / 2) + (x.upper.v - x.lower.v) / 2 <= precision(x) * 2;
 			}
 		private:
 			value_type relerr;

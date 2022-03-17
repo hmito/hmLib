@@ -2,6 +2,7 @@
 #define HMLIB_NUMERIC_EVALUE_INC 100
 #
 #include<utility>
+#include<type_traits>
 namespace hmLib{
 	namespace numeric{
 		template<typename T>
@@ -12,12 +13,12 @@ namespace hmLib{
 		public:
 			evalpair()=default;
 			explicit evalpair(T x_)noexcept:x(x_),f(){}
-			evalpair(T x_, T f_)noexcept:x(x_),f(f_){}
-			template<typename F>
-			evalpair(F fn, T x_):x(x_),f(fn(x_)){}
-			void set(T x_, T f_)noexcept{v=x_; f=f_;}
-			template<typename F>
-			void set(F fn, T x_){v=x_; f=fn(v);}
+			evalpair(T v_, T f_)noexcept:v(v_),f(f_){}
+			template<typename F, std::enable_if_t<std::is_invocable_v<F,T>,std::nullptr_t> = nullptr>
+			evalpair(F fn, T v_):v(v_),f(fn(v_)){}
+			void set(T v_, T f_)noexcept{v= v_; f=f_;}
+			template<typename F, std::enable_if_t<std::is_invocable_v<F, T>, std::nullptr_t> = nullptr>
+			void set(F fn, T v_){v= v_; f=fn(v);}
 			template<typename F>
 			void eval(F fn){f=fn(v);}
 		};
@@ -36,7 +37,7 @@ namespace hmLib{
 				: lower(lower_)
 				, upper(upper_){
 			}
-			template<typename F>
+			template<typename F, std::enable_if_t<std::is_invocable_v<F, T>, std::nullptr_t> = nullptr>
 			evalrange(F fn, T lowerval, T upperval)
 				: lower(fn,lowerval)
 				, upper(fn,upperval){
@@ -71,7 +72,7 @@ namespace hmLib{
 				, lower(lower_)
 				, upper(upper_){
 			}
-			template<typename F>
+			template<typename F, std::enable_if_t<std::is_invocable_v<F, T>, std::nullptr_t> = nullptr>
 			guess_evalrange(F fn, T guessval, T lowerval, T upperval)
 				: guess(fn,guessval)
 				, lower(fn,lowerval)
@@ -82,7 +83,7 @@ namespace hmLib{
 				lower = lower_;
 				upper = upper_;
 			}
-			template<typename F>
+			template<typename F, std::enable_if_t<std::is_invocable_v<F, T>, std::nullptr_t> = nullptr>
 			void set(F fn, T guessval, T lowerval, T upperval){
 				guess.eval(fn,guessval);
 				lower.eval(fn,lowerval);

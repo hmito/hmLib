@@ -38,7 +38,7 @@ namespace hmLib{
 				if(hmLib::math::sign(z.f) == hmLib::math::sign::zero){
 					x.lower = z;
 					x.upper = z;
-				}else if(hmLib::math::sign(a.f)*hmLib::math::sign(z.f) == hmLib::math::sign::negative){
+				}else if(hmLib::math::sign(x.lower.f)*hmLib::math::sign(z.f) == hmLib::math::sign::negative){
 					x.upper = z;
 				}else{
 					x.lower = z;

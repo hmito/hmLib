@@ -3,7 +3,6 @@
 #include <vector>
 #include <algorithm>
 #include <list>
-#include"../../../numeric.hpp"
 #include "../../../algorithm.hpp"
 #include "../../../random.hpp"
 #include"../../../iterators/ordered_access_iterator.hpp"
@@ -82,7 +81,6 @@ namespace hmLib{
 			}
 		}
 	};
-
 	TEST_CLASS(test_keep_algorithms) {
 	public:
 		TEST_METHOD(keep_if_notag) {

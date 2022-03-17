@@ -51,8 +51,8 @@ namespace hmLib{
 				}
 			}
 		};
-		template<typename F, typename T, typename breaker>
-		auto breakable_golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk){
+		template<typename F, typename T, typename precision_breaker>
+		auto breakable_golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, precision_breaker Brk){
 			using stepper = golden_section_minima_stepper<T>;
 			using state = typename stepper::state;
 			stepper Stepper;
@@ -61,13 +61,13 @@ namespace hmLib{
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
+				Stepper(fn,State, Brk.precision(State));
 			}
 
 			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename T, typename breaker, typename observer>
-		auto breakable_golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk, observer Obs){
+		template<typename F, typename T, typename precision_breaker, typename observer>
+		auto breakable_golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, precision_breaker Brk, observer Obs){
 			using stepper = golden_section_minima_stepper<T>;
 			using state = typename stepper::state;
 			stepper Stepper;
@@ -76,7 +76,7 @@ namespace hmLib{
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
+				Stepper(fn,State, Brk.precision(State));
 				Obs(State,i);
 			}
 

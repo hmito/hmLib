@@ -20,8 +20,8 @@ namespace hmLib{
 			void initialize(F, state&)noexcept{
 				IsFirst = true;
 			}
-			template<typename fn,typename error_type>
-			void operator()(fn f, state& x, error_type precision) {
+			template<typename F,typename error_type>
+			void operator()(F fn, state& x, error_type precision) {
 				using std::abs;
 				constexpr T epsilon(1.0/(math::golden_ratio<T>+1.0));
 
@@ -118,9 +118,9 @@ namespace hmLib{
 			evalpair<T> best2nd;
 			evalpair<T> best3rd;
 		};
-		template<typename fn, typename value_type, typename precision_breaker, typename observer>
-		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk, observer Obs){
-			using stepper = toms748_root_stepper<T>;
+		template<typename F, typename T, typename precision_breaker, typename observer>
+		auto breakable_brent_minima(F fn, T lowerval, T upperval, unsigned int maxitr, precision_breaker Brk, observer Obs){
+			using stepper = brent_minima_stepper<T>;
 			using state = typename stepper::state;
 			stepper Stepper;
 			state State(fn, (lowerval+upperval)/2.0, lowerval,upperval);
@@ -128,34 +128,34 @@ namespace hmLib{
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(Fn,State,Brk.precision(State));
+				Stepper(fn,State,Brk.precision(State));
 				Obs(State,i);
 			}
 
 			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename fn, typename value_type, typename precision_breaker>
-		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk){
-			using stepper = toms748_root_stepper<T>;
+		template<typename F, typename T, typename precision_breaker>
+		auto breakable_brent_minima(F fn, T lowerval, T upperval, unsigned int maxitr, precision_breaker Brk){
+			using stepper = brent_minima_stepper<T>;
 			using state = typename stepper::state;
 			stepper Stepper;
-			state State(fn, (lowerval+upperval)/2.0, lowerval,upperval);
+			state State(fn,(lowerval+upperval)/2.0,lowerval,upperval);
 			State.order();
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(Fn,State,Brk.precision(State));
+				Stepper(fn,State,Brk.precision(State));
 			}
 
 			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename fn, typename value_type, typename error_type, typename observer>
-		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,make_range_precision_breaker(relerr,abserr),Obs);
+		template<typename F, typename T, typename error_type, typename observer>
+		auto brent_minima(F fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_brent_minima(fn, lowerval, upperval, maxitr, range_precision_breaker<error_type>(relerr,abserr),Obs);
 		}
-		template<typename fn, typename value_type, typename error_type>
-		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,make_range_precision_breaker(relerr,abserr));
+		template<typename F, typename T, typename error_type>
+		auto brent_minima(F fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_brent_minima(fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
 		}
     }
 }

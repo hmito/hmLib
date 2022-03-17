@@ -17,7 +17,7 @@ namespace hmLib{
 				auto x = a.v - (a.f / (b.f - a.f)) * (b.v - a.v);
 
 				auto tol = std::numeric_limits<value_type>::epsilon() * 5;
-				if((a.v + abs(a.v) * tol.v < x) && (x < b.v - abs(b.v) * tol)) return x;
+				if((a.v + abs(a.v) * tol < x) && (x < b.v - abs(b.v) * tol)) return x;
 				
 				//secant faild; return bisect
 				return bisect_interpolate(a,b);
@@ -87,7 +87,7 @@ namespace hmLib{
 				value_type d32 = (d31 - q21) * c.f / (c.f - a.f);
 				value_type q33 = (d32 - q22) * a.f / (d.f - a.f);
 
-				value_type x = q31 + q32 + q33 + a;
+				value_type x = q31 + q32 + q33 + a.v;
 
 				if(a.v < x && x < b.v) return x;
 
