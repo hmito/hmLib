@@ -2,8 +2,8 @@
 #define HMLIB_ODEINT_OBSERVER_OBSERVESKIPPER_INC 100
 #
 #include<type_traits>
-namespace hmLib{
-	namespace odeint{
+namespace hmLib {
+	namespace odeint {
 		template<typename observer>
 		class observe_skipper {
 			observer Obs;

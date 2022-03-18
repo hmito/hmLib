@@ -1,10 +1,10 @@
-#ifndef HMLIB_MINIMA_SIMPLEXPRECISIONBREAKER_INC
-#define HMLIB_MINIMA_SIMPLEXPRECISIONBREAKER_INC 100
+#ifndef HMLIB_NUMERIC_SIMPLEXPRECISIONBREAKER_INC
+#define HMLIB_NUMERIC_SIMPLEXPRECISIONBREAKER_INC 100
 #
 #include<cmath>
 #include<iterator>
 namespace hmLib{
-	namespace minima{
+	namespace numeric{
  		template<typename value_type_>
 		struct simplex_precision_breaker{
 			//following functions should be callable;
@@ -22,8 +22,8 @@ namespace hmLib{
 				: relerr(relative_error_)
 				, abserr(absolute_error_){
 			}
-			template<typename state_type>
-			bool operator()(const state_type& x)const{
+			template<typename state_type,typename step_type>
+			bool operator()(const state_type& x,step_type)const{
 				unsigned int size = std::distance(x.begin(), x.end()) - 1;
 				for (unsigned int i = 0; i < size; ++i) {
 					auto nitr = x.begin(); 

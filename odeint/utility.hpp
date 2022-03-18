@@ -8,9 +8,11 @@
 #include<boost/numeric/odeint/util/resizer.hpp>
 #include<boost/numeric/odeint/util/is_resizeable.hpp>
 #include<boost/numeric/odeint/util/same_size.hpp>
+#include<boost/numeric/odeint/algebra/algebra_dispatcher.hpp>
 #include<boost/numeric/odeint/algebra/vector_space_algebra.hpp>
 #include<boost/numeric/odeint/algebra/array_algebra.hpp>
 #include<boost/numeric/odeint/algebra/range_algebra.hpp>
+#include<boost/numeric/odeint/algebra/operations_dispatcher.hpp>
 #include"../utility.hpp"
 #include"../type_traits.hpp"
 namespace hmLib{

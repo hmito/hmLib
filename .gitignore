@@ -197,3 +197,7 @@ hmLib_config\.h
 *.opendb
 
 *.manifest
+
+.DS_Store
+
+*.testlog

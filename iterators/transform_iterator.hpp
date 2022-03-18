@@ -224,6 +224,10 @@ namespace hmLib {
 		}
 	};
 	template<typename base_iterator_, typename transform_>
+	transform_iterator<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type> make_transform_iterator(base_iterator_ Itr, transform_&& Transform) {
+		return transform_iterator<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type>(std::move(Itr),  std::move(Transform));
+	}
+	template<typename base_iterator_, typename transform_>
 	transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type> make_transform_range(base_iterator_ Beg, base_iterator_ End, transform_&& Transform) {
 		return transform_range<typename std::decay<base_iterator_>::type, typename std::decay<transform_>::type>(std::move(Beg), std::move(End), std::move(Transform));
 	}
