@@ -267,7 +267,7 @@ public:
 		Cir.push_back(1);
 		Cir.push_back(2);
 		Cir.push_back(3);
-		Assert::AreEqual(4, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(4, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -286,7 +286,7 @@ public:
 		}
 
 		Cir.pop_front();
-		Assert::AreEqual(3, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(3, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -302,7 +302,7 @@ public:
 		}
 
 		Cir.pop_front();
-		Assert::AreEqual(2, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(2, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -315,7 +315,7 @@ public:
 		}
 
 		Cir.pop_front();
-		Assert::AreEqual(1, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(1, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -324,7 +324,7 @@ public:
 			Assert::IsTrue(Itr == Cir.end(), L"End itr error");
 		}
 		Cir.pop_front();
-		Assert::AreEqual(0, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(0, Cir.end() - Cir.begin(), L"iterator diff error");
 		Assert::IsTrue(Cir.begin()==Cir.end(), L"empty error");
 	}
 	TEST_METHOD(iterator_1){
@@ -346,7 +346,7 @@ public:
 		Cir.push_back(1);
 		Cir.push_back(2);
 		Cir.push_back(3);
-		Assert::AreEqual(4, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(4, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -365,7 +365,7 @@ public:
 		}
 
 		Cir.pop_front();
-		Assert::AreEqual(3, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(3, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -381,7 +381,7 @@ public:
 		}
 
 		Cir.pop_front();
-		Assert::AreEqual(2, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(2, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -394,7 +394,7 @@ public:
 		}
 
 		Cir.pop_front();
-		Assert::AreEqual(1, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(1, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -403,7 +403,7 @@ public:
 			Assert::IsTrue(Itr == Cir.end(), L"End itr error");
 		}
 		Cir.pop_front();
-		Assert::AreEqual(0, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(0, Cir.end() - Cir.begin(), L"iterator diff error");
 		Assert::IsTrue(Cir.begin() == Cir.end(), L"empty error");
 	}
 	TEST_METHOD(iterator_2){
@@ -425,7 +425,7 @@ public:
 		Cir.push_front(1);
 		Cir.push_front(2);
 		Cir.push_front(3);
-		Assert::AreEqual(4, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(4, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -444,7 +444,7 @@ public:
 		}
 
 		Cir.pop_back();
-		Assert::AreEqual(3, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(3, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -460,7 +460,7 @@ public:
 		}
 
 		Cir.pop_back();
-		Assert::AreEqual(2, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(2, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -473,7 +473,7 @@ public:
 		}
 
 		Cir.pop_back();
-		Assert::AreEqual(1, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(1, Cir.end() - Cir.begin(), L"iterator diff error");
 		{
 			auto Itr = Cir.begin();
 			Assert::IsFalse(Itr == Cir.end(), L"End itr error");
@@ -482,7 +482,7 @@ public:
 			Assert::IsTrue(Itr == Cir.end(), L"End itr error");
 		}
 		Cir.pop_back();
-		Assert::AreEqual(0, Cir.end() - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(0, Cir.end() - Cir.begin(), L"iterator diff error");
 		Assert::IsTrue(Cir.begin() == Cir.end(), L"empty error");
 	}
 	TEST_METHOD(iterator_3){
@@ -502,37 +502,37 @@ public:
 		}
 
 		auto Itr = Cir.begin();
-		Assert::AreEqual(0, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(-6, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(0, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(-6, Itr - Cir.end(), L"iterator diff error");
 		Assert::AreEqual<int>(0, *Itr, L"iterator access error");
 
 		Itr += 2;
-		Assert::AreEqual(2, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(-4, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(2, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(-4, Itr - Cir.end(), L"iterator diff error");
 		Assert::AreEqual<int>(2, *Itr, L"iterator access error");
 
 		Itr += 2;
-		Assert::AreEqual(4, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(-2, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(4, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(-2, Itr - Cir.end(), L"iterator diff error");
 		Assert::AreEqual<int>(4, *Itr, L"iterator access error");
 
 		Itr += 2;
-		Assert::AreEqual(6, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(0, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(6, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(0, Itr - Cir.end(), L"iterator diff error");
 
 		Itr -= 2;
-		Assert::AreEqual(4, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(-2, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(4, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(-2, Itr - Cir.end(), L"iterator diff error");
 		Assert::AreEqual<int>(4, *Itr, L"iterator access error");
 
 		Itr -= 2;
-		Assert::AreEqual(2, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(-4, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(2, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(-4, Itr - Cir.end(), L"iterator diff error");
 		Assert::AreEqual<int>(2, *Itr, L"iterator access error");
 
 		Itr -= 2;
-		Assert::AreEqual(0, Itr - Cir.begin(), L"iterator diff error");
-		Assert::AreEqual(-6, Itr - Cir.end(), L"iterator diff error");
+		Assert::AreEqual<int>(0, Itr - Cir.begin(), L"iterator diff error");
+		Assert::AreEqual<int>(-6, Itr - Cir.end(), L"iterator diff error");
 		Assert::AreEqual<int>(0, *Itr, L"iterator access error");
 	}
 	TEST_METHOD(iterator_4){

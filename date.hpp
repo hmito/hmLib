@@ -1,22 +1,22 @@
 ﻿#ifndef HMLIB_DATE_INC
 #define HMLIB_DATE_INC 100
 #
-/*===date===
-system_clockを日付型に変換する
-あくまで入出力用であり、加算等の演算はできない
-*/
 #include<chrono>
 #include<ctime>
+#include<string>
+#include<iostream>
+#include<iomanip>
+#include<sstream>
 namespace hmLib{
 	struct date{
 		typedef std::chrono::system_clock::time_point time_point;
-		unsigned int Year;
-		unsigned int Month;
-		unsigned int Day;
-		unsigned int Hour;
-		unsigned int Min;
-		unsigned int Sec;
-		unsigned int mSec;
+		unsigned int Year;	//Y
+		unsigned int Month;	//M
+		unsigned int Day;	//D
+		unsigned int Hour;	//h
+		unsigned int Min;	//m
+		unsigned int Sec;	//s
+		unsigned int mSec;	//d
 	public:
 		date():Year(0),Month(0),Day(0),Hour(0),Min(0),Sec(0),mSec(0){}
 		date(unsigned int Year_,unsigned int Month_,unsigned int Day_,unsigned int Hour_,unsigned int Min_,unsigned int Sec_,unsigned int mSec_)
@@ -43,7 +43,52 @@ namespace hmLib{
 			Sec  = st->tm_sec;
 			mSec = (std::chrono::duration_cast<std::chrono::milliseconds>(Time_.time_since_epoch()).count())%1000;
 		}
+		std::string str(std::string format){
+			std::string ans;
+			for (auto c : format) {
+				std::ostringstream sout;
+				switch (c) {
+				case 'Y':
+					sout << std::setw(4) << std::setfill('0') << std::right << Year;
+					ans += sout.str();
+					break;
+				case 'M':
+					sout << std::setw(2) << std::setfill('0') << std::right << Month;
+					ans += sout.str();
+					break;
+				case 'D':
+					sout << std::setw(2) << std::setfill('0') << std::right << Day;
+					ans += sout.str();
+					break;
+				case 'h':
+					sout << std::setw(2) << std::setfill('0') << std::right << Hour;
+					ans += sout.str();
+					break;
+				case 'm':
+					sout << std::setw(2) << std::setfill('0') << std::right << Min;
+					ans += sout.str();
+					break;
+				case 's':
+					sout << std::setw(2) << std::setfill('0') << std::right << Sec;
+					ans += sout.str();
+					break;
+				case 'd':
+					sout << std::setw(3) << std::setfill('0') << std::right << mSec;
+					ans += sout.str();
+					break;
+				default:
+					ans += c;
+					break;
+				}
+			}
+			return ans;
+		}
 	};
+	inline date current_date() {
+		date Cur;
+		Cur.from_time(std::chrono::system_clock::now());
+		return Cur;
+	}
 }
 #
 #endif

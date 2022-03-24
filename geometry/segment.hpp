@@ -9,7 +9,8 @@ namespace hmLib {
 		private:
 			using this_type = segment<T>;
 		public:
-			using point_type = point<T>;
+			using value_type = T;
+			using point_type = point<value_type>;
 		public:
 			point_type p1;
 			point_type p2;
@@ -32,7 +33,7 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename point_type_, typename std::enable_if<std::is_convertible<point_type_, point_type>::value>::type*& = hmLib::utility::enabler>
-			void set(point_type_ x_, point_type_ y_) {
+			void set(point_type_ p1_, point_type_ p2_) {
 				p1 = p1_;
 				p2 = p2_;
 			}
@@ -82,10 +83,14 @@ namespace hmLib {
 				return *this;
 			}
 			template<typename U, typename std::enable_if<std::is_convertible<T, U>::value>::type*& = hmLib::utility::enabler>
-			explicit operator point<U>()const {
-				return point<U>(static_cast<U>(x), static_cast<U>(y));
+			explicit operator segment<U>()const {
+				return segment<U>(static_cast<U>(p1), static_cast<U>(p2));
 			}
 		};
+		template<typename T,typename U>
+		auto make_segment(const point<T>& p, const point<U>& q) {
+			return segment<decltype(std::declval<T>() + std::declval<U>())>(p, q);
+		}
 		template<typename T, typename U>
 		bool operator==(const segment<T>& s1, const segment<U>& s2) {
 			return(s1.p1 == s2.p1 && s1.p2 == s2.p2);

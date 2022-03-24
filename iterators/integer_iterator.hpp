@@ -96,18 +96,18 @@ namespace hmLib {
 		using pointer = typename std::iterator_traits<iterator>::pointer;
 		using difference_type = typename std::iterator_traits<iterator>::difference_type;
 	private:
-		T Min;
-		T Max;
+		T Beg;
+		T End;
 	public:
-		integer_range(T Min_, T Max_) :Min(Min_), Max(Max_) {}
-		iterator begin()const { return iterator(Min); }
-		iterator end()const { return iterator(Max + 1); }
+		integer_range(T Beg_, T End_) :Beg(Beg_), End(End_) {}
+		iterator begin()const { return iterator(Beg); }
+		iterator end()const { return iterator(End); }
 		iterator cbegin()const { return begin(); }
 		iterator cend()const { return end(); }
 	};
 
 	template<typename T>
-	auto make_integer_range(T Min_, T Max_) { return integer_range<T>(Min_, Max_); }
+	auto make_integer_range(T Beg_, T End_) { return integer_range<T>(Beg_, End_); }
 
 	using int_iterator = integer_iterator<int>;
 	using signed_int_iterator = integer_iterator<signed int>;

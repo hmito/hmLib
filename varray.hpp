@@ -4,10 +4,13 @@
 #include<array>
 #include<algorithm>
 #include<numeric>
+#include<cmath>
 #include<initializer_list>
 #include<type_traits>
 #include"utility.hpp"
 namespace hmLib {
+	//order of varray: same with multiarray
+	// [0,0] < [0,1] < [1,0]
 	template<typename T, std::size_t N>
 	struct varray {
 	private:
@@ -291,28 +294,28 @@ namespace hmLib {
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator<(const varray<T, N>& v1, const varray<U, N>& v2) { 
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]<v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]<v2[i];
 		}
 		return false;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() < std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator<=(const varray<T, N>& v1, const varray<U, N>& v2) { 
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]<v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]<v2[i];
 		}
 		return true;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator>(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]>v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]>v2[i];
 		}
 		return false;
 	}
 	template<typename T, typename U, std::size_t N, typename std::enable_if<std::is_convertible<decltype(std::declval<T>() > std::declval<U>()), bool>::value>::type*& = hmLib::utility::enabler>
 	bool operator>=(const varray<T, N>& v1, const varray<U, N>& v2) {
 		for(unsigned int i = 0; i < N; ++i) {
-			if(!(v1[N-1-i] == v2[N-1-i]))return v1[N-1-i]>v2[N-1-i];
+			if(!(v1[i] == v2[i]))return v1[i]>v2[i];
 		}
 		return true;
 	}
@@ -442,22 +445,6 @@ namespace hmLib {
 		varray<decltype(std::abs(std::declval<T>())), N> Ans;
 		auto itr = v.begin();
 		for(auto& a:Ans)a = std::abs(*(itr++));
-		return Ans;
-	}
-	template<typename T, std::size_t N>
-	decltype(std::sqrt(std::declval<T>()*std::declval<T>())) norm(const varray<T, N>& v) {
-		static_assert(N>0, "norm can be calculated only when N>0.");
-
-		auto Ans = v.front()* v.front();
-		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
-		return std::sqrt(Ans);
-	}
-	template<typename T, std::size_t N>
-	decltype(std::declval<T>()*std::declval<T>()) norm2(const varray<T, N>& v) {
-		static_assert(N>0, "norm can be calculated only when N>0.");
-
-		auto Ans = v.front()* v.front();
-		for(auto itr = std::next(v.begin()); itr!=v.end(); ++itr) Ans += (*itr)*(*itr);
 		return Ans;
 	}
 }

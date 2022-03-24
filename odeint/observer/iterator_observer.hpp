@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_ODEINT_ITERATOROBSERVER_INC
-#define HMLIB_ODEINT_ITERATOROBSERVER_INC 100
+﻿#ifndef HMLIB_ODEINT_OBSERVER_ITERATOROBSERVER_INC
+#define HMLIB_ODEINT_OBSERVER_ITERATOROBSERVER_INC 100
 #
 namespace hmLib{
 	namespace odeint{
@@ -56,8 +56,8 @@ namespace hmLib{
 		};
 
 		template<typename state_iterator>
-		iterator_observer<state_iterator, void> make_iterator_observer(state_iterator Itr){
-			return iterator_observer<state_iterator, void>(Itr);
+		iterator_observer<state_iterator, void> make_iterator_observer(state_iterator StateItr){
+			return iterator_observer<state_iterator, void>(StateItr);
 		}
 		template<typename state_iterator,typename time_iterator>
 		iterator_observer<state_iterator, time_iterator> make_iterator_observer(state_iterator StateItr, time_iterator TimeItr){

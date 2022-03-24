@@ -2,19 +2,18 @@
 #include "CppUnitTest.h"
 #include <array>
 #include <cmath>
-#include <hmLib/odeint.hpp>
-#include <hmLib/odeint/breakable_integrate.hpp>
-#include <hmLib/odeint/container_observer.hpp>
-#include <hmLib/odeint/stream_observer.hpp>
-#include <hmLib/odeint/iterator_observer.hpp>
-#include <hmLib/odeint/break_observer.hpp>
-#include <hmLib/odeint/eqstate_break_observer.hpp>
-#include <hmLib/odeint/range_stepper.hpp>
-
+#include <boost/numeric/odeint.hpp>
+#include "../../../varray.hpp"
+#include "../../../odeint.hpp"
+#include "../../../odeint/observer/null_observer.hpp"
+#include "../../../odeint/observer/stream_observer.hpp"
+#include "../../../odeint/observer/iterator_observer.hpp"
+#include "../../../odeint/observer/histgoram_observer.hpp"
+#include "../../../odeint/observer/observer_pack.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hmLib{
-	namespace bodeint = boost::numeric::odeint;
+	namespace boost_odeint = boost::numeric::odeint;
 	TEST_CLASS(test_odeint_observer){
 		struct test_system{
 			using state = std::array<double, 2>;
@@ -27,75 +26,70 @@ namespace hmLib{
 			}
 			unsigned int region(const state&, double){ return 1; }
 		};
-public:
-	TEST_METHOD(container_observer){
-		bodeint::euler<test_system::state> Stepper;
-		test_system System;
-		test_system::state State{0.0,1.0};
+	public:
+		TEST_METHOD(stream_observer){
+			boost_odeint::euler<test_system::state> Stepper;
+			test_system System;
+			test_system::state State{0.0,1.0};
 
-		odeint::container_observer<test_system::state> Observer;
+			odeint::stream_observer Observer(std::cout);
 
-		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-	}
-	TEST_METHOD(stream_observer){
-		bodeint::euler<test_system::state> Stepper;
-		test_system System;
-		test_system::state State{0.0,1.0};
+			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
+		}
+		TEST_METHOD(s_iterator_observer){
+			boost_odeint::euler<test_system::state> Stepper;
+			test_system System;
+			test_system::state State{0.0,1.0};
 
-		odeint::stream_observer Observer(std::cout);
+			std::vector<test_system::state> Log;
+			auto Observer = odeint::make_iterator_observer(std::back_inserter(Log));
 
-		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-	}
-	TEST_METHOD(s_iterator_observer){
-		bodeint::euler<test_system::state> Stepper;
-		test_system System;
-		test_system::state State{0.0,1.0};
+			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
+		}
+		TEST_METHOD(st_iterator_observer){
+			boost_odeint::euler<test_system::state> Stepper;
+			test_system System;
+			test_system::state State{0.0,1.0};
 
-		std::vector<test_system::state> Log;
-		auto Observer = odeint::make_iterator_observer(std::back_inserter(Log));
+			std::vector<test_system::state> Log;
+			std::vector<double> TLog;
+			auto Observer = odeint::make_iterator_observer(std::back_inserter(Log), std::back_inserter(TLog));
 
-		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-	}
-	TEST_METHOD(st_iterator_observer){
-		bodeint::euler<test_system::state> Stepper;
-		test_system System;
-		test_system::state State{0.0,1.0};
+			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
+		}
+		TEST_METHOD(pair_iterator_observer){
+			boost_odeint::euler<test_system::state> Stepper;
+			test_system System;
+			test_system::state State{0.0,1.0};
 
-		std::vector<test_system::state> Log;
-		std::vector<double> TLog;
-		auto Observer = odeint::make_iterator_observer(std::back_inserter(Log), std::back_inserter(TLog));
+			std::vector<std::pair<double, test_system::state> > Log;
+			auto Observer = odeint::make_pair_iterator_observer(std::back_inserter(Log));
 
-		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-	}
-	TEST_METHOD(pair_iterator_observer){
-		bodeint::euler<test_system::state> Stepper;
-		test_system System;
-		test_system::state State{0.0,1.0};
+			boost_odeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
+		}
+		TEST_METHOD(observer_pack1) {
+			std::vector<double> StateLog;
+			auto IObs1 = hmLib::odeint::make_iterator_observer(std::back_insert_iterator(StateLog));
+			std::vector<std::pair<double,double>> PairLog;
+			auto IObs2 = hmLib::odeint::make_pair_iterator_observer(std::back_insert_iterator(PairLog));
+			auto Obs = hmLib::odeint::make_observer_pack(IObs1, IObs2);
 
-		std::vector<std::pair<double, test_system::state> > Log;
-		auto Observer = odeint::make_pair_iterator_observer(std::back_inserter(Log));
+			std::vector<std::pair<double, double>> Data{ {2.5,0.0},{4.5,1.0},{5.1,2.0} };
 
-		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1);
-	}
-	TEST_METHOD(break_observer){
-		bodeint::euler<test_system::state> Stepper;
-		test_system System;
-		test_system::state State{0.0,1.0};
+			for (const auto& p : Data) {
+				Obs(p.first, p.second);
+			}
 
-		std::vector<std::pair<double, test_system::state> > Log;
-		auto Observer = odeint::make_break_observer([](const test_system::state& State, double)->bool{return State[0] > 1.0; });
+			Assert::AreEqual(Data.size(), StateLog.size());
+			Assert::AreEqual(Data.size(), PairLog.size());
 
-		bodeint::integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, Observer);
-	}
-	TEST_METHOD(range_stepper){
-		auto Stepper = bodeint::make_dense_output(1.0e-10, 1.0e-6, bodeint::runge_kutta_dopri5<test_system::state>());
-		test_system System;
-		test_system::state State{0.0,1.0};
+			for (unsigned int i = 0; i < Data.size();++i) {
+				Assert::AreEqual(Data[i].first, StateLog[i], 1e-10);
+				Assert::AreEqual(Data[i].first, PairLog[i].second, 1e-10);
+				Assert::AreEqual(Data[i].second, PairLog[i].first, 1e-10);
 
-		odeint::region_abridged_stepper<decltype(Stepper)> RStepper(0.001, std::move(Stepper));
-
-		RStepper.do_step(System);
-	}
+			}
+		}
 	};
 	TEST_CLASS(test_segment_cross){
 	private:
@@ -244,4 +238,323 @@ public:
 			Assert::IsTrue(is_cross_segment(b1, b2, a1, a2), L"Same line");
 		}
 	};
+	TEST_CLASS(test_odeint_breakable) {
+	private:
+		using state = varray<double, 2>;
+		struct dynamics {
+			void operator()(const state& x, state& dx, double t)const {
+				dx[0] = -0.5 * x[0] + 0.9 * x[1]+0.2;
+				dx[1] = -0.6 * x[1] + 0.7 * x[0]+0.2;
+			}
+		};
+		struct breaker {
+			bool operator()(const state& x, double t)const {
+				return x[0] < 0 || x[1] > 0.1;
+			}
+		};
+		struct observer {
+			void operator()(const state& x, double t)const {}
+		};
+	public:
+		TEST_METHOD(test_integrate_st) {
+			dynamics Dyno;
+			observer Observer;
+			boost_odeint::runge_kutta4<state> Stepper;
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+		}
+		TEST_METHOD(test_breakable_integrate_st) {
+			state State{ 0.0,0.0 };
+			dynamics Dyno;
+			breaker Breaker;
+			observer Observer;
+			boost_odeint::runge_kutta4<state> Stepper;
+
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+		}
+		TEST_METHOD(test_integrate_ctrst) {
+			dynamics Dyno;
+			observer Observer;
+			auto Stepper = boost_odeint::make_controlled(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state>());
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+		}
+		TEST_METHOD(test_breakable_integrate_ctrst) {
+			dynamics Dyno;
+			breaker Breaker;
+			observer Observer;
+			auto Stepper = boost_odeint::make_controlled(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state>());
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+		}
+		TEST_METHOD(test_integrate_adpst) {
+			state State{ 0.0,0.0 };
+			dynamics Dyno;
+			observer Observer;
+			auto Stepper = hmLib::odeint::make_adaptive(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state>());
+
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+		}
+		TEST_METHOD(test_breakable_integrate_adpst) {
+			state State{ 0.0,0.0 };
+			dynamics Dyno;
+			breaker Breaker;
+			observer Observer;
+			auto Stepper = hmLib::odeint::make_adaptive(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state>());
+
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+		}
+		TEST_METHOD(test_integrate_dnsst) {
+			state State{ 0.0,0.0 };
+			dynamics Dyno;
+			observer Observer;
+			auto Stepper = boost_odeint::make_dense_output(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state>());
+
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.01, Observer);
+				Assert::AreEqual(0.238, State[0], 0.001);
+				Assert::AreEqual(0.216, State[1], 0.001);
+			}
+		}
+		TEST_METHOD(test_breakable_integrate_dnsst) {
+			state State{ 0.0,0.0 };
+			dynamics Dyno;
+			breaker Breaker;
+			observer Observer;
+			auto Stepper = boost_odeint::make_dense_output(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state>());
+
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_const(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+			{
+				state State{ 0.0,0.0 };
+				hmLib::odeint::breakable_integrate_adaptive(Stepper, Dyno, State, 0.0, 1.0, 0.001, Breaker, Observer);
+				Assert::AreEqual(0.110, State[0], 0.02);
+				Assert::AreEqual(0.105, State[1], 0.01);
+			}
+		}
+	};
+	/*
+	TEST_CLASS(test_odeint_adaptive) {
+
+	}
+	TEST_CLASS(test_odeint_validate) {
+		using state_t = varray<double, 2>;
+		struct system_t {
+			void operator()(const state_t& x, state_t& dx, double t) {
+				dx[0] = -0.5*x[0]+0.8*x[1];
+				dx[1] = -0.4*x[1]+0.9*x[0];
+			}
+			hmLib::odeint::validate_result validate(const state_t& x, double t, state_t& newx) {
+				return hmLib::odeint::validate_result::none;
+			}
+		};
+	public:
+		TEST_METHOD(try_interfere_integrate_adaptive_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = boost_odeint::runge_kutta_dopri5<state_t>();
+			odeint::interfere_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_adaptive_controlled_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = boost_odeint::make_controlled(1e-3,1e-3, boost_odeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_adaptive_dense_output_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = boost_odeint::make_dense_output(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_adaptive(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_const_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = boost_odeint::runge_kutta_dopri5<state_t>();
+			odeint::interfere_integrate_const(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_const_controlled_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = boost_odeint::make_controlled(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_const(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+		TEST_METHOD(try_interfere_integrate_const_dense_output_stepper) {
+			auto State = state_t{ 0.5, 0.5 };
+			auto System = system_t();
+			auto Stepper = boost_odeint::make_dense_output(1e-3, 1e-3, boost_odeint::runge_kutta_dopri5<state_t>());
+			odeint::interfere_integrate_const(Stepper, System, State, 0.0, 10.0, 0.1, 1e-4);
+		}
+	};
+	*/
 }
