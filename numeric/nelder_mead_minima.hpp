@@ -13,18 +13,24 @@ namespace hmLib{
 		template<typename T>
 		struct nelder_mead_minima_stepper{
 		private:
+			using point = std::vector<T>;
 			struct vertex {
 			private:
-				T val;
+				point val;
 				T fval;
 			public:
 				vertex() = default;
-				vertex(T val_, T fval_) :val(val_), fval(fval_) {}
-				T& value(){ return val; }
+				vertex(point val_, T fval_) :val(std::move(val_)), fval(fval_) {}
+				point& value(){ return val; }
 				T& fvalue(){ return fval; }
-				const T& value()const{ return val; }
+				const point& value()const{ return val; }
 				const T& fvalue()const { return fval; }
+				friend bool operator==(const vertex& v1, const vertex& v2) { return v1.fvalue() == v2.fvalue(); }
+				friend bool operator!=(const vertex& v1, const vertex& v2) { return v1.fvalue() != v2.fvalue(); }
 				friend bool operator<(const vertex& v1, const vertex& v2) { return v1.fvalue() < v2.fvalue(); }
+				friend bool operator<=(const vertex& v1, const vertex& v2) { return v1.fvalue() <= v2.fvalue(); }
+				friend bool operator>(const vertex& v1, const vertex& v2) { return v1.fvalue() > v2.fvalue(); }
+				friend bool operator>=(const vertex& v1, const vertex& v2) { return v1.fvalue() >= v2.fvalue(); }
 			};
 		public:
 			struct state{
@@ -41,7 +47,7 @@ namespace hmLib{
 			public:
 				state() = default;
 				template<typename F, typename error_type>
-				state(F fn, const T& ini, error_type rel_value, error_type abs_value) {
+				state(F fn, const point& ini, error_type rel_value, error_type abs_value) {
 					std::size_t size = std::distance(ini.begin(), ini.end());
 					//initialize vertex
 					v.assign(size + 1, vertex(ini, fn(ini)));
@@ -51,13 +57,13 @@ namespace hmLib{
 						v[i].fvalue() = fn(v[i].value());
 					}
 				}
-				T& value() {
+				point& value() {
 					return std::min_element(v.begin(), v.end())->value();
 				}
 				T& fvalue() {
 					return std::min_element(v.begin(), v.end())->fvalue();
 				}
-				const T& value()const{
+				const point& value()const{
 					return std::min_element(v.begin(),v.end())->value();
 				}
 				const T& fvalue()const {
@@ -160,37 +166,41 @@ namespace hmLib{
 			double rho;
 			double sigma;
 		};
-		template<typename F, typename T, typename breaker>
-		auto breakable_nelder_mead_minima(F fn, T ini, unsigned int maxitr, breaker Brk){
-			nelder_mead_minima_stepper<T,decltype(std::declval<F>()(std::declval<T>()))> Stepper;
-			auto State = Stepper.make_state(fn, ini, 0.2, 0.001);
+		template<typename F, typename vect, typename breaker>
+		auto breakable_nelder_mead_minima(F fn, vect ini, unsigned int maxitr, breaker Brk){
+			using stepper = nelder_mead_minima_stepper<decltype(std::declval<F>()(std::declval<vect>()))>;
+			using state =typename stepper::state;
+			stepper Stepper;
+			state State(fn, ini, 0.2, 0.001);
 
 			for(unsigned int i = 0; i<maxitr; ++i){
-				if(Brk(State, i))return make_minima_result(true, i, State.value(),State.fvalue());
+				if(Brk(State, i))return std::make_pair(State, count_result(true, i));
 				Stepper(fn,State);
 			}
 
-			return make_minima_result(Brk(State, maxitr), maxitr,State.value(),State.fvalue());
+			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename T, typename breaker,typename observer>
-		auto breakable_nelder_mead_minima(F fn, T ini, unsigned int maxitr, breaker Brk, observer Obs){
-			nelder_mead_minima_stepper<T,decltype(std::declval<F>()(std::declval<T>()))> Stepper;
-			auto State = Stepper.make_state(fn, ini, 0.2, 0.001);
-
+		template<typename F, typename vect, typename breaker,typename observer>
+		auto breakable_nelder_mead_minima(F fn, vect ini, unsigned int maxitr, breaker Brk, observer Obs){
+			using stepper = nelder_mead_minima_stepper<decltype(std::declval<F>()(std::declval<vect>()))>;
+			using state =typename stepper::state;
+			stepper Stepper;
+			state State(fn, ini, 0.2, 0.001);
+			
 			for(unsigned int i = 0; i<maxitr; ++i){
-				if(Brk(State, i))return make_minima_result(true, i, State.value(),State.fvalue());
+				if(Brk(State, i))return std::make_pair(State, count_result(true, i));
 				Stepper(fn,State);
 				Obs(State,i);
 			}
 
-			return make_minima_result(Brk(State, maxitr), maxitr,State.value(),State.fvalue());
+			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename T, typename error_type>
-		auto nelder_mead_minima(F fn, T ini, unsigned int maxitr, error_type relerr, error_type abserr){
+		template<typename F, typename vect, typename error_type>
+		auto nelder_mead_minima(F fn, vect ini, unsigned int maxitr, error_type relerr, error_type abserr){
 			return breakable_nelder_mead_minima(fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr));
 		}
-		template<typename F, typename T, typename error_type,typename observer>
-		auto nelder_mead_minima(F fn, T ini, unsigned int maxitr, error_type relerr, error_type abserr, observer obs){
+		template<typename F, typename vect, typename error_type,typename observer>
+		auto nelder_mead_minima(F fn, vect ini, unsigned int maxitr, error_type relerr, error_type abserr, observer obs){
 			return breakable_nelder_mead_minima(fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr), obs);
 		}
 	}

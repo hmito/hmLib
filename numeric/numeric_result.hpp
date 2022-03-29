@@ -6,6 +6,8 @@ namespace hmLib{
 		struct count_result{
 			bool success;
 			unsigned int count;
+			count_result() = default;
+			count_result(bool success_,unsigned int count_):success(success_),count(count_){}
 		};
 	}
 }
