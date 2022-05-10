@@ -23,11 +23,11 @@ namespace hmLib{
 			}
 			template<typename state_type>
 			auto precision(const state_type& x)const{
-				return relerr * std::abs(x.value()) + abserr / 4;
+				return relerr * std::abs(x.guess_v()) + abserr / 4;
 			}
 			template<typename state_type, typename step_type>
 			bool operator()(const state_type& x, step_type)const{
-				return std::abs(x.value() - (x.upper() + x.lower()) / 2) + (x.upper() - x.lower()) / 2 <= precision(x) * 2 ;
+				return std::abs(x.guess_v() - (x.upper_v() + x.lower_v()) / 2) + (x.upper_v() - x.lower_v()) / 2 <= precision(x) * 2 ;
 			}
 		private:
 			value_type relerr;
