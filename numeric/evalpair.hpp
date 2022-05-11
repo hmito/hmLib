@@ -30,8 +30,6 @@ namespace hmLib{
 			template<typename fn>
 			void eval(fn Fn){e=Fn(v);}
 		public:
-			const value_type& guess_v()const{return v;}
-			const evalue_type& guess_e()const{return e;}
 			friend bool operator==(const this_type& v1, const this_type& v2) { return v1.e == v2.e; }
 			friend bool operator!=(const this_type& v1, const this_type& v2) { return v1.e != v2.e; }
 			friend bool operator<(const this_type& v1, const this_type& v2) { return v1.e < v2.e; }
@@ -91,11 +89,6 @@ namespace hmLib{
 			}
 			bool is_ordered()const{return lower.v <= upper.v;}
 			void order(){if(!is_ordered())std::swap(lower,upper);}
-		public:
-			const value_type& lower_v()const{return lower.v;}
-			const evalue_type& upper_v()const{return upper.v;}
-			const value_type& lower_e()const{return lower.e;}
-			const evalue_type& upper_e()const{return upper.e;}
 		};
 		template<typename fn, typename value_type>
 		auto make_evalrange(fn Fn, value_type&& lower,value_type&& upper){
@@ -165,12 +158,6 @@ namespace hmLib{
 			bool is_ordered()const{return lower.v <= upper.v;}
 			void order(){if(!is_ordered())std::swap(lower,upper);}
 		public:
-			const value_type& lower_v()const{return lower.v;}
-			const evalue_type& upper_v()const{return upper.v;}
-			const value_type& lower_e()const{return lower.e;}
-			const evalue_type& upper_e()const{return upper.e;}
-			const value_type& guess_v()const{return v;}
-			const evalue_type& guess_e()const{return e;}
 			friend bool operator==(const this_type& v1, const this_type& v2) { return v1.e == v2.e; }
 			friend bool operator!=(const this_type& v1, const this_type& v2) { return v1.e != v2.e; }
 			friend bool operator<(const this_type& v1, const this_type& v2) { return v1.e < v2.e; }
@@ -182,6 +169,43 @@ namespace hmLib{
 		auto make_guess_evalrange(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
 			return make_guess_evalrange<std::decay_t<value_type>, decltype(Fn(v))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
+		template<typename error_type_>
+		struct evalrange_precision_breaker{
+			//following functions should be callable;
+			// state_type::lower() : return lower value of the range
+			// state_type::upper() : return upper value of the range
+			// state_type::value() : return optimal value of the range
+			using error_type = error_type_;
+		public:
+			evalrange_precision_breaker() = delete;
+			explicit evalrange_precision_breaker(error_type relative_error_)
+				: relerr(relative_error_)
+				, abserr(relative_error_/4){
+			}
+			evalrange_precision_breaker(error_type relative_error_, error_type absolute_error_)
+				: relerr(relative_error_)
+				, abserr(absolute_error_){
+			}
+			template<typename value_type, typename evalue_type>
+			auto precision(const evalpair<value_type,evalue_type>& x)const{
+				return relerr * std::abs((x.upper.v + x.lower.v) / 2) + abserr / 4;
+			}
+			template<typename value_type, typename evalue_type>
+			auto precision(const guess_evalpair<value_type,evalue_type>& x)const{
+				return relerr * std::abs(x.guess.v) + abserr / 4;
+			}
+			template<typename value_type, typename evalue_type, typename step_type>
+			bool operator()(const evalpair<value_type,evalue_type>& x, step_type)const{
+				return (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
+			}
+			template<typename value_type, typename evalue_type, typename step_type>
+			bool operator()(const guess_evalpair<value_type,evalue_type>& x, step_type)const{
+				return std::abs(x.guess.v - (x.upper.v + x.lower.v) / 2) + (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
+			}
+		private:
+			error_type relerr;
+			error_type abserr;
+		};
 	}
 }
 #

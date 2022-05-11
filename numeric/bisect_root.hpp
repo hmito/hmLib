@@ -5,10 +5,11 @@
 #include"../math/sign.hpp"
 #include"../exceptions/exception.hpp"
 #include"../exceptions/numeric_exceptions.hpp"
+#include"evalpair.hpp"
 #include"numeric_result.hpp"
 namespace hmLib{
 	namespace numeric{
-		template<typename value_type, typename evalue_type>
+		template<typename value_type, typename evalue_type=value_type>
 		struct bisect_root_stepper{
 			using pair = evalpair<value_type,evalue_type>;
 			using state =evalrange<value_type,evalue_type>;
@@ -79,11 +80,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_bisect_root(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr,evalrange_precision_breaker<error_type>(relerr,abserr));
 		}
  		template<typename fn, typename value_type, typename error_type,typename observer>
 		auto bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_bisect_root(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr), Obs);
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr,evalrange_precision_breaker<error_type>(relerr,abserr), Obs);
 		}
 	}
 }

@@ -8,10 +8,9 @@
 #include"../math/sign.hpp"
 #include"evalpair.hpp"
 #include"numeric_result.hpp"
-#include"range_precision_breaker.hpp"
 namespace hmLib{
     namespace numeric{
-		template<typename value_type, typename evalue_type>
+		template<typename value_type, typename evalue_type=value_type>
 		struct brent_minima_stepper{
 			using pair = evalpair<value_type,evalue_type>;
 			using state = guess_evalrange<value_type,evalue_type>;
@@ -152,11 +151,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename error_type, typename observer>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr),Obs);
+			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,evalrange_precision_breaker<error_type>(relerr,abserr),Obs);
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,evalrange_precision_breaker<error_type>(relerr,abserr));
 		}
     }
 }
