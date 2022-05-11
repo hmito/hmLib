@@ -3,17 +3,18 @@
 #
 #include<cmath>
 #include<utility>
+#include"../exceptions.hpp"
 #include"../math/constants.hpp"
 #include"../math/sign.hpp"
 #include"evalpair.hpp"
-#include"../exceptions.hpp"
 #include"numeric_result.hpp"
 #include"range_precision_breaker.hpp"
 namespace hmLib{
     namespace numeric{
-		template<typename T>
+		template<typename value_type, typename evalue_type>
 		struct brent_minima_stepper{
-			using state = guess_evalrange<T>;
+			using pair = evalpair<value_type,evalue_type>;
+			using state = guess_evalrange<value_type,evalue_type>;
 		public:
 			brent_minima_stepper():IsFirst(true),delta(0),pdelta(0),best2nd(),best3rd(){}
 			template<typename fn>
@@ -23,7 +24,7 @@ namespace hmLib{
 			template<typename fn,typename error_type>
 			void operator()(fn Fn, state& x, error_type precision) {
 				using std::abs;
-				constexpr T epsilon(1.0/(math::golden_ratio<T>+1.0));
+				constexpr value_type epsilon(1.0/(math::golden_ratio<value_type>+1.0));
 
 				if(std::exchange(IsFirst,false)){
 					hmLib_assert(x.lower.v <= x.guess.v && x.guess.v <= x.upper.v, hmLib::numeric_exceptions::incorrect_arithmetic_request, "brent minima require lower <= guess <= upper.");
@@ -34,13 +35,13 @@ namespace hmLib{
 				}
 
 				// midpoint
-				T midval = (x.upper.v + x.lower.v) / 2;
+				auto midval = (x.upper.v + x.lower.v) / 2;
 
 				//whether we should try parabolic fit or not?
 				if(std::abs(pdelta) > precision){
-					T r = (x.guess.v - best2nd.v) * (x.guess.f - best3rd.f);
-					T q = (x.guess.v - best3rd.v) * (x.guess.f - best2nd.f);
-					T p = (x.guess.v - best3rd.v) * q - (x.guess.v - best2nd.v) * r;
+					auto r = (x.guess.v - best2nd.v) * (x.guess.e - best3rd.e);
+					auto q = (x.guess.v - best3rd.v) * (x.guess.e - best2nd.e);
+					auto p = (x.guess.v - best3rd.v) * q - (x.guess.v - best2nd.v) * r;
 
 					q = 2 * (q - r);
 
@@ -57,7 +58,7 @@ namespace hmLib{
 						pdelta = delta;
 						delta = p / q;
 
-						T newval = x.guess.v + delta;
+						auto newval = x.guess.v + delta;
 						if((newval - x.lower.v) < 2*precision || (x.upper.v- newval) < 2*precision){
 							delta = static_cast<T>((midval - x.guess.v) < 0 ? -abs(precision) : abs(precision));
 						}
@@ -69,7 +70,7 @@ namespace hmLib{
 				}
 
 				// okey, let's try another positition.
-				evalpair trial(x.guess);
+				pair trial(x.guess);
 				if(abs(delta) >= precision){
 					trial.v += delta;
 				}else if(hmLib::math::sign(delta) == hmLib::math::sign::positive){
@@ -79,7 +80,7 @@ namespace hmLib{
 				}
 				trial.eval(Fn);
 
-				if(trial.f <= x.guess.f){
+				if(trial.e <= x.guess.e){
 					// update holding points
 					best3rd = best2nd;
 					best2nd = x.guess;
@@ -94,11 +95,11 @@ namespace hmLib{
 					}
 				}else{
 					// update holding points
-					if((trial.f <= best2nd.f) || (best2nd.v == x.guess.v)){
+					if((trial.e <= best2nd.e) || (best2nd.v == x.guess.v)){
 						// tried point is the second best
 						best3rd = best2nd;
 						best2nd = trial;
-					} else if((trial.f <= best3rd.f) || (best3rd.v == x.guess.v) || (best3rd.v  == best2nd.v)){
+					} else if((trial.e <= best3rd.e) || (best3rd.v == x.guess.v) || (best3rd.v  == best2nd.v)){
 						// tried point is the third best
 						best3rd = trial;
 					}
@@ -113,18 +114,18 @@ namespace hmLib{
 			}
 		private:
 			bool IsFirst;
-			T delta;  // The distance moved in the last step
-			T pdelta; // The distance moved in the step before last
-			evalpair<T> best2nd;
-			evalpair<T> best3rd;
+			value_type delta;  // The distance moved in the last step
+			value_type pdelta; // The distance moved in the step before last
+			pair best2nd;
+			pair best3rd;
 		};
 		template<typename fn, typename value_type, typename precision_breaker, typename observer>
 		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk, observer Obs){
-			using stepper = brent_minima_stepper<value_type>;
+			using stepper = brent_minima_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
 			using state = typename stepper::state;
 			stepper Stepper;
 			state State(Fn, (lowerval+upperval)/2.0, lowerval, upperval);
-			State.order();
+			//State.order();
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
@@ -136,7 +137,7 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename precision_breaker>
 		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk){
-			using stepper = brent_minima_stepper<value_type>;
+			using stepper = brent_minima_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
 			using state = typename stepper::state;
 			stepper Stepper;
 			state State(Fn, (lowerval+upperval)/2.0, lowerval, upperval);
