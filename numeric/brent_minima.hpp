@@ -16,12 +16,12 @@ namespace hmLib{
 			using state = guess_evalrange<T>;
 		public:
 			brent_minima_stepper():IsFirst(true),delta(0),pdelta(0),best2nd(),best3rd(){}
-			template<typename F>
-			void initialize(F, state&)noexcept{
+			template<typename fn>
+			void initialize(fn, state&)noexcept{
 				IsFirst = true;
 			}
 			template<typename fn,typename error_type>
-			void operator()(fn f, state& x, error_type precision) {
+			void operator()(fn Fn, state& x, error_type precision) {
 				using std::abs;
 				constexpr T epsilon(1.0/(math::golden_ratio<T>+1.0));
 
@@ -77,7 +77,7 @@ namespace hmLib{
 				}else{
 					trial.v -= precision;
 				}
-				trial.eval(f);
+				trial.eval(Fn);
 
 				if(trial.f <= x.guess.f){
 					// update holding points

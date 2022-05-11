@@ -14,12 +14,12 @@ namespace hmLib{
 			using state =evalrange<T>;
 		public:
 			bisect_root_stepper():IsFirst(true){}
-			template<typename F>
-			void initialize(F, state&)noexcept{
+			template<typename fn>
+			void initialize(fn, state&)noexcept{
 				IsFirst = true;
 			}
-			template<typename F>
-			void operator()(F fn, state& x){
+			template<typename fn>
+			void operator()(fn Fn, state& x){
 				if(std::exchange(IsFirst,false)){
 					hmLib_assert(x.lower.v <= x.upper.v, hmLib::numeric_exceptions::incorrect_arithmetic_request, "bisect root require lower <= upper.");
 					if(hmLib::math::sign(x.lower.f) == hmLib::math::sign::zero){
@@ -32,7 +32,7 @@ namespace hmLib{
 					}
 				}
 
-				pair z(fn,detail::bisect_interpolate(x.lower,x.upper));
+				pair z(Fn,detail::bisect_interpolate(x.lower,x.upper));
 
 				if(hmLib::math::sign(z.f) == hmLib::math::sign::zero){
 					x.lower = z;
@@ -46,44 +46,44 @@ namespace hmLib{
 		private:
 			bool IsFirst;
 		};
-		template<typename F, typename T, typename breaker>
-		auto breakable_bisect_root(F fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk){
+		template<typename fn, typename T, typename breaker>
+		auto breakable_bisect_root(fn Fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk){
 			using stepper = bisect_root_stepper<T>;
 			using state = typename stepper::state;
 			stepper Stepper;
-			state State(fn, lowerval,upperval);
+			state State(Fn, lowerval,upperval);
 			State.order();
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
+				Stepper(Fn,State);
 			}
 
 			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename T, typename breaker, typename observer>
-		auto breakable_bisect_root(F fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk, observer Obs){
+		template<typename fn, typename T, typename breaker, typename observer>
+		auto breakable_bisect_root(fn Fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk, observer Obs){
 			using stepper = bisect_root_stepper<T>;
 			using state = typename stepper::state;
 			stepper Stepper;
-			state State(fn, lowerval,upperval);
+			state State(Fn, lowerval,upperval);
 			State.order();
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
+				Stepper(Fn,State);
 				Obs(State,i);
 			}
 
 			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename T, typename error_type>
-		auto bisect_root(F fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_bisect_root(fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+		template<typename fn, typename T, typename error_type>
+		auto bisect_root(fn Fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
 		}
- 		template<typename F, typename T, typename error_type,typename observer>
-		auto bisect_root(F fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_bisect_root(fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr), Obs);
+ 		template<typename fn, typename T, typename error_type,typename observer>
+		auto bisect_root(fn Fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr), Obs);
 		}
 	}
 }
