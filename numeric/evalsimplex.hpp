@@ -21,8 +21,10 @@ namespace hmLib{
 			std::vector<pair> Simplex;
 		public:
 			evalsimplex() = default;
-			template<typename fn, typename value_type, typename error_type>
-			evalsimplex(fn Fn, value_type inival, error_type rel_value, error_type abs_value) {
+			template<typename fn, typename input_iterator>
+			evalsimplex(fn Fn, input_iterator Beg, input_iterator End){}
+			template<typename fn, typename random_value_generator>
+			evalsimplex(fn Fn, value_type inival, random_value_generator gen) {
 				std::size_t size = std::distance(beg,end);
 				//initialize vertex
 				Simplex.reserve(size+1);
