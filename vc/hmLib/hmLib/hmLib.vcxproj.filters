@@ -73,8 +73,8 @@
     <Filter Include="hmLib\odeint\breaker">
       <UniqueIdentifier>{46448f91-6639-48e0-9a60-368e944b42ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="hmLib\minima">
-      <UniqueIdentifier>{f5d42eca-4215-40bd-a7de-c01d301dac52}</UniqueIdentifier>
+    <Filter Include="hmLib\numeric">
+      <UniqueIdentifier>{92d81207-65cd-4670-aecd-cd3930ba6ffd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -209,33 +209,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\algorithm\keep_if.hpp">
       <Filter>hmLib\algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\inserter.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\range.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\transform_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\zip_iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\iterators\iterator.hpp">
-      <Filter>hmLib\iterators</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\functional\function_ptr.hpp">
       <Filter>hmLib\functional</Filter>
@@ -477,15 +450,6 @@
     <ClInclude Include="..\..\..\math\histgram.hpp">
       <Filter>hmLib\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\histgoram_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\validate.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
@@ -519,12 +483,6 @@
     <ClInclude Include="..\..\..\odeint\recursive.hpp">
       <Filter>hmLib\odeint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\null_observer.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\odeint\observer\observer_pack.hpp">
-      <Filter>hmLib\odeint\observer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\odeint\breaker\time_overflow_breaker.hpp">
       <Filter>hmLib\odeint\breaker</Filter>
     </ClInclude>
@@ -537,31 +495,104 @@
     <ClInclude Include="..\..\..\blocks.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima\brent_minima.hpp">
-      <Filter>hmLib\minima</Filter>
+    <ClInclude Include="..\..\..\numeric\bisect_root.hpp">
+      <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima\golden_section_minima.hpp">
-      <Filter>hmLib\minima</Filter>
+    <ClInclude Include="..\..\..\numeric\brent_minima.hpp">
+      <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima\minima_result.hpp">
-      <Filter>hmLib\minima</Filter>
+    <ClInclude Include="..\..\..\numeric\evalpair.hpp">
+      <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima\nelder_mead_minima.hpp">
-      <Filter>hmLib\minima</Filter>
+    <ClInclude Include="..\..\..\numeric\golden_section_minima.hpp">
+      <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima\range_precision_breaker.hpp">
-      <Filter>hmLib\minima</Filter>
+    <ClInclude Include="..\..\..\numeric\interpolate.hpp">
+      <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima\simplex_precision_breaker.hpp">
-      <Filter>hmLib\minima</Filter>
+    <ClInclude Include="..\..\..\numeric\nelder_mead_minima.hpp">
+      <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\minima.hpp">
+    <ClInclude Include="..\..\..\numeric\numeric_result.hpp">
+      <Filter>hmLib\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\numeric\range_precision_breaker.hpp">
+      <Filter>hmLib\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\numeric\simplex_precision_breaker.hpp">
+      <Filter>hmLib\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\numeric\toms748_root.hpp">
+      <Filter>hmLib\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\numeric.hpp">
       <Filter>hmLib</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\use_blocks.cpp">
+    <ClInclude Include="..\use_lattice.hpp">
       <Filter>ソースファイル</Filter>
-    </ClCompile>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\ordered_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\any_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\circular_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\inserter.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\integer_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\plane_pos_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\range.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\transform_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\iterators\zip_iterator.hpp">
+      <Filter>hmLib\iterators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\histogram_stream_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\null_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\observe_container.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\observe_skipper.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\observer_pack.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\progress_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\state_accessor.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp">
+      <Filter>hmLib\odeint\observer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -163,6 +163,7 @@
     <ClInclude Include="hmLib_config.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClCompile Include="test_numeric.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

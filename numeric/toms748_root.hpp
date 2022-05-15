@@ -76,9 +76,9 @@ namespace hmLib{
 				auto tol = std::numeric_limits<value_type>::epsilon() * 2;
 				if((x.upper.v - x.lower.v) < 2 * tol * x.lower.v){
 					zv = detail::bisect_interpolate(x.lower,x.upper);
-				}else if(z <= x.lower.v + std::abs(x.lower.v) * tol){
+				}else if(zv <= x.lower.v + std::abs(x.lower.v) * tol){
 					zv = x.lower.v + std::abs(x.lower.v) * tol;
-				}else if(z >= x.upper.v - std::abs(x.upper.v) * tol){
+				}else if(zv >= x.upper.v - std::abs(x.upper.v) * tol){
 					zv = x.upper.v - std::abs(x.upper.v) * tol;
 				}
 

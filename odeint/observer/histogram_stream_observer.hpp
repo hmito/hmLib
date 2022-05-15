@@ -7,7 +7,7 @@
 #include"../../math/histgram.hpp"
 namespace hmLib {
 	namespace odeint {
-		struct histgram_stream_observer {
+		struct histogram_stream_observer {
 		private:
 			std::ostream& out;
 			double lower;
@@ -16,7 +16,7 @@ namespace hmLib {
 			std::string delm;
 			std::string end;
 		public:
-			histgram_stream_observer(std::ostream& out_, double lower_, double upper_, unsigned int hsize_, std::string delm_ = ", ", std::string end_ = "\n")
+			histogram_stream_observer(std::ostream& out_, double lower_, double upper_, unsigned int hsize_, std::string delm_ = ", ", std::string end_ = "\n")
 				: out(out_)
 				, lower(lower_)
 				, upper(upper_)
@@ -40,14 +40,14 @@ namespace hmLib {
 				}
 			}
 		};
-		struct adaptive_histgram_stream_observer {
+		struct adaptive_histogram_stream_observer {
 		private:
 			std::ostream& out;
 			unsigned int hsize;
 			std::string delm;
 			std::string end;
 		public:
-			adaptive_histgram_stream_observer(std::ostream& out_, unsigned int hsize_, std::string delm_ = ", ", std::string end_ = "\n")
+			adaptive_histogram_stream_observer(std::ostream& out_, unsigned int hsize_, std::string delm_ = ", ", std::string end_ = "\n")
 				: out(out_)
 				, hsize(hsize_)
 				, delm(delm_)

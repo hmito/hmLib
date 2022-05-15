@@ -2,6 +2,7 @@
 #define HMLIB_NUMERIC_EVALUE_INC 100
 #
 #include<utility>
+#include<type_traits>
 namespace hmLib{
 	namespace numeric{
 		template<typename value_type_, typename evalue_type_>
