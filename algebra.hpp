@@ -5,22 +5,39 @@ namespace hmLib{
 	namespace algebra{
 		namespace detail{
 			template<typename op, typename rhs>
-			struct unary_expr{};
+			class unary_expr{
+				const rhs& rhsv;
+			public:
+				explicit unary_expr(const rhs& rhsv_):rhsv(rhsv_){}
+				template<typename evaluator>
+				auto operator()(evaluator& eval){
+					return op()(eval,rhsv);
+				}
+			};
 			template<typename lhs, typename op, typename rhs>
-			struct binary_expr{};
+			class binary_expr{
+				const lhs& lhsv;
+				const rhs& rhsv;
+			public:
+				binary_expr(const lhs& lhsv_, const rhs& rhsv_):lhsv(lhsv_),rhsv(rhsv_){}
+				template<typename evaluator>
+				auto operator()(evaluator& eval){
+					return op()(eval,lhsv,rhsv);
+				}
+			};
 		}
 		struct operators{
 			struct add{
-				template<typename lhs, typename rhs>
-				auto operator()(const lhs& l, const rhs& r){
-					return l + r;
+				template<typename evaluator, typename lhs, typename rhs>
+				auto operator()(const evaluator& Eval, const lhs& l, const rhs& r){
+					return Eval.add(l,r);
 				}
 			};
 		};
 		template<typename eval_type>
 		struct vector_space_algebra{
-			vector identity();
-			auto operator-(vector v){return -1*v;}
+			static auto identity();
+			static auto minus(vector v){return -1*v;}
 			auto operator+(vector v1, vector v2);
 			auto operator-(vector v1, vector v2){return v1 + (-v2);}
 			auto operator*(scalar s, vector v);
