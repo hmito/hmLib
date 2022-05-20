@@ -4,49 +4,105 @@
 namespace hmLib{
 	namespace algebra{
 		namespace detail{
-			template<typename op, typename rhs>
-			class unary_expr{
-				const rhs& rhsv;
+			template<typename op_t>
+			class nullary_expr{
 			public:
-				explicit unary_expr(const rhs& rhsv_):rhsv(rhsv_){}
 				template<typename evaluator>
 				auto operator()(evaluator& eval){
-					return op()(eval,rhsv);
+					return eval(op_t);
 				}
 			};
-			template<typename lhs, typename op, typename rhs>
-			class binary_expr{
-				const lhs& lhsv;
-				const rhs& rhsv;
+			template<typename op_t, typename rhs_t>
+			class unary_expr{
+				const rhs_t& rhs;
 			public:
-				binary_expr(const lhs& lhsv_, const rhs& rhsv_):lhsv(lhsv_),rhsv(rhsv_){}
+				explicit unary_expr(const rhs_t& rhs_):rhs(rhs_){}
 				template<typename evaluator>
 				auto operator()(evaluator& eval){
-					return op()(eval,lhsv,rhsv);
+					return eval(op_t(),rhs);
+				}
+			};
+			template<typename op_t, typename lhs_t, typename rhs_t>
+			class binary_expr{
+				const lhs_t& lhs;
+				const rhs_t& rhs;
+			public:
+				binary_expr(const lhs_t& lhs_, const rhs_t& rhs_):lhs(lhs_),rhs(rhs_){}
+				template<typename evaluator>
+				auto operator()(evaluator& eval){
+					return eval(op_t(),lhs,rhs);
 				}
 			};
 		}
 		struct operators{
 			struct add{
-				template<typename evaluator, typename lhs, typename rhs>
-				auto operator()(const evaluator& Eval, const lhs& l, const rhs& r){
-					return Eval.add(l,r);
+				template<typename lhs_t, typename rhs_t>
+				auto operator()(const lhs_t& lhs, const rhs_t& rhs){
+					return lhs+rhs;
+				}
+			};
+			struct sub{
+				template<typename lhs_t, typename rhs_t>
+				auto operator()(const lhs_t& lhs, const rhs_t& rhs){
+					return lhs-rhs;
+				}
+			};
+			struct prd{
+				template<typename lhs_t, typename rhs_t>
+				auto operator()(const lhs_t& lhs, const rhs_t& rhs){
+					return lhs*rhs;
+				}
+			};
+			struct div{
+				template<typename lhs_t, typename rhs_t>
+				auto operator()(const lhs_t& lhs, const rhs_t& rhs){
+					return lhs/rhs;
 				}
 			};
 		};
-		template<typename eval_type>
-		struct vector_space_algebra{
-			static auto identity();
-			static auto minus(vector v){return -1*v;}
-			auto operator+(vector v1, vector v2);
-			auto operator-(vector v1, vector v2){return v1 + (-v2);}
-			auto operator*(scalar s, vector v);
-			auto operator*(vector v, scalar s){return s*v;}
+		namespace vector_space_algebra{
+			template<typename vector_base>
+			struct vector{
+				using this_type = vector<vector_base>;
+				template<typename other_vector_base>
+				friend auto operator+(const this_type& lhs, const vector<other_base>& rhs){
+					return detail::binary_expression<operators::add, this_type, vector<other_base>>(lhs,rhs);
+				}
+				template<typename other_vector_base>
+				friend auto operator-(const this_type& lhs, const vector<other_base>& rhs){
+					return detail::binary_expression<operators::sub, this_type, vector<other_base>>(lhs,rhs);
+				}
+				template<typename scalar>
+				friend auto operator*(const scalar& s, const this_type& v){
+					return detail::binary_expression<operators::prd, scalar, this_type>(lhs,rhs);
+				}
+				template<typename scalar>
+				friend auto operator*(const this_type& v, scalar s){return s*v;}
+			};
+			auto identity();
+			template<typename vector_base>
+			auto v_(const vector_base& v){return vector<vector_base>(v);}
 		};
-		template<typename eval_type>
-		struct normed_vector_space_algebra: vector_space_algebra<eval_type>{
+		namespace normed_vector_space_algebra{
+			using namespace vector_space_algebra;
 			auto norm(vector v);
 		};
+		struct evaluated{
+			template<typename assigned_t>
+			friend assigned_t& operator=(assigned_t& ass, do_evaluate&){
+			}
+		};
+		struct range_evaluator{
+			template<typename op_t>
+			auto operator()(op_t op);
+			template<typename op_t, typename rhs_t>
+			auto operator()(op_t op, const rhs_t& rhs);
+			template<typename op_t, typename lhs_t, typename rhs_t>
+			evaluated operator()(op_t op, const lhs_t& lhs, const rhs_t& rhs){
+				op(lhs,rhs);
+			}
+		};
+
 		template<typename eval_type>
 		struct metric_vector_space_algebra: normed_vector_space_algebra<eval_type>{
 			auto inner_prod(vector v1, vector v2);
