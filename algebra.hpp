@@ -97,9 +97,13 @@ namespace hmLib{
 			auto operator()(op_t op);
 			template<typename op_t, typename rhs_t>
 			auto operator()(op_t op, const rhs_t& rhs);
-			template<typename op_t, typename lhs_t, typename rhs_t>
-			evaluated operator()(op_t op, const lhs_t& lhs, const rhs_t& rhs){
-				op(lhs,rhs);
+			template<typename return_t, typename lhs_t, typename rhs_t>
+			auto operator()(return_t& ans, operators::add op, const lhs_t& lhs, const rhs_t& rhs){
+				for_each(ans, op, lhs, rhs);
+			}
+			template<typename return_t, typename lhs_t, typename rhs_t>
+			auto operator()(return_t& ans, operators::sub op, const lhs_t& lhs, const rhs_t& rhs){
+				for_each(ans, op, lhs, rhs);
 			}
 		};
 

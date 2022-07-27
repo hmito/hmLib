@@ -4,6 +4,7 @@
 #include<utility>
 #include<cstdint>
 #include<cstring>
+#include<memory>
 #include"utility.hpp"
 #include"type_traits.hpp"
 namespace hmLib {
