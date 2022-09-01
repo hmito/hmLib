@@ -89,7 +89,7 @@ namespace hmLib{
 					p = pair(0,0);
 					x.lower = z;
 					x.upper = z;
-				}else if(hmLib::math::sign(p.e)*hmLib::math::sign(z.e) == hmLib::math::sign::negative){
+				}else if(hmLib::math::sign(x.lower.e)*hmLib::math::sign(z.e) == hmLib::math::sign::negative){
 					p = x.upper;
 					x.upper = z;
 				}else{
