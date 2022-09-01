@@ -6,6 +6,7 @@
 #include"../exceptions/numeric_exceptions.hpp"
 #include "../math/math.hpp"
 #include "../math/sign.hpp"
+#include "numeric_result.hpp"
 #include "evalpair.hpp"
 #include "interpolate.hpp"
 namespace hmLib{
@@ -13,7 +14,7 @@ namespace hmLib{
 		template<typename value_type, typename evalue_type=value_type>
 		struct toms748_root_stepper{
 			using pair = evalpair<value_type,evalue_type>;
-			using state =evalrange<value_type.evalue_type>;
+			using state =evalrange<value_type,evalue_type>;
 		public:
 			toms748_root_stepper():Stage(0){}
 			template<typename fn>
@@ -48,7 +49,7 @@ namespace hmLib{
 					}else{
 						//otherwise just try additional interpolate
 						Dist = x.upper.v - x.lower.v;			
-						bracket(x, detail::cubic_interpolate(x.lower,x.upper,2),Fn, true);
+						bracket(x, detail::cubic_interpolate(x.lower,x.upper,p,q,2),Fn, true);
 						Stage = 3;
 					}
 					break;
@@ -63,7 +64,7 @@ namespace hmLib{
 						x.lower=x.upper;
 						return;
 					}
-					bracket(x, secant_interpolate(x.lower,x.upper), Fn, false);
+					bracket(x, detail::secant_interpolate(x.lower,x.upper), Fn, false);
 					Stage = 1; //reset stage number
 					break;
 				}
@@ -82,13 +83,13 @@ namespace hmLib{
 					zv = x.upper.v - std::abs(x.upper.v) * tol;
 				}
 
-				pair z(Fn,zv);
+				auto z = pair(zv).eval(Fn);
 
 				if(hmLib::math::sign(z.e) == hmLib::math::sign::zero){
 					p = pair(0,0);
 					x.lower = z;
 					x.upper = z;
-				}else if(hmLib::math::sign(a.e)*hmLib::math::sign(z.e) == hmLib::math::sign::negative){
+				}else if(hmLib::math::sign(p.e)*hmLib::math::sign(z.e) == hmLib::math::sign::negative){
 					p = x.upper;
 					x.upper = z;
 				}else{

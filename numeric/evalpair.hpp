@@ -18,18 +18,10 @@ namespace hmLib{
 			explicit evalpair(value_type&& v_)noexcept:v(std::move(v_)),e(){}
 			evalpair(const value_type& v_, evalue_type e_)noexcept:v(v_),e(std::move(e_)){}
 			evalpair(value_type&& v_, evalue_type e_)noexcept:v(std::move(v_)),e(std::move(e_)){}
-			template<typename fn>
-			evalpair(fn Fn, const value_type& v_):v(v_),e(Fn(v_)){}
-			template<typename fn>
-			evalpair(fn Fn, value_type&& v_):v(std::move(v_)),e(){eval(Fn);}
 			void set(const value_type& v_, evalue_type e_)noexcept{v=v_; e=std::move(e_);}
 			void set(value_type&& v_, evalue_type e_)noexcept{v=std::move(v_); e=std::move(e_);}
 			template<typename fn>
-			void set(fn Fn, const value_type& v_){v=v_; e=Fn(v);}
-			template<typename fn>
-			void set(fn Fn, value_type&& v_){v=std::move(v_); e=Fn(v);}
-			template<typename fn>
-			void eval(fn Fn){e=Fn(v);}
+			this_type& eval(fn Fn){e=Fn(v);return *this;}
 		public:
 			friend bool operator==(const this_type& v1, const this_type& v2) { return v1.e == v2.e; }
 			friend bool operator!=(const this_type& v1, const this_type& v2) { return v1.e != v2.e; }
@@ -62,8 +54,10 @@ namespace hmLib{
 			}
 			template<typename fn>
 			evalrange(fn Fn, value_type lowerval, value_type upperval)
-				: lower(Fn,std::move(lowerval))
-				, upper(Fn,std::move(upperval)){
+				: lower(std::move(lowerval))
+				, upper(std::move(upperval)){
+					lower.eval(Fn);
+					upper.eval(Fn);
 			}
 			void set(const this_evalpair& lower_, const this_evalpair& upper_)noexcept{
 				lower = std::move(lower_);
@@ -84,16 +78,20 @@ namespace hmLib{
 				upper.eval(Fn,std::move(upperval));
 			}
 			template<typename fn>
-			void eval(fn Fn){
+			this_type& eval(fn Fn){
 				lower.eval(Fn);
 				upper.eval(Fn);
+				return *this;
 			}
 			bool is_ordered()const{return lower.v <= upper.v;}
-			void order(){if(!is_ordered())std::swap(lower,upper);}
+			this_type& order(){
+				if(!is_ordered())std::swap(lower,upper);
+				return *this;
+			}
 		};
 		template<typename fn, typename value_type>
 		auto make_evalrange(fn Fn, value_type&& lower,value_type&& upper){
-			return make_evalrange<std::decay_t<value_type>, decltype(Fn(v))>(Fn,std::forward<value_type>(lower),std::forward<value_type>(upper));
+			return make_evalrange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
 		template<typename value_type_, typename evalue_type_>
 		struct guess_evalrange{
@@ -128,7 +126,7 @@ namespace hmLib{
 				, lower(Fn,std::move(lowerval))
 				, upper(Fn,std::move(upperval)){
 			}
-			void set(const evalpair<value_type>& guess_, const evalpair<value_type>& lower_, const evalpair<value_type>& upper_)noexcept{
+			void set(const evalpair<value_type,evalue_type>& guess_, const evalpair<value_type,evalue_type>& lower_, const evalpair<value_type,evalue_type>& upper_)noexcept{
 				guess = guess_;
 				lower = lower_;
 				upper = upper_;
@@ -146,18 +144,22 @@ namespace hmLib{
 			}
 			template<typename fn>
 			void set(fn Fn, value_type&& guessval, value_type&& lowerval, value_type&& upperval){
-				guess.eval(Fn,std::move(guessval))
-				lower.eval(Fn,std::move(lowerval))
+				guess.eval(Fn,std::move(guessval));
+				lower.eval(Fn,std::move(lowerval));
 				upper.eval(Fn,std::move(upperval));
 			}
 			template<typename fn>
-			void eval(fn Fn){
+			this_type& eval(fn Fn){
 				guess.eval(Fn);
 				lower.eval(Fn);
 				upper.eval(Fn);
+				return *this;
 			}
 			bool is_ordered()const{return lower.v <= upper.v;}
-			void order(){if(!is_ordered())std::swap(lower,upper);}
+			this_type& order(){
+				if(!is_ordered())std::swap(lower,upper);
+				return *this;
+			}
 		public:
 			friend bool operator==(const this_type& v1, const this_type& v2) { return v1.e == v2.e; }
 			friend bool operator!=(const this_type& v1, const this_type& v2) { return v1.e != v2.e; }
@@ -168,7 +170,7 @@ namespace hmLib{
 		};
 		template<typename fn, typename value_type>
 		auto make_guess_evalrange(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
-			return make_guess_evalrange<std::decay_t<value_type>, decltype(Fn(v))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
+			return make_guess_evalrange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
 		template<typename error_type_>
 		struct evalrange_precision_breaker{
@@ -188,19 +190,19 @@ namespace hmLib{
 				, abserr(absolute_error_){
 			}
 			template<typename value_type, typename evalue_type>
-			auto precision(const evalpair<value_type,evalue_type>& x)const{
+			auto precision(const evalrange<value_type,evalue_type>& x)const{
 				return relerr * std::abs((x.upper.v + x.lower.v) / 2) + abserr / 4;
 			}
 			template<typename value_type, typename evalue_type>
-			auto precision(const guess_evalpair<value_type,evalue_type>& x)const{
+			auto precision(const guess_evalrange<value_type,evalue_type>& x)const{
 				return relerr * std::abs(x.guess.v) + abserr / 4;
 			}
 			template<typename value_type, typename evalue_type, typename step_type>
-			bool operator()(const evalpair<value_type,evalue_type>& x, step_type)const{
+			bool operator()(const evalrange<value_type,evalue_type>& x, step_type)const{
 				return (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
 			}
 			template<typename value_type, typename evalue_type, typename step_type>
-			bool operator()(const guess_evalpair<value_type,evalue_type>& x, step_type)const{
+			bool operator()(const guess_evalrange<value_type,evalue_type>& x, step_type)const{
 				return std::abs(x.guess.v - (x.upper.v + x.lower.v) / 2) + (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
 			}
 		private:
