@@ -56,6 +56,7 @@ namespace hmLib{
 				default://start from here
 					//init_first step
 					hmLib_assert(x.lower.v <= x.upper.v, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748 root require lower <= upper.");
+					hmLib_assert(hmLib::math::sign(x.lower.e)*hmLib::math::sign(x.upper.e) == hmLib::math::sign::negative, hmLib::numeric_exceptions::incorrect_arithmetic_request, "toms748 root require fn(lower) * fn(upper) <= 0.");
 					if(hmLib::math::sign(x.lower.e) == hmLib::math::sign::zero){
 						x.upper=x.lower;
 						return;
