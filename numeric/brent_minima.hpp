@@ -6,16 +6,16 @@
 #include"../math/constants.hpp"
 #include"../math/sign.hpp"
 #include"evalpair.hpp"
+#include"../exceptions.hpp"
 #include"numeric_result.hpp"
 #include"range_precision_breaker.hpp"
 namespace hmLib{
     namespace numeric{
 		template<typename T>
 		struct brent_minima_stepper{
-			using stepper_tag = precision_stepper;
 			using state = guess_evalrange<T>;
 		public:
-			brent_minima_stepper():IsFirst(true){}
+			brent_minima_stepper():IsFirst(true),delta(0),pdelta(0),best2nd(),best3rd(){}
 			template<typename F>
 			void initialize(F, state&)noexcept{
 				IsFirst = true;
@@ -77,7 +77,7 @@ namespace hmLib{
 				}else{
 					trial.v -= precision;
 				}
-				trial.eval(fn);
+				trial.eval(f);
 
 				if(trial.f <= x.guess.f){
 					// update holding points
@@ -120,10 +120,10 @@ namespace hmLib{
 		};
 		template<typename fn, typename value_type, typename precision_breaker, typename observer>
 		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk, observer Obs){
-			using stepper = toms748_root_stepper<T>;
+			using stepper = brent_minima_stepper<value_type>;
 			using state = typename stepper::state;
 			stepper Stepper;
-			state State(fn, (lowerval+upperval)/2.0, lowerval,upperval);
+			state State(Fn, (lowerval+upperval)/2.0, lowerval, upperval);
 			State.order();
 
 			for(unsigned int i = 0; i<maxitr; ++i){
@@ -136,11 +136,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename precision_breaker>
 		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk){
-			using stepper = toms748_root_stepper<T>;
+			using stepper = brent_minima_stepper<value_type>;
 			using state = typename stepper::state;
 			stepper Stepper;
-			state State(fn, (lowerval+upperval)/2.0, lowerval,upperval);
-			State.order();
+			state State(Fn, (lowerval+upperval)/2.0, lowerval, upperval);
+			//State.order();
 
 			for(unsigned int i = 0; i<maxitr; ++i){
 				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
@@ -151,11 +151,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename error_type, typename observer>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,make_range_precision_breaker(relerr,abserr),Obs);
+			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr),Obs);
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,make_range_precision_breaker(relerr,abserr));
+			return breakable_brent_minima(Fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
 		}
     }
 }

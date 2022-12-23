@@ -10,20 +10,22 @@ namespace hmLib{
 			T v;
 			T f;
 		public:
-			evalpair()=default;
-			explict evalpair(T x_)noexcept:x(x_),f(){}
-			evalpair(T x_, T f_)noexcept:x(x_),f(f_){}
+			evalpair()noexcept:v(0),f(0){}
+			explicit evalpair(T v_)noexcept:v(v_),f(){}
+			evalpair(T v_, T f_)noexcept:v(v_),f(f_){}
 			template<typename F>
-			evalpair(F fn, T x_):x(x_),f(fn(x_)){}
-			void set(T x_, T f_)noexcept{v=x_; f=f_;}
+			evalpair(F fn, T v_):v(v_),f(fn(v_)){}
+			void set(T v_, T f_)noexcept{v=v_; f=f_;}
 			template<typename F>
-			void set(F fn, T x_){v=x_; f=fn(v);}
+			void set(F fn, T v_){v=v_; f=fn(v);}
 			template<typename F>
 			void eval(F fn){f=fn(v);}
+			T guess_v()const{return v;}
+			T guess_f()const{return f;}
 		};
 		template<typename F, typename T>
-		auto make_evalpair(F fn, T x){
-			return evalpair<decltype(x * fn(x))>(x,fn(x));
+		auto make_evalpair(F fn, T v){
+			return evalpair<decltype(v * fn(v))>(v,fn(v));
 		}
 		template<typename T>
 		struct evalrange{
@@ -57,6 +59,10 @@ namespace hmLib{
 			}
 			bool is_ordered()const{return lower.v <= upper.v;}
 			void order(){if(!is_ordered())std::swap(lower,upper);}
+			T lower_v()const{return lower.v;}
+			T upper_v()const{return upper.v;}
+			T lower_f()const{return lower.f;}
+			T upper_f()const{return upper.f;}
 		};
 		template<typename T>
 		struct guess_evalrange{
@@ -96,6 +102,12 @@ namespace hmLib{
 			}
 			bool is_ordered()const{return lower.v <= upper.v;}
 			void order(){if(!is_ordered())std::swap(lower,upper);}
+			T guess_v()const{return guess.v;}
+			T guess_f()const{return guess.f;}
+			T lower_v()const{return lower.v;}
+			T upper_v()const{return upper.v;}
+			T lower_f()const{return lower.f;}
+			T upper_f()const{return upper.f;}
 		};
 	}
 }
