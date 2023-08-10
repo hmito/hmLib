@@ -1,9 +1,9 @@
-#ifndef HMLIB_ODEINT_BREAKER_BREAKSKIPPER_INC
-#define HMLIB_ODEINT_BREAKER_BREAKSKIPPER_INC 100
+#ifndef HMLIB_RECUR_BREAKER_BREAKSKIPPER_INC
+#define HMLIB_RECUR_BREAKER_BREAKSKIPPER_INC 100
 #
 #include<type_traits>
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename breaker>
 		class break_skipper {
 			breaker brk;

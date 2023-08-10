@@ -1,8 +1,8 @@
-#ifndef HMLIB_BREAKERS_OVERTIMEBREAKER_INC
-#define HMLIB_BREAKERS_OVERTIMEBREAKER_INC 100
+#ifndef HMLIB_RECUR_BREAKER_OVERTIMEBREAKER_INC
+#define HMLIB_RECUR_BREAKER_OVERTIMEBREAKER_INC 100
 #
 namespace hmLib {
-    namespace breakers{
+    namespace recur{
         template<typename time_type>
         struct overtime_breaker {
         private:

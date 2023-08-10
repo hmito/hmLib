@@ -1,12 +1,12 @@
-#ifndef HMLIB_ODEINT_OBSERVER_HISTOGRAMSTREAMOBSERVER_INC
-#define HMLIB_ODEINT_OBSERVER_HISTOGRAMSTREAMOBSERVER_INC 100
+#ifndef HMLIB_RECUR_OBSERVER_HISTOGRAMSTREAMOBSERVER_INC
+#define HMLIB_RECUR_OBSERVER_HISTOGRAMSTREAMOBSERVER_INC 100
 #
 #include<ostream>
 #include<string>
 #include<algorithm>
 #include"../../math/histgram.hpp"
 namespace hmLib {
-	namespace odeint {
+	namespace recur {
 		struct histogram_stream_observer {
 		private:
 			std::ostream& out;

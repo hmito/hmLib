@@ -1,9 +1,9 @@
-#ifndef HMLIB_ODEINT_OBSERVER_STATEACCESSOR_INC
-#define HMLIB_ODEINT_OBSERVER_STATEACCESSOR_INC 100
+#ifndef HMLIB_RECUR_OBSERVER_STATEACCESSOR_INC
+#define HMLIB_RECUR_OBSERVER_STATEACCESSOR_INC 100
 #
 #include "../../iterators/range.hpp"
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename container>
 		struct range_accessor{
 		private:

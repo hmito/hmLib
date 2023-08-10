@@ -1,5 +1,5 @@
-#ifndef HMLIB_ODEINT_OBSERVER_OBSERVECONTAINER_INC
-#define HMLIB_ODEINT_OBSERVER_OBSERVECONTAINER_INC 100
+#ifndef HMLIB_RECUR_OBSERVER_OBSERVECONTAINER_INC
+#define HMLIB_RECUR_OBSERVER_OBSERVECONTAINER_INC 100
 #
 #include<vector>
 #include"../../circular.hpp"
@@ -7,7 +7,7 @@
 #include"observe_skipper.hpp"
 #include"state_accessor.hpp"
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename state_type, typename time_type>
 		struct observe_vector{
 		public:

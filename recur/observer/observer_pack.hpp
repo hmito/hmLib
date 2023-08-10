@@ -1,11 +1,11 @@
-﻿#ifndef HMLIB_ODEINT_OBSERVAERPACK_INC
-#define HMLIB_ODEINT_OBSERVAERPACK_INC 100 
+﻿#ifndef HMLIB_RECUR_OBSERVAERPACK_INC
+#define HMLIB_RECUR_OBSERVAERPACK_INC 100 
 #
 #include<utility>
 #include"../../tuple.hpp"
 #include"null_observer.hpp"
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename observer, typename... others>
 		struct observer_pack {
 			using pack = std::tuple<observer, others...>;

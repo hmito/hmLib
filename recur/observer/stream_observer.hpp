@@ -1,12 +1,12 @@
-﻿#ifndef HMLIB_ODEINT_OBSERVER_STREAMOBSERVER_INC
-#define HMLIB_ODEINT_OBSERVER_STREAMOBSERVER_INC 100
+﻿#ifndef HMLIB_RECUR_OBSERVER_STREAMOBSERVER_INC
+#define HMLIB_RECUR_OBSERVER_STREAMOBSERVER_INC 100
 #
 #include<iostream>
 #include<string>
 #include"../../utility.hpp"
 #include"../../type_traits.hpp"
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		struct stream_observer{
 		private:
 			std::ostream& out;

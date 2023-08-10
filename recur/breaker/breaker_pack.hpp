@@ -1,11 +1,11 @@
-﻿#ifndef HMLIB_ODEINT_BREAKER_BREAKERPACK_INC
-#define HMLIB_ODEINT_BREAKER_BREAKERPACK_INC 100 
+﻿#ifndef HMLIB_RECUR_BREAKER_BREAKERPACK_INC
+#define HMLIB_RECUR_BREAKER_BREAKERPACK_INC 100 
 #
 #include<utility>
 #include"../../tuple.hpp"
 #include"../observer/null_observer.hpp"
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename breaker, typename... others>
 		struct breaker_pack {
 			using pack = std::tuple<breaker, others...>;
