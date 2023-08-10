@@ -109,7 +109,7 @@ namespace hmLib{
 			double sigma;
 		};
 		template<typename fn, typename state_type, typename breaker,typename observer>
-		auto breakable_nelder_mead_minima(fn Fn, state_type& State, unsigned int maxitr, breaker Brk, observer Obs){
+		auto breakable_nelder_mead_minima(fn Fn, state_type State, unsigned int maxitr, breaker Brk, observer Obs){
 //			using stepper = brent_minima_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
 			using stepper = nelder_mead_minima_stepper<typename state_type::value_type, typename state_type::eval_type>;
 
@@ -117,7 +117,7 @@ namespace hmLib{
 			//state_type State(Fn, ini, 0.2, 0.001);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			return count_result(ans.first|Brk(State,ans.second),ans.second);
+			return std::pair<state_type,count_result>(std::move(State), count_result(ans.first|Brk(State,ans.second),ans.second));
 		}
 		template<typename fn, typename state_type, typename breaker>
 		auto breakable_nelder_mead_minima(fn Fn, state_type& State, unsigned int maxitr, breaker Brk){
