@@ -1,5 +1,5 @@
-#ifndef HMLIB_NUMERIC_EVALUE_INC
-#define HMLIB_NUMERIC_EVALUE_INC 100
+#ifndef HMLIB_NUMERIC_ERANGEPRECISIONBREAKER_INC
+#define HMLIB_NUMERIC_ERANGEPRECISIONBREAKER_INC 100
 #
 #include<cmath>
 #include"../evalue.hpp"
@@ -23,12 +23,16 @@ namespace hmLib{
 				, abserr(absolute_error_){
 			}
 			template<typename value_type, typename eval_type>
+			auto precision(const evalue<value_type,eval_type>& x)const{
+				return relerr * std::abs(x.v / 2) + abserr / 4;
+			}
+			template<typename value_type, typename eval_type>
 			auto precision(const erange<value_type,eval_type>& x)const{
 				return relerr * std::abs((x.upper.v + x.lower.v) / 2) + abserr / 4;
 			}
 			template<typename value_type, typename eval_type>
 			auto precision(const etrio<value_type,eval_type>& x)const{
-				return relerr * std::abs(x.guess.v) + abserr / 4;
+				return precision(x.guess);
 			}
 			template<typename value_type, typename eval_type, typename step_type>
 			bool operator()(const erange<value_type,eval_type>& x, step_type)const{

@@ -2,6 +2,7 @@
 #define HMLIB_NUMERIC_INTERPOLATE_INC 100
 #
 #include "../evalue.hpp"
+#include "../../math.hpp"
 namespace hmLib{
 	namespace numeric{
 		namespace detail{
