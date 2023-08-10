@@ -3,6 +3,7 @@
 #
 #include<utility>
 #include<type_traits>
+#include"../math/sign.hpp"
 namespace hmLib{
 	namespace numeric{
 		template<typename value_type_, typename eval_type_>
@@ -94,7 +95,6 @@ namespace hmLib{
 				if(!is_ordered())std::swap(lower,upper);
 				return *this;
 			}
-			value_type center()const{return (lower.v+upper.v)/2;}
 		};
 		template<typename fn, typename value_type>
 		auto make_erange(fn Fn, value_type&& lower,value_type&& upper){
@@ -187,6 +187,26 @@ namespace hmLib{
 		auto make_etrio(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
 			return make_etrio<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
+
+		template<typename value_type, typename eval_type>
+		value_type guess_minima(const evalue<value_type,eval_type>& x){return x.v;}
+		template<typename value_type, typename eval_type>
+		value_type guess_minima(const erange<value_type,eval_type>& x){return x.upper.e <= x.lower.e?x.upper.v:x.lower.e;}
+		template<typename value_type, typename eval_type>
+		value_type guess_minima(const etrio<value_type,eval_type>& x){return x.guess.v;}
+		template<typename value_type, typename eval_type>
+		value_type guess_root(const evalue<value_type,eval_type>& x){return x.v;}
+		template<typename value_type, typename eval_type>
+		value_type guess_root(const erange<value_type,eval_type>& x){
+			auto base = std::abs(x.lower.e)+std::abs(x.upper.e); 
+			if(hmLib::math::sign(base)==hmLib::math::sign::zero){
+				return (x.upper.v+x.lower.v)/2;
+			}else{
+				return (std::abs(x.upper.e)*x.lower.v+std::abs(x.lower.e)*x.upper.v)/base;
+			}
+		}
+		template<typename value_type, typename eval_type>
+		value_type guess_root(const etrio<value_type,eval_type>& x){return x.guess.v;}
 	}
 }
 #
