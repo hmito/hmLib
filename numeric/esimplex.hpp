@@ -4,12 +4,12 @@
 #include<cmath>
 #include<iterator>
 #include<vector>
-#include"evalpair.hpp"
+#include"evalue.hpp"
 namespace hmLib{
 	namespace numeric{
-		template<typename value_type, typename evalue_type>
-		struct evalsimplex{
-			using pair = evalpair<value_type,evalue_type>
+		template<typename value_type, typename eval_type>
+		struct esimplex{
+			using pair = evalue<value_type,eval_type>
 		private:
 			using container = std::vector<vertex>;
 		public:
@@ -20,11 +20,11 @@ namespace hmLib{
 		private:
 			std::vector<pair> Simplex;
 		public:
-			evalsimplex() = default;
+			esimplex() = default;
 			template<typename fn, typename input_iterator>
-			evalsimplex(fn Fn, input_iterator Beg, input_iterator End){}
+			esimplex(fn Fn, input_iterator Beg, input_iterator End){}
 			template<typename fn, typename random_value_generator>
-			evalsimplex(fn Fn, value_type inival, random_value_generator gen) {
+			esimplex(fn Fn, value_type inival, random_value_generator gen) {
 				std::size_t size = std::distance(beg,end);
 				//initialize vertex
 				Simplex.reserve(size+1);
@@ -50,24 +50,24 @@ namespace hmLib{
 			const_iterator minima()const { return std::min_element(Simplex.begin(),Simplex.end());}
 		};
 		template<typename error_type_>
-		struct simplex_precision_breaker{
+		struct esimplex_precision_breaker{
 			//following functions should be callable;
 			// state_type::begin() : return begin iterator of the node array of the simplex
 			// state_type::end() : return end iterator of the node array of simplex
 			//  each node also should have begin/end for access value on each axis. 
 			using error_type = error_type_;
 		public:
-			simplex_precision_breaker() = delete;
-			explicit simplex_precision_breaker(error_type relative_error_)
+			esimplex_precision_breaker() = delete;
+			explicit esimplex_precision_breaker(error_type relative_error_)
 				: relerr(relative_error_)
 				, abserr(relative_error_/4){
 			}
-			simplex_precision_breaker(error_type relative_error_, error_type absolute_error_)
+			esimplex_precision_breaker(error_type relative_error_, error_type absolute_error_)
 				: relerr(relative_error_)
 				, abserr(absolute_error_){
 			}
-			template<typename value_type, typename evalue_type>
-			bool operator()(const evalsimplex<value_type,evalue_type>& x,step_type)const{
+			template<typename value_type, typename eval_type>
+			bool operator()(const esimplex<value_type,eval_type>& x,step_type)const{
 				unsigned int size = std::distance(x.begin(), x.end()) - 1;
 				auto minima = x.minima();
 				for (unsigned int i = 0; i < size; ++i) {

@@ -6,17 +6,17 @@
 #include<algorithm>
 #include<cmath>
 #include<iostream>
-#include"evalpair.hpp"
-#include"evalsimplex.hpp"
+#include"evalue.hpp"
+#include"esimplex.hpp"
 #include"numeric_result.hpp"
 namespace hmLib{
 	namespace numeric{
-		template<typename value_type,typename evalue_type>
+		template<typename value_type,typename eval_type>
 		struct nelder_mead_minima_stepper{
 		private:
-			using pair = evalpair<value_type,evalue_type>;
-			using state = evalsimplex<value_type,evalue_type>;
-			using this_type = nelder_mead_minima_stepper<value_type,evalue_type>;
+			using pair = evalue<value_type,eval_type>;
+			using state = esimplex<value_type,eval_type>;
+			using this_type = nelder_mead_minima_stepper<value_type,eval_type>;
 		public:
 			nelder_mead_minima_stepper()
 				: alpha(1)
@@ -134,11 +134,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename vect, typename error_type>
 		auto nelder_mead_minima(fn Fn, vect ini, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_nelder_mead_minima(Fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr));
+			return breakable_nelder_mead_minima(Fn, ini, maxitr,esimplex_precision_breaker<error_type>(relerr,abserr));
 		}
 		template<typename fn, typename vect, typename error_type,typename observer>
 		auto nelder_mead_minima(fn Fn, vect ini, unsigned int maxitr, error_type relerr, error_type abserr, observer obs){
-			return breakable_nelder_mead_minima(Fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr), obs);
+			return breakable_nelder_mead_minima(Fn, ini, maxitr,esimplex_precision_breaker<error_type>(relerr,abserr), obs);
 		}
 	}
 }

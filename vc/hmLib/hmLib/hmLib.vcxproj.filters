@@ -501,13 +501,13 @@
     <ClInclude Include="..\..\..\numeric\brent_minima.hpp">
       <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\numeric\evalpair.hpp">
+    <ClInclude Include="..\..\..\numeric\evalue.hpp">
       <Filter>hmLib\numeric</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\numeric\golden_section_minima.hpp">
       <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\numeric\interpolate.hpp">
+    <ClInclude Include="..\..\..\numeric\detail\interpolate.hpp">
       <Filter>hmLib\numeric</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\numeric\nelder_mead_minima.hpp">
@@ -519,7 +519,7 @@
     <ClInclude Include="..\..\..\numeric\range_precision_breaker.hpp">
       <Filter>hmLib\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\numeric\simplex_precision_breaker.hpp">
+    <ClInclude Include="..\..\..\numeric\esimplex_precision_breaker.hpp">
       <Filter>hmLib\numeric</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\numeric\toms748_root.hpp">

@@ -122,13 +122,13 @@
     <ClInclude Include="..\..\..\numeric.hpp" />
     <ClInclude Include="..\..\..\numeric\bisect_root.hpp" />
     <ClInclude Include="..\..\..\numeric\brent_minima.hpp" />
-    <ClInclude Include="..\..\..\numeric\evalpair.hpp" />
+    <ClInclude Include="..\..\..\numeric\evalue.hpp" />
     <ClInclude Include="..\..\..\numeric\golden_section_minima.hpp" />
-    <ClInclude Include="..\..\..\numeric\interpolate.hpp" />
+    <ClInclude Include="..\..\..\numeric\detail\interpolate.hpp" />
     <ClInclude Include="..\..\..\numeric\nelder_mead_minima.hpp" />
     <ClInclude Include="..\..\..\numeric\numeric_result.hpp" />
     <ClInclude Include="..\..\..\numeric\range_precision_breaker.hpp" />
-    <ClInclude Include="..\..\..\numeric\simplex_precision_breaker.hpp" />
+    <ClInclude Include="..\..\..\numeric\esimplex_precision_breaker.hpp" />
     <ClInclude Include="..\..\..\numeric\toms748_root.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp" />

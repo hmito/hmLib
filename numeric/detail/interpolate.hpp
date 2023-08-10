@@ -1,16 +1,16 @@
 #ifndef HMLIB_NUMERIC_INTERPOLATE_INC
 #define HMLIB_NUMERIC_INTERPOLATE_INC 100
 #
-#include "evalpair.hpp"
+#include "../evalue.hpp"
 namespace hmLib{
 	namespace numeric{
 		namespace detail{
-			template <typename value_type,typename evalue_type>
-			inline value_type bisect_interpolate(const evalpair<value_type,evalue_type>& a, const evalpair<value_type,evalue_type>& b){
+			template <typename value_type,typename eval_type>
+			inline value_type bisect_interpolate(const evalue<value_type,eval_type>& a, const evalue<value_type,eval_type>& b){
 				return a.v + (b.v - a.v) / 2;
 			}
-			template <typename value_type,typename evalue_type>
-			inline value_type secant_interpolate(const evalpair<value_type,evalue_type>& a, const evalpair<value_type,evalue_type>& b){
+			template <typename value_type,typename eval_type>
+			inline value_type secant_interpolate(const evalue<value_type,eval_type>& a, const evalue<value_type,eval_type>& b){
 				using std::abs;
 
 				//secant calculation
@@ -22,8 +22,8 @@ namespace hmLib{
 				//secant faild; return bisect
 				return bisect_interpolate(a,b);
 			}
-			template <typename value_type,typename evalue_type>
-			inline value_type double_secant_interpolate(const evalpair<value_type,evalue_type>& a, const evalpair<value_type,evalue_type>& b){
+			template <typename value_type,typename eval_type>
+			inline value_type double_secant_interpolate(const evalue<value_type,eval_type>& a, const evalue<value_type,eval_type>& b){
 				using std::abs;
 				if(abs(a.e) < abs(b.e)){
 					auto z = a.v - 2 * (a.e / (b.e - a.e)) * (b.v - a.v);
@@ -36,8 +36,8 @@ namespace hmLib{
 				//double secant faild; return bisect
 				return bisect_interpolate(a,b);
 			}
-			template <typename value_type,typename evalue_type>
-			inline value_type quadratic_interpolate(const evalpair<value_type,evalue_type>& a, const evalpair<value_type,evalue_type>& b, const evalpair<value_type,evalue_type>& c, unsigned int count){
+			template <typename value_type,typename eval_type>
+			inline value_type quadratic_interpolate(const evalue<value_type,eval_type>& a, const evalue<value_type,eval_type>& b, const evalue<value_type,eval_type>& c, unsigned int count){
 				//coeffcients of quadratic
 				auto B = div_or<value_type>(b.e - a.e, b.v - a.v, std::numeric_limits<value_type>::max());
 				auto C = div_or<value_type>(c.e - b.e, c.v - b.v, std::numeric_limits<value_type>::max());
@@ -65,8 +65,8 @@ namespace hmLib{
 				//quadratic faild; try secant
 				return secant_interpolate(a, b);
 			}
-			template <typename value_type,typename evalue_type>
-			inline value_type cubic_interpolate(const evalpair<value_type,evalue_type>& a,const evalpair<value_type,evalue_type>& b,const evalpair<value_type,evalue_type>& c, const evalpair<value_type,evalue_type>& d, unsigned int count){
+			template <typename value_type,typename eval_type>
+			inline value_type cubic_interpolate(const evalue<value_type,eval_type>& a,const evalue<value_type,eval_type>& b,const evalue<value_type,eval_type>& c, const evalue<value_type,eval_type>& d, unsigned int count){
 				auto min_diff = std::numeric_limits<value_type>::min() * 32;
 				bool nocubic = (std::abs(a.e - b.e) < min_diff) || (std::abs(a.e - c.e) < min_diff) || (std::abs(a.e - d.e) < min_diff) || (std::abs(b.e - c.e) < min_diff) || (std::abs(b.e - d.e) < min_diff) || (std::abs(c.e - d.e) < min_diff);
 

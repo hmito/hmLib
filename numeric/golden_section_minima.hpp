@@ -4,15 +4,15 @@
 #include<cmath>
 #include"../math/constants.hpp"
 #include"../math/sign.hpp"
-#include"evalpair.hpp"
+#include"evalue.hpp"
 #include"numeric_result.hpp"
 namespace hmLib{
     namespace numeric{
-		template<typename value_type,typename evalue_type=value_type>
+		template<typename value_type,typename eval_type=value_type>
 		struct golden_section_minima_stepper{
 			using stepper_tag = precision_stepper;
-			using pair = evalpair<value_type,evalue_type>;
-			using state = guess_evalrange<value_type,evalue_type>;
+			using pair = evalue<value_type,eval_type>;
+			using state = etrio<value_type,eval_type>;
 			template<typename fn,typename error_type>
 			void operator()(fn Fn, state& x, error_type precision)const {
 				using std::abs;
@@ -84,11 +84,11 @@ namespace hmLib{
 		}
 		template<typename fn, typename value_type, typename error_type>
 		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,evalrange_precision_breaker<error_type>(relerr,abserr));
+			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,erange_precision_breaker<error_type>(relerr,abserr));
 		}
  		template<typename fn, typename value_type, typename error_type,typename observer>
 		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,evalrange_precision_breaker<error_type>(relerr,abserr), Obs);
+			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,erange_precision_breaker<error_type>(relerr,abserr), Obs);
 		}
    }
 }

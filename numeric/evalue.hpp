@@ -5,21 +5,21 @@
 #include<type_traits>
 namespace hmLib{
 	namespace numeric{
-		template<typename value_type_, typename evalue_type_>
-		struct evalpair{
+		template<typename value_type_, typename eval_type_>
+		struct evalue{
 			using value_type = value_type_;
-			using evalue_type = evalue_type_;
-			using this_type = evalpair<value_type,evalue_type>;
+			using eval_type = eval_type_;
+			using this_type = evalue<value_type,eval_type>;
 			value_type v;
-			evalue_type e;
+			eval_type e;
 		public:
-			evalpair()noexcept:v(0),e(0){}
-			explicit evalpair(const value_type& v_)noexcept:v(v_),e(){}
-			explicit evalpair(value_type&& v_)noexcept:v(std::move(v_)),e(){}
-			evalpair(const value_type& v_, evalue_type e_)noexcept:v(v_),e(std::move(e_)){}
-			evalpair(value_type&& v_, evalue_type e_)noexcept:v(std::move(v_)),e(std::move(e_)){}
-			void set(const value_type& v_, evalue_type e_)noexcept{v=v_; e=std::move(e_);}
-			void set(value_type&& v_, evalue_type e_)noexcept{v=std::move(v_); e=std::move(e_);}
+			evalue()noexcept:v(0),e(0){}
+			explicit evalue(const value_type& v_)noexcept:v(v_),e(){}
+			explicit evalue(value_type&& v_)noexcept:v(std::move(v_)),e(){}
+			evalue(const value_type& v_, eval_type e_)noexcept:v(v_),e(std::move(e_)){}
+			evalue(value_type&& v_, eval_type e_)noexcept:v(std::move(v_)),e(std::move(e_)){}
+			void set(const value_type& v_, eval_type e_)noexcept{v=v_; e=std::move(e_);}
+			void set(value_type&& v_, eval_type e_)noexcept{v=std::move(v_); e=std::move(e_);}
 			template<typename fn>
 			this_type& eval(fn Fn){e=Fn(v);return *this;}
 		public:
@@ -31,39 +31,39 @@ namespace hmLib{
 			friend bool operator>=(const this_type& v1, const this_type& v2) { return v1.e >= v2.e; }
 		};
 		template<typename fn, typename value_type>
-		auto make_evalpair(fn Fn, value_type&& v){
-			return evalpair<std::decay_t<value_type>, decltype(Fn(v))>(Fn,std::forward<value_type>(v));
+		auto make_evalue(fn Fn, value_type&& v){
+			return evalue<std::decay_t<value_type>, decltype(Fn(v))>(Fn,std::forward<value_type>(v));
 		}
-		template<typename value_type_, typename evalue_type_>
-		struct evalrange{
+		template<typename value_type_, typename eval_type_>
+		struct erange{
 			using value_type = value_type_;
-			using evalue_type = evalue_type_;
-			using this_evalpair = evalpair<value_type,evalue_type>;
-			using this_type = evalrange<value_type,evalue_type>;
-			this_evalpair lower;
-			this_evalpair upper;
+			using eval_type = eval_type_;
+			using evalue = evalue<value_type,eval_type>;
+			using this_type = erange<value_type,eval_type>;
+			evalue lower;
+			evalue upper;
 		public:
-			evalrange()=default;
-			evalrange(const this_evalpair& lower_, const this_evalpair& upper_)
+			erange()=default;
+			erange(const evalue& lower_, const evalue& upper_)
 				: lower(lower_)
 				, upper(upper_){
 			}
-			evalrange(this_evalpair&& lower_, this_evalpair&& upper_)
+			erange(evalue&& lower_, evalue&& upper_)
 				: lower(std::move(lower_))
 				, upper(std::move(upper_)){
 			}
 			template<typename fn>
-			evalrange(fn Fn, value_type lowerval, value_type upperval)
+			erange(fn Fn, value_type lowerval, value_type upperval)
 				: lower(std::move(lowerval))
 				, upper(std::move(upperval)){
 					lower.eval(Fn);
 					upper.eval(Fn);
 			}
-			void set(const this_evalpair& lower_, const this_evalpair& upper_)noexcept{
+			void set(const evalue& lower_, const evalue& upper_)noexcept{
 				lower = std::move(lower_);
 				upper = std::move(upper_);
 			}
-			void set(this_evalpair&& lower_, this_evalpair&& upper_)noexcept{
+			void set(evalue&& lower_, evalue&& upper_)noexcept{
 				lower = std::move(lower_);
 				upper = std::move(upper_);
 			}
@@ -90,48 +90,48 @@ namespace hmLib{
 			}
 		};
 		template<typename fn, typename value_type>
-		auto make_evalrange(fn Fn, value_type&& lower,value_type&& upper){
-			return make_evalrange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(lower),std::forward<value_type>(upper));
+		auto make_erange(fn Fn, value_type&& lower,value_type&& upper){
+			return make_erange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
-		template<typename value_type_, typename evalue_type_>
-		struct guess_evalrange{
+		template<typename value_type_, typename eval_type_>
+		struct etrio{
 			using value_type = value_type_;
-			using evalue_type = evalue_type_;
-			using this_evalpair = evalpair<value_type,evalue_type>;
-			using this_type = guess_evalrange<value_type,evalue_type>;
-			this_evalpair guess;
-			this_evalpair lower;
-			this_evalpair upper;
+			using eval_type = eval_type_;
+			using evalue = evalue<value_type,eval_type>;
+			using this_type = etrio<value_type,eval_type>;
+			evalue guess;
+			evalue lower;
+			evalue upper;
 		public:
-			guess_evalrange()=default;
-			guess_evalrange(const this_evalpair& guess_, const this_evalpair& lower_, const this_evalpair& upper_)
+			etrio()=default;
+			etrio(const evalue& guess_, const evalue& lower_, const evalue& upper_)
 				: guess(guess_)
 				, lower(lower_)
 				, upper(upper_){
 			}
-			guess_evalrange(this_evalpair&& guess_, this_evalpair&& lower_, this_evalpair&& upper_)
+			etrio(evalue&& guess_, evalue&& lower_, evalue&& upper_)
 				: guess(std::move(guess_))
 				, lower(std::move(lower_))
 				, upper(std::move(upper_)){
 			}
 			template<typename fn>
-			guess_evalrange(fn Fn, const value_type& guessval, const value_type& lowerval, const value_type& upperval)
+			etrio(fn Fn, const value_type& guessval, const value_type& lowerval, const value_type& upperval)
 				: guess(Fn,guessval)
 				, lower(Fn,lowerval)
 				, upper(Fn,upperval){
 			}
 			template<typename fn>
-			guess_evalrange(fn Fn, value_type&& guessval, value_type&& lowerval, value_type&& upperval)
+			etrio(fn Fn, value_type&& guessval, value_type&& lowerval, value_type&& upperval)
 				: guess(Fn,std::move(guessval))
 				, lower(Fn,std::move(lowerval))
 				, upper(Fn,std::move(upperval)){
 			}
-			void set(const evalpair<value_type,evalue_type>& guess_, const evalpair<value_type,evalue_type>& lower_, const evalpair<value_type,evalue_type>& upper_)noexcept{
+			void set(const evalue<value_type,eval_type>& guess_, const evalue<value_type,eval_type>& lower_, const evalue<value_type,eval_type>& upper_)noexcept{
 				guess = guess_;
 				lower = lower_;
 				upper = upper_;
 			}
-			void set(this_evalpair&& guess_, this_evalpair&& lower_, this_evalpair&& upper_)noexcept{
+			void set(evalue&& guess_, evalue&& lower_, evalue&& upper_)noexcept{
 				guess = std::move(guess_);
 				lower = std::move(lower_);
 				upper = std::move(upper_);
@@ -169,40 +169,40 @@ namespace hmLib{
 			friend bool operator>=(const this_type& v1, const this_type& v2) { return v1.e >= v2.e; }
 		};
 		template<typename fn, typename value_type>
-		auto make_guess_evalrange(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
-			return make_guess_evalrange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
+		auto make_etrio(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
+			return make_etrio<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
 		template<typename error_type_>
-		struct evalrange_precision_breaker{
+		struct erange_precision_breaker{
 			//following functions should be callable;
 			// state_type::lower() : return lower value of the range
 			// state_type::upper() : return upper value of the range
 			// state_type::value() : return optimal value of the range
 			using error_type = error_type_;
 		public:
-			evalrange_precision_breaker() = delete;
-			explicit evalrange_precision_breaker(error_type relative_error_)
+			erange_precision_breaker() = delete;
+			explicit erange_precision_breaker(error_type relative_error_)
 				: relerr(relative_error_)
 				, abserr(relative_error_/4){
 			}
-			evalrange_precision_breaker(error_type relative_error_, error_type absolute_error_)
+			erange_precision_breaker(error_type relative_error_, error_type absolute_error_)
 				: relerr(relative_error_)
 				, abserr(absolute_error_){
 			}
-			template<typename value_type, typename evalue_type>
-			auto precision(const evalrange<value_type,evalue_type>& x)const{
+			template<typename value_type, typename eval_type>
+			auto precision(const erange<value_type,eval_type>& x)const{
 				return relerr * std::abs((x.upper.v + x.lower.v) / 2) + abserr / 4;
 			}
-			template<typename value_type, typename evalue_type>
-			auto precision(const guess_evalrange<value_type,evalue_type>& x)const{
+			template<typename value_type, typename eval_type>
+			auto precision(const etrio<value_type,eval_type>& x)const{
 				return relerr * std::abs(x.guess.v) + abserr / 4;
 			}
-			template<typename value_type, typename evalue_type, typename step_type>
-			bool operator()(const evalrange<value_type,evalue_type>& x, step_type)const{
+			template<typename value_type, typename eval_type, typename step_type>
+			bool operator()(const erange<value_type,eval_type>& x, step_type)const{
 				return (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
 			}
-			template<typename value_type, typename evalue_type, typename step_type>
-			bool operator()(const guess_evalrange<value_type,evalue_type>& x, step_type)const{
+			template<typename value_type, typename eval_type, typename step_type>
+			bool operator()(const etrio<value_type,eval_type>& x, step_type)const{
 				return std::abs(x.guess.v - (x.upper.v + x.lower.v) / 2) + (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
 			}
 		private:
