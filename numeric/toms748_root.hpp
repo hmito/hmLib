@@ -6,8 +6,6 @@
 #include"../exceptions/numeric_exceptions.hpp"
 #include "../math/math.hpp"
 #include "../math/sign.hpp"
-#include"../recur/breakable_recurse.hpp"
-#include"../recur/stepper_category.hpp"
 #include "detail/interpolate.hpp"
 #include "evalue.hpp"
 #include "breaker/erange_precision_breaker.hpp"
@@ -16,7 +14,6 @@ namespace hmLib{
 	namespace numeric{
 		template<typename value_type, typename eval_type=value_type>
 		struct toms748_root_stepper{
-			using stepper_category = hmLib::recur::naive_stepper_tag;
 			using this_evalue = evalue<value_type,eval_type>;
 			//system_type = fn;
 			using state_type = erange<value_type,eval_type>;
