@@ -115,7 +115,7 @@ namespace hmLib{
 			using stepper = nelder_mead_minima_stepper<typename std::decay_t<state_type>::value_type, typename state_type::eval_type>;
 
 			stepper Stepper;
-			state_type ThisState = std::foward<state_type>(State);
+			state_type ThisState = std::forward<state_type>(State);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, ThisState, maxitr, Brk, Obs);
 			return std::pair<state_type,count_result>(std::move(ThisState), count_result(ans.first|Brk(ThisState,ans.second),ans.second));
