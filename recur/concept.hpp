@@ -31,9 +31,9 @@ namespace hmLib{
 		concept error_stepper = requires(stepper_type st, system_type sys, state_type x, time_type t){
 			{st.try_step(sys,x,t)} -> std::convertible_to<bool>;
 		} && !requires(stepper_type st, system_type sys, std::add_const_t<std::decay_t<state_type>> x, time_type t){
-			{st.do_step(sys,x,t)};
+			{st.try_step(sys,x,t)};
 		} && !requires(stepper_type st, system_type sys, state_type x,  std::add_const_t<std::decay_t<time_type>> t){
-			{st.do_step(sys,x,t)};
+			{st.try_step(sys,x,t)};
 		};
 	}
 }

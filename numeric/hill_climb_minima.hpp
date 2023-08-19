@@ -1,55 +1,91 @@
 #ifndef HMLIB_NUMERIC_HILLCLIMBMINIMA_INC
 #define HMLIB_NUMERIC_HILLCLIMBMINIMA_INC 100
 #
+#include"../recur/breakable_recurse.hpp"
+#include"../recur/stepper_category.hpp"
 #include<cmath>
 #include"../recur/breakable_recurse.hpp"
 #include"evalue.hpp"
 #include"numeric_result.hpp"
-namespace hmLib {
-	namespace numeric {
-		struct hill_climb_stepper{
+namespace hmLib{
+	namespace numeric{
+		template<typename value_type,typename eval_type,typename urbg>
+		struct hill_climbing_minima_stepper{
+			//system_type = pair<Fn,Mutate>;
+			using state_type = evalue<value_type,eval_type>;
+			using stepper_category = hmLib::recur::naive_stepper_tag;
+		public:
+			hill_climbing_minima_stepper() = delete;
+			explicit hill_climbing_minima_stepper(urbg URBG_):URBG(URBG_){}
 			template<typename fnpair>
-			bool try_step(fnpair FnPair, state_type& x)const {
-				using std::abs;
-				constexpr value_type epsilon(1.0/(math::golden_ratio<value_type>+1.0));
-
-				auto precision = FnPair.second(x);
-
-				// golden section point
-				value_type delta = epsilon * ((x.guess.v * 2 >= x.upper.v + x.lower.v) ? x.lower.v - x.guess.v: x.upper.v - x.guess.v);
-
-				// check whether golden section point can be used
-				this_evalue trial(x.guess);
-				if(abs(delta) >= precision){
-					trial.v += delta;
-				}else if(hmLib::math::sign(delta) == hmLib::math::sign::positive){
-					trial.v += precision;
-				}else{
-					trial.v -= precision;
-				}
-				trial.eval(FnPair.first);
-
-				if(trial.e <= x.guess.e){
-					//if tried point is the best; update guess
-					if(trial.v >= x.guess.v){
-						x.lower = x.guess;
-						x.guess = trial;
-					}else{
-						x.upper = x.guess;
-						x.guess = trial;
-					}
-				}else{
-					//if the tried point is not the best; update only either border
-					if(trial.v < x.guess.v){
-						x.lower = trial;
-					}else{
-						x.upper = trial;
-					}
+			void do_step(fnpair FnPair,  state_type& State)const{
+				NState.v = State.v;
+				FnPair.second(NState.v, URBG);
+				NState.eval(FnPair.first);
+				if(State.e > NState.e){
+					State = std::move(NState);
 				}
 			}
-
-
+		private:
+			state_type NState;
+			urbg URBG;
 		};
+		template<typename value_type,typename eval_type,typename urbg>
+		struct simulated_annealing_minima_stepper{
+			//system_type = pair<Fn,Mutate>;
+			using state_type = evalue<value_type,eval_type>;
+			using stepper_category = hmLib::recur::stepper_tag;
+			using time_type = unsigned int;
+		public:
+			simulated_annealing_minima_stepper() = delete;
+			explicit simulated_annealing_minima_stepper(unsigned int StepNum_, double MaxTemp_, double MinTemp_, urbg URBG_)
+				:StepNum(StepNum_)
+				,MaxTemp(MaxTemp_)
+				,MinTemp(MinTemp_)
+				,URBG(URBG_){
+			}
+			template<typename fnpair>
+			void do_step(fnpair FnPair,  state_type& State, time_type& t)const{
+				NState.v = State.v;
+				FnPair.second(NState.v, URBG);
+				NState.eval(FnPair.first);
+				if(State.e > NState.e || std::uniform_real_distribution<double>(0.0, 1.0)(URBG) < std::exp((State.e - NState.e) / (1e-10 +  MinTemp + (MaxTemp-MinTemp)*(1.0 - static_cast<double>(t) / StepNum)))){
+					State = std::move(NState);
+				}
+				++t;
+			}
+		private:
+			state_type NState;
+			urbg URBG;
+			unsigned int StepNum;
+			double MinTemp;
+			double MaxTemp;
+		};
+		template<typename evaluate, typename mutate, typename state_type, typename breaker, typename observer>
+		auto breakable_hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk, observer Obs){
+			using stepper = bisect_root_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
+			using state_type = typename stepper::state_type;
+
+			stepper Stepper;
+			state_type State(Fn, lowerval, upperval);
+			State.order();
+
+			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
+			return std::make_pair(State, count_result(ans.first|Brk(State,ans.second),ans.second));
+		}
+		template<typename fn, typename value_type, typename breaker>
+		auto breakable_bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk){
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr, Brk, hmLib::recur::null_observer());
+		}
+ 		template<typename fn, typename value_type, typename error_type,typename observer>
+		auto bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr, erange_precision_breaker<error_type>(relerr,abserr), Obs);
+		}
+		template<typename fn, typename value_type, typename error_type>
+		auto bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_bisect_root(Fn, lowerval, upperval, maxitr, erange_precision_breaker<error_type>(relerr,abserr));
+		}
+
 		//hill climing search
 		template<typename evaluate, typename state_type, typename mutate, typename urbg, typename state_breaker>
 		auto hill_climbing_minima(evaluate&& Evaluate, state_type& State, mutate&& Mutate, state_breaker&& Breaker, urbg&& URBG)->decltype(Evaluate(State)){

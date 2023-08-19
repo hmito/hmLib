@@ -6,7 +6,6 @@
 #include<algorithm>
 #include<type_traits>
 #include<cmath>
-#include<iostream>
 #include"../recur/breakable_recurse.hpp"
 #include"../recur/stepper_category.hpp"
 #include"evalue.hpp"
