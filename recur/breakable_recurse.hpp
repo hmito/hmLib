@@ -91,8 +91,8 @@ namespace hmLib{
 	}
 	template<typename system_type, typename state_type,
 		hmLib::recur::naive_stepper<system_type, state_type> stepper_type,
-		hmLib::recur::breaker<state_type,time_type> brk,
-		hmLib::recur::observer<state_type,time_type> obs>
+		hmLib::recur::breaker<state_type,unsigned int> brk,
+		hmLib::recur::observer<state_type,unsigned int> obs>
 	std::pair<bool, unsigned int> breakable_recurse(stepper_type&& Stepper, system_type&& System, state_type& State, unsigned int StepNum, brk Breaker, obs Observer) {
 		for (unsigned int Cnt = 0; Cnt < StepNum; ++Cnt) {
 			if (Breaker(State, StepNum)) {
@@ -105,7 +105,7 @@ namespace hmLib{
 	}
 	template<typename system_type, typename state_type,
 		hmLib::recur::naive_stepper<system_type, state_type> stepper_type,
-		hmLib::recur::breaker<state_type,time_type> brk>
+		hmLib::recur::breaker<state_type,unsigned int> brk>
 	std::pair<bool, unsigned int> breakable_recurse(stepper_type&& Stepper, system_type&& System, state_type& State, unsigned int StepNum, brk Breaker) {
 		return breakable_recurse(std::forward<stepper_type>(Stepper), std::forward<system_type>(System), State, StepNum, Breaker, hmLib::recur::null_observer());
 	}

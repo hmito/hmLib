@@ -6,17 +6,16 @@
 #include<algorithm>
 #include<type_traits>
 #include<cmath>
+#include<iostream>
 #include"../recur/breakable_recurse.hpp"
-#include"../recur/stepper_category.hpp"
 #include"evalue.hpp"
 #include"esimplex.hpp"
-#include"breaker/esimplex_precision_breaker.hpp"
 #include"numeric_result.hpp"
+#include"breaker/esimplex_precision_breaker.hpp"
 namespace hmLib{
 	namespace numeric{
 		template<typename value_type,typename eval_type>
 		struct nelder_mead_minima_stepper{
-			using stepper_category = hmLib::recur::naive_stepper_tag;
 			using state_type = esimplex<value_type,eval_type>;
 			using vertex_type = typename state_type::vertex;
 		private:
