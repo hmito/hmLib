@@ -116,7 +116,11 @@ namespace hmLib{
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			return std::make_pair(State, count_result(ans.first|Brk(State,ans.second),ans.second));
+			if(!(ans.first|Brk(State,ans.state))){
+				return(step_result(ans.second,State));
+			}else{
+				return(step_result(ans.second,State,(State.upper+State.lower)/2.));
+			}
 		}
 		template<typename fn, typename value_type, typename breaker>
 		auto breakable_toms748_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk){

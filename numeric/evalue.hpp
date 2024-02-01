@@ -101,28 +101,28 @@ namespace hmLib{
 			return make_erange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
 		template<typename value_type_, typename eval_type_>
-		struct etrio{
+		struct etrirange{
 			using value_type = value_type_;
 			using eval_type = eval_type_;
 			using this_evalue = evalue<value_type,eval_type>;
-			using this_type = etrio<value_type,eval_type>;
+			using this_type = etrirange<value_type,eval_type>;
 			this_evalue guess;
 			this_evalue lower;
 			this_evalue upper;
 		public:
-			etrio()=default;
-			etrio(const this_evalue& guess_, const this_evalue& lower_, const this_evalue& upper_)
+			etrirange()=default;
+			etrirange(const this_evalue& guess_, const this_evalue& lower_, const this_evalue& upper_)
 				: guess(guess_)
 				, lower(lower_)
 				, upper(upper_){
 			}
-			etrio(this_evalue&& guess_, this_evalue&& lower_, this_evalue&& upper_)
+			etrirange(this_evalue&& guess_, this_evalue&& lower_, this_evalue&& upper_)
 				: guess(std::move(guess_))
 				, lower(std::move(lower_))
 				, upper(std::move(upper_)){
 			}
 			template<typename fn>
-			etrio(fn Fn, const value_type& guessval, const value_type& lowerval, const value_type& upperval)
+			etrirange(fn Fn, const value_type& guessval, const value_type& lowerval, const value_type& upperval)
 				: guess(guessval)
 				, lower(lowerval)
 				, upper(upperval){
@@ -131,7 +131,7 @@ namespace hmLib{
 				upper.eval(Fn);
 			}
 			template<typename fn>
-			etrio(fn Fn, value_type&& guessval, value_type&& lowerval, value_type&& upperval)
+			etrirange(fn Fn, value_type&& guessval, value_type&& lowerval, value_type&& upperval)
 				: guess(std::move(guessval))
 				, lower(std::move(lowerval))
 				, upper(std::move(upperval)){
@@ -184,29 +184,9 @@ namespace hmLib{
 			friend bool operator>=(const this_type& v1, const this_type& v2) { return v1.e >= v2.e; }
 		};
 		template<typename fn, typename value_type>
-		auto make_etrio(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
-			return make_etrio<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
+		auto make_etrirange(fn Fn, value_type&& guess, value_type&& lower,value_type&& upper){
+			return make_etrirange<std::decay_t<value_type>, decltype(Fn(std::declval<value_type>()))>(Fn,std::forward<value_type>(guess),std::forward<value_type>(lower),std::forward<value_type>(upper));
 		}
-
-		template<typename value_type, typename eval_type>
-		value_type guess_minima(const evalue<value_type,eval_type>& x){return x.v;}
-		template<typename value_type, typename eval_type>
-		value_type guess_minima(const erange<value_type,eval_type>& x){return x.upper.e <= x.lower.e?x.upper.v:x.lower.e;}
-		template<typename value_type, typename eval_type>
-		value_type guess_minima(const etrio<value_type,eval_type>& x){return x.guess.v;}
-		template<typename value_type, typename eval_type>
-		value_type guess_root(const evalue<value_type,eval_type>& x){return x.v;}
-		template<typename value_type, typename eval_type>
-		value_type guess_root(const erange<value_type,eval_type>& x){
-			auto base = std::abs(x.lower.e)+std::abs(x.upper.e); 
-			if(hmLib::math::sign(base)==hmLib::math::sign::zero){
-				return (x.upper.v+x.lower.v)/2;
-			}else{
-				return (std::abs(x.upper.e)*x.lower.v+std::abs(x.lower.e)*x.upper.v)/base;
-			}
-		}
-		template<typename value_type, typename eval_type>
-		value_type guess_root(const etrio<value_type,eval_type>& x){return x.guess.v;}
 	}
 }
 #

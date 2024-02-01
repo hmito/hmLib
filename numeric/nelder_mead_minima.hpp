@@ -116,7 +116,11 @@ namespace hmLib{
 			state_type ThisState = std::forward<state_type>(State);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, ThisState, maxitr, Brk, Obs);
-			return std::pair<state_type,count_result>(std::move(ThisState), count_result(ans.first|Brk(ThisState,ans.second),ans.second));
+			if(!(ans.first|Brk(State,ans.state))){
+				return(step_result(ans.second,State));
+			}else{
+				return(step_result(ans.second,State,*(State.minima())));
+			}
 		}
 		template<typename fn, typename state_type, typename breaker>
 		auto breakable_nelder_mead_minima(fn Fn, state_type&& State, unsigned int maxitr, breaker Brk){

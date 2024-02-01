@@ -17,7 +17,7 @@ namespace hmLib{
 		struct bisect_root_stepper{
 			using this_evalue = evalue<value_type,eval_type>;
 			//system_type = fn;
-			using state_type =erange<value_type,eval_type>;
+			using state_type = erange<value_type,eval_type>;
 		public:
 			bisect_root_stepper():IsFirst(true){}
 			template<typename fn>
@@ -63,7 +63,12 @@ namespace hmLib{
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			return std::make_pair(State, count_result(ans.first|Brk(State,ans.second),ans.second));
+			if(!(ans.first|Brk(State,ans.state))){
+				return(step_result(ans.second,State));
+			}else{
+				return(step_result(ans.second,State,(State.lower+State.upper)/2.));
+			}
+//			return std::make_pair(State, (ans.first|Brk(State,ans.second),ans.second));
 		}
 		template<typename fn, typename value_type, typename breaker>
 		auto breakable_bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk){

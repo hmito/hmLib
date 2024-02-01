@@ -31,7 +31,7 @@ namespace hmLib{
 				return relerr * std::abs((x.upper.v + x.lower.v) / 2) + abserr / 4;
 			}
 			template<typename value_type, typename eval_type>
-			auto precision(const etrio<value_type,eval_type>& x)const{
+			auto precision(const etrirange<value_type,eval_type>& x)const{
 				return precision(x.guess);
 			}
 			template<typename value_type, typename eval_type, typename step_type>
@@ -39,7 +39,7 @@ namespace hmLib{
 				return (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
 			}
 			template<typename value_type, typename eval_type, typename step_type>
-			bool operator()(const etrio<value_type,eval_type>& x, step_type)const{
+			bool operator()(const etrirange<value_type,eval_type>& x, step_type)const{
 				return std::abs(x.guess.v - (x.upper.v + x.lower.v) / 2) + (x.upper.v - x.lower.v) / 2 <= precision(x) * 2 ;
 			}
 		private:

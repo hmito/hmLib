@@ -5,128 +5,118 @@
 #include"../recur/breakable_recurse.hpp"
 #include"evalue.hpp"
 #include"numeric_result.hpp"
+#include"numeric_system.hpp"
+#include"breaker/minima_stagnant_breaker.hpp"
 namespace hmLib{
 	namespace numeric{
 		template<typename value_type,typename eval_type,typename urbg>
 		struct hill_climbing_minima_stepper{
 			//system_type = pair<Fn,Mutate>;
 			using state_type = evalue<value_type,eval_type>;
-			using stepper_category = hmLib::recur::naive_stepper_tag;
 		public:
 			hill_climbing_minima_stepper() = delete;
 			explicit hill_climbing_minima_stepper(urbg URBG_):URBG(URBG_){}
-			template<typename fnpair>
-			void do_step(fnpair FnPair,  state_type& State)const{
-				NState.v = State.v;
-				FnPair.second(NState.v, URBG);
-				NState.eval(FnPair.first);
+			template<typename fn_type,typename generator_type>
+			void do_step(generator_system<fn_type,generator_type> Sys, state_type& State)const{
+				state_type NState = State;
+				Sys.generator(NState.v, URBG);
+				NState.eval(Sys.fn);
 				if(State.e > NState.e){
 					State = std::move(NState);
 				}
 			}
 		private:
-			state_type NState;
 			urbg URBG;
 		};
+		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename breaker, typename observer>
+		auto breakable_hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, breaker Brk, observer Obs){
+			using stepper = hill_climbing_minima_stepper<std::decay_t<value_type>,decltype(Fn(inival)),urbg>;
+			using state_type = typename stepper::state_type;
+			using system_type = generator_system<std::decay_t<evaluate>,std::decay_t<mutate>>;
+			stepper Stepper(URBG);
+			state_type State(inival,Fn(inival));
+			system_type Sys(std::forward<evaluate>(Fn),std::forward<mutate>(Mutate)); 
+
+			auto ans = hmLib::breakable_recurse(Stepper, Sys, State, maxitr, Brk, Obs);
+			if(!(ans.first|Brk(State,ans.state))){
+				return(step_result(ans.second,State));
+			}else{
+				return(step_result(ans.second,State,State));
+			}
+		}
+		template<typename fn, typename value_type, typename breaker>
+		auto breakable_hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, breaker Brk){
+			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, Brk, hmLib::recur::null_observer());
+		}
+ 		template<typename fn, typename value_type, typename error_type,typename observer>
+		auto hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, unsigned int stableitr, observer Obs){
+			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
+			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, Brk, Obs);
+		}
+		template<typename fn, typename value_type, typename error_type>
+		auto hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, unsigned int stableitr){
+			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
+			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, Brk);
+		}
+
 		template<typename value_type,typename eval_type,typename urbg>
 		struct simulated_annealing_minima_stepper{
-			//system_type = pair<Fn,Mutate>;
 			using state_type = evalue<value_type,eval_type>;
-			using stepper_category = hmLib::recur::stepper_tag;
 			using time_type = unsigned int;
 		public:
 			simulated_annealing_minima_stepper() = delete;
 			explicit simulated_annealing_minima_stepper(unsigned int StepNum_, double MaxTemp_, double MinTemp_, urbg URBG_)
-				:StepNum(StepNum_)
-				,MaxTemp(MaxTemp_)
-				,MinTemp(MinTemp_)
-				,URBG(URBG_){
+				: StepNum(StepNum_)
+				, MaxTemp(MaxTemp_)
+				, MinTemp(MinTemp_)
+				, URBG(URBG_){
 			}
-			template<typename fnpair>
-			void do_step(fnpair FnPair,  state_type& State, time_type& t)const{
-				NState.v = State.v;
-				FnPair.second(NState.v, URBG);
-				NState.eval(FnPair.first);
-				if(State.e > NState.e || std::uniform_real_distribution<double>(0.0, 1.0)(URBG) < std::exp((State.e - NState.e) / (1e-10 +  MinTemp + (MaxTemp-MinTemp)*(1.0 - static_cast<double>(t) / StepNum)))){
+			template<typename fn_type,typename generator_type>
+			void do_step(generator_system<fn_type,generator_type> Sys, state_type& State, time_type& t)const{
+				state_type NState = State;
+				Sys.generator(NState.v, URBG);
+				NState.eval(Sys.fn);
+				if(State.e > NState.e 
+					|| std::uniform_real_distribution<double>(0.0, 1.0)(URBG) < std::exp((State.e - NState.e) / (1e-10 +  MinTemp + (MaxTemp-MinTemp)*(1.0 - static_cast<double>(t) / StepNum)))){
 					State = std::move(NState);
 				}
 				++t;
 			}
 		private:
-			state_type NState;
 			urbg URBG;
 			unsigned int StepNum;
 			double MinTemp;
 			double MaxTemp;
 		};
-		template<typename evaluate, typename mutate, typename state_type, typename breaker, typename observer>
-		auto breakable_hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk, observer Obs){
-			using stepper = bisect_root_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
+		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename breaker, typename observer>
+		auto breakable_simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, unsigned int StepNum, double MaxTemp, double MinTemp, urbg URBG, breaker Brk, observer Obs){
+			using stepper = hill_climbing_minima_stepper<std::decay_t<value_type>,decltype(Fn(inival)),urbg>;
 			using state_type = typename stepper::state_type;
+			using system_type = generator_system<std::decay_t<evaluate>,std::decay_t<mutate>>;
+			stepper Stepper(StepNum,MaxTemp,MinTemp,URBG);
+			state_type State(inival,Fn(inival));
+			system_type Sys(std::forward<evaluate>(Fn),std::forward<mutate>(Mutate)); 
 
-			stepper Stepper;
-			state_type State(Fn, lowerval, upperval);
-			State.order();
-
-			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			return std::make_pair(State, count_result(ans.first|Brk(State,ans.second),ans.second));
+			auto ans = hmLib::breakable_recurse(Stepper, Sys, State, maxitr, Brk, Obs);
+			if(!(ans.first|Brk(State,ans.state))){
+				return(step_result(ans.second,State));
+			}else{
+				return(step_result(ans.second,State,State));
+			}
 		}
 		template<typename fn, typename value_type, typename breaker>
-		auto breakable_bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk){
-			return breakable_bisect_root(Fn, lowerval, upperval, maxitr, Brk, hmLib::recur::null_observer());
+		auto breakable_simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, unsigned int StepNum, double MaxTemp, double MinTemp, urbg URBG, breaker Brk){
+			return breakable_simulated_annealing_minima(Fn, Mutate, inival, maxitr, StepNum,MaxTemp,MinTemp,URBG, Brk, hmLib::recur::null_observer());
 		}
  		template<typename fn, typename value_type, typename error_type,typename observer>
-		auto bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_bisect_root(Fn, lowerval, upperval, maxitr, erange_precision_breaker<error_type>(relerr,abserr), Obs);
+		auto simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr,unsigned int StepNum, double MaxTemp, double MinTemp,  urbg URBG, unsigned int stableitr, observer Obs){
+			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
+			return breakable_simulated_annealing_minima(Fn, Mutate, inival, maxitr, StepNum,MaxTemp,MinTemp,URBG, Brk, Obs);
 		}
 		template<typename fn, typename value_type, typename error_type>
-		auto bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_bisect_root(Fn, lowerval, upperval, maxitr, erange_precision_breaker<error_type>(relerr,abserr));
-		}
-
-		//hill climing search
-		template<typename evaluate, typename state_type, typename mutate, typename urbg, typename state_breaker>
-		auto hill_climbing_minima(evaluate&& Evaluate, state_type& State, mutate&& Mutate, state_breaker&& Breaker, urbg&& URBG)->decltype(Evaluate(State)){
-			auto Eval = Evaluate(State);
-			state_type NState = State;
-
-			while(!Breaker(State, Eval)){
-				Mutate(NState, URBG);
-				auto NEval = Evaluate(NState);
-
-				if(Eval > NEval){
-					Eval = NEval;
-					State = NState;
-				} else{
-					NState = State;
-				}
-			}
-
-			return Eval;
-		}
-
-		//simulated annealing search
-		template<typename evaluate, typename state_type, typename mutate, typename temp, typename urbg, typename state_breaker>
-		auto simulated_annealing_minima(evaluate&& Evaluate, state_type& State, mutate&& Mutate, temp&& Temp, state_breaker&& Breaker, unsigned int StepNum, urbg&& URBG)->decltype(Evaluate(State)){
-			auto Eval = Evaluate(State);
-			state_type NState = State;
-
-			unsigned int StepCnt = 0;
-			while(!Breaker(State, Eval)){
-				Mutate(NState, URBG);
-				auto NEval = Evaluate(NState);
-
-				if(Eval > NEval || std::uniform_real_distribution<double>(0.0, 1.0)(URBG) < std::exp((Eval - NEval) / Temp(static_cast<double>(StepCnt) / StepNum))){
-					Eval = NEval;
-					State = NState;
-				} else{
-					NState = State;
-				}
-
-				++StepCnt;
-			}
-
-			return Eval;
+		auto simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, unsigned int StepNum, double MaxTemp, double MinTemp, urbg URBG, unsigned int stableitr){
+			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
+			return breakable_simulated_annealing_minima(Fn, Mutate, inival, maxitr, StepNum,MaxTemp,MinTemp,URBG, Brk);
 		}
 	}
 }

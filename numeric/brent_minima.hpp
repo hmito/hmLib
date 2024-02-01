@@ -10,25 +10,28 @@
 #include"evalue.hpp"
 #include"breaker/erange_precision_breaker.hpp"
 #include"numeric_result.hpp"
+#include"numeric_system.hpp"
 namespace hmLib{
     namespace numeric{
+		template<typename fn_type, typename precision_type>
+		using brent_minima_system = precision_system<fn_type,precision_type>;
 		template<typename value_type, typename eval_type=value_type>
 		struct brent_minima_stepper{
 			using this_evalue = evalue<value_type,eval_type>;
 			//system_type = pair<fn, precison_fn>;
-			using state_type = etrio<value_type,eval_type>;
+			using state_type = etrirange<value_type,eval_type>;
 		public:
 			brent_minima_stepper():IsFirst(true),delta(0),pdelta(0),best2nd(),best3rd(){}
-			template<typename fnpair>
-			void initialize(fnpair, state_type&)noexcept{
+			template<typename fn_type, typename precision_type>
+			void initialize(brent_minima_system<fn_type, precision_type>, state_type&)noexcept{
 				IsFirst = true;
 			}
-			template<typename fnpair>
-			void do_step(fnpair FnPair, state_type& x) {
+			template<typename fn_type, typename precision_type>
+			void do_step(brent_minima_system<fn_type, precision_type>, Sys, state_type& x) {
 				using std::abs;
 				constexpr value_type epsilon(1.0/(math::golden_ratio<value_type>+1.0));
 
-				auto precision = FnPair.second(x);
+				auto precision = Sys.precision(x);
 
 				if(std::exchange(IsFirst,false)){
 					hmLib_assert(x.lower.v <= x.guess.v && x.guess.v <= x.upper.v, hmLib::numeric_exceptions::incorrect_arithmetic_request, "brent minima require lower <= guess <= upper.");
@@ -82,7 +85,7 @@ namespace hmLib{
 				}else{
 					trial.v -= precision;
 				}
-				trial.eval(FnPair.first);
+				trial.eval(Sys.fn);
 
 				if(trial.e <= x.guess.e){
 					// update holding points
@@ -132,8 +135,12 @@ namespace hmLib{
 			state_type State(Fn, (lowerval+upperval)/2.0, lowerval, upperval);
 			State.order();
 
-			auto ans = hmLib::breakable_recurse(Stepper, std::make_pair(Fn,[&Brk](const state_type& x){return Brk.precision(x);}), State, maxitr, Brk, Obs);
-			return std::make_pair(State, count_result(ans.first|Brk(State,ans.second),ans.second));
+			auto ans = hmLib::breakable_recurse(Stepper, make_precision_system(Fn,[&Brk](const state_type& x){return Brk.precision(x);}), State, maxitr, Brk, Obs);
+			if(!(ans.first|Brk(State,ans.state))){
+				return(step_result(ans.second,State));
+			}else{
+				return(step_result(ans.second,State,State.guess));
+			}
 		}
 		template<typename fn, typename value_type, typename precision_breaker>
 		auto breakable_brent_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, precision_breaker Brk){

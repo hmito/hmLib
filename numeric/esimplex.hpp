@@ -90,8 +90,6 @@ namespace hmLib{
 			const_reference operator[](unsigned int n)const { return Simplex[n]; }
 			const_iterator minima()const { return std::min_element(Simplex.begin(),Simplex.end());}
 		};
-		template<typename value_type, typename eval_type>
-		auto guess_minima(const esimplex<value_type,eval_type>& x){return x.minima()->v;}
 	}
 }
 #
