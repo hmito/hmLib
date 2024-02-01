@@ -1,8 +1,6 @@
 #ifndef HMLIB_NUMERIC_HILLCLIMBMINIMA_INC
 #define HMLIB_NUMERIC_HILLCLIMBMINIMA_INC 100
 #
-#include"../recur/breakable_recurse.hpp"
-#include"../recur/stepper_category.hpp"
 #include<cmath>
 #include"../recur/breakable_recurse.hpp"
 #include"evalue.hpp"

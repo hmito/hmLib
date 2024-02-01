@@ -6,13 +6,12 @@
 #include"../math/sign.hpp"
 #include"../recur/breakable_recurse.hpp"
 #include"evalue.hpp"
-#include"breaker/erange_precision_breaker.hpp"
 #include"numeric_result.hpp"
+#include"breaker/erange_precision_breaker.hpp"
 namespace hmLib{
     namespace numeric{
 		template<typename value_type,typename eval_type=value_type>
 		struct golden_section_minima_stepper{
-			//using stepper_category = hmLib::recur::naive_stepper_tag;
 			using this_evalue = evalue<value_type,eval_type>;
 			//system_type = pair<fn, precison_fn>;
 			using state_type = etrio<value_type,eval_type>;
