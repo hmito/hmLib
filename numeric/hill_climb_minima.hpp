@@ -17,7 +17,7 @@ namespace hmLib{
 			hill_climbing_minima_stepper() = delete;
 			explicit hill_climbing_minima_stepper(urbg URBG_):URBG(URBG_){}
 			template<typename fn_type,typename generator_type>
-			void do_step(generator_system<fn_type,generator_type> Sys, state_type& State)const{
+			void do_step(generator_system<fn_type,generator_type> Sys, state_type& State){
 				state_type NState = State;
 				Sys.generator(NState.v, URBG);
 				NState.eval(Sys.fn);
@@ -44,19 +44,17 @@ namespace hmLib{
 				return(make_step_result(ans.second,State,State.v));
 			}
 		}
-		template<typename fn, typename value_type, typename breaker>
+		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename breaker>
 		auto breakable_hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, breaker Brk){
 			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, Brk, hmLib::recur::null_observer());
 		}
- 		template<typename fn, typename value_type, typename error_type,typename observer>
+ 		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename observer>
 		auto hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, unsigned int stableitr, observer Obs){
-			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
-			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, Brk, Obs);
+			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, make_minima_stagnant_breaker(Fn(inival),stableitr), Obs);
 		}
-		template<typename fn, typename value_type, typename error_type>
+		template<typename evaluate, typename mutate, typename value_type, typename urbg>
 		auto hill_climbing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, urbg URBG, unsigned int stableitr){
-			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
-			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, Brk);
+			return breakable_hill_climbing_minima(Fn, Mutate, inival, maxitr, URBG, make_minima_stagnant_breaker(Fn(inival),stableitr));
 		}
 
 		template<typename value_type,typename eval_type,typename urbg>
@@ -72,7 +70,7 @@ namespace hmLib{
 				, URBG(URBG_){
 			}
 			template<typename fn_type,typename generator_type>
-			void do_step(generator_system<fn_type,generator_type> Sys, state_type& State, time_type& t)const{
+			void do_step(generator_system<fn_type,generator_type> Sys, state_type& State, time_type& t){
 				state_type NState = State;
 				Sys.generator(NState.v, URBG);
 				NState.eval(Sys.fn);
@@ -104,16 +102,16 @@ namespace hmLib{
 				return(make_step_result(ans.second,State,State.v));
 			}
 		}
-		template<typename fn, typename value_type, typename breaker>
+		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename breaker>
 		auto breakable_simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, unsigned int StepNum, double MaxTemp, double MinTemp, urbg URBG, breaker Brk){
 			return breakable_simulated_annealing_minima(Fn, Mutate, inival, maxitr, StepNum,MaxTemp,MinTemp,URBG, Brk, hmLib::recur::null_observer());
 		}
- 		template<typename fn, typename value_type, typename error_type,typename observer>
+		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename observer>
 		auto simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr,unsigned int StepNum, double MaxTemp, double MinTemp,  urbg URBG, unsigned int stableitr, observer Obs){
 			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
 			return breakable_simulated_annealing_minima(Fn, Mutate, inival, maxitr, StepNum,MaxTemp,MinTemp,URBG, Brk, Obs);
 		}
-		template<typename fn, typename value_type, typename error_type>
+		template<typename evaluate, typename mutate, typename value_type, typename urbg>
 		auto simulated_annealing_minima(evaluate&& Fn, mutate&& Mutate, value_type inival, unsigned int maxitr, unsigned int StepNum, double MaxTemp, double MinTemp, urbg URBG, unsigned int stableitr){
 			auto Brk = make_minima_stagnant_breaker(Fn(inival),stableitr);
 			return breakable_simulated_annealing_minima(Fn, Mutate, inival, maxitr, StepNum,MaxTemp,MinTemp,URBG, Brk);
