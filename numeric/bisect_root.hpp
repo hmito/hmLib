@@ -63,10 +63,10 @@ namespace hmLib{
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.state))){
-				return(step_result(ans.second,State));
+			if(!(ans.first|Brk(State,ans.second))){
+				return make_step_result(ans.second,State);
 			}else{
-				return(step_result(ans.second,State,(State.lower+State.upper)/2.));
+				return make_step_result(ans.second,State,detail::secant_interpolate(State.lower,State.upper));
 			}
 //			return std::make_pair(State, (ans.first|Brk(State,ans.second),ans.second));
 		}

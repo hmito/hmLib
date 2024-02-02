@@ -1,3 +1,7 @@
+#ifndef HMLIB_NUMERIC_NUMERICSYSTEM_INC
+#define HMLIB_NUMERIC_NUMERICSYSTEM_INC 100
+#
+#include<type_traits>
 namespace hmLib{
     namespace numeric{
 		template<typename fn_type, typename precision_type>
@@ -22,3 +26,5 @@ namespace hmLib{
 		}
 	}
 }
+#
+#endif

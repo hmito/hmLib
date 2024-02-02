@@ -10,6 +10,7 @@ namespace hmLib{
 		struct evalue{
 			using value_type = value_type_;
 			using eval_type = eval_type_;
+			using evalue_type = evalue<value_type,eval_type>;
 			using this_type = evalue<value_type,eval_type>;
 			value_type v;
 			eval_type e;
@@ -43,17 +44,17 @@ namespace hmLib{
 		struct erange{
 			using value_type = value_type_;
 			using eval_type = eval_type_;
-			using this_evalue = evalue<value_type,eval_type>;
+			using evalue_type = evalue<value_type,eval_type>;
 			using this_type = erange<value_type,eval_type>;
-			this_evalue lower;
-			this_evalue upper;
+			evalue_type lower;
+			evalue_type upper;
 		public:
 			erange()=default;
-			erange(const this_evalue& lower_, const this_evalue& upper_)
+			erange(const evalue_type& lower_, const evalue_type& upper_)
 				: lower(lower_)
 				, upper(upper_){
 			}
-			erange(this_evalue&& lower_, this_evalue&& upper_)
+			erange(evalue_type&& lower_, evalue_type&& upper_)
 				: lower(std::move(lower_))
 				, upper(std::move(upper_)){
 			}
@@ -64,11 +65,11 @@ namespace hmLib{
 					lower.eval(Fn);
 					upper.eval(Fn);
 			}
-			void set(const this_evalue& lower_, const this_evalue& upper_)noexcept{
+			void set(const evalue_type& lower_, const evalue_type& upper_)noexcept{
 				lower = std::move(lower_);
 				upper = std::move(upper_);
 			}
-			void set(this_evalue&& lower_, this_evalue&& upper_)noexcept{
+			void set(evalue_type&& lower_, evalue_type&& upper_)noexcept{
 				lower = std::move(lower_);
 				upper = std::move(upper_);
 			}
@@ -104,19 +105,19 @@ namespace hmLib{
 		struct etrirange{
 			using value_type = value_type_;
 			using eval_type = eval_type_;
-			using this_evalue = evalue<value_type,eval_type>;
+			using evalue_type = evalue<value_type,eval_type>;
 			using this_type = etrirange<value_type,eval_type>;
-			this_evalue guess;
-			this_evalue lower;
-			this_evalue upper;
+			evalue_type guess;
+			evalue_type lower;
+			evalue_type upper;
 		public:
 			etrirange()=default;
-			etrirange(const this_evalue& guess_, const this_evalue& lower_, const this_evalue& upper_)
+			etrirange(const evalue_type& guess_, const evalue_type& lower_, const evalue_type& upper_)
 				: guess(guess_)
 				, lower(lower_)
 				, upper(upper_){
 			}
-			etrirange(this_evalue&& guess_, this_evalue&& lower_, this_evalue&& upper_)
+			etrirange(evalue_type&& guess_, evalue_type&& lower_, evalue_type&& upper_)
 				: guess(std::move(guess_))
 				, lower(std::move(lower_))
 				, upper(std::move(upper_)){
@@ -139,12 +140,12 @@ namespace hmLib{
 				lower.eval(Fn);
 				upper.eval(Fn);
 			}
-			void set(const this_evalue& guess_, const this_evalue& lower_, const this_evalue& upper_)noexcept{
+			void set(const evalue_type& guess_, const evalue_type& lower_, const evalue_type& upper_)noexcept{
 				guess = guess_;
 				lower = lower_;
 				upper = upper_;
 			}
-			void set(this_evalue&& guess_, this_evalue&& lower_, this_evalue&& upper_)noexcept{
+			void set(evalue_type&& guess_, evalue_type&& lower_, evalue_type&& upper_)noexcept{
 				guess = std::move(guess_);
 				lower = std::move(lower_);
 				upper = std::move(upper_);

@@ -60,7 +60,7 @@ namespace hmLib{
 		};
 		template<typename fn, typename value_type, typename breaker,typename observer>
 		auto breakable_golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk, observer Obs){
-			using stepper = golden_section_minima_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
+			using stepper = golden_section_minima_stepper<std::decay_t<value_type>,std::decay_t<decltype(Fn(lowerval))>>;
 			using state_type = typename stepper::state_type;
 
 			stepper Stepper;
@@ -69,9 +69,9 @@ namespace hmLib{
 
 			auto ans = hmLib::breakable_recurse(Stepper, make_precision_system(Fn,[&Brk](const state_type& x){return Brk.precision(x);}), State, maxitr, Brk, Obs);
 			if(!(ans.first|Brk(State,ans.second))){
-				return(step_result(ans.second,State));
+				return(make_step_result(ans.second,State));
 			}else{
-				return(step_result(ans.second,State,State.guess));
+				return(make_step_result(ans.second,State,State.guess.v));
 			}
 		}
 		template<typename fn, typename value_type, typename breaker>

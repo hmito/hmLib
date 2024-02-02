@@ -27,7 +27,7 @@ namespace hmLib{
 				IsFirst = true;
 			}
 			template<typename fn_type, typename precision_type>
-			void do_step(brent_minima_system<fn_type, precision_type>, Sys, state_type& x) {
+			void do_step(brent_minima_system<fn_type, precision_type> Sys, state_type& x) {
 				using std::abs;
 				constexpr value_type epsilon(1.0/(math::golden_ratio<value_type>+1.0));
 
@@ -136,10 +136,10 @@ namespace hmLib{
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, make_precision_system(Fn,[&Brk](const state_type& x){return Brk.precision(x);}), State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.state))){
-				return(step_result(ans.second,State));
+			if(!(ans.first|Brk(State,ans.second))){
+				return(make_step_result(ans.second,State));
 			}else{
-				return(step_result(ans.second,State,State.guess));
+				return(make_step_result(ans.second,State,State.guess.v));
 			}
 		}
 		template<typename fn, typename value_type, typename precision_breaker>

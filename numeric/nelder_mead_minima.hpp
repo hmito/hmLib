@@ -14,13 +14,15 @@
 #include"breaker/esimplex_precision_breaker.hpp"
 namespace hmLib{
 	namespace numeric{
-		template<typename value_type,typename eval_type>
+		template<typename elem_type_,typename eval_type_>
 		struct nelder_mead_minima_stepper{
-			using state_type = esimplex<value_type,eval_type>;
-			using vertex_type = typename state_type::vertex;
+			using elem_type = elem_type_;
+			using eval_type = eval_type_;
+			using state_type = esimplex<elem_type,eval_type>;
+			using evalue_type = typename state_type::evalue_type;
 		private:
 			//system_type = fn;
-			using this_type = nelder_mead_minima_stepper<value_type,eval_type>;
+			using this_type = nelder_mead_minima_stepper<elem_type,eval_type>;
 		public:
 			nelder_mead_minima_stepper()
 				: alpha(1)
@@ -28,7 +30,7 @@ namespace hmLib{
 				, rho(0.5)
 				, sigma(0.5){
 			}
-			nelder_mead_minima_stepper(value_type alpha_, value_type gamma_, value_type rho_, value_type sigma_)
+			nelder_mead_minima_stepper(elem_type alpha_, elem_type gamma_, elem_type rho_, elem_type sigma_)
 				: alpha(alpha_)
 				, gamma(gamma_)
 				, rho(rho_)
@@ -42,7 +44,7 @@ namespace hmLib{
 				std::sort(State.begin(),State.end());
 
 				//calculate centroid of all points except State[n]
-				vertex_type Center = State[0];
+				evalue_type Center = State[0];
 				for(std::size_t i=0; i < n; ++i){
 					for(std::size_t j = 1; j < n; ++j){
 						Center.v[i] += State[j].v[i];
@@ -109,17 +111,17 @@ namespace hmLib{
 		};
 		template<typename fn, typename state_type, typename breaker,typename observer>
 		auto breakable_nelder_mead_minima(fn Fn, state_type&& State, unsigned int maxitr, breaker Brk, observer Obs){
-//			using stepper = brent_minima_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
-			using stepper = nelder_mead_minima_stepper<typename std::decay_t<state_type>::value_type, typename state_type::eval_type>;
+//			using stepper = brent_minima_stepper<std::decay_t<elem_type>,decltype(Fn(lowerval))>;
+			using stepper = nelder_mead_minima_stepper<typename std::decay_t<state_type>::elem_type, typename std::decay_t<state_type>::eval_type>;
 
 			stepper Stepper;
 			state_type ThisState = std::forward<state_type>(State);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, ThisState, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.state))){
-				return(step_result(ans.second,State));
+			if(!(ans.first|Brk(State,ans.second))){
+				return make_step_result(ans.second,State);
 			}else{
-				return(step_result(ans.second,State,*(State.minima())));
+				return make_step_result(ans.second,State,State.minima()->v);
 			}
 		}
 		template<typename fn, typename state_type, typename breaker>
