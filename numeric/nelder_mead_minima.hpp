@@ -6,12 +6,14 @@
 #include<algorithm>
 #include<type_traits>
 #include<cmath>
+#include<ranges>
 #include<iostream>
 #include"../recur/breakable_recurse.hpp"
 #include"evalue.hpp"
 #include"esimplex.hpp"
 #include"numeric_result.hpp"
 #include"breaker/esimplex_precision_breaker.hpp"
+#include"../random.hpp"
 namespace hmLib{
 	namespace numeric{
 		template<typename elem_type_,typename eval_type_>
@@ -109,32 +111,33 @@ namespace hmLib{
 			double rho;
 			double sigma;
 		};
-		template<typename fn, typename state_type, typename breaker,typename observer>
-		auto breakable_nelder_mead_minima(fn Fn, state_type&& State, unsigned int maxitr, breaker Brk, observer Obs){
+		template<typename fn, typename value_type, typename elem_type, typename breaker,typename observer>
+		auto breakable_nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, breaker Brk, observer Obs){
 //			using stepper = brent_minima_stepper<std::decay_t<elem_type>,decltype(Fn(lowerval))>;
-			using stepper = nelder_mead_minima_stepper<typename std::decay_t<state_type>::elem_type, typename std::decay_t<state_type>::eval_type>;
+			using stepper = nelder_mead_minima_stepper<std::decay_t<decltype(*(Range.begin()))>, std::decay_t<decltype(Fn(Range))>>;
+			using state_type = typename stepper::state_type;
 
 			stepper Stepper;
-			state_type ThisState = std::forward<state_type>(State);
+			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval, hmLib::random::default_engine());
 
-			auto ans = hmLib::breakable_recurse(Stepper, Fn, ThisState, maxitr, Brk, Obs);
+			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
 			if(!(ans.first|Brk(State,ans.second))){
 				return make_step_result(ans.second,State);
 			}else{
 				return make_step_result(ans.second,State,State.minima()->v);
 			}
 		}
-		template<typename fn, typename state_type, typename breaker>
-		auto breakable_nelder_mead_minima(fn Fn, state_type&& State, unsigned int maxitr, breaker Brk){
-			return breakable_nelder_mead_minima(Fn, std::forward<state_type>(State), maxitr, Brk, hmLib::recur::null_observer());
+		template<typename fn, typename value_type, typename elem_type, typename breaker>
+		auto breakable_nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, breaker Brk){
+			return breakable_nelder_mead_minima(Fn,  std::forward<value_type>(Range), relval, absval, maxitr, Brk, hmLib::recur::null_observer());
 		}
-		template<typename fn, typename state_type, typename error_type,typename observer>
-		auto nelder_mead_minima(fn Fn, state_type&& State, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_nelder_mead_minima(Fn, std::forward<state_type>(State), maxitr,esimplex_precision_breaker<error_type>(relerr,abserr), Obs);
+		template<typename fn, typename value_type, typename elem_type, typename error_type,typename observer>
+		auto nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_nelder_mead_minima(Fn, std::forward<value_type>(Range), relval, absval, maxitr,esimplex_precision_breaker<error_type>(relerr,abserr), Obs);
 		}
-		template<typename fn, typename state_type, typename error_type>
-		auto nelder_mead_minima(fn Fn, state_type&& State, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_nelder_mead_minima(Fn, std::forward<state_type>(State), maxitr,esimplex_precision_breaker<error_type>(relerr,abserr));
+		template<typename fn, typename value_type, typename elem_type, typename error_type>
+		auto nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_nelder_mead_minima(Fn,  std::forward<value_type>(Range), relval, absval, maxitr,esimplex_precision_breaker<error_type>(relerr,abserr));
 		}
 	}
 }

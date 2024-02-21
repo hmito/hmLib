@@ -113,6 +113,8 @@
         "stop_token": "cpp",
         "__bits": "cpp",
         "numbers": "cpp",
-        "semaphore": "cpp"
+        "semaphore": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }

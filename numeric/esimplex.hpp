@@ -50,9 +50,9 @@ namespace hmLib{
 				Simplex.assign(size + 1, evalue_type(std::vector<elem_type>(vBeg,vEnd)));
 				for (std::size_t i = 0; i < Simplex.size(); ++i) {
 					if(i < size ){
-						Simplex[i].value()[i] += rel_value*Simplex[i].v[i] + abs_value;
+						Simplex[i].v[i] += rel_value*Simplex[i].v[i] + abs_value;
 					}
-					Simplex[i].fvalue() = Fn(Simplex[i].value());
+					Simplex[i].e = Fn(Simplex[i].v);
 				}
 			}
 			template<typename fn,typename urbg>
@@ -62,9 +62,9 @@ namespace hmLib{
 				Simplex.assign(size + 1, evalue_type(inival));
 				for (std::size_t i = 0; i < Simplex.size(); ++i) {
 					for(std::size_t j = 0; j < size; ++j){
-						Simplex[i].value()[j] += (rel_value*Simplex[i].v[j] + abs_value)*std::uniform_int_distribution(0,1)(URBG);
+						Simplex[i].v[j] += (rel_value*Simplex[i].v[j] + abs_value)*std::uniform_int_distribution(0,1)(URBG);
 					}
-					Simplex[i].fvalue() = Fn(Simplex[i].value());
+					Simplex[i].e = Fn(Simplex[i].v);
 				}
 			}
 			template<typename fn, typename input_value_iterator,typename urbg>
@@ -74,9 +74,9 @@ namespace hmLib{
 				Simplex.assign(size + 1, evalue_type(std::vector<elem_type>(vBeg,vEnd)));
 				for (std::size_t i = 0; i < Simplex.size(); ++i) {
 					for(std::size_t j = 0; j < size; ++j){
-						Simplex[i].value()[j] += (rel_value*Simplex[i].v[j] + abs_value)*std::uniform_int_distribution(0,1)(URBG);
+						Simplex[i].v[j] += (rel_value*Simplex[i].v[j] + abs_value)*std::uniform_int_distribution(0,1)(URBG);
 					}
-					Simplex[i].fvalue() = Fn(Simplex[i].value());
+					Simplex[i].e = Fn(Simplex[i].v);
 				}
 			}
 			iterator begin() { return Simplex.begin(); }
