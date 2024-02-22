@@ -68,10 +68,10 @@ namespace hmLib{
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, make_precision_system(Fn,[&Brk](const state_type& x){return Brk.precision(x);}), State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.second))){
+			if(!(ans.first||Brk(State,ans.second))){
 				return(make_step_result(ans.second,State));
 			}else{
-				return(make_step_result(ans.second,State,State.guess.v));
+				return(make_step_result(ans.second,State,State.guess));
 			}
 		}
 		template<typename fn, typename value_type, typename breaker>

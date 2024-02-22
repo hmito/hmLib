@@ -116,10 +116,12 @@ namespace hmLib{
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.second))){
+			if(!(ans.first||Brk(State,ans.second))){
 				return make_step_result(ans.second,State);
 			}else{
-				return make_step_result(ans.second,State,detail::secant_interpolate(State.lower,State.upper));
+				return make_step_result(ans.second,State,
+					evalue_type(detail::secant_interpolate(State.lower,State.upper)).eval(Fn)
+				);
 			}
 		}
 		template<typename fn, typename value_type, typename breaker>

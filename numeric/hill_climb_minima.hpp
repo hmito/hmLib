@@ -38,10 +38,10 @@ namespace hmLib{
 			system_type Sys(std::forward<evaluate>(Fn),std::forward<mutate>(Mutate)); 
 
 			auto ans = hmLib::breakable_recurse(Stepper, Sys, State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.second))){
+			if(!(ans.first||Brk(State,ans.second))){
 				return(make_step_result(ans.second,State));
 			}else{
-				return(make_step_result(ans.second,State,State.v));
+				return(make_step_result(ans.second,State,State));
 			}
 		}
 		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename breaker>
@@ -96,10 +96,10 @@ namespace hmLib{
 			system_type Sys(std::forward<evaluate>(Fn),std::forward<mutate>(Mutate)); 
 
 			auto ans = hmLib::breakable_recurse(Stepper, Sys, State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.second))){
+			if(!(ans.first||Brk(State,ans.second))){
 				return(make_step_result(ans.second,State));
 			}else{
-				return(make_step_result(ans.second,State,State.v));
+				return(make_step_result(ans.second,State,State));
 			}
 		}
 		template<typename evaluate, typename mutate, typename value_type, typename urbg, typename breaker>

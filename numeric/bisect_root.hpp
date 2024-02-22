@@ -57,16 +57,19 @@ namespace hmLib{
 		auto breakable_bisect_root(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk, observer Obs){
 			using stepper = bisect_root_stepper<std::decay_t<value_type>,decltype(Fn(lowerval))>;
 			using state_type = typename stepper::state_type;
+			using evalue_type = typename state_type::evalue_type;
 
 			stepper Stepper;
 			state_type State(Fn, lowerval, upperval);
 			State.order();
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.second))){
+			if(!(ans.first||Brk(State,ans.second))){
 				return make_step_result(ans.second,State);
 			}else{
-				return make_step_result(ans.second,State,detail::secant_interpolate(State.lower,State.upper));
+				return make_step_result(ans.second,State,
+					evalue_type(detail::secant_interpolate(State.lower,State.upper)).eval(Fn)
+				);
 			}
 //			return std::make_pair(State, (ans.first|Brk(State,ans.second),ans.second));
 		}

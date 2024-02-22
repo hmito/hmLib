@@ -121,10 +121,11 @@ namespace hmLib{
 			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval, hmLib::random::default_engine());
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
-			if(!(ans.first|Brk(State,ans.second))){
+			auto guessItr = State.minima();
+			if(!(ans.first||Brk(State,ans.second) && guessItr == State.end())){
 				return make_step_result(ans.second,State);
 			}else{
-				return make_step_result(ans.second,State,State.minima()->v);
+				return make_step_result(ans.second,State,*guessItr);
 			}
 		}
 		template<typename fn, typename value_type, typename elem_type, typename breaker>
