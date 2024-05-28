@@ -4,25 +4,32 @@
 #include<cmath>
 #include"../math/constants.hpp"
 #include"../math/sign.hpp"
-#include"evalpair.hpp"
+#include"../recur/breakable_recurse.hpp"
+#include"evalue.hpp"
 #include"numeric_result.hpp"
-#include"range_precision_breaker.hpp"
+#include"numeric_system.hpp"
+#include"breaker/erange_precision_breaker.hpp"
 namespace hmLib{
     namespace numeric{
-		template<typename T>
+		template<typename fn_type, typename precision_type>
+		using golden_section_minima_system = precision_system<fn_type,precision_type>;
+		template<typename value_type,typename eval_type=value_type>
 		struct golden_section_minima_stepper{
-			using stepper_tag = precision_stepper;
-			using state = guess_evalrange<T>;
-			template<typename F,typename error_type>
-			void operator()(F fn, state& x, error_type precision)const {
+			using this_evalue = evalue<value_type,eval_type>;
+			//system_type = pair<fn, precison_fn>;
+			using state_type = etrirange<value_type,eval_type>;
+			template<typename fn_type, typename precision_type>
+			void do_step(golden_section_minima_system<fn_type,precision_type> Sys, state_type& x)const {
 				using std::abs;
-				constexpr T epsilon(1.0/(math::golden_ratio<T>+1.0));
+				constexpr value_type epsilon(1.0/(math::golden_ratio<value_type>+1.0));
+
+				auto precision = Sys.precision(x);
 
 				// golden section point
-				T delta = epsilon * ((x.guess.v * 2 >= x.upper.v + x.lower.v) ? x.lower.v - x.guess.v: x.upper.v - x.guess.v);
+				value_type delta = epsilon * ((x.guess.v * 2 >= x.upper.v + x.lower.v) ? x.lower.v - x.guess.v: x.upper.v - x.guess.v);
 
 				// check whether golden section point can be used
-				evalpair trial(x.guess);
+				this_evalue trial(x.guess);
 				if(abs(delta) >= precision){
 					trial.v += delta;
 				}else if(hmLib::math::sign(delta) == hmLib::math::sign::positive){
@@ -30,9 +37,9 @@ namespace hmLib{
 				}else{
 					trial.v -= precision;
 				}
-				trial.eval(fn);
+				trial.eval(Sys.fn);
 
-				if(trial.f <= x.guess.f){
+				if(trial.e <= x.guess.e){
 					//if tried point is the best; update guess
 					if(trial.v >= x.guess.v){
 						x.lower = x.guess;
@@ -51,44 +58,33 @@ namespace hmLib{
 				}
 			}
 		};
-		template<typename F, typename T, typename breaker>
-		auto breakable_golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk){
-			using stepper = golden_section_minima_stepper<T>;
-			using state = typename stepper::state;
+		template<typename fn, typename value_type, typename breaker,typename observer>
+		auto breakable_golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk, observer Obs){
+			using stepper = golden_section_minima_stepper<std::decay_t<value_type>,std::decay_t<decltype(Fn(lowerval))>>;
+			using state_type = typename stepper::state_type;
+
 			stepper Stepper;
-			state State(fn, (lowerval+upperval)/2.0, lowerval, upperval);
+			state_type State(Fn, (lowerval+upperval)/2.0, lowerval, upperval);
 			State.order();
 
-			for(unsigned int i = 0; i<maxitr; ++i){
-				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
+			auto ans = hmLib::breakable_recurse(Stepper, make_precision_system(Fn,[&Brk](const state_type& x){return Brk.precision(x);}), State, maxitr, Brk, Obs);
+			if(!(ans.first||Brk(State,ans.second))){
+				return(make_step_result(ans.second,State));
+			}else{
+				return(make_step_result(ans.second,State,State.guess));
 			}
-
-			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename T, typename breaker, typename observer>
-		auto breakable_golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, breaker Brk, observer Obs){
-			using stepper = golden_section_minima_stepper<T>;
-			using state = typename stepper::state;
-			stepper Stepper;
-			state State(fn, (lowerval+upperval)/2.0, lowerval, upperval);
-			State.order();
-
-			for(unsigned int i = 0; i<maxitr; ++i){
-				if(Brk(State,i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
-				Obs(State,i);
-			}
-
-			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
+		template<typename fn, typename value_type, typename breaker>
+		auto breakable_golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, breaker Brk){
+			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,Brk,hmLib::recur::null_observer());
 		}
-		template<typename F, typename T, typename error_type>
-		auto golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_golden_section_minima(fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr));
+ 		template<typename fn, typename value_type, typename error_type,typename observer>
+		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,erange_precision_breaker<error_type>(relerr,abserr), Obs);
 		}
- 		template<typename F, typename T, typename error_type,typename observer>
-		auto golden_section_minima(F fn, T lowerval, T upperval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
-			return breakable_golden_section_minima(fn, lowerval, upperval, maxitr,range_precision_breaker<error_type>(relerr,abserr), Obs);
+		template<typename fn, typename value_type, typename error_type>
+		auto golden_section_minima(fn Fn, value_type lowerval, value_type upperval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_golden_section_minima(Fn, lowerval, upperval, maxitr,erange_precision_breaker<error_type>(relerr,abserr));
 		}
    }
 }

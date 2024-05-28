@@ -1,8 +1,8 @@
-﻿#ifndef HMLIB_ODEINT_OBSERVER_ITERATOROBSERVER_INC
-#define HMLIB_ODEINT_OBSERVER_ITERATOROBSERVER_INC 100
+﻿#ifndef HMLIB_RECUR_OBSERVER_ITERATOROBSERVER_INC
+#define HMLIB_RECUR_OBSERVER_ITERATOROBSERVER_INC 100
 #
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename pair_iterator>
 		struct pair_iterator_observer{
 		private:

@@ -4,11 +4,12 @@
 #include<utility>
 #include<vector>
 #include<cmath>
-#include<boost/optional.hpp>
+#include<optional>
 #include"../tuple.hpp"
 #include"../algorithm/sampling.hpp"
 #include"../random.hpp"
 #include"../exceptions.hpp"
+#include"../recur/stepper_category.hpp"
 #include"pairgame.hpp"
 namespace hmLib {
 	namespace bio {
@@ -146,79 +147,64 @@ namespace hmLib {
 		struct osi_step_result {
 			bool success;
 			double dt;
-			boost::optional<trait> branch;
+			std::optional<trait> branch;
 			osi_step_result() = default;
-			osi_step_result(bool success_, double dt_) :success(success_), dt(dt_), branch(boost::none) {}
+			osi_step_result(bool success_, double dt_) :success(success_), dt(dt_), branch() {}
 			osi_step_result(bool success_, double dt_, trait x) :success(success_), dt(dt_), branch(std::move(x)) {}
 		};
 
-		template<typename osi_policy_>
-		struct osi_stepper {
-			using osi_policy = osi_policy_;	//control invasion trial
-		private:
-			osi_policy OSIPolicy;
-			unsigned int MaxMutationTrial;
-		public:
-			osi_stepper(osi_policy OSIPolicy_, unsigned int MaxMutationTrial_ = 10000)
-				: OSIPolicy(std::move(OSIPolicy_)), MaxMutationTrial(MaxMutationTrial_) {
-			}
-			void reset() { OSIPolicy.reset(); }
-			//return value is osi_step_result with the focal trait type
-			//[fbeg,fend) and meanw is changed inside of the function
-			template<typename strainfitness, typename mutate, typename trait_iterator, typename frac_iterator,typename URBG>
-			auto operator()(strainfitness&& Fitness, mutate&& Mutate, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend, double& meanw, URBG&& Engine) {
-				hmLib_assert(std::distance(xbeg, xend) == std::distance(fbeg, fend), hmLib::numeric_exceptions::incorrect_arithmetic_request, "distance of two iterator pairs are different.");
+		template<typename osi_policy, typename strainfitness, typename mutate, typename trait_iterator, typename frac_iterator,typename URBG>
+		auto try_osi_step(osi_policy& OSIPolicy, strainfitness&& Fitness, mutate&& Mutate, unsigned int MaxMutationTrial, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend, double& meanw, URBG&& Engine) {
+			hmLib_assert(std::distance(xbeg, xend) == std::distance(fbeg, fend), hmLib::numeric_exceptions::incorrect_arithmetic_request, "distance of two iterator pairs are different.");
 
-				//make sampler following frequency of each strain
-				auto Sampler = hmLib::make_roulette_sampler(xbeg, xend, fbeg, fend);
+			//make sampler following frequency of each strain
+			auto Sampler = hmLib::make_roulette_sampler(xbeg, xend, fbeg, fend);
 
-				//consumed time
-				double dt = 0.0;
+			//consumed time
+			double dt = 0.0;
 
-				//create trait variable for mutant
-				auto mutant = (*xbeg);
+			//create trait variable for mutant
+			auto mutant = (*xbeg);
 
-				//try to find successful invasion
-				for (unsigned int MTrial = 0; MTrial < MaxMutationTrial; ++MTrial) {
-					//select strain producing mutant
-					auto sxitr = Sampler(Engine);
+			//try to find successful invasion
+			for (unsigned int MTrial = 0; MTrial < MaxMutationTrial; ++MTrial) {
+				//select strain producing mutant
+				auto sxitr = Sampler(Engine);
 
-					//create mutant
-					mutant = Mutate(*sxitr, Engine);
-					double w = Fitness(mutant, xbeg, xend, fbeg, fend);
+				//create mutant
+				mutant = Mutate(*sxitr, Engine);
+				double w = Fitness(mutant, xbeg, xend, fbeg, fend);
 
-					//calc current trial num with updating maxf
-					//  std::tuple<bool[Success], double[dt]>
-					auto Invasion = OSIPolicy.try_invade(w, meanw);
-					dt += std::get<1>(Invasion);
+				//calc current trial num with updating maxf
+				//  std::tuple<bool[Success], double[dt]>
+				auto Invasion = OSIPolicy.try_invade(w, meanw);
+				dt += std::get<1>(Invasion);
 
-					//if fail to invade, just continue loop.
-					if (!std::get<0>(Invasion))continue;
+				//if fail to invade, just continue loop.
+				if (!std::get<0>(Invasion))continue;
 
-					//swap trait value
+				//swap trait value
+				std::swap(*sxitr, mutant);
+
+				//Update fraction with mutant
+				double nmeanw = Fitness.solve(xbeg, xend, fbeg, fend);
+
+				//calculate fitness for pre-resident
+				double nw = Fitness(mutant, xbeg, xend, fbeg, fend);
+
+				//reverse invasion is possible
+				if (OSIPolicy.can_invade(nw, nmeanw)) {
+					//swap trait value again (so mutant is now back to mutant)
 					std::swap(*sxitr, mutant);
-
-					//Update fraction with mutant
-					double nmeanw = Fitness.solve(xbeg, xend, fbeg, fend);
-
-					//calculate fitness for pre-resident
-					double nw = Fitness(mutant, xbeg, xend, fbeg, fend);
-
-					//reverse invasion is possible
-					if (OSIPolicy.can_invade(nw, nmeanw)) {
-						//swap trait value again (so mutant is now back to mutant)
-						std::swap(*sxitr, mutant);
-						meanw = Fitness.solve(xbeg, xend, fbeg, fend);
-						return osi_step_result<decltype(mutant)>{ true, dt, mutant };
-					} else {
-						meanw = nmeanw;
-						return osi_step_result<decltype(mutant)>{ true, dt };
-					}
+					meanw = Fitness.solve(xbeg, xend, fbeg, fend);
+					return osi_step_result<decltype(mutant)>{ true, dt, mutant };
+				} else {
+					meanw = nmeanw;
+					return osi_step_result<decltype(mutant)>{ true, dt };
 				}
-				return osi_step_result<decltype(mutant)>{ false, dt };
 			}
-		};
-
+			return osi_step_result<decltype(mutant)>{ false, dt };
+		}
 
 		/*strain fitness 
 		struct strainfitness_pattern{
@@ -236,54 +222,31 @@ namespace hmLib {
 			std::vector<std::tuple<trait_type, double, unsigned int>> strains;
 			double meanw;
 		};
-		template<typename strainfitness_, typename mutate_, typename osi_policy_>
-		struct osi_dsystem {
+		template<typename strainfitness_, typename mutate_>
+		struct osi_system {
 			using strainfitness = strainfitness_;
 			using trait_type = typename strainfitness::trait_type;
 			using mutate = mutate_;
-			using osi_policy = osi_policy_;
 			using state_type = osi_state<trait_type>;
-			using this_type = osi_dsystem<strainfitness, mutate, osi_policy>;
-			struct failtrial_breaker {
-			private:
-				const this_type& Ref;
-			public:
-				failtrial_breaker(const this_type& Ref_) :Ref(Ref_) {}
-				bool operator()(const state_type&, double t)const {return Ref.FailTrial;}
-			};
+			using this_type = osi_system<strainfitness, mutate>;
 		private:
 			strainfitness Fitness;
 			mutate Mutate;
-			osi_stepper<osi_policy_> Stepper;
 			unsigned int StrainNo;
-			double ThrFreq;
-			bool FailTrial;
 		public:
-			osi_dsystem(strainfitness Fitness_, mutate Mutate_, osi_policy OSIPolicy_, unsigned int MaxTrial_ = 10000, double ThrFreq_ = 1e-6)
-				: Fitness(std::move(Fitness_)), Mutate(std::move(Mutate_)), Stepper(OSIPolicy_, MaxTrial_), StrainNo(0), ThrFreq(ThrFreq_), FailTrial(false){
+			osi_system(strainfitness Fitness_, mutate Mutate_, unsigned int InitialStrainNo_ = 0)
+				: Fitness(std::move(Fitness_)), Mutate(std::move(Mutate_)), StrainNo(InitialStrainNo_){
 			}
-			void operator()(state_type& s, double& t) {
-				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
-				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
-
-				auto Result = Stepper(Fitness, Mutate, xrange.begin(), xrange.end(), frange.begin(), frange.end(), s.meanw, hmLib::random::default_engine());
-				t += Result.dt;
-				FailTrial = !Result.success;
-
-				//add new strain
-				if (Result.branch) {
-					s.strains.emplace_back(std::move(Result.branch).value(), ThrFreq*2, StrainNo++);
-					auto xrange2 = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
-					auto frange2 = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
-
-					s.meanw = Fitness.solve(xrange2.begin(), xrange2.end(), frange2.begin(), frange2.end());
-				}
-
-				//remove extinction
-				auto ssend = std::remove_if(s.strains.begin(), s.strains.end(), [=](const auto& v) {return std::get<1>(v) < ThrFreq; });
-				s.strains.erase(ssend, s.strains.end());
+			template<typename osi_policy, typename trait_iterator, typename frac_iterator,typename URBG>
+			auto operator()(osi_policy& OSIPolicy, unsigned int MaxMutationTrial, trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend, double& meanw, URBG&& Engine) {
+				return try_osi_step(OSIPolicy, Fitness, Mutate, MaxMutationTrial, xbeg, xend, fbeg, fend, meanw, Engine);
 			}
-			void reset() { Stepper.reset(); StrainNo = 0; }
+			template<typename trait_iterator, typename frac_iterator>
+			auto mean_fitness(trait_iterator xbeg, trait_iterator xend, frac_iterator fbeg, frac_iterator fend){
+				return Fitness.solve(xbeg, xend, fbeg, fend);
+			}
+			unsigned int new_starain_no(){return StrainNo++;}
+			void reset() { StrainNo = 0; }
 			template<typename trait_iterator>
 			state_type make_state(trait_iterator Beg, trait_iterator End) {
 				state_type s;
@@ -303,6 +266,51 @@ namespace hmLib {
 				s.meanw = Fitness.solve(xrange.begin(), xrange.end(), frange.begin(), frange.end());
 				return s;
 			}
+		};
+		template<typename osi_policy_>
+		struct osi_stepper{
+			using stepper_category = hmLib::recur::stepper_tag;
+			using osi_policy = osi_policy_;
+			using this_type = osi_dsystem<osi_policy_>;
+			struct failtrial_breaker {
+			private:
+				const this_type& Ref;
+			public:
+				failtrial_breaker(const this_type& Ref_) :Ref(Ref_) {}
+				bool operator()(const state_type&, double t)const {return Ref.FailTrial;}
+			};
+		private:
+			osi_policy OSIPolicy;
+			unsigned int MutationMaxTrial;
+			double ThrFreq;
+			bool FailTrial;
+		public:
+			osi_stepper(osi_policy OSIPolicy_, unsigned int MutationMaxTrial_ = 10000, double ThrFreq_ = 1e-6)
+				: OSIPolicy(std::move(OSIPolicy_)), MutationMaxTrial(MutationMaxTrial_), ThrFreq(ThrFreq_), FailTrial(false){
+			}
+			template<typename system_type, typename trait_type>
+			void do_step(system_type& sys, osi_state<trait_type>& s, double& t) {
+				auto xrange = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
+				auto frange = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
+
+				auto Result = sys(OSIPolicy, xrange.begin(), xrange.end(), frange.begin(), frange.end(), s.meanw, hmLib::random::default_engine());
+				t += Result.dt;
+				FailTrial = !Result.success;
+
+				//add new strain
+				if (Result.branch) {
+					s.strains.emplace_back(std::move(Result.branch).value(), ThrFreq*2, sys.new_strain_no());
+					auto xrange2 = hmLib::make_get_range<0>(s.strains.begin(), s.strains.end());
+					auto frange2 = hmLib::make_get_range<1>(s.strains.begin(), s.strains.end());
+
+					s.meanw = sys.mean_fitness(xrange2.begin(), xrange2.end(), frange2.begin(), frange2.end());
+				}
+
+				//remove extinction
+				auto ssend = std::remove_if(s.strains.begin(), s.strains.end(), [=](const auto& v) {return std::get<1>(v) < ThrFreq; });
+				s.strains.erase(ssend, s.strains.end());
+			}
+			void reset() { OSIPolicy.reset(); }
 			failtrial_breaker make_failtrial_breaker()const {return failtrial_breaker(*this);}
 		};
 	}

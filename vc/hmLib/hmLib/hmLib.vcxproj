@@ -81,12 +81,15 @@
     <ClInclude Include="..\..\..\inquiries\unique_connections.hpp" />
     <ClInclude Include="..\..\..\io_utility.hpp" />
     <ClInclude Include="..\..\..\iterators.hpp" />
+    <ClInclude Include="..\..\..\iterators\ordered_access_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\any_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\circular_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\index_access_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\inserter.hpp" />
     <ClInclude Include="..\..\..\iterators\integer_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\overflow_iterator.hpp" />
+    <ClInclude Include="..\..\..\iterators\plane_pos_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\range.hpp" />
     <ClInclude Include="..\..\..\iterators\transform_iterator.hpp" />
     <ClInclude Include="..\..\..\iterators\zip_iterator.hpp" />
@@ -115,14 +118,18 @@
     <ClInclude Include="..\..\..\math\optimize.hpp" />
     <ClInclude Include="..\..\..\math\root.hpp" />
     <ClInclude Include="..\..\..\math\static_math.hpp" />
-    <ClInclude Include="..\..\..\minima.hpp" />
-    <ClInclude Include="..\..\..\minima\brent_minima.hpp" />
-    <ClInclude Include="..\..\..\minima\golden_section_minima.hpp" />
-    <ClInclude Include="..\..\..\minima\minima_result.hpp" />
-    <ClInclude Include="..\..\..\minima\nelder_mead_minima.hpp" />
-    <ClInclude Include="..\..\..\minima\range_precision_breaker.hpp" />
-    <ClInclude Include="..\..\..\minima\simplex_precision_breaker.hpp" />
     <ClInclude Include="..\..\..\mutex_proxy.hpp" />
+    <ClInclude Include="..\..\..\numeric.hpp" />
+    <ClInclude Include="..\..\..\numeric\bisect_root.hpp" />
+    <ClInclude Include="..\..\..\numeric\brent_minima.hpp" />
+    <ClInclude Include="..\..\..\numeric\evalue.hpp" />
+    <ClInclude Include="..\..\..\numeric\golden_section_minima.hpp" />
+    <ClInclude Include="..\..\..\numeric\detail\interpolate.hpp" />
+    <ClInclude Include="..\..\..\numeric\nelder_mead_minima.hpp" />
+    <ClInclude Include="..\..\..\numeric\numeric_result.hpp" />
+    <ClInclude Include="..\..\..\numeric\range_precision_breaker.hpp" />
+    <ClInclude Include="..\..\..\numeric\esimplex_precision_breaker.hpp" />
+    <ClInclude Include="..\..\..\numeric\toms748_root.hpp" />
     <ClInclude Include="..\..\..\odeint.hpp" />
     <ClInclude Include="..\..\..\odeint\adaptive_stepper.hpp" />
     <ClInclude Include="..\..\..\odeint\border.hpp" />
@@ -136,10 +143,14 @@
     <ClInclude Include="..\..\..\odeint\integrate\breakable_integrate_const.hpp" />
     <ClInclude Include="..\..\..\odeint\integrate\integrate_adaptive.hpp" />
     <ClInclude Include="..\..\..\odeint\integrate\integrate_const.hpp" />
-    <ClInclude Include="..\..\..\odeint\observer\observer_pack.hpp" />
-    <ClInclude Include="..\..\..\odeint\observer\histgoram_observer.hpp" />
+    <ClInclude Include="..\..\..\odeint\observer\histogram_stream_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\iterator_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\null_observer.hpp" />
+    <ClInclude Include="..\..\..\odeint\observer\observer_pack.hpp" />
+    <ClInclude Include="..\..\..\odeint\observer\observe_container.hpp" />
+    <ClInclude Include="..\..\..\odeint\observer\observe_skipper.hpp" />
+    <ClInclude Include="..\..\..\odeint\observer\progress_observer.hpp" />
+    <ClInclude Include="..\..\..\odeint\observer\state_accessor.hpp" />
     <ClInclude Include="..\..\..\odeint\observer\stream_observer.hpp" />
     <ClInclude Include="..\..\..\odeint\recursive.hpp" />
     <ClInclude Include="..\..\..\odeint\recursive\breakable_recurrence.hpp" />
@@ -171,9 +182,7 @@
     <ClInclude Include="..\..\..\utility.hpp" />
     <ClInclude Include="..\..\..\varray.hpp" />
     <ClInclude Include="..\..\..\version.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\use_blocks.cpp" />
+    <ClInclude Include="..\use_lattice.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A10C302A-31D3-4E31-A256-8331A9214833}</ProjectGuid>

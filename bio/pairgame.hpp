@@ -5,9 +5,9 @@
 #include<utility>
 #include<numeric>
 #include<vector>
+#include<optional>
 #include<boost/numeric/odeint.hpp>
 #include<boost/numeric/ublas/matrix.hpp>
-#include<boost/optional.hpp>
 #include"../exceptions/exception.hpp"
 #include"../ublas.hpp"
 #include"../odeint/validate.hpp"
@@ -46,7 +46,7 @@ namespace hmLib {
 			}
 			//return mean payoff if success to calculate fitness, none if fail to calculate inverse matrix
 			//ignore even if derived fraction is negative
-			boost::optional<double> solve_freq_by_matrix(const payoff_matrix& Mx, freq_vector& Freq) {
+			std::optional<double> solve_freq_by_matrix(const payoff_matrix& Mx, freq_vector& Freq) {
 				//check monomorphic case
 				if (Mx.size1() == 1) {
 					Freq = boost::numeric::ublas::vector<double>(1, 1.0);
@@ -57,7 +57,7 @@ namespace hmLib {
 				boost::numeric::ublas::matrix<double> IW;
 				if (hmLib::ublas::invert(Mx, IW)) {
 					//fail to calculate inverce matrix
-					return boost::none;
+					return std::nullopt;
 				}
 				Freq = boost::numeric::ublas::prod(IW, boost::numeric::ublas::vector<double>(Mx.size1(), 1.0));
 
@@ -69,11 +69,11 @@ namespace hmLib {
 			//fraction is kept larger than MinFreq
 			//Recursive flag allow extinction of multiple strains
 			//Note: recursive = true case might sometimes cause unnecessary extinction.
-			boost::optional<double> solve_freq_by_matrix(const payoff_matrix& Mx, freq_vector& Freq, double MinFreq, bool Recursive = false) {
+			std::optional<double> solve_freq_by_matrix(const payoff_matrix& Mx, freq_vector& Freq, double MinFreq, bool Recursive = false) {
 				std::vector<unsigned int> Exist;
 				{
 					auto Ans = solve_freq_by_matrix(Mx, Freq);
-					if (!Ans)return boost::none;
+					if (!Ans)return std::nullopt;
 
 					auto MinItr = std::min_element(Freq.begin(), Freq.end());
 					if (*MinItr >= MinFreq) {
@@ -103,7 +103,7 @@ namespace hmLib {
 
 					freq_vector SubFreq(SubMx.size1(), 0.0);
 					auto Ans = solve_freq_by_matrix(SubMx, SubFreq);
-					if (!Ans)return boost::none;
+					if (!Ans)return std::nullopt;
 
 					auto MinItr = std::min_element(SubFreq.begin(), SubFreq.end());
 					if (*MinItr >= MinFreq) {
@@ -118,7 +118,7 @@ namespace hmLib {
 					}
 
 					//multiple strain extinction
-					if (!Recursive)return boost::none;
+					if (!Recursive)return std::nullopt;
 
 					//remove minimum strain
 					Exist[std::distance(SubFreq.begin(), MinItr)] = Exist.back();

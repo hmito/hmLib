@@ -1,10 +1,10 @@
-﻿#ifndef HMLIB_ODEINT_OBSERVER_PROGRESSOBSERVER_INC
-#define HMLIB_ODEINT_OBSERVER_PROGRESSOBSERVER_INC 100
+﻿#ifndef HMLIB_RECUR_OBSERVER_PROGRESSOBSERVER_INC
+#define HMLIB_RECUR_OBSERVER_PROGRESSOBSERVER_INC 100
 #
 #include<iostream>
 #include"../../io_utility.hpp"
 namespace hmLib{
-	namespace odeint{
+	namespace recur{
 		template<typename time_type>
 		class progress_observer {
 		private:

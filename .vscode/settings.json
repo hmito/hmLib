@@ -110,6 +110,11 @@
         "xlocmes": "cpp",
         "xlocmon": "cpp",
         "xloctime": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "__bits": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }

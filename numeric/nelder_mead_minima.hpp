@@ -4,82 +4,27 @@
 #include<utility>
 #include<vector>
 #include<algorithm>
+#include<type_traits>
 #include<cmath>
+#include<ranges>
 #include<iostream>
+#include"../recur/breakable_recurse.hpp"
+#include"evalue.hpp"
+#include"esimplex.hpp"
 #include"numeric_result.hpp"
-#include"simplex_precision_breaker.hpp"
+#include"breaker/esimplex_precision_breaker.hpp"
+#include"../random.hpp"
 namespace hmLib{
 	namespace numeric{
-		template<typename T>
+		template<typename elem_type_,typename eval_type_>
 		struct nelder_mead_minima_stepper{
+			using elem_type = elem_type_;
+			using eval_type = eval_type_;
+			using state_type = esimplex<elem_type,eval_type>;
+			using evalue_type = typename state_type::evalue_type;
 		private:
-			using point = std::vector<T>;
-			struct vertex {
-			private:
-				point val;
-				T fval;
-			public:
-				vertex() = default;
-				vertex(point val_, T fval_) :val(std::move(val_)), fval(fval_) {}
-				point& value(){ return val; }
-				T& fvalue(){ return fval; }
-				const point& value()const{ return val; }
-				const T& fvalue()const { return fval; }
-				friend bool operator==(const vertex& v1, const vertex& v2) { return v1.fvalue() == v2.fvalue(); }
-				friend bool operator!=(const vertex& v1, const vertex& v2) { return v1.fvalue() != v2.fvalue(); }
-				friend bool operator<(const vertex& v1, const vertex& v2) { return v1.fvalue() < v2.fvalue(); }
-				friend bool operator<=(const vertex& v1, const vertex& v2) { return v1.fvalue() <= v2.fvalue(); }
-				friend bool operator>(const vertex& v1, const vertex& v2) { return v1.fvalue() > v2.fvalue(); }
-				friend bool operator>=(const vertex& v1, const vertex& v2) { return v1.fvalue() >= v2.fvalue(); }
-			};
-		public:
-			struct state{
-				friend struct nelder_mead_minima_stepper<T>;
-			private:
-				using container = std::vector<vertex>;
-			public:
-				using iterator = decltype(std::declval<container>().begin());
-				using const_iterator = decltype(std::declval<container>().cbegin());
-				using reference = vertex&;
-				using const_reference = const vertex&;
-			private:
-				std::vector<vertex> v;
-			public:
-				state() = default;
-				template<typename F, typename error_type>
-				state(F fn, const point& ini, error_type rel_value, error_type abs_value) {
-					std::size_t size = std::distance(ini.begin(), ini.end());
-					//initialize vertex
-					v.assign(size + 1, vertex(ini, fn(ini)));
-					for (std::size_t i = 1; i < v.size(); ++i) {
-						auto itr = std::next(v[i].value().begin(), i - 1);
-						(*itr) += abs_value + rel_value * (*itr);
-						v[i].fvalue() = fn(v[i].value());
-					}
-				}
-				point& value() {
-					return std::min_element(v.begin(), v.end())->value();
-				}
-				T& fvalue() {
-					return std::min_element(v.begin(), v.end())->fvalue();
-				}
-				const point& value()const{
-					return std::min_element(v.begin(),v.end())->value();
-				}
-				const T& fvalue()const {
-					return std::min_element(v.begin(),v.end())->fvalue();
-				}
-				iterator begin() { return v.begin(); }
-				iterator end() { return v.end(); }
-				const_iterator begin()const { return v.begin(); }
-				const_iterator end()const { return v.end(); }
-				const_iterator cbegin()const { return v.cbegin(); }
-				const_iterator cend()const { return v.cend(); }
-				reference at(unsigned int n) { return v.at(n); }
-				const_reference at(unsigned int n)const { return v.at(n); }
-				reference operator[](unsigned int n) { return v[n]; }
-				const_reference operator[](unsigned int n)const { return v[n]; }
-			};
+			//system_type = fn;
+			using this_type = nelder_mead_minima_stepper<elem_type,eval_type>;
 		public:
 			nelder_mead_minima_stepper()
 				: alpha(1)
@@ -87,47 +32,47 @@ namespace hmLib{
 				, rho(0.5)
 				, sigma(0.5){
 			}
-			nelder_mead_minima_stepper(T alpha_, T gamma_, T rho_, T sigma_)
+			nelder_mead_minima_stepper(elem_type alpha_, elem_type gamma_, elem_type rho_, elem_type sigma_)
 				: alpha(alpha_)
 				, gamma(gamma_)
 				, rho(rho_)
 				, sigma(sigma_){
 			}
-			template<typename F>
-			void operator()(F fn, state& State)const {
+			template<typename fn>
+			void do_step(fn Fn, state_type& State)const {
 				std::size_t n = std::distance(State.begin(),State.end())-1;
 
 				//sort by the order of the function
 				std::sort(State.begin(),State.end());
 
 				//calculate centroid of all points except State[n]
-				vertex Center = State[0];
+				evalue_type Center = State[0];
 				for(std::size_t i=0; i < n; ++i){
 					for(std::size_t j = 1; j < n; ++j){
-						Center.value()[i] += State[j].value()[i];
+						Center.v[i] += State[j].v[i];
 					}
-					Center.value()[i] /= n;
+					Center.v[i] /= n;
 				}
-				Center.fvalue() = fn(Center.value());
+				Center.e = Fn(Center.v);
 
 				//calculate rerected point, which is located on the opposite side of the Center from the worst point
 				auto Refrect = Center;
 				for(std::size_t i=0; i < n; ++i){
-					Refrect.value()[i] += alpha*(Center.value()[i] - State[n].value()[i]);
+					Refrect.v[i] += alpha*(Center.v[i] - State[n].v[i]);
 				}
-				Refrect.fvalue() = fn(Refrect.value());
+				Refrect.e = Fn(Refrect.v);
 				
-				if(Refrect.fvalue() < State[0].fvalue()){
+				if(Refrect.e < State[0].e){
 					//if the rerected point is best, calculate expanded point,
 					//	try another type of point: expanded point, which is farer than the refrected point from the center
 					//	(gamma > 1 for this purpose)
 					auto Expand = Center;
 					for(std::size_t i=0; i < n; ++i){
-						Expand.value()[i] += gamma*(Refrect.value()[i] - Center.value()[i]);
+						Expand.v[i] += gamma*(Refrect.v[i] - Center.v[i]);
 					}
-					Expand.fvalue() = fn(Expand.value());
+					Expand.e = Fn(Expand.v);
 
-					if(Expand.fvalue() < Refrect.fvalue()){
+					if(Expand.e < Refrect.e){
 						//if the expanded point is best,
 						//	replace the worst point by the expanded point
 						State[n] = Expand;
@@ -135,7 +80,7 @@ namespace hmLib{
 						//otherwise, replace the worst point by the expanded point
 						State[n] = Refrect;
 					}
-				}else if(State[0].fvalue() <= Refrect.fvalue() && Refrect.fvalue() < State[n-1].fvalue()){
+				}else if(State[0].e <= Refrect.e && Refrect.e < State[n-1].e){
 					//if the refrected point is not best but better than worst point
 					State[n] = Refrect;
 				}else{
@@ -143,19 +88,19 @@ namespace hmLib{
 					//	try another type of point: contracted point, which is located between the worst point and the center
 					auto Contracted = Center;
 					for(std::size_t i=0; i < n; ++i){
-						Contracted.value()[i] += rho*(State[n].value()[i] - Center.value()[i]);
+						Contracted.v[i] += rho*(State[n].v[i] - Center.v[i]);
 					}				
-					Contracted.fvalue() = fn(Contracted.value());
-					if(Contracted.fvalue() < State[n].fvalue()){
+					Contracted.e = Fn(Contracted.v);
+					if(Contracted.e < State[n].e){
 						//if the contracted point is better than the worst, replace
 						State[n] = Contracted;
 					}else{
 						//otherwise, all points shrink to the best point.
 						for(std::size_t j = 1; j < n+1; ++j){
 							for(std::size_t i=0; i < n; ++i){
-								State[j].value()[i] = State[0].value()[i] + sigma*(State[j].value()[i] - State[0].value()[i]);
+								State[j].v[i] = State[0].v[i] + sigma*(State[j].v[i] - State[0].v[i]);
 							}
-							State[j].fvalue() = fn(State[j].value());
+							State[j].e = Fn(State[j].v);
 						}
 					}
 				}
@@ -166,42 +111,34 @@ namespace hmLib{
 			double rho;
 			double sigma;
 		};
-		template<typename F, typename vect, typename breaker>
-		auto breakable_nelder_mead_minima(F fn, vect ini, unsigned int maxitr, breaker Brk){
-			using stepper = nelder_mead_minima_stepper<decltype(std::declval<F>()(std::declval<vect>()))>;
-			using state =typename stepper::state;
+		template<typename fn, typename value_type, typename elem_type, typename breaker,typename observer>
+		auto breakable_nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, breaker Brk, observer Obs){
+//			using stepper = brent_minima_stepper<std::decay_t<elem_type>,decltype(Fn(lowerval))>;
+			using stepper = nelder_mead_minima_stepper<std::decay_t<decltype(*(Range.begin()))>, std::decay_t<decltype(Fn(Range))>>;
+			using state_type = typename stepper::state_type;
+
 			stepper Stepper;
-			state State(fn, ini, 0.2, 0.001);
+			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval, hmLib::random::default_engine());
 
-			for(unsigned int i = 0; i<maxitr; ++i){
-				if(Brk(State, i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
+			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
+			auto guessItr = State.minima();
+			if(!(ans.first||Brk(State,ans.second) && guessItr == State.end())){
+				return make_step_result(ans.second,State);
+			}else{
+				return make_step_result(ans.second,State,*guessItr);
 			}
-
-			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
 		}
-		template<typename F, typename vect, typename breaker,typename observer>
-		auto breakable_nelder_mead_minima(F fn, vect ini, unsigned int maxitr, breaker Brk, observer Obs){
-			using stepper = nelder_mead_minima_stepper<decltype(std::declval<F>()(std::declval<vect>()))>;
-			using state =typename stepper::state;
-			stepper Stepper;
-			state State(fn, ini, 0.2, 0.001);
-			
-			for(unsigned int i = 0; i<maxitr; ++i){
-				if(Brk(State, i))return std::make_pair(State, count_result(true, i));
-				Stepper(fn,State);
-				Obs(State,i);
-			}
-
-			return std::make_pair(State, count_result(Brk(State,maxitr), maxitr));
+		template<typename fn, typename value_type, typename elem_type, typename breaker>
+		auto breakable_nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, breaker Brk){
+			return breakable_nelder_mead_minima(Fn,  std::forward<value_type>(Range), relval, absval, maxitr, Brk, hmLib::recur::null_observer());
 		}
-		template<typename F, typename vect, typename error_type>
-		auto nelder_mead_minima(F fn, vect ini, unsigned int maxitr, error_type relerr, error_type abserr){
-			return breakable_nelder_mead_minima(fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr));
+		template<typename fn, typename value_type, typename elem_type, typename error_type,typename observer>
+		auto nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, error_type relerr, error_type abserr, observer Obs){
+			return breakable_nelder_mead_minima(Fn, std::forward<value_type>(Range), relval, absval, maxitr,esimplex_precision_breaker<error_type>(relerr,abserr), Obs);
 		}
-		template<typename F, typename vect, typename error_type,typename observer>
-		auto nelder_mead_minima(F fn, vect ini, unsigned int maxitr, error_type relerr, error_type abserr, observer obs){
-			return breakable_nelder_mead_minima(fn, ini, maxitr,simplex_precision_breaker<error_type>(relerr,abserr), obs);
+		template<typename fn, typename value_type, typename elem_type, typename error_type>
+		auto nelder_mead_minima(fn Fn, value_type&& Range, elem_type relval, elem_type absval, unsigned int maxitr, error_type relerr, error_type abserr){
+			return breakable_nelder_mead_minima(Fn,  std::forward<value_type>(Range), relval, absval, maxitr,esimplex_precision_breaker<error_type>(relerr,abserr));
 		}
 	}
 }
