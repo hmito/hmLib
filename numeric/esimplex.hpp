@@ -36,24 +36,22 @@ namespace hmLib{
 				std::size_t size = inival.size();
 				//initialize evalue_type
 				Simplex.assign(size + 1, evalue_type(inival));
-				for (std::size_t i = 0; i < Simplex.size(); ++i) {
-					if(i < size ){
-						Simplex[i].v[i] += rel_value*Simplex[i].v[i] + abs_value;
-					}
+				for (std::size_t i = 0; i < size; ++i) {
+					Simplex[i].v[i] += rel_value*Simplex[i].v[i] + abs_value;
 					Simplex[i].e = Fn(Simplex[i].v);
 				}
+				Simplex[size].e = Fn(Simplex[size].v);
 			}
 			template<typename fn, typename input_value_iterator>
 			esimplex(fn Fn, input_value_iterator vBeg, input_value_iterator vEnd, elem_type rel_value, elem_type abs_value){
 				std::size_t size = std::distance(vBeg, vEnd);
 				//initialize evalue_type
 				Simplex.assign(size + 1, evalue_type(std::vector<elem_type>(vBeg,vEnd)));
-				for (std::size_t i = 0; i < Simplex.size(); ++i) {
-					if(i < size ){
-						Simplex[i].v[i] += rel_value*Simplex[i].v[i] + abs_value;
-					}
+				for (std::size_t i = 0; i < size; ++i) {
+					Simplex[i].v[i] += rel_value*Simplex[i].v[i] + abs_value;
 					Simplex[i].e = Fn(Simplex[i].v);
 				}
+				Simplex[size].e = Fn(Simplex[size].v);
 			}
 			template<typename fn,typename urbg>
 			esimplex(fn Fn, const std::vector<elem_type>& inival, elem_type rel_value, elem_type abs_value, urbg URBG){
