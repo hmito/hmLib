@@ -117,7 +117,7 @@ namespace hmLib{
 			using state_type = typename stepper::state_type;
 
 			stepper Stepper;
-			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval);
+			state_type State(Fn, Range, relval, absval);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
 
