@@ -118,9 +118,10 @@ namespace hmLib{
 			using state_type = typename stepper::state_type;
 
 			stepper Stepper;
-			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval, hmLib::random::default_engine());
+			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
+
 			auto guessItr = State.minima();
 			if((ans.first || Brk(State,ans.second)) && guessItr != State.end()){
 				return make_step_result(ans.second,State,*guessItr);
