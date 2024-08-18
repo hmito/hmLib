@@ -13,7 +13,6 @@
 #include"esimplex.hpp"
 #include"numeric_result.hpp"
 #include"breaker/esimplex_precision_breaker.hpp"
-#include"../random.hpp"
 namespace hmLib{
 	namespace numeric{
 		template<typename elem_type_,typename eval_type_>
@@ -118,14 +117,15 @@ namespace hmLib{
 			using state_type = typename stepper::state_type;
 
 			stepper Stepper;
-			state_type State(Fn, std::begin(Range), std::end(Range), relval, absval, hmLib::random::default_engine());
+			state_type State(Fn, Range, relval, absval);
 
 			auto ans = hmLib::breakable_recurse(Stepper, Fn, State, maxitr, Brk, Obs);
+
 			auto guessItr = State.minima();
-			if(!(ans.first||Brk(State,ans.second) && guessItr == State.end())){
-				return make_step_result(ans.second,State);
-			}else{
+			if((ans.first || Brk(State,ans.second)) && guessItr != State.end()){
 				return make_step_result(ans.second,State,*guessItr);
+			}else{
+				return make_step_result(ans.second,State);
 			}
 		}
 		template<typename fn, typename value_type, typename elem_type, typename breaker>
