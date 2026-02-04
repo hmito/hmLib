@@ -10,13 +10,13 @@ namespace hmLib {
 			unsigned int count;
 			unsigned int limit;
 		public:
-			time_stagnant__breaker(time_type IniTime_, unsigned int limit_ = 1) 
+			time_stagnant__breaker(time_type IniTime_, unsigned int limit_ = 1)
 				: last(IniTime_), count(0), limit(limit_) {}
 			template<typename state_type>
 			bool operator()(const state_type&, time_type t) {
 				if (last == t) {
 					return (++count >= limit);
-				}				
+				}
 				last = t;
 				count = 0;
 				return false;

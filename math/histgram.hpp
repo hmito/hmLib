@@ -27,7 +27,7 @@ namespace hmLib {
 		}
 		void clear() {
 			if (Axis.empty())return;
-			Vec.assign(Axis.size()-1, 0u);
+			Vec.assign(Axis.size(), 0u);
 			Underflow = 0;
 			Overflow = 0;
 		}

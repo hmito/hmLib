@@ -13,27 +13,19 @@ namespace hmLib{
 		concept breaker = requires(breaker_type brk, const state_type& x, time_type t){
 			{brk(x,t)} -> std::convertible_to<bool>;
 		};
-		template<typename stepper_type, typename system_type, typename state_type>
-		concept naive_stepper = requires(stepper_type st, system_type sys, state_type x){
-			{st.do_step(sys,x)};
-		} && !requires(stepper_type st, system_type sys, std::add_const_t<std::decay_t<state_type>> x){
-			{st.do_step(sys,x)};
+		template<typename system_type, typename state_type>
+		concept invariant_system = requires(system_type s, state_type& x) {
+			{ s(x) } -> std::same_as<void>;
 		};
-		template<typename stepper_type, typename system_type, typename state_type, typename time_type>
-		concept stepper = requires(stepper_type st, system_type sys, state_type x, time_type t){
-			{st.do_step(sys,x,t)};
-		} && !requires(stepper_type st, system_type sys, std::add_const_t<std::decay_t<state_type>> x, time_type t){
-			{st.do_step(sys,x,t)};
-		} && !requires(stepper_type st, system_type sys, state_type x,  std::add_const_t<std::decay_t<time_type>> t){
-			{st.do_step(sys,x,t)};
+
+		template<typename system_type, typename state_type, typename time_type, typename duration_type>
+		concept const_step_system =	requires(system_type s, state_type& x, time_type t, duration_type dt) {
+			{ s(x, t, dt) } -> std::same_as<void>;
 		};
-		template<typename stepper_type, typename system_type, typename state_type, typename time_type>
-		concept error_stepper = requires(stepper_type st, system_type sys, state_type x, time_type t){
-			{st.try_step(sys,x,t)} -> std::convertible_to<bool>;
-		} && !requires(stepper_type st, system_type sys, std::add_const_t<std::decay_t<state_type>> x, time_type t){
-			{st.try_step(sys,x,t)};
-		} && !requires(stepper_type st, system_type sys, state_type x,  std::add_const_t<std::decay_t<time_type>> t){
-			{st.try_step(sys,x,t)};
+
+		template<typename system_type, typename state_type, typename time_type, typename duration_type>
+		concept adaptive_step_system = requires(system_type s, state_type& x, time_type t, duration_type dt) {
+			{ s(x, t, dt) } -> std::convertible_to<duration_type>;
 		};
 	}
 }

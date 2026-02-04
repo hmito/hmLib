@@ -26,18 +26,16 @@ namespace hmLib {
 			}
 			template<typename state_type,typename time_type>
 			void operator()(const state_type& s, time_type t) {
-				if (n % 10 == 0) {
-					out << t;
+				out << t;
 
-					auto Hist = hmLib::make_histgram(lower, upper, hsize);
-					Hist(s.begin(), s.end());
-					out << "," << Hist.underflow();
-					for (auto v : Hist) {
-						out << "," << v;
-					}
-					out << "," << Hist.overflow();
-					out << std::endl;
+				auto Hist = hmLib::make_histgram(lower, upper, hsize);
+				Hist(s.begin(), s.end());
+				out << "," << Hist.underflow();
+				for (auto v : Hist) {
+					out << "," << v;
 				}
+				out << "," << Hist.overflow();
+				out << std::endl;
 			}
 		};
 		struct adaptive_histogram_stream_observer {
@@ -55,19 +53,17 @@ namespace hmLib {
 			}
 			template<typename state_type,typename time_type>
 			void operator()(const state_type& s, time_type t) {
-				if (n % 10 == 0) {
-					out << t;
+				out << t;
 
-					auto MinMax = std::minmax_element(s.begin(), s.end());
-					auto Mergin = (*(MinMax.second) - *(MinMax.first)) / hsize * 1e-6;
-					auto Hist = hmLib::make_histgram(*(MinMax.first), *(MinMax.second) + Mergin, hsize);
-					Hist(s.begin(), s.end());
-					out << "," << Hist.lower() << "," << Hist.upper();
-					for (auto v : Hist) {
-						out << "," << v;
-					}
-					out << std::endl;
+				auto MinMax = std::minmax_element(s.begin(), s.end());
+				auto Mergin = (*(MinMax.second) - *(MinMax.first)) / hsize * 1e-6;
+				auto Hist = hmLib::make_histgram(*(MinMax.first), *(MinMax.second) + Mergin, hsize);
+				Hist(s.begin(), s.end());
+				out << "," << Hist.lower() << "," << Hist.upper();
+				for (auto v : Hist) {
+					out << "," << v;
 				}
+				out << std::endl;
 			}
 		};
 	}
