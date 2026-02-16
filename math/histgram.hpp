@@ -4,13 +4,13 @@
 #include<vector>
 #include"axis.hpp"
 namespace hmLib {
-	template<typename value_type_, typename grid_adjuster_ = math::default_grid_adjuster>
+	template<typename range_axis_type_>
 	struct histgram {
-		using axis_t = range_axis<value_type_, grid_adjuster_>;
-		using value_type = value_type_;
-		using grid_adjuster = grid_adjuster_;
+		using range_axis_type = range_axis_type_;
+		using value_type = typename range_axis_type::value_type;
+		using grid_policy = typename range_axis_type::grid_policy;
 	private:
-		axis_t Axis;
+		range_axis_type Axis;
 		std::vector<unsigned int> Vec;
 		unsigned int Underflow;
 		unsigned int Overflow;
@@ -19,11 +19,8 @@ namespace hmLib {
 		using const_iterator = std::vector<unsigned int>::const_iterator;
 	public:
 		histgram() = default;
-		histgram(value_type Min_, value_type Max_, unsigned int SepNum_):Axis(Min_,Max_,SepNum_+1){
-			clear();
-		}
-		explicit histgram(axis_t Axis_):Axis(std::move(Axis_)) {
-			clear();
+		explicit histgram(range_axis_type Axis_)
+			:Axis(std::move(Axis_)),Vec(Axis.size(), 0u), Underflow(0), Overflow(0) {
 		}
 		void clear() {
 			if (Axis.empty())return;
@@ -31,18 +28,14 @@ namespace hmLib {
 			Underflow = 0;
 			Overflow = 0;
 		}
-		void reset(value_type Min_, value_type Max_, unsigned int SepNum_) {
-			Axis.assign(Min_, Max_, SepNum_+1);
-			clear();
-		}
-		void reset(const axis_t& Axis_) {
+		void reset(const range_axis_type& Axis_) {
 			Axis = Axis_;
 			clear();
 		}
 	public:
 		void operator()(value_type Val) {
-			if(Val < Axis.grid_lower())++Underflow;
-			else if(Val >= Axis.grid_upper()) ++Overflow;
+			if(Val < Axis.lower())++Underflow;
+			else if(Val >= Axis.upper()) ++Overflow;
 			else ++Vec[Axis.index(Val)];
 		}
 		template<typename input_iterator>
@@ -77,17 +70,12 @@ namespace hmLib {
 		std::vector<unsigned int>&& data()&&{return std::move(Vec);}
 		value_type lower()const { return Axis.lower(); }
 		value_type upper()const { return Axis.upper(); }
-		const axis_t& axis()const { return Axis; }
+		const range_axis_type& axis()const { return Axis; }
 	};
-
 	template<typename T, typename grid_adjuster>
 	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_adjuster GridAdjuster, math::range_axis_option Opt = math::range_axis_option::none) {
-		using value_type = typename std::decay<T>::type;
-		return histgram<value_type, grid_adjuster>(make_range_axis(Lower,Upper,Size+1, GridAdjuster, Opt));
-	}
-	template<typename T>
-	auto make_histgram(T Lower, T Upper, unsigned int Size, math::range_axis_option Opt = math::range_axis_option::none) {
-		return make_histgram(Lower, Upper, Size, math::default_grid_adjuster(), Opt);
+		auto Axis = make_range_axis(Lower,Upper,Size+1, GridAdjuster, Opt);
+		return histgram<decltype(Axis)>(Axis);
 	}
 }
 #

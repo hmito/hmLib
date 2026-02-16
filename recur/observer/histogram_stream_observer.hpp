@@ -28,7 +28,7 @@ namespace hmLib {
 			void operator()(const state_type& s, time_type t) {
 				out << t;
 
-				auto Hist = hmLib::make_histgram(lower, upper, hsize);
+				auto Hist = hmLib::make_histgram(lower, upper, hsize, hmLib::math::grid::round_policy());
 				Hist(s.begin(), s.end());
 				out << "," << Hist.underflow();
 				for (auto v : Hist) {
@@ -57,7 +57,7 @@ namespace hmLib {
 
 				auto MinMax = std::minmax_element(s.begin(), s.end());
 				auto Mergin = (*(MinMax.second) - *(MinMax.first)) / hsize * 1e-6;
-				auto Hist = hmLib::make_histgram(*(MinMax.first), *(MinMax.second) + Mergin, hsize);
+				auto Hist = hmLib::make_histgram(*(MinMax.first), *(MinMax.second) + Mergin, hsize, hmLib::math::grid::round_policy());
 				Hist(s.begin(), s.end());
 				out << "," << Hist.lower() << "," << Hist.upper();
 				for (auto v : Hist) {
