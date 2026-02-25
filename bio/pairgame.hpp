@@ -12,7 +12,7 @@
 #include"../ublas.hpp"
 #include"../odeint/validate.hpp"
 #include"../odeint/integrate.hpp"
-#include"../odeint/breaker/overflow_breaker.hpp"
+#include"../recur/breaker/time_limit_breaker.hpp"
 namespace hmLib {
 	namespace bio {
 		/*
@@ -156,10 +156,10 @@ namespace hmLib {
 						}
 					}
 					bool is_invalid_step(const state_type& x, time_type t) {
-						return std::any_of(x.begin(), x.end(), [=](double v) {return v < 0.0; });
+						return std::any_of(x.begin(), x.end(), [](double v) {return v < 0.0; });
 					}
 					validate_result validate(const state_type& x, time_type t, state_type& nx) {
-						if (std::any_of(x.begin(), x.end(), [=](double v) {return v < ThrFreq; })) {
+						if (std::any_of(x.begin(), x.end(), [this](double v) {return v < ThrFreq; })) {
 							nx = x;
 							for (auto& v : nx) {
 								if (v < ThrFreq)v = 0.0;
@@ -193,7 +193,7 @@ namespace hmLib {
 
 				detail::freq_csys Sys(Mx,ThrFreq);
 
-				hmLib::odeint::time_overflow_breaker<> Brk(1e50);
+				hmLib::recur::time_limit_breaker<double> Brk(1e50);
 				hmLib::odeint::breakable_integrate_adaptive_n(Stepper, Sys, Freq, 0.0, 0.001, stepnum, Brk);
 
 				for (auto& v : Freq) {

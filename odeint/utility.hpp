@@ -210,18 +210,18 @@ namespace hmLib{
 				//using std::swap;
 				std::swap(x1, x2);
 			}
-			template<typename state_type>
-			void resize(const state_type& from, state_type& to, boost::true_type) {
-				if(!boost::numeric::odeint::same_size(from, to)) {
-					boost::numeric::odeint::resize(to, from);
+			template<typename state_type,typename is_resizeable>
+			void resize(const state_type& from, state_type& to, is_resizeable) {
+				if constexpr (std::is_convertible<is_resizeable, boost::true_type>::value){
+					if(!boost::numeric::odeint::same_size(from, to)) {
+						boost::numeric::odeint::resize(to, from);
+					}
 				}
 			}
 			template<typename state_type>
-			void resize(const state_type& from, state_type& to, boost::false_type) {}
-			template<typename state_type>
 			void resize(const state_type& from, state_type& to) {
-				using is_resizable = typename boost::numeric::odeint::template is_resizeable<state_type>::type;
-				resize(from, to, is_resizable());
+				using is_resizeable = typename boost::numeric::odeint::template is_resizeable<state_type>;
+				resize(from, to, is_resizeable());
 			}
 			template<typename state_type>
 			void resize_and_copy(const state_type& from, state_type& to) {
