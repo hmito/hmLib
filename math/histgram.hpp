@@ -74,7 +74,7 @@ namespace hmLib {
 	};
 	template<typename T, typename grid_adjuster>
 	auto make_histgram(T Lower, T Upper, unsigned int Size, grid_adjuster GridAdjuster, math::range_axis_option Opt = math::range_axis_option::none) {
-		auto Axis = make_range_axis(Lower,Upper,Size+1, GridAdjuster, Opt);
+		auto Axis = make_range_axis(Lower,Upper,Size, GridAdjuster, Opt);
 		return histgram<decltype(Axis)>(Axis);
 	}
 }
