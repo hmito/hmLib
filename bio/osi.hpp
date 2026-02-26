@@ -296,6 +296,16 @@ namespace hmLib {
 				return dt;
 			}
 		};
+
+		struct osi_strainnum_breaker {
+			unsigned int maxnum;
+		public:
+			osi_strainnum_breaker(unsigned int maxnum_) :maxnum(maxnum_) {}
+			template<typename state_type,typename time_type>
+			bool operator()(const state_type& s, time_type) {
+				return s.strains.size() > maxnum;
+			}
+		};
 	}
 }
 #

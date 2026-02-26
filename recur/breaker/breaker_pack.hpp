@@ -16,7 +16,7 @@ namespace hmLib{
 			breaker_pack(breaker_ Brk, others_... Others) :Pack(std::forward<breaker_>(Brk), std::forward<others_>(Others)...) {}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& State, time_type Time) {
-				return hmLib::tuple_reduce(Pack, false, [x = &State, t = &Time](bool Ini, auto& brk) {return Ini || brk(x, t); });
+				return hmLib::tuple_reduce(Pack, false, [&x = State, &t = Time](bool Ini, auto& brk) {return Ini || brk(x, t); });
 			}
 		};
 		template<typename breaker, typename... others>

@@ -15,12 +15,10 @@
 #include"../recur/breaker/time_limit_breaker.hpp"
 namespace hmLib {
 	namespace bio {
-		/*
-		struct pair_game_pattern{
-			//payoff of pair game between x1 and x2 (first: for x1, second: for x2)
-			std::pair<double,double> operator()(trait x1, trait x2);
+		template<typename T, typename trait_type>
+		concept pair_game = requires(T game, trait_type a, trait_type b){
+			{ game(a, b) } -> std::same_as<std::pair<double,double>>;
 		};
-		*/
 		namespace pairgame {
 			using payoff_matrix = boost::numeric::ublas::matrix<double>;
 			using freq_vector = boost::numeric::ublas::vector < double>;
