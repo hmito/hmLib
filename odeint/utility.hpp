@@ -212,8 +212,9 @@ namespace hmLib{
 			}
 			template<typename state_type,typename is_resizeable>
 			void resize(const state_type& from, state_type& to, is_resizeable) {
-				if constexpr (std::is_convertible<is_resizeable, boost::true_type>::value){
-					if(!boost::numeric::odeint::same_size(from, to)) {
+				using tag = typename boost::numeric::odeint::is_resizeable<state_type>::type;
+				if constexpr (tag::value) {
+					if (!boost::numeric::odeint::same_size(from, to)) {
 						boost::numeric::odeint::resize(to, from);
 					}
 				}

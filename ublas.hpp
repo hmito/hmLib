@@ -17,7 +17,11 @@ namespace hmLib {
 
 			b = ub::identity_matrix<T>(tmp.size1());
 
-			ub::lu_substitute(tmp, pm, b);
+			try {
+				ub::lu_substitute(tmp, pm, b);
+			} catch (...) {
+				return true; // fail to calculate inverse matrix
+			}
 
 			return false;
 		}
