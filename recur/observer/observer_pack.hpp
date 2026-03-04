@@ -1,4 +1,4 @@
-﻿#ifndef HMLIB_RECUR_OBSERVAERPACK_INC
+#ifndef HMLIB_RECUR_OBSERVAERPACK_INC
 #define HMLIB_RECUR_OBSERVAERPACK_INC 100 
 #
 #include<utility>
@@ -12,7 +12,8 @@ namespace hmLib{
 		private:
 			pack Pack;
 		public:
-			template<typename observer_, typename... others_>
+ 		    template<typename observer_, typename... others_>
+				requires (!std::same_as<std::decay_t<observer_>, observer_pack>)
 			observer_pack(observer_&& Obs, others_&&... Others) :Pack(std::forward<observer_>(Obs), std::forward<others_>(Others)...) {}
 			template<typename state_type, typename time_type>
 			void operator()(const state_type& State, time_type Time) {

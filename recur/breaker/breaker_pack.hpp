@@ -13,6 +13,7 @@ namespace hmLib{
 			pack Pack;
 		public:
 			template<typename breaker_, typename... others_>
+				requires (!std::same_as<std::decay_t<breaker_>, breaker_pack>)
 			breaker_pack(breaker_ Brk, others_... Others) :Pack(std::forward<breaker_>(Brk), std::forward<others_>(Others)...) {}
 			template<typename state_type, typename time_type>
 			bool operator()(const state_type& State, time_type Time) {
