@@ -105,7 +105,18 @@ namespace hmLib{
 		}
 		return Beg;
 	}
-
+	template<typename random_access_iterator, typename URBG>
+	void partial_shuffle(random_access_iterator Begin, random_access_iterator End, std::size_t size, URBG&& Engine){
+		std::size_t fullsize = std::distance(Begin,End);
+		if(size * 3 > fullsize){
+			std::shuffle(Begin,End,Engine);
+		}else{
+			for(std::size_t cnt = 0; cnt < size; ++cnt){
+				std::size_t pos = std::uniform_int_distribution<std::size_t>(cnt, fullsize - 1)(Engine);
+				if(cnt != pos) std::swap(Begin[cnt], Begin[pos]);
+			}
+		}
+	}
 	template<typename Iterator, typename Transform>
 	auto transform_max_element(Iterator Beg, Iterator End, Transform Fn){
 		auto Max = std::numeric_limits<typename std::remove_reference<decltype(Fn(*Beg))>::type>::lowest();
