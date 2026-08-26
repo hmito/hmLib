@@ -9,50 +9,6 @@
 #include"../exceptions.hpp"
 namespace hmLib{
 	template<std::forward_iterator Iterator, std::uniform_random_bit_generator URBG>
-	std::size_t random_index_sample(Iterator Begin,Iterator End, URBG&& Engine){
-		if(Begin == End)return 0;
-		return std::uniform_int_distribution<std::size_t>(0,std::distance(Begin,End)-1)(Engine);
-	}
-	template<std::forward_iterator Iterator, std::output_iterator OIterator, std::uniform_random_bit_generator URBG>
-	OIterator random_index_sample(Iterator Begin,Iterator End, OIterator Out, std::size_t n, URBG&& Engine){
-		if(Begin == End)return Out;
-
-		std::uniform_int_distribution<std::size_t> Dist(0, std::distance(Begin, End) - 1);
-		for(std::size_t i = 0; i < n; ++i){
-			*Out++ = Dist(Engine);
-		}
-		return Out;
-	}
-	class random_index_sampler{
-		using dist_type = std::uniform_int_distribution<std::size_t>;
-	private:
-		dist_type Dist;
-	public:
-		random_index_sampler()=default;
-		template<std::forward_iterator Iterator>
-		random_index_sampler(Iterator Begin_,Iterator End_){reset(Begin_,End_);}
-	public:
-		template<typename std::uniform_random_bit_generator URBG>
-		std::size_t operator()(URBG Engine){
-			return Dist(Engine);
-		}
-		template<std::forward_iterator Iterator>
-		void reset(Iterator Begin_,Iterator End_){
-			if(Begin_==End_){
-				dist_type::param_type prm(0, 0);
-				Dist.param(prm);
-			}else{
-				dist_type::param_type prm(0, std::distance(Begin_, End_)-1);
-				Dist.param(prm);
-			}
-		}
-	};
-	template<typename InputIterator>
-	auto make_random_index_sampler(InputIterator Begin_,InputIterator End_){
-		return random_index_sampler<InputIterator>(Begin_,End_);
-	}
-
-	template<std::forward_iterator Iterator, std::uniform_random_bit_generator URBG>
 	InputIterator random_sample(Iterator Begin,Iterator End, URBG&& Engine){
 		if(Begin == End)return End;
 		return std::next(Begin, std::uniform_int_distribution<int>(0,std::distance(Begin,End)-1)(Engine));
@@ -72,122 +28,77 @@ namespace hmLib{
 		using dist_type = std::uniform_int_distribution<std::size_t>;
 	private:
 		Iterator Begin;
-		random_index_sampler IndexSampler;
+		dist_type Dist;
 	public:
 		random_sampler()=default;
 		random_sampler(Iterator Begin_,Iterator End_){reset(Begin_,End_);}
 	public:
 		template<typename RandEngine>
 		Iterator operator()(RandEngine Engine){
-			return std::next(Begin, IndexSampler(Engine));
+			hmLib_assert(!empty(), hmLib::numeric_exceptions::incorrect_arithmetic_request, "Sampling is requested for empty sampler.");
+			return std::next(Begin, Dist(Engine));
 		}
 		void reset(Iterator Begin_,Iterator End_){
-			Begin=Begin_;
-			IndexSampler.reset(Begin_,End_);
+			Begin = Begin_;
+			Dist.param(dist_type::param_type(0,std::distance(Begin_,End_)));
 		}
 	};
 	template<std::forward_iterator Iterator>
 	auto make_random_sampler(Iterator Begin_,Iterator End_){
 		return random_sampler<Iterator>(Begin_,End_);
 	}
-
-	template<std::forward_iterator Iterator, std::uniform_random_bit_generator URBG>
-	std::size_t roulette_index_sample(Iterator Begin, Iterator End, URBG&& Engine) {
-		if(Begin==End)return 0;
-		using value_type = std::iter_value_t<Iterator>;
-		value_type TotalWeight = std::accumulate(Begin, End, value_type{});
-		return roulette_index_sample(Begin, End, std::forward<URBG>(Engine), TotalWeight);
-	}
-	template<std::forward_iterator Iterator, std::uniform_random_bit_generator URBG, typename value_type>
-	std::size_t roulette_index_sample(Iterator Begin, Iterator End, URBG&& Engine, value_type TotalWeight) {
-		if(Begin==End)return 0;
-		value_type Selected = std::uniform_real_distribution<value_type>(0, TotalWeight)(Engine);
-		for(auto Itr = Begin; Itr!=End; ++Itr) {
-			Selected -= *Itr;
-			if(Selected <= 0.)return std::distance(Begin, Itr);
-		}
-		return std::distance(Begin, End);
-	}
-	template<std::forward_iterator Iterator, std::output_iterator OIterator, std::uniform_random_bit_generator URBG>
-	OutputIterator roulette_index_sample(Iterator Begin, Iterator End, OIterator Out, std::size_t n, URBG&& Engine) {
-		if(Begin==End)return Out;
-		using value_type = std::iter_value_t<Iterator>;
-		value_type TotalWeight = std::accumulate(Begin, End, value_type{});
-		return roulette_index_sample(Begin,End,Out,n,Engine,TotalWeight);
-	}
-	template<std::forward_iterator Iterator, std::output_iterator OIterator, std::uniform_random_bit_generator URBG, typename value_type>
-	OutputIterator roulette_index_sample(Iterator Begin, Iterator End, OIterator Out, std::size_t n, URBG&& Engine, value_type TotalWeigh) {
-		if(Begin==End)return Out;
-		for(std::size_t i = 0;i<n;++i){
-			value_type Selected = std::uniform_real_distribution<value_type>(0., TotalWeight)(Engine);
-			for(auto Itr = Begin; Itr!=End; ++Itr) {
-				Selected -= *Itr;
-				if(Selected <= 0.) {
-					Out++ = std::distance(Begin, Itr);
-					break;
-				}
-			}
-			if(Selected>0){
-				*Out++  = std::distance(Begin, End);
-			}
-		}
-		return Out;
-	}
-	template<typename value_type>
-	class roulette_index_sampler{
+	template<std::forward_iterator Iterator>
+	class aggregate_random_sampler{
+		using dist_type = std::uniform_int_distribution<std::size_t>;
 	private:
-		std::vector<value_type> WeightVec;
+		std::vector<Iterator> Container;
 	public:
-		roulette_index_sampler()=default;
-		roulette_index_sampler(InputIterator Begin_,InputIterator End_){reset(Begin_,End_);}
+		aggregate_random_sampler()=default;
+		aggregate_random_sampler(Iterator Begin_,Iterator End_){reset(Begin_,End_);}
 	public:
-		template<std::uniform_random_bit_generator URB>
-		std::size_t operator()(URB&& Engine){
-			if(WeightVec.empty())return 0;
-			return std::distance(WeightVec.begin(),std::lower_bound(
-				WeightVec.begin(),WeightVec.end(),std::uniform_real_distribution<value_type>(0,WeightVec.back())(Engine)
-			));
+		template<typename RandEngine>
+		Iterator operator()(RandEngine Engine){
+			hmLib_assert(!empty(), hmLib::numeric_exceptions::incorrect_arithmetic_request, "Sampling is requested for empty sampler.");
+			return *std::next(Container.begin(), dist_type(0,Container.size()-1)(Engine));
 		}
-		void reset(){WeightVec.clear();}
-		template<std::forward_iterator Iterator>
+		void reset(){Container.clear();}
 		void reset(Iterator Begin_,Iterator End_){
-			WeightVec.clear();
-			value_type Val=0;
-			for(;Begin_!=End_;++Begin_){
-				Val+=*Begin_;
-				WeightVec.push_back(Val);
+			Container.clear();
+			insert(Begin_,End_,WeightBegin_,WeightEnd_);
+		}
+		void insert(Iterator Itr_) {
+			Container.push_back(Itr_);
+		}
+		void insert(Iterator Begin_, Iterator End_) {
+			if constexpr(std::random_access_iterator<Iterator>){
+				Container.reserve(Container.size() + End_-Begin_);
+			}
+			for(;Begin_!=End_;++Begin){
+				Container.push_back(Begin_);
 			}
 		}
-		template<std::random_access_iterator Iterator>
-		void reset(Iterator Begin_,Iterator End_){
-			WeightVec.clear();
-			WeightVec.reserve(End_-Begin_);
-			value_type Val=0;
-			for(;Begin_!=End_;++Begin_){
-				Val+=*Begin_;
-				WeightVec.push_back(Val);
-			}
-		}
+		bool empty()const { return Container.empty(); }
+		std::size_t size()const{return Container.size();}
 	};
 	template<std::forward_iterator Iterator>
-	auto make_roulette_index_sampler(Iterator Begin_,Iterator End_){
-		return roulette_index_sampler<std::decay_t<decltype(*Begin_)>>(Begin_,End_);
+	auto make_aggregate_random_sampler(Iterator Begin_,Iterator End_){
+		return aggregate_random_sampler<Iterator>(Begin_,End_);
 	}
 
-	template<std::forward_iterator SampleIterator, std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG>
-	SampleIterator roulette_sample(SampleIterator Begin, SampleIterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, URBG&& Engine) {
+	template<std::forward_iterator Iterator, std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG>
+	Iterator roulette_sample(Iterator Begin, Iterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, URBG&& Engine) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(WeightBegin, WeightEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
 		if(Begin == End)return End;
 		return std::next(Begin,roulette_index_sample(WeightBegin,WeightEnd,Engine));
 	}
-	template<std::forward_iterator SampleIterator, std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG, typename value_type>
-	SampleIterator roulette_sample(SampleIterator Begin, SampleIterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, URBG&& Engine, value_type TotalWeight) {
+	template<std::forward_iterator Iterator, std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG, typename value_type>
+	Iterator roulette_sample(Iterator Begin, Iterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, URBG&& Engine, value_type TotalWeight) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(WeightBegin, WeightEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
 		if(Begin == End)return End;
 		return std::next(Begin,roulette_index_sample(WeightBegin,WeightEnd,Engine,TotalWeight));
 	}
-	template<std::forward_iterator SampleIterator, std::forward_iterator WeightIterator, std::output_iterator OutputIterator, std::uniform_random_bit_generator URBG>
-	OutputIterator roulette_sample(SampleIterator Begin, SampleIterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, OutputIterator Out, std::size_t n, URBG&& Engine) {
+	template<std::forward_iterator Iterator, std::forward_iterator WeightIterator, std::output_iterator OutputIterator, std::uniform_random_bit_generator URBG>
+	OutputIterator roulette_sample(Iterator Begin, Iterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, OutputIterator Out, std::size_t n, URBG&& Engine) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(WeightBegin, WeightEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
 		if(Begin == End)return Out;
 		using value_type = std::iter_value_t<WeightIterator>;
@@ -195,7 +106,7 @@ namespace hmLib{
 		return roulette_index_sample(Begin,End,WeightBegin, WeightEnd,Out,n,Engine,TotalWeight);
 	}
 	template<std::forward_iterator SampleIterator, std::forward_iterator WeightIterator, std::output_iterator OutputIterator, std::uniform_random_bit_generator URBG, typename value_type>
-	OutputIterator roulette_sample(SampleIterator Begin, SampleIterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, OutputIterator Out, std::size_t n, URBG&& Engine, value_type TotalWeight) {
+	OutputIterator roulette_sample(Iterator Begin, Iterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, OutputIterator Out, std::size_t n, URBG&& Engine, value_type TotalWeight) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(WeightBegin, WeightEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
 		for(std::size_t i = 0;i<n;++i){
 			value_type Selected = std::uniform_real_distribution<value_type>(0., TotalWeight)(Engine);
@@ -203,117 +114,129 @@ namespace hmLib{
 			for(auto WeightItr = WeightBegin; WeightItr!=WeightEnd; ++WeightItr) {
 				Selected -= *WeightItr;
 				if(Selected <= 0.) {
-					Out++ = Itr;
+					Out++ = *Itr;
 					break;
 				}
 				++Itr;
 			}
-			if(Selected>0){
-				*Out++  = End;
-			}
+			hmLib_assert(Selected<=0., hmLib::numeric_exceptions::incorrect_arithmetic_request, "Given TotalWeight is lower than sum of each Weight.");
 		}
 		return Out;
 	}
-	template<std::random_access_iterator SampleIterator, std::random_access_iterator WeightIterator, std::output_iterator OutputIterator, std::uniform_random_bit_generator URBG, typename value_type>
-	OutputIterator roulette_sample(SampleIterator Begin, SampleIterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, OutputIterator Out, std::size_t n, URBG&& Engine, value_type TotalWeight) {
+	template<std::random_access_iterator Iterator, std::random_access_iterator WeightIterator, std::output_iterator OutputIterator, std::uniform_random_bit_generator URBG, typename value_type>
+	OutputIterator roulette_sample(Iterator Begin, Iterator End, WeightIterator WeightBegin, WeightIterator WeightEnd, OutputIterator Out, std::size_t n, URBG&& Engine, value_type TotalWeight) {
 		hmLib_assert(std::distance(Begin, End) == std::distance(WeightBegin, WeightEnd), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
 		for(std::size_t i = 0;i<n;++i){
 			value_type Selected = std::uniform_real_distribution<value_type>(0., TotalWeight)(Engine);
 			for(auto WeightItr = WeightBegin; WeightItr!=WeightEnd; ++WeightItr) {
 				Selected -= *WeightItr;
 				if(Selected <= 0.) {
-					Out++ = std::next(Begin, std::distance(WeightBegin, WeightItr));
+					Out++ = *std::next(Begin, std::distance(WeightBegin, WeightItr));
 					break;
 				}
 			}
-			if(Selected>0){
-				*Out++  = End;
-			}
+			hmLib_assert(Selected<=0., hmLib::numeric_exceptions::incorrect_arithmetic_request, "Given TotalWeight is lower than sum of each Weight.");
 		}
 		return Out;
 	}
-	template<typename InputIterator>
+	template<std::forward_iterator Iterator, typename value_type = double>
 	class roulette_sampler{
-		struct assess_itr{
-			InputIterator Itr;
-			double Val;
-		public:
-			assess_itr(double Val_):Val(Val_){}
-			assess_itr(InputIterator Itr_,double Val_):Itr(Itr_),Val(Val_){}
-			bool operator<(const assess_itr& My_)const{return Val<My_.Val;}
-		};
+		using dist_type = std::uniform_real_distribution<value_type>;
 	private:
-		std::vector<assess_itr> AssessVec;
+		Iterator Begin;
+		std::vector<value_type> Container;
+		dist_type Dist;
 	public:
-		roulette_sampler(){}
-		template<typename fnAssess>
-		roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess&& FnAssess_){reset(Begin_,End_, std::forward<fnAssess>(FnAssess_));}
-		template<typename assess_iterator>
-		roulette_sampler(InputIterator Begin_, InputIterator End_, assess_iterator ABeg_, assess_iterator AEnd_) { reset(Begin_, End_, ABeg_, AEnd_); }
-	public:
-		template<typename RandEngine>
-		InputIterator operator()(RandEngine&& Engine){
-			return std::lower_bound(
-				AssessVec.begin()
-				,AssessVec.end()
-				,assess_itr(InputIterator(), std::uniform_real_distribution<double>(0.,assess_total())(Engine))
-			)->Itr;
+		roulette_sampler()=default;
+		template<std::forward_iterator WeightIterator>
+		roulette_sampler(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) { reset(Begin_, End_, WeightBeg_, WeightEnd_); }
+		template<std::uniform_random_bit_generator URBG>
+		Iterator operator()(URBG&& Engine){
+			hmLib_assert(!empty(), hmLib::numeric_exceptions::incorrect_arithmetic_request, "Sampling is requested for empty sampler.");
+			return std::next(Begin,
+				std::distance(Container.begin(), std::lower_bound(Container.begin(),Container.end(),Dist(Engine)))
+			);
 		}
-		void reset() { AssessVec.clear(); }
-		template<typename fnAssess>
-		void reset(InputIterator Begin_,InputIterator End_, fnAssess&& FnAssess_){
-			double Val=0.;
-			AssessVec.clear();
-			while(Begin_!=End_){
-				Val+=FnAssess_(*Begin_);
-				AssessVec.push_back(assess_itr(Begin_++,Val));
+		template<std::forward_iterator WeightIterator>
+		void reset(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) {
+			hmLib_assert(std::distance(Begin_, End_) == std::distance(WeightBeg_, WeightEnd_), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
+			Container.clear();
+			if constexpr(std::random_access_iterator<Iterator>){
+				Container.reserve(End_-Begin_);
 			}
-		}
-		template<typename assess_iterator>
-		void reset(InputIterator Begin_, InputIterator End_, assess_iterator ABeg_, assess_iterator AEnd_) {
-			hmLib_assert(std::distance(Begin_, End_) == std::distance(ABeg_, AEnd_), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
-			double Val = 0.;
-			AssessVec.clear();
+			value_type Val = 0.0;
 			while(Begin_!=End_) {
-				Val += *ABeg_;
-				AssessVec.push_back(assess_itr(Begin_, Val));
+				Val += *WeightBeg_;
+				Container.emplace_back(Val);
 				++Begin_;
-				++ABeg_;
+				++WeightBeg_;
 			}
+			Dist.param(dist_type::param_type(0.0,Val));
 		}
-		template<typename fnAssess>
-		void push(InputIterator Begin_, InputIterator End_, fnAssess&& FnAssess_) {
-			double Val = 0.0;
-			if(!empty())Val = AssessVec.back().Val;
-			while(Begin_!=End_) {
-				Val += FnAssess_(*Begin_);
-				AssessVec.push_back(assess_itr(Begin_++, Val));
-			}
-		}
-		template<typename assess_iterator>
-		void push(InputIterator Begin_, InputIterator End_, assess_iterator ABeg_, assess_iterator AEnd_) {
-			hmLib_assert(std::distance(Begin_, End_) == std::distance(ABeg_, AEnd_), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
-			double Val = 0.0;
-			if(!empty())Val = AssessVec.back().Val;
-			while(Begin_!=End_) {
-				Val += *ABeg_;
-				AssessVec.push_back(assess_itr(Begin_, Val));
-				++Begin_;
-				++ABeg_;
-			}
-		}
-		bool empty()const { return AssessVec.empty(); }
-		unsigned int size()const{return AssessVec.size();}
-	private:
-		double assess_total() { if(empty())return 0.0; return AssessVec.back().Val; }
 	};
-	template<typename InputIterator,typename fnAssess>
-	roulette_sampler<InputIterator> make_roulette_sampler(InputIterator Begin_,InputIterator End_,fnAssess&& FnAssess_){
-		return roulette_sampler<InputIterator>(Begin_,End_,std::forward<fnAssess>(FnAssess_));
+	template<typename Iterator, typename WeightIterator>
+	auto make_roulette_sampler(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) {
+		return roulette_sampler<Iterator,std::decay_t(decltype(*WeightBeg_))>(Begin_, End_, WeightBeg_, WeightEnd_);
 	}
-	template<typename InputIterator, typename assess_iterator>
-	roulette_sampler<InputIterator> make_roulette_sampler(InputIterator Begin_, InputIterator End_, assess_iterator ABeg_, assess_iterator AEnd_) {
-		return roulette_sampler<InputIterator>(Begin_, End_, ABeg_, AEnd_);
+	template<std::forward_iterator Iterator, typename value_type = double>
+	class aggregate_roulette_sampler{
+		struct element{
+			value_type value;
+			Iterator itr;
+			element()=delete;
+			element(value_type v):value(v),itr(){}
+			element(value_type v, Iterator i):value(v),itr(i){}
+			friend bool operator<(const element& e1, const element& e2){return e1.value<e2.value;}
+		};
+		using dist_type = std::uniform_real_distribution<value_type>;
+	private:
+		std::vector<element> Container;
+		dist_type Dist;
+	public:
+		aggregate_roulette_sampler()=default;
+		template<std::forward_iterator WeightIterator>
+		aggregate_roulette_sampler(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) { reset(Begin_, End_, WeightBeg_, WeightEnd_); }
+		template<std::uniform_random_bit_generator URBG>
+		Iterator operator()(URBG&& Engine){
+			hmLib_assert(!empty(), hmLib::numeric_exceptions::incorrect_arithmetic_request, "Sampling is requested for empty sampler.");
+			return std::lower_bound(Container.begin(),Container.end(),element{Dist(Engine)})->itr;
+		}
+		void reset() { Container.clear(); }
+		template<std::forward_iterator WeightIterator>
+		void reset(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) {
+			hmLib_assert(std::distance(Begin_, End_) == std::distance(WeightBeg_, WeightEnd_), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
+			Container.clear();
+			insert(Begin_,End_,WeightBeg_,WeightEnd_);
+		}
+		void insert(Iterator Itr_, value_type Weight_) {
+			value_type Val = 0;
+			if(!empty())Val = Container.back().value;
+			Val+=Weight_;
+			Container.emplace_back(Val,Itr_);
+			Dist.param(dist_type::param_type(0.0,Val));
+		}
+		template<std::forward_iterator WeightIterator>
+		void insert(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) {
+			hmLib_assert(std::distance(Begin_, End_) == std::distance(WeightBeg_, WeightEnd_), hmLib::numeric_exceptions::invalid_initialvalue, "Given pair of iterators has different distance.");
+			if constexpr(std::random_access_iterator<Iterator>){
+				Container.reserve(Container.size() + End_-Begin_);
+			}
+			value_type Val = 0.0;
+			if(!empty())Val = Container.back().value;
+			while(Begin_!=End_) {
+				Val += *WeightBeg_;
+				Container.emplace_back(Val,Begin_);
+				++Begin_;
+				++WeightBeg_;
+			}
+			Dist.param(dist_type::param_type(0.0,Val));
+		}
+		bool empty()const { return Container.empty(); }
+		std::size_t size()const{return Container.size();}
+	};
+	template<typename Iterator, typename WeightIterator>
+	auto make_aggregate_roulette_sampler(Iterator Begin_, Iterator End_, WeightIterator WeightBeg_, WeightIterator WeightEnd_) {
+		return aggregate_roulette_sampler<Iterator,std::decay_t(decltype(*WeightBeg_))>(Begin_, End_, WeightBeg_, WeightEnd_);
 	}
 
 	template<typename InputIterator>

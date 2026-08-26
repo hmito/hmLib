@@ -1,5 +1,5 @@
-﻿#ifndef HMLIB_ALGORITHM_NONREPEATRANDOMINTEGRALS_INC
-#define HMLIB_ALGORITHM_NONREPEATRANDOMINTEGRALS_INC 100
+﻿#ifndef HMLIB_ALGORITHM_UNIQUERANDOMINTEGRALS_INC
+#define HMLIB_ALGORITHM_UNIQUERANDOMINTEGRALS_INC 100
 #
 #include <random>
 #include <vector>
@@ -14,7 +14,7 @@
 namespace hmLib{
 	namespace algorithm{
 		template<typename type,typename generator>
-		std::vector<type> nonrepeat_random_integrals_by_unique(const std::size_t size, type rand_min, type rand_max, generator& Engine){
+		std::vector<type> unique_random_integrals_by_SortUnique(const std::size_t size, type rand_min, type rand_max, generator& Engine){
 			using unsigned_type = typename std::make_unsigned<type>::type;
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
@@ -44,7 +44,7 @@ namespace hmLib{
 			return tmp;
 		}
 		template<typename type, typename generator>
-		std::vector<type> nonrepeat_random_integrals_by_select(const std::size_t size, type rand_min, type rand_max, generator& Engine){
+		std::vector<type> unique_random_integrals_by_Select(const std::size_t size, type rand_min, type rand_max, generator& Engine){
 			using unsigned_type = typename std::make_unsigned<type>::type;
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
@@ -68,16 +68,16 @@ namespace hmLib{
 			return tmp;
 		}
 		template<typename type, typename generator>
-		std::vector<type> nonrepeat_random_integrals(const std::size_t size, type rand_min, type rand_max, generator& Engine){
+		std::vector<type> unique_random_integrals(const std::size_t size, type rand_min, type rand_max, generator& Engine){
 			using unsigned_type = typename std::make_unsigned<type>::type;
 
 			if(rand_min > rand_max) std::swap(rand_min, rand_max);
 			const unsigned_type max_min_diff = rand_max - rand_min + 1;
 
 			if(size < max_min_diff / 33){
-				return nonrepeat_random_integrals_by_unique(size, rand_min, rand_max, Engine);
+				return unique_random_integrals_by_SortUnique(size, rand_min, rand_max, Engine);
 			} else{
-				return nonrepeat_random_integrals_by_select(size, rand_min, rand_max, Engine);
+				return unique_random_integrals_by_Select(size, rand_min, rand_max, Engine);
 			}
 		}
 	}
