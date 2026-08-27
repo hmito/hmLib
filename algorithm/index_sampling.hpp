@@ -126,7 +126,7 @@ namespace hmLib{
 	public:
 		template<std::uniform_random_bit_generator URB>
 		std::size_t operator()(URB&& Engine){
-			if(WeightVec.empty())return 0;
+			hmLib_assert(!empty(),hmLib::numeric_exceptions::incorrect_arithmetic_request,"Sampling is requested for empty sampler.");
 			return std::distance(WeightVec.begin(),std::lower_bound(WeightVec.begin(),WeightVec.end(),Dist(Engine)));
 		}
 		void reset(){WeightVec.clear();}
@@ -144,14 +144,15 @@ namespace hmLib{
 			}
 			Dist.param(dist_type::param_type{0.0,Val});
 		}
+		bool empty()const{return WeightVec.empty();}
 	};
 	template<std::forward_iterator WeightIterator>
 	auto make_roulette_indexer(WeightIterator Begin_,WeightIterator End_){
 		return roulette_indexer<std::decay_t<decltype(*Begin_)>>(Begin_,End_);
 	}
 
-	template<std::output_iterator<std::size_t> OutputIterator, std::uniform_random_bit_generator URBG>
-	std::vector<std::size_t> unique_random_index(std::size_t Size, OutputIterator Out, std::size_t N, URBG&& Engine){
+	template<std::uniform_random_bit_generator URBG>
+	std::vector<std::size_t> unique_random_index(std::size_t Size,  std::size_t N, URBG&& Engine){
 		return algorithm::unique_random_integrals<std::size_t>(N,0,Size,Engine);
 	}
 	class unique_random_indexer{

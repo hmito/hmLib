@@ -189,7 +189,7 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
-hmLib_config\.h
+hmLib_config.h
 
 
 *.db-shm
@@ -203,3 +203,4 @@ hmLib_config\.h
 .DS_Store
 
 *.testlog
+.vscode/
