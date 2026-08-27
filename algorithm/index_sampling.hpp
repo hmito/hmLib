@@ -10,12 +10,14 @@
 #include"unique_random_integrals.hpp"
 #include"../exceptions.hpp"
 namespace hmLib{
-	template<std::uniform_random_bit_generator URBG>
+	template<typename URBG>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 	std::size_t random_index(std::size_t Size, URBG&& Engine){
 		hmLib_assert(Size>0, hmLib::numeric_exceptions::incorrect_arithmetic_request, "Size must be positive integral.");
 		return std::uniform_int_distribution<std::size_t>(0,Size-1)(Engine);
 	}
-	template<std::uniform_random_bit_generator URBG>
+	template<typename URBG>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 	std::vector<std::size_t> random_index(std::size_t Size, std::size_t N, URBG&& Engine){
 		hmLib_assert(Size>0, hmLib::numeric_exceptions::incorrect_arithmetic_request, "Size must be positive integral.");
 		std::uniform_int_distribution<std::size_t> Dist(0, Size - 1);
@@ -35,7 +37,8 @@ namespace hmLib{
 		random_indexer()=default;
 		random_indexer(std::size_t Size_){reset(Size_);}
 	public:
-		template<std::uniform_random_bit_generator URBG>
+		template<typename URBG>
+		requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 		std::size_t operator()(URBG&& Engine){
 			return Dist(std::forward<URBG>(Engine));
 		}
@@ -48,14 +51,8 @@ namespace hmLib{
 		return random_indexer(Size_);
 	}
 
-	template<std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG>
-	std::size_t roulette_index(WeightIterator Begin, WeightIterator End, URBG&& Engine) {
-		hmLib_assert(Begin!=End, hmLib::numeric_exceptions::incorrect_arithmetic_request, "WeightIterator must be positive distance.");
-		using weight_type = std::iter_value_t<WeightIterator>;
-		weight_type TotalWeight = std::accumulate(Begin, End, weight_type{});
-		return roulette_index(Begin, End, std::forward<URBG>(Engine), TotalWeight);
-	}
-	template<std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG, typename weight_type>
+	template<std::forward_iterator WeightIterator, typename URBG,typename weight_type = std::iter_value_t<WeightIterator>>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 	std::size_t roulette_index(WeightIterator Begin, WeightIterator End, URBG&& Engine, weight_type TotalWeight) {
 		hmLib_assert(Begin!=End, hmLib::numeric_exceptions::incorrect_arithmetic_request, "WeightIterator must be positive distance.");
 		weight_type Selected = std::uniform_real_distribution<weight_type>(0, TotalWeight)(Engine);
@@ -75,14 +72,16 @@ namespace hmLib{
 			hmLib_throw(hmLib::numeric_exceptions::incorrect_arithmetic_request, "TotalWeight is smaller than sum of each Weight.");
 		}
 	}
-	template<std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG>
-	std::vector<std::size_t> roulette_index(WeightIterator Begin, WeightIterator End, std::size_t N, URBG&& Engine) {
+	template<std::forward_iterator WeightIterator, typename URBG>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
+	std::size_t roulette_index(WeightIterator Begin, WeightIterator End, URBG&& Engine) {
 		hmLib_assert(Begin!=End, hmLib::numeric_exceptions::incorrect_arithmetic_request, "WeightIterator must be positive distance.");
 		using weight_type = std::iter_value_t<WeightIterator>;
 		weight_type TotalWeight = std::accumulate(Begin, End, weight_type{});
-		return roulette_index(Begin,End,N,Engine,TotalWeight);
+		return hmLib::roulette_index<WeightIterator,URBG,weight_type>(Begin, End, std::forward<URBG>(Engine), TotalWeight);
 	}
-	template<std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG, typename weight_type>
+	template<std::forward_iterator WeightIterator, typename URBG, typename weight_type>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 	std::vector<std::size_t> roulette_index(WeightIterator Begin, WeightIterator End,  std::size_t N, URBG&& Engine, weight_type TotalWeight) {
 		hmLib_assert(Begin!=End, hmLib::numeric_exceptions::incorrect_arithmetic_request, "WeightIterator must be positive distance.");
 
@@ -113,6 +112,14 @@ namespace hmLib{
 		}
 		return Idx;
 	}
+	template<std::forward_iterator WeightIterator, typename URBG>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
+	std::vector<std::size_t> roulette_index(WeightIterator Begin, WeightIterator End, std::size_t N, URBG&& Engine) {
+		hmLib_assert(Begin!=End, hmLib::numeric_exceptions::incorrect_arithmetic_request, "WeightIterator must be positive distance.");
+		using weight_type = std::iter_value_t<WeightIterator>;
+		weight_type TotalWeight = std::accumulate(Begin, End, weight_type{});
+		return hmLib::roulette_index(Begin,End,N,Engine,TotalWeight);
+	}
 	template<typename weight_type>
 	class roulette_indexer{
 		using dist_type = std::uniform_real_distribution<weight_type>;
@@ -124,7 +131,7 @@ namespace hmLib{
 		template<std::forward_iterator WeightIterator>
 		roulette_indexer(WeightIterator Begin_,WeightIterator End_){reset(Begin_,End_);}
 	public:
-		template<std::uniform_random_bit_generator URB>
+		template<typename URB>
 		std::size_t operator()(URB&& Engine){
 			hmLib_assert(!empty(),hmLib::numeric_exceptions::incorrect_arithmetic_request,"Sampling is requested for empty sampler.");
 			return std::distance(WeightVec.begin(),std::lower_bound(WeightVec.begin(),WeightVec.end(),Dist(Engine)));
@@ -142,7 +149,7 @@ namespace hmLib{
 				Val+=*Begin_;
 				WeightVec.push_back(Val);
 			}
-			Dist.param(dist_type::param_type{0.0,Val});
+			Dist.param(typename dist_type::param_type(0.0,Val));
 		}
 		bool empty()const{return WeightVec.empty();}
 	};
@@ -151,7 +158,8 @@ namespace hmLib{
 		return roulette_indexer<std::decay_t<decltype(*Begin_)>>(Begin_,End_);
 	}
 
-	template<std::uniform_random_bit_generator URBG>
+	template<typename URBG>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 	std::vector<std::size_t> unique_random_index(std::size_t Size,  std::size_t N, URBG&& Engine){
 		return algorithm::unique_random_integrals<std::size_t>(N,0,Size,Engine);
 	}
@@ -164,7 +172,7 @@ namespace hmLib{
 		unique_random_indexer()=default;
 		unique_random_indexer(std::size_t Size_){reset(Size_);}
 	public:
-		template<std::uniform_random_bit_generator URBG>
+		template<typename URBG>
 		std::size_t operator()(URBG&& Engine){
 			hmLib_assert(!Container.empty(), hmLib::numeric_exceptions::incorrect_arithmetic_request,
 						"Sampling is requested for empty sampler.");
@@ -194,7 +202,8 @@ namespace hmLib{
 		return unique_random_indexer(Size);
 	}
 
-	template<std::forward_iterator WeightIterator, std::uniform_random_bit_generator URBG>
+	template<std::forward_iterator WeightIterator, typename URBG>
+	requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 	std::vector<std::size_t> unique_roulette_index(WeightIterator Begin, WeightIterator End, std::size_t N, URBG&& Engine) {
 		hmLib_assert(Begin != End,hmLib::numeric_exceptions::incorrect_arithmetic_request,"WeightIterator must be positive distance.");
 
@@ -258,9 +267,10 @@ namespace hmLib{
 				CWeight.push_back(sum);
 			}
 		}
-		bool empty() const { return CWeight.empty()}
+		bool empty() const { return CWeight.empty();}
 		std::size_t size() const { return CWeight.size(); }
-		template<std::uniform_random_bit_generator URBG>
+		template<typename URBG>
+		requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
 		std::size_t operator()(URBG& Engine){
 			hmLib_assert(!empty(),hmLib::numeric_exceptions::incorrect_arithmetic_request,"Sampling is requested for empty sampler.");
 
@@ -283,6 +293,11 @@ namespace hmLib{
 			return Index;
 		}
 	};
+	template<std::forward_iterator WeightIterator>
+	auto make_unique_roulette_indexer(WeightIterator WeightBegin, WeightIterator WeightEnd){
+		using weight_type = std::iter_value_t<WeightIterator>;
+		return unique_roulette_indexer<weight_type>(WeightBegin,WeightEnd);
+	}
 }
 #
 #endif
